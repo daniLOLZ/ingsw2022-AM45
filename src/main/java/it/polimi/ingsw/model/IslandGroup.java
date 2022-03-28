@@ -98,7 +98,7 @@ public class IslandGroup {
 
     /**
      * Merges this islandGroup with the parameter
-     * @signals (UnmergeableException e) (*The two island groups have different tower color or are not adjacent*)
+     * @exception  UnmergeableException The two island groups have different tower color or are not adjacent
      * @param islandGroup the islandGroup to merge this with
      * @return A new IslandGroup, consisting of the two previous groups merged together, retaining all relevant information
      */
