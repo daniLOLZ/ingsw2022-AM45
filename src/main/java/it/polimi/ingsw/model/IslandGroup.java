@@ -7,8 +7,8 @@ import java.util.List;
 public class IslandGroup {
     private final int idGroup;
     private Collection<Island> islands;
-    private final IslandGroup nextIslandGroup;
-    private final IslandGroup prevIslandGroup;
+    private IslandGroup nextIslandGroup;
+    private IslandGroup prevIslandGroup;
     private Collection<StudentEnum> students;
     private TeamEnum towerColor;
 
@@ -19,6 +19,14 @@ public class IslandGroup {
         this.prevIslandGroup = prevIslandGroup;
         this.students = students;
         this.towerColor = towerColor;
+    }
+
+    public void setNextIslandGroup(IslandGroup nextIslandGroup) {
+        this.nextIslandGroup = nextIslandGroup;
+    }
+
+    public void setPrevIslandGroup(IslandGroup prevIslandGroup) {
+        this.prevIslandGroup = prevIslandGroup;
     }
 
     /**
