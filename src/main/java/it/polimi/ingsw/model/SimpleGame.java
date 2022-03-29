@@ -14,6 +14,8 @@ public class SimpleGame {
     private int studentsPerCloud;
     private int currentIslandGroupId;
 
+    public SimpleGame(int numPlayers){}
+
     /**
      * increments by one the current group id and returns it
      * this way there won't be, two equal IDs

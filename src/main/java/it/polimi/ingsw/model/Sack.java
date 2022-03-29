@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.Stack;
 
 public class Sack {
-    private Stack<StudentEnum> students;
+    protected Stack<StudentEnum> students;
 
     public Sack(int numStudentsByType){
         List<StudentEnum> studentsList = new ArrayList<>();
@@ -34,6 +34,7 @@ public class Sack {
     public boolean isEmpty(){
         return students.isEmpty();
     }
+    public int size(){return students.size();}
     private Stack<StudentEnum> shuffle(List<StudentEnum> studentList){
 
         Instant seed = Instant.now();
