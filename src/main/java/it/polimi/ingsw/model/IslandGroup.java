@@ -6,13 +6,13 @@ import java.util.List;
 
 public class IslandGroup {
     private final int idGroup;
-    private Collection<Island> islands;
+    private List<Island> islands;
     private IslandGroup nextIslandGroup;
     private IslandGroup prevIslandGroup;
-    private Collection<StudentEnum> students;
+    private List<StudentEnum> students;
     private TeamEnum towerColor;
 
-    public IslandGroup(int idGroup, Collection<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, Collection<StudentEnum> students, TeamEnum towerColor) {
+    public IslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor) {
         this.idGroup = idGroup;
         this.islands = islands;
         this.nextIslandGroup = nextIslandGroup;
@@ -27,6 +27,30 @@ public class IslandGroup {
 
     public void setPrevIslandGroup(IslandGroup prevIslandGroup) {
         this.prevIslandGroup = prevIslandGroup;
+    }
+
+    public IslandGroup getPrevIslandGroup() {
+        return prevIslandGroup;
+    }
+
+    public IslandGroup getNextIslandGroup() {
+        return nextIslandGroup;
+    }
+
+    public List<Island> getIslands() {
+        return islands;
+    }
+
+    public List<StudentEnum> getStudents() {
+        return students;
+    }
+
+    public TeamEnum getTowerColor() {
+        return towerColor;
+    }
+
+    public int getIdGroup() {
+        return idGroup;
     }
 
     /**
@@ -93,10 +117,10 @@ public class IslandGroup {
         }
 
         for (Player p : players) {
-            if (p.getTeamColor().equals(previousTeam) && p.isLeader() == true) {
-                p.getBoard().updateTowers(numOfIslandsInGroup());
+            if (p.getTeamColor().equals(previousTeam) && p.isLeader()) {
+                p.getBoard().updateTowers(-numOfIslandsInGroup());
             }
-            if (p.getTeamColor().equals(team) && p.isLeader() == true){
+            if (p.getTeamColor().equals(team) && p.isLeader()){
                 p.getBoard().updateTowers(numOfIslandsInGroup());
             }
         }
@@ -105,48 +129,49 @@ public class IslandGroup {
     }
 
     /**
-     * Merges this islandGroup with the parameter
-     * @exception  UnmergeableException The two island groups have different tower color or are not adjacent
-     * @param islandGroup the islandGroup to merge this with
-     * @return A new IslandGroup, consisting of the two previous groups merged together, retaining all relevant information
+     * Merges this islandGroup with the neighboring islands
+     * @param groups the List of IslandGroups to modify
+     * @param newId the id to assign the newly formed group
+     * @exception  UnmergeableException The island groups have different tower colors
      */
-    public IslandGroup mergeAdjacent(IslandGroup islandGroup, SimpleGame game) throws UnmergeableException{
-        if(!this.towerColor.equals(islandGroup.towerColor)){
+    public void mergeAdjacent(List<IslandGroup> groups, int newId) throws UnmergeableException{
+
+        //Checking if it can merge with any island at all
+        if(!towerColor.equals(nextIslandGroup.towerColor) && !towerColor.equals(prevIslandGroup.towerColor)){
             throw new UnmergeableException();
         }
 
-        // Finds which of the two island groups comes first
-        // throws an exception in case the two aren't adjacent
-        IslandGroup predecessor;
-        IslandGroup successor;
-        if(this.nextIslandGroup.equals(islandGroup) && islandGroup.prevIslandGroup.equals(this)){
-            predecessor = this;
-            successor = islandGroup;
+        // Attributes of the new island group
+        IslandGroup successor = this;
+        IslandGroup predecessor = this;
+        List<Island> mergedIslands = new ArrayList<>(this.islands);
+        List<StudentEnum> mergedStudents = new ArrayList<>(this.students);
+
+
+        // Finds what merging needs to happen (with the successor, the predecessor, or both),
+        // then updates the temporary island group
+        if (nextIslandGroup.towerColor.equals(towerColor)){
+            successor = nextIslandGroup;
+            mergedIslands.addAll(nextIslandGroup.islands);
+            mergedStudents.addAll(nextIslandGroup.students);
+            // Once we know the island must be merged, we remove it from the group
+            groups.remove(nextIslandGroup);
         }
-        else if(this.prevIslandGroup.equals(islandGroup) && islandGroup.nextIslandGroup.equals(this)){
-            predecessor = islandGroup;
-            successor = this;
-        }
-        else{
-            throw new UnmergeableException();
+        if(prevIslandGroup.towerColor.equals(towerColor)){
+            predecessor = prevIslandGroup;
+            mergedIslands.addAll(prevIslandGroup.islands);
+            mergedStudents.addAll(prevIslandGroup.students);
+            // Same as before
+            groups.remove(prevIslandGroup);
         }
 
-        // Prepare attributes of the new island group
-            // prepare pointers
+        // prepare pointers
         IslandGroup nextPointer = successor.nextIslandGroup;
         IslandGroup previousPointer = predecessor.prevIslandGroup;
-            // prepare islands forming the group
-        Collection<Island> mergedIslands = new ArrayList<Island>();
-        mergedIslands.addAll(this.islands);
-        mergedIslands.addAll(islandGroup.islands);
-            // prepare the new id
-        int mergedId = game.getNewCurrentIslandId();
-            // prepare the students on the island group
-        Collection<StudentEnum> mergedStudents = new ArrayList<StudentEnum>();
-        mergedStudents.addAll(this.students);
-        mergedStudents.addAll(islandGroup.students);
 
-        return new IslandGroup(mergedId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
+        IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
+
+        groups.add(mergedGroup);
     }
 
     /**
@@ -155,10 +180,6 @@ public class IslandGroup {
      */
     public void addStudent(StudentEnum student){
         students.add(student);
-    }
-
-    public IslandGroup getNextIslandGroup() {
-        return nextIslandGroup;
     }
 
     /**

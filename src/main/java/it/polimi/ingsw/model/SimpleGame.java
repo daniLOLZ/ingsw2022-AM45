@@ -13,8 +13,15 @@ public class SimpleGame {
     private int numTowers;
     private int studentsPerCloud;
     private int currentIslandGroupId;
+    private List<IslandGroup> islandGroups; // These are not in order of navigation, the order
+                                            // is given by the pointers
+    private List<Player> players;
+    private List<Cloud> clouds;
+    private MotherNature MN;
+    private Sack sack;
 
-    /**
+    @Deprecated
+    /*
      * increments by one the current group id and returns it
      * this way there won't be, two equal IDs
      * @return a new islandGroup id
