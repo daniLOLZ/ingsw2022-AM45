@@ -1,14 +1,14 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+
 
 public class IslandGroupTest {
 
@@ -16,7 +16,7 @@ public class IslandGroupTest {
     int numIslands = 10; //random amount of islands
     int islandGroupId = 0;
 
-    @Before
+    @BeforeEach
     public void initializeIslandGroup(){
 
         group = new ArrayList<>();
@@ -47,11 +47,11 @@ public class IslandGroupTest {
             curIsland = curIsland.getNextIslandGroup();
         }
         //After a full visit, we should end up at the exact same group
-        assertSame("The two groups aren't the same", firstGroup, curIsland);
+        assertSame(firstGroup, curIsland, "The two groups aren't the same");
 
         for (IslandGroup Is : group) {
-            assertSame("Error in assignment next -> prev",Is.getNextIslandGroup().getPrevIslandGroup(), Is);
-            assertSame("Error in assignment prev -> next",Is.getPrevIslandGroup().getNextIslandGroup(), Is);
+            assertSame(Is.getNextIslandGroup().getPrevIslandGroup(), Is, "Error in assignment next -> prev");
+            assertSame(Is.getPrevIslandGroup().getNextIslandGroup(), Is, "Error in assignment prev -> next");
         }
     }
 
@@ -62,8 +62,8 @@ public class IslandGroupTest {
     public void UnmergeableExceptionTest(){
 
         islandGroupId += 1;
-        //assertThrows(UnmergeableException.class, group.get(1).mergeAdjacent(group, islandGroupId));
-        assert(true); //TODO update junit to 5 to allow for assertThrows
+        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(group, islandGroupId));
+
     }
 
 
@@ -110,8 +110,8 @@ public class IslandGroupTest {
         totalIslands.addAll(g2.getIslands());
         totalIslands.addAll(g3.getIslands());
 
-        assertTrue("Students anomaly", totalStudents.containsAll(gMerged.getStudents()));
-        assertTrue("Islands anomaly", totalIslands.containsAll(gMerged.getIslands()));
+        assertTrue(totalStudents.containsAll(gMerged.getStudents()), "Students anomaly");
+        assertTrue(totalIslands.containsAll(gMerged.getIslands()), "Islands anomaly");
         assertEquals(gMerged.getNextIslandGroup(), g3.getNextIslandGroup());
         assertEquals(gMerged.getPrevIslandGroup(), g1.getPrevIslandGroup());
     }
