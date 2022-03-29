@@ -20,6 +20,8 @@ public class SimpleGame {
     private MotherNature MN;
     private Sack sack;
 
+    public SimpleGame(int numPlayers){}
+
     @Deprecated
     /*
      * increments by one the current group id and returns it
