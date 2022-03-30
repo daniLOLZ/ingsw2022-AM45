@@ -1,10 +1,16 @@
 package it.polimi.ingsw.model;
 
 public enum TeamEnum {
-    WHITE,
-    BLACK,
-    GREY,
-    NOTEAM;
+    WHITE(0),
+    BLACK(1),
+    GREY(2),
+    NOTEAM(3);
+
+    public int index;
+
+     TeamEnum(int index){
+        this.index = index;
+    }
 
     /**
      * returns the number of teams.

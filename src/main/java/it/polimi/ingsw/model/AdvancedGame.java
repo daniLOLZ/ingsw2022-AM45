@@ -12,6 +12,7 @@ public class AdvancedGame extends SimpleGame{
     private int AdditionalInfluence;
     private StudentEnum IgnoredStudentType;
     private List<CharacterCard> CharacterCards;
+    private IslandGroup islandToEvaluate;
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards){
         super(numPlayers);
@@ -20,6 +21,7 @@ public class AdvancedGame extends SimpleGame{
         MNAdditionalSteps = 0;
         CountTowers = false;
         AdditionalInfluence = 0;
+        islandToEvaluate = null;                           //useful for FlagBearer
         IgnoredStudentType = StudentEnum.NOSTUDENT;
         CharacterCards = new ArrayList<>();
 
@@ -56,6 +58,14 @@ public class AdvancedGame extends SimpleGame{
 
     public void setMNAdditionalSteps(int MNAdditionalSteps) {
         this.MNAdditionalSteps = MNAdditionalSteps;
+    }
+
+    public void setIslandToEvaluate(IslandGroup islandToEvaluate) {
+        this.islandToEvaluate = islandToEvaluate;
+    }
+
+    public IslandGroup getIslandToEvaluate() {
+        return islandToEvaluate;
     }
 }
 
