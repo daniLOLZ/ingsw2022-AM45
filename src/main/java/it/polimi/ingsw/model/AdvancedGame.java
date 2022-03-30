@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class AdvancedGame extends SimpleGame{
 
 
         for(int card= 0; card < numCharacterCards; card++){
-            CharacterCards.add(CharacterCardCreator.getCharacterCard(CharacterCards));
+            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards));
         }
 
     }

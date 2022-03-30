@@ -27,10 +27,6 @@ public enum StudentEnum {
      * If NOSTUDENT is always the last in the enumeration it is equal to the returned value.
      */
     public static int getNumStudentTypes() {
-        int numberOfTypes = 0;
-        for (StudentEnum i : StudentEnum.values()) {
-            numberOfTypes++;
-        }
-        return numberOfTypes;
+        return StudentEnum.values().length;
     }
 }

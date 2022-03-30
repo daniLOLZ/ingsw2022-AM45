@@ -33,5 +33,21 @@ public class SimpleGame {
         return currentIslandGroupId;
     }
 
+    public List<PlayerEnum> getProfessors() {
+        return professors;
+    }
+
+    public int getCurrentIslandGroupId() {
+        return currentIslandGroupId;
+    }
+
+    public List<IslandGroup> getIslandGroups() {
+        return islandGroups;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
     //TODO implement the rest of the class
 }

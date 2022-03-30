@@ -12,19 +12,20 @@ import java.util.List;
 
 public class IslandGroupTest {
 
+    SimpleGame game;
     List<IslandGroup> group;
     int numIslands = 10; //random amount of islands
     int islandGroupId = 0;
 
     @BeforeEach
     public void initializeIslandGroup(){
-
+        game = new SimpleGame(2);
         group = new ArrayList<>();
 
         for (islandGroupId = 0; islandGroupId < numIslands; islandGroupId++){
             List<Island> islList = new ArrayList<>();
             islList.add(new Island(islandGroupId));
-            group.add(new IslandGroup(islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.WHITE));
+            group.add(new IslandGroup(game, islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.WHITE));
 
         }
         group.get(0).setNextIslandGroup(group.get(1));
@@ -38,6 +39,9 @@ public class IslandGroupTest {
         //TODO Maybe implement a FactoryIslandGroupArray of some sort
     }
 
+    /**
+     * Does a round trip of the island groups and checks that all pointers are consistent.
+     */
     @Test
     public void properInitializationOfPointers(){
 
@@ -56,17 +60,21 @@ public class IslandGroupTest {
     }
 
     /**
-     * Tests merging of 3 island groups
+     * Tests merging exception with newly initialized island groups
+     * (run in @Before)
      */
     @Test
     public void UnmergeableExceptionTest(){
 
         islandGroupId += 1;
-        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(group, islandGroupId));
+        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(islandGroupId));
 
     }
 
-
+    /**
+     * Tests whether a simple merge between three islandGroups succeeds
+     * and keeps the internal state of the group consistent
+     */
     @Test public void mergeTest(){
         IslandGroup g1 = group.get(1);
         IslandGroup g2 = group.get(2);
@@ -87,7 +95,7 @@ public class IslandGroupTest {
         g3.build(TeamEnum.WHITE, players);
 
         try {
-            group.get(2).mergeAdjacent(group,islandGroupId+1);
+            group.get(2).mergeAdjacent(islandGroupId+1);
             islandGroupId++;
         }
         catch(UnmergeableException e){
@@ -114,5 +122,6 @@ public class IslandGroupTest {
         assertTrue(totalIslands.containsAll(gMerged.getIslands()), "Islands anomaly");
         assertEquals(gMerged.getNextIslandGroup(), g3.getNextIslandGroup());
         assertEquals(gMerged.getPrevIslandGroup(), g1.getPrevIslandGroup());
+        assertEquals(gMerged.getTowerColor(), g1.getTowerColor());
     }
 }

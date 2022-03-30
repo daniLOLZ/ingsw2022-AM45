@@ -11,10 +11,6 @@ public enum TeamEnum {
      * If NOTEAM is always the last in the enumeration it is equal to the returned value.
      */
     public static int getNumTeams(){
-        int numberOfTeams = 0;
-        for(TeamEnum i : TeamEnum.values()){
-            numberOfTeams++;
-        }
-        return numberOfTeams;
+        return TeamEnum.values().length;
     }
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class IslandGroup {
+    private SimpleGame game;
     private final int idGroup;
     private List<Island> islands;
     private IslandGroup nextIslandGroup;
@@ -12,7 +13,8 @@ public class IslandGroup {
     private List<StudentEnum> students;
     private TeamEnum towerColor;
 
-    public IslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor) {
+    public IslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor) {
+        this.game = game;
         this.idGroup = idGroup;
         this.islands = islands;
         this.nextIslandGroup = nextIslandGroup;
@@ -56,39 +58,39 @@ public class IslandGroup {
     /**
      * Evaluates which team has the most influence
      * If two or more teams have the same influence, returns TeamEnum.NOTEAM
-     * @param professors Copy of the SimpleGame.professors collection
      * @return the Team with the most influence on this IslandGroup
      */
-    public TeamEnum evaluateMostInfluential(List<PlayerEnum> professors, List<Player> players){
+    public TeamEnum evaluateMostInfluential(){
         int maximumInfluence = 0;
         TeamEnum mostInfluentialTeam = TeamEnum.NOTEAM;
 
-        for (TeamEnum t : TeamEnum.values()){
+        for (TeamEnum currentTeam : TeamEnum.values()){
+
             // There's no point in checking NOTEAM's influence
-            if(t.equals(TeamEnum.NOTEAM)){
-                break;
+            if(currentTeam.equals(TeamEnum.NOTEAM)){
+                continue;
             }
 
             int currentInfluence = 0;
-            TeamEnum currentTeam = TeamEnum.NOTEAM;
 
             // Check influence of towers
-            if (towerColor.equals(t)){
+            if (towerColor.equals(currentTeam)){
                 currentInfluence += numOfIslandsInGroup();
             }
 
             // Check influence of students
             for (StudentEnum s : StudentEnum.values()){
-                PlayerEnum professorOwner = professors.get(s.ordinal());
-                for (Player player : players){
+                PlayerEnum professorOwner = game.getProfessors().get(s.ordinal());
+
+                for (Player player : game.getPlayers()){
                     if(player.getPlayerId().equals(professorOwner)){ // if a player owns the current professor
-                       if(t.equals(player.getTeamColor())){ // and if the player is of the current team that's being checked
-                            currentInfluence += numberOfStudentsOfColor(s);
+                       if(currentTeam.equals(player.getTeamColor())) { // and if the player is of the current team that's being checked
+                           currentInfluence += numberOfStudentsOfColor(s);
                        }
-                       break;
                     }
                 }
             }
+
             if (currentInfluence > maximumInfluence){
                 maximumInfluence = currentInfluence;
                 mostInfluentialTeam = currentTeam;
@@ -99,6 +101,7 @@ public class IslandGroup {
         }
         return mostInfluentialTeam;
     }
+
 
     /**
      * Builds the towers according to the evaluation of the most influential Team
@@ -129,12 +132,16 @@ public class IslandGroup {
     }
 
     /**
-     * Merges this islandGroup with the neighboring islands
-     * @param groups the List of IslandGroups to modify
+     * Merges this islandGroup with the neighboring islands and updates the IslandGroup collection in game
      * @param newId the id to assign the newly formed group
      * @exception  UnmergeableException The island groups have different tower colors
      */
-    public void mergeAdjacent(List<IslandGroup> groups, int newId) throws UnmergeableException{
+    public void mergeAdjacent(int newId) throws UnmergeableException{
+
+        //Checks if the island has a tower built on top of it
+        if(towerColor.equals(TeamEnum.NOTEAM)){
+            throw new UnmergeableException();
+        }
 
         //Checking if it can merge with any island at all
         if(!towerColor.equals(nextIslandGroup.towerColor) && !towerColor.equals(prevIslandGroup.towerColor)){
@@ -155,23 +162,23 @@ public class IslandGroup {
             mergedIslands.addAll(nextIslandGroup.islands);
             mergedStudents.addAll(nextIslandGroup.students);
             // Once we know the island must be merged, we remove it from the group
-            groups.remove(nextIslandGroup);
+            game.getIslandGroups().remove(nextIslandGroup);
         }
         if(prevIslandGroup.towerColor.equals(towerColor)){
             predecessor = prevIslandGroup;
             mergedIslands.addAll(prevIslandGroup.islands);
             mergedStudents.addAll(prevIslandGroup.students);
             // Same as before
-            groups.remove(prevIslandGroup);
+            game.getIslandGroups().remove(prevIslandGroup);
         }
 
         // prepare pointers
         IslandGroup nextPointer = successor.nextIslandGroup;
         IslandGroup previousPointer = predecessor.prevIslandGroup;
 
-        IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
+        IslandGroup mergedGroup = new IslandGroup(game, newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
 
-        groups.add(mergedGroup);
+        game.getIslandGroups().add(mergedGroup); // possibly unsafe handling of game attribute
     }
 
     /**

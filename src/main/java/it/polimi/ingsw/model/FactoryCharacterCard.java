@@ -7,7 +7,7 @@ import java.util.List;
  * with listCardsGot param you can create a random card without create two identical cards.
  * this class has field numCharacterCards with the amount of cards that can be created
  */
-public class  CharacterCardCreator {
+public class FactoryCharacterCard {
 
     public final static int numCharacterCards = 12;
 
