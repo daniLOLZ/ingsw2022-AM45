@@ -47,8 +47,6 @@ public class Player {
         this.assistantPlayed = assistant;
     }
 
-    //FIXME discuss the utility of playAssistant and setAssistantPlayed
-
     /**
      * Plays the assistant by setting it as assistantPlayed
      * @param assistantId id of the assistant to play

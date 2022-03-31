@@ -19,24 +19,9 @@ public class IslandGroupTest {
 
     @BeforeEach
     public void initializeIslandGroup(){
-        game = new SimpleGame(2);
-        group = new ArrayList<>();
 
-        for (islandGroupId = 0; islandGroupId < numIslands; islandGroupId++){
-            List<Island> islList = new ArrayList<>();
-            islList.add(new Island(islandGroupId));
-            group.add(new IslandGroup(game, islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.WHITE));
+        group = IslandGroup.getCollectionOfIslandGroup(game,0, 10);
 
-        }
-        group.get(0).setNextIslandGroup(group.get(1));
-        group.get(0).setPrevIslandGroup(group.get(numIslands-1));
-        group.get(numIslands-1).setNextIslandGroup(group.get(0));
-        group.get(numIslands-1).setPrevIslandGroup(group.get(numIslands-2));
-        for(int i = 1; i < numIslands-1;i++){
-            group.get(i).setPrevIslandGroup(group.get(i-1));
-            group.get(i).setNextIslandGroup(group.get(i+1));
-        }
-        //TODO Maybe implement a FactoryIslandGroupArray of some sort
     }
 
     /**

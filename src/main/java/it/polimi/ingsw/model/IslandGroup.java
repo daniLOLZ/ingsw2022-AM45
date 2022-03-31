@@ -23,11 +23,59 @@ public class IslandGroup {
         this.towerColor = towerColor;
     }
 
-    public void setNextIslandGroup(IslandGroup nextIslandGroup) {
+    public IslandGroup(IslandGroup island){
+        this.game = island.game;
+        this.idGroup = island.idGroup;
+        this.islands = island.islands;
+        this.nextIslandGroup = island.nextIslandGroup;
+        this.prevIslandGroup = island.prevIslandGroup;
+        this.students = island.students;
+        this.towerColor = island.towerColor;
+    }
+
+    public static IslandGroup getIslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor){
+        return new IslandGroup(game, idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor);
+    }
+
+    /**
+     * Creates a collection of island groups with no useful data inside except for
+     * the linkage between these island groups
+     * @requires amount > 0
+     * @param startingId Starting id for the IslandGroups
+     * @param amount Amount of IslandGroups to have in the collection.
+     *               if the amount is 1, the next and previous pointers will refer to
+     *               the single island group in the collection
+     * @return A collection of island groups, ordered cyclically
+     */
+    public static List<IslandGroup> getCollectionOfIslandGroup(SimpleGame game, int startingId, int amount){
+
+        List<IslandGroup> returnList = new ArrayList<>();
+        for (int islandGroupId = startingId; islandGroupId < startingId+amount; islandGroupId++){
+            List<Island> islList = new ArrayList<>();
+            islList.add(new Island(islandGroupId));
+            returnList.add(new IslandGroup(game, islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.NOTEAM));
+        }
+
+        IslandGroup first = returnList.get(0);
+        IslandGroup last = returnList.get(amount-1);
+
+        first.setPrevIslandGroup(last);
+        last.setNextIslandGroup(first);
+
+        for(int index = 1; index < amount; index++){
+            returnList.get(index).setPrevIslandGroup(returnList.get(index-1));
+            returnList.get(index-1).setNextIslandGroup(returnList.get(index));
+        }
+
+        return returnList;
+
+    }
+
+    private void setNextIslandGroup(IslandGroup nextIslandGroup) {
         this.nextIslandGroup = nextIslandGroup;
     }
 
-    public void setPrevIslandGroup(IslandGroup prevIslandGroup) {
+    private void setPrevIslandGroup(IslandGroup prevIslandGroup) {
         this.prevIslandGroup = prevIslandGroup;
     }
 
@@ -63,6 +111,8 @@ public class IslandGroup {
     public TeamEnum evaluateMostInfluential(){
         int maximumInfluence = 0;
         TeamEnum mostInfluentialTeam = TeamEnum.NOTEAM;
+        PlayerEnum professorOwner;
+        TeamEnum owningTeam;
 
         for (TeamEnum currentTeam : TeamEnum.values()){
 
@@ -71,6 +121,9 @@ public class IslandGroup {
                 continue;
             }
 
+            professorOwner = PlayerEnum.NOPLAYER;
+            owningTeam = TeamEnum.NOTEAM;
+
             int currentInfluence = 0;
 
             // Check influence of towers
@@ -78,9 +131,9 @@ public class IslandGroup {
                 currentInfluence += numOfIslandsInGroup();
             }
 
-            // Check influence of students
+            /* Check influence of students
             for (StudentEnum s : StudentEnum.values()){
-                PlayerEnum professorOwner = game.getProfessors().get(s.ordinal());
+                professorOwner = game.getProfessors().get(s.ordinal());
 
                 for (Player player : game.getPlayers()){
                     if(player.getPlayerId().equals(professorOwner)){ // if a player owns the current professor
@@ -90,6 +143,22 @@ public class IslandGroup {
                     }
                 }
             }
+            */
+            // Checks influence of students
+            for(StudentEnum stud : students){
+                professorOwner = game.getProfessors().get(stud.ordinal());
+
+                //Finds which team that owner is part of
+                for (Player player : game.getPlayers()){
+                    if(player.getPlayerId().equals(professorOwner)){
+                        owningTeam = player.getTeamColor();
+                    }
+                }
+
+                // adds one to the influence if it's the current team being checked
+                if (owningTeam.equals(currentTeam)) currentInfluence++;
+            }
+
 
             if (currentInfluence > maximumInfluence){
                 maximumInfluence = currentInfluence;
