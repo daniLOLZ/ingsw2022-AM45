@@ -1,10 +1,10 @@
 package it.polimi.ingsw.model;
 
-public class Glutton extends CharacterCard{
+public class Centaur extends CharacterCard{
 
     @Override
     public void activateEffect(AdvancedGame game) {
-        game.setDrawIsWin(true);
+        game.setCountTowers(false);
     }
 
 }
