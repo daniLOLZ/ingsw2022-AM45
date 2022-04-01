@@ -1,6 +1,9 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.characterCards;
 
-public class FlagBearer extends CharacterCard{
+import it.polimi.ingsw.model.AdvancedGame;
+import it.polimi.ingsw.model.CharacterCard;
+
+public class FlagBearer extends CharacterCard {
 
     @Override
     public void activateEffect(AdvancedGame game) {

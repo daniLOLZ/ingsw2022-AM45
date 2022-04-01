@@ -2,13 +2,15 @@ package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
 
 public class Board {
 
     private int numberOfTowers;
     private TeamEnum towerColor;
-    private ArrayList<StudentEnum> studentsAtEntrance;
-    private ArrayList<Integer> studentsPerTable;
+    private List<StudentEnum> studentsAtEntrance;
+    private List<Integer> studentsPerTable;
     private Integer selectedEntranceStudentPos;
 
     public Board(int numTowers, TeamEnum colorTeam){
@@ -27,14 +29,18 @@ public class Board {
         numberOfTowers = numTowers;
     }
 
-    void setSelectedEntranceStudentPos(int pos){
+    public void setSelectedEntranceStudentPos(int pos){
         selectedEntranceStudentPos = pos;
     }
 
+    public int getNumberOfTowers() {return numberOfTowers;}
+
+    public TeamEnum getTowerColor() {return towerColor;}
+
     /**
-     * remove Student from studentsAtEntrance.
+     * remove Student from studentsAtEntrance
      * add 1 Student to right position of StudentsPerTable
-     * calls updateProfessors;
+     * calls updateProfessors
      * resets selectedEntranceStudentPos
      * @return moved student's type
      */
@@ -44,14 +50,60 @@ public class Board {
 
         int studentsOnTable = studentsPerTable.get(student.ordinal());
 
-        if (studentsOnTable >= 10) return StudentEnum.NOSTUDENT; //TODO remove hardcoding
+        //table is full
+        //TODO remove hardcoding
+        if (studentsOnTable >= 10) return StudentEnum.NOSTUDENT;
 
+        //remove student from entrance
         studentsAtEntrance.remove(selectedEntranceStudentPos.intValue());
 
+        //add student to table
         studentsPerTable.set(student.ordinal(), studentsOnTable + 1);
 
         selectedEntranceStudentPos = null;
 
         return student;
+    }
+
+
+    /**
+     * removes the right student from studentsAtEntrance
+     * adds 1 student, of the right type, in chosenIsland
+     * @param chosenIsland the IslandGroup selected by the current player
+     */
+    public void moveFromEntranceToIsland(IslandGroup chosenIsland){
+
+        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos);
+
+        //remove student from entrance
+        studentsAtEntrance.remove(selectedEntranceStudentPos.intValue());
+
+        //adds the student to the IslandGroup
+        chosenIsland.addStudent(student);
+    }
+
+    //should this method be here?
+    void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
+
+        //TODO remove hardcoding
+        if (studentsAtEntrance.size() == 7) throw new FullEntranceException();
+
+        int studentsOnTable = studentsPerTable.get(chosenTable.ordinal());
+        studentsPerTable.set(chosenTable.ordinal(), studentsOnTable - 1);
+
+        studentsAtEntrance.add(chosenTable);
+    }
+
+    /**
+     * call empty from chosenCloud and add the elements of the obtained collection to studentsAtEntrance collection
+     * @param chosenCloud the Cloud chosen by the current player
+     */
+    public void moveFromCloud(Cloud chosenCloud){
+
+        //get students from chosenCloud
+        Collection<StudentEnum> students = chosenCloud.empty();
+
+        //adds the returned students to the Entrance
+        studentsAtEntrance.addAll(students);
     }
 }
