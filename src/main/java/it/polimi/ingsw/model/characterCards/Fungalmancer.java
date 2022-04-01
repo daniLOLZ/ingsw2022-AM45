@@ -2,17 +2,17 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
 
-public class FlagBearer extends CharacterCard {
+public class Fungalmancer extends CharacterCard {
 
-    public FlagBearer(){
-        super(3,3);
+    public Fungalmancer(){
+        super(3,9);
     }
 
     @Override
     public void activateEffect(AdvancedGame game) {
 
         super.activateEffect(game);
-        game.setIslandToEvaluateDue(true);
 
+        game.setIgnoredStudent(true);
     }
 }

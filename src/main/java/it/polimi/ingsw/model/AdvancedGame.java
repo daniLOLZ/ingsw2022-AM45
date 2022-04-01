@@ -1,27 +1,39 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.characterCards.CharacterCard;
+import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class AdvancedGame extends SimpleGame{
     private int numCoins;
-    private boolean drawIsWin;
-    private int MNAdditionalSteps;
-    private boolean CountTowers;
-    private int AdditionalInfluence;
-    private StudentEnum IgnoredStudentType;
-    private List<CharacterCard> CharacterCards;
-    private IslandGroup islandToEvaluate;
+    private boolean drawIsWin;                             //Glutton effect active
+    private int idCharacterCardActive;                     //CharacterCard active this round
+    private int TradeableStudent;                          //Minstrel(or Juggler) effect active when != 0
+    private boolean IslandToEvaluateDue;                   //FlagBearer effect active
+    private int MNAdditionalSteps;                         //Mailman effect active
+    private boolean CountTowers;                           //Centaur effect active
+    private int AdditionalInfluence;                       //Knight effect active when != 0
+    private boolean isIgnoredStudent;                      //Fungalmacer effect active
+    private StudentEnum ChoosenStudentType;                //useful for LoanShark,Fungalmancer
+    private final List<CharacterCard> CharacterCards;
+    private AdvancedIslandGroup choosenIsland;             //useful for FlagBearer, Herbalist
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards){
         super(numPlayers);
+        sack = new AdvancedSack(26);
         this.numCoins = numCoins;
         drawIsWin = false;
         MNAdditionalSteps = 0;
         CountTowers = false;
+        isIgnoredStudent = false;
+        idCharacterCardActive = 0;
+        IslandToEvaluateDue = false;
         AdditionalInfluence = 0;
-        islandToEvaluate = null;                           //useful for FlagBearer
-        IgnoredStudentType = StudentEnum.NOSTUDENT;
+        TradeableStudent = 0;
+        choosenIsland = null;
+        ChoosenStudentType = StudentEnum.NOSTUDENT;
         CharacterCards = new ArrayList<>();
 
 
@@ -35,8 +47,13 @@ public class AdvancedGame extends SimpleGame{
         drawIsWin = false;
         MNAdditionalSteps = 0;
         CountTowers = false;
+        isIgnoredStudent = false;
+        idCharacterCardActive = 0;
+        IslandToEvaluateDue = false;
         AdditionalInfluence = 0;
-        IgnoredStudentType = StudentEnum.NOSTUDENT;
+        TradeableStudent = 0;
+        ChoosenStudentType = StudentEnum.NOSTUDENT;
+        choosenIsland = null;
     }
 
     public void setAdditionalInfluence(int additionalInfluence) {
@@ -51,20 +68,56 @@ public class AdvancedGame extends SimpleGame{
         this.drawIsWin = drawIsWin;
     }
 
-    public void setIgnoredStudentType(StudentEnum ignoredStudentType) {
-        IgnoredStudentType = ignoredStudentType;
+    public void setChoosenStudentType(StudentEnum type) {
+        ChoosenStudentType = type;
     }
 
     public void setMNAdditionalSteps(int MNAdditionalSteps) {
         this.MNAdditionalSteps = MNAdditionalSteps;
     }
 
-    public void setIslandToEvaluate(IslandGroup islandToEvaluate) {
-        this.islandToEvaluate = islandToEvaluate;
+    public void setIslandToEvaluate(AdvancedIslandGroup choosenIsland) {
+        this.choosenIsland = choosenIsland;
     }
 
-    public IslandGroup getIslandToEvaluate() {
-        return islandToEvaluate;
+    public AdvancedIslandGroup getChoosenIsland() {
+        return choosenIsland;
+    }
+
+    public void setIgnoredStudent(boolean ignoredStudent) {
+        isIgnoredStudent = ignoredStudent;
+    }
+
+    public int getIdCharacterCardActive() {
+        return idCharacterCardActive;
+    }
+
+    public void UsedCharacterCard(int id) {
+        idCharacterCardActive= id;
+    }
+
+    public int getTradeableStudent() {
+        return TradeableStudent;
+    }
+
+    public void setTradeableStudent(int tradeableStudent) {
+        TradeableStudent = tradeableStudent;
+    }
+
+    public void setChoosenIsland(AdvancedIslandGroup choosenIsland) {
+        this.choosenIsland = choosenIsland;
+    }
+
+    public StudentEnum getChoosenStudentType() {
+        return ChoosenStudentType;
+    }
+
+    public void setIslandToEvaluateDue(boolean islandToEvaluateDue) {
+        IslandToEvaluateDue = islandToEvaluateDue;
+    }
+
+    public boolean IslandToEvaluateDue() {
+        return IslandToEvaluateDue;
     }
 }
 

@@ -106,4 +106,28 @@ public class Board {
         //adds the returned students to the Entrance
         studentsAtEntrance.addAll(students);
     }
+
+    public List<StudentEnum> removeNStudentsFromHall(StudentEnum colorStudent, int numToSubtract){
+        List<StudentEnum> returnList = new ArrayList<>();
+
+        //TODO
+
+        return returnList;
+    }
+
+    public void addToEntrance(StudentEnum studentToAdd){
+        studentsAtEntrance.add(studentToAdd);
+    }
+
+    public void addToHall(StudentEnum student){
+
+        Integer previousNumStudents = studentsPerTable.get(student.index);
+        studentsPerTable.set(student.index, previousNumStudents++);
+    }
+
+    public StudentEnum removeFromHall(StudentEnum color){
+        Integer previousNumStudents = studentsPerTable.get(color.index);
+        studentsPerTable.set(color.index, previousNumStudents--);
+        return color;
+    }
 }

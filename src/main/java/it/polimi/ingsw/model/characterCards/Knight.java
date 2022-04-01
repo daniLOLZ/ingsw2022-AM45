@@ -1,14 +1,19 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.CharacterCard;
 
 public class Knight extends CharacterCard {
 
-    private final int addabelInfluent = 2;
+    private final int addableInfluent = 2;
+
+    public Knight(){
+        super(2,8);
+    }
 
     @Override
     public void activateEffect(AdvancedGame game) {
-        game.setAdditionalInfluence(addabelInfluent);
+
+        super.activateEffect(game);
+        game.setAdditionalInfluence(addableInfluent);
     }
 }

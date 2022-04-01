@@ -18,7 +18,7 @@ public class SimpleGame {
     private List<Player> players;
     private List<Cloud> clouds;
     private MotherNature MN;
-    private Sack sack;
+    protected Sack sack;
 
     public SimpleGame(int numPlayers){}
 
@@ -53,4 +53,13 @@ public class SimpleGame {
         return islandGroups;
     }
     //TODO implement the rest of the class
+
+
+    public Sack getSack() {
+        return sack;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
 }
