@@ -27,6 +27,7 @@ public class Board {
      */
     public void updateTowers(int numTowers){
         numberOfTowers = numTowers;
+        //TODO should notify the controller that the game is over
     }
 
     public void setSelectedEntranceStudentPos(int pos){

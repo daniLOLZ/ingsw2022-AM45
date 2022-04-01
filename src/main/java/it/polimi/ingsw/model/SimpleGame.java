@@ -33,6 +33,10 @@ public class SimpleGame {
         return currentIslandGroupId;
     }
 
+    public int getNumTowers() {
+        return numTowers;
+    }
+
     public List<PlayerEnum> getProfessors() {
         return professors;
     }

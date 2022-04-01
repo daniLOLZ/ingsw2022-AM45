@@ -180,6 +180,7 @@ public class IslandGroup {
      */
     public void build(TeamEnum team, List<Player> players){
 
+        int oldTowers;
         TeamEnum previousTeam = towerColor;
         if(team.equals(TeamEnum.NOTEAM)) {
             return;
@@ -190,10 +191,12 @@ public class IslandGroup {
 
         for (Player p : players) {
             if (p.getTeamColor().equals(previousTeam) && p.isLeader()) {
-                p.getBoard().updateTowers(-numOfIslandsInGroup());
+                oldTowers = p.getBoard().getNumberOfTowers();
+                p.getBoard().updateTowers(oldTowers-numOfIslandsInGroup());
             }
             if (p.getTeamColor().equals(team) && p.isLeader()){
-                p.getBoard().updateTowers(numOfIslandsInGroup());
+                oldTowers = p.getBoard().getNumberOfTowers();
+                p.getBoard().updateTowers(oldTowers+numOfIslandsInGroup());
             }
         }
         towerColor = team;

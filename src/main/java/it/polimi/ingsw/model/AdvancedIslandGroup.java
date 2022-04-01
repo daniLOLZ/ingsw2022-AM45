@@ -15,6 +15,16 @@ public class AdvancedIslandGroup extends IslandGroup {
         super(game, idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor);
         this.blockTiles = new ArrayList<>(blockTiles);
     }
+
+    /**
+     *
+     * @param game The game hosting the collection
+     * @param startingId Starting id for the IslandGroups
+     * @param amount Amount of IslandGroups to have in the collection.
+     *               if the amount is 1, the next and previous pointers will refer to
+     *               the single island group in the collection
+     * @return a collection of AdvancedIslandGroup
+     */
     public List<AdvancedIslandGroup> getCollectionAdvancedIslandGroup(AdvancedGame game, int startingId, int amount){
         List<IslandGroup> simpleIslands = getCollectionOfIslandGroup(game, startingId, amount);
         List<AdvancedIslandGroup> advancedIslands = new ArrayList<>();
