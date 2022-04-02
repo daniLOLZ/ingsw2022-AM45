@@ -1,12 +1,13 @@
 package it.polimi.ingsw.model;
 
 import java.util.Collection;
+import java.util.List;
 
 public class Wizard {
-    private final int idWizard;
-    private Collection<Assistant> assistants;
+    private final int idWizard;                 //ID    0   10  20  30
+    private List<Assistant> assistants;
 
-    public Wizard(int idWizard, Collection<Assistant> assistants){
+    public Wizard(int idWizard, List<Assistant> assistants){
         this.idWizard = idWizard;
         this.assistants = assistants;
     }
@@ -29,5 +30,13 @@ public class Wizard {
 
     public boolean isEmpty(){
         return assistants.isEmpty();
+    }
+
+    public int size(){
+        return assistants.size();
+    }
+
+    public Assistant getAssistant(int index){
+        return assistants.get(index);
     }
 }

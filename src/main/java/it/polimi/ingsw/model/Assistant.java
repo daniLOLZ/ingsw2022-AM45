@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model;
 
+import java.util.Objects;
+
 public class Assistant {
     public final int id;
 
@@ -22,5 +24,18 @@ public class Assistant {
 
     public int getTurnOrder() {
         return turnOrder;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Assistant assistant = (Assistant) o;
+        return motherNatureSteps == assistant.motherNatureSteps && turnOrder == assistant.turnOrder;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(motherNatureSteps, turnOrder);
     }
 }
