@@ -18,6 +18,9 @@ public class Board {
         towerColor = colorTeam;
         studentsAtEntrance = new ArrayList<StudentEnum>();
         studentsPerTable = new ArrayList<Integer>();
+        for(int position = 0; position < StudentEnum.values().length; position++){
+            studentsPerTable.add(0);
+        }
         selectedEntranceStudentPos = null;
     }
 
@@ -83,8 +86,8 @@ public class Board {
         chosenIsland.addStudent(student);
     }
 
-    //should this method be here?
-    void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
+    //should this method be here?YES
+    public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
 
         //TODO remove hardcoding
         if (studentsAtEntrance.size() == 7) throw new FullEntranceException();
@@ -123,12 +126,25 @@ public class Board {
     public void addToHall(StudentEnum student){
 
         Integer previousNumStudents = studentsPerTable.get(student.index);
-        studentsPerTable.set(student.index, previousNumStudents++);
+        previousNumStudents = new Integer(previousNumStudents.intValue() + 1);
+        studentsPerTable.set(student.index, previousNumStudents);
     }
 
     public StudentEnum removeFromHall(StudentEnum color){
         Integer previousNumStudents = studentsPerTable.get(color.index);
         studentsPerTable.set(color.index, previousNumStudents--);
         return color;
+    }
+
+    public StudentEnum getAtEntrance(int index){
+        return studentsAtEntrance.get(index);
+    }
+
+    public int EntranceSize(){
+        return studentsAtEntrance.size();
+    }
+
+    public Integer getStudentsPerTable(StudentEnum color) {
+        return studentsPerTable.get(color.index);
     }
 }

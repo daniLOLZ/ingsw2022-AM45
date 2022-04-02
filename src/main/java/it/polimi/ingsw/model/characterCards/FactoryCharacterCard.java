@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.characterCards;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,7 +60,67 @@ public class FactoryCharacterCard {
             else
                 return x;
         }
-        //TODO
         return x;
+    }
+
+    public static CharacterCard getSpecificCard(int id){
+        if(id == 1)
+            return  new Priest();
+        if(id == 2)
+            return  new Glutton();
+        if(id == 3)
+            return  new FlagBearer();
+        if(id == 4)
+            return  new Mailman();
+        if(id == 5)
+            return  new Herbalist();
+        if(id == 6)
+            return  new Centaur();
+        if(id == 7)
+            return  new Juggler();
+        if(id == 8)
+            return  new Knight();
+        if(id == 9)
+            return  new Fungalmancer();
+        if(id == 10)
+            return  new Minstrel();
+        if(id == 11)
+            return  new Dame();
+        if(id == 12)
+            return  new LoanShark();
+
+        return new Glutton();
+    }
+
+    public static CharacterCard getCharacterCard(){
+        List<CharacterCard> list = new ArrayList<>();
+        return getCharacterCard(list);
+    }
+
+    public static List<CharacterCard> getAllCards(){
+        List<CharacterCard> listCards = new ArrayList<>();
+        listCards.add(new Priest());
+        listCards.add(new Glutton());
+        listCards.add(new FlagBearer());
+        listCards.add(new Mailman());
+        listCards.add(new Herbalist());
+        listCards.add(new Centaur());
+        listCards.add(new Juggler());
+        listCards.add(new Knight());
+        listCards.add(new Fungalmancer());
+        listCards.add(new Minstrel());
+        listCards.add(new Dame());
+        listCards.add(new LoanShark());
+
+        return  listCards;
+    }
+
+    public static List<CharacterCard> getInitialEffectCards(){
+        List<CharacterCard> listCards = new ArrayList<>();
+        listCards.add(new Juggler());
+        listCards.add(new Dame());
+        listCards.add(new Priest());
+
+        return  listCards;
     }
 }

@@ -1,9 +1,6 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.Board;
-import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.*;
 
 public class Minstrel extends CharacterCard {
 
@@ -21,15 +18,22 @@ public class Minstrel extends CharacterCard {
         game.setTradeableStudent(maxTradeableStudents);
     }
 
-    //TODO waiting Board implementation
-    /*
-    public void tradeStudents(Player player, StudentEnum colorEntrance, StudentEnum colorHall){
+
+
+    public void tradeStudents(Player player, int indexStudentEntrance, StudentEnum colorHall){
         if(trades > 2)
             return;
 
         Board board = player.getBoard();
-        board.addToHall();
+        board.setSelectedEntranceStudentPos(indexStudentEntrance);
+        board.moveFromEntranceToHall();
+        try {
+            board.moveFromHallToEntrance(colorHall);
+        } catch (FullEntranceException e) {
+            e.printStackTrace();
+            return;
+        }
         trades++;
     }
-    */
+
 }

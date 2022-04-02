@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
 import it.polimi.ingsw.model.AdvancedIslandGroup;
+import it.polimi.ingsw.model.IslandGroup;
 
 public class Priest extends InitialEffect{
     private final int startingStudents = 4;
@@ -21,7 +22,7 @@ public class Priest extends InitialEffect{
 
     }
 
-    public void placeStudentOnIsland(AdvancedGame game, AdvancedIslandGroup island, int studentIndex){
+    public void placeStudentOnIsland(AdvancedGame game, IslandGroup island, int studentIndex){
         island.addStudent(removeStudent(studentIndex));
 
         if(!game.getSack().isEmpty())
