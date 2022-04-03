@@ -1,8 +1,9 @@
 package it.polimi.ingsw.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.sun.jdi.ArrayReference;
+
+import java.util.*;
+
 
 public class SimpleGame {
     private final int numPlayers;
@@ -18,7 +19,7 @@ public class SimpleGame {
     private int currentIslandGroupId;
     private List<IslandGroup> islandGroups; // These are not in order of navigation, the order
                                             // is given by the pointers
-    private List<Player> players;
+    private List<Player> players; // These will not be in order, they will get shifted around
     private List<Cloud> clouds;
     private MotherNature MN;
     protected Sack sack;
@@ -35,6 +36,7 @@ public class SimpleGame {
         //TODO see if possible to not hardcode player constructors
         //TODO handle nicknames
         int numberOfClouds = numPlayers;
+        this.hasBeenInitialized = false;
         this.amountOfIslands = 12;
         this.numPlayers = numPlayers;
         this.maxStudentsByType = 120/StudentEnum.getNumStudentTypes();
@@ -85,7 +87,7 @@ public class SimpleGame {
         }
     }
 
-    //TODO add an override with in AdvancedGame
+    //TODO add an override within AdvancedGame
     public void initializeGame(){
         //We must not initialize twice
         if (hasBeenInitialized == true) return;
@@ -114,6 +116,75 @@ public class SimpleGame {
      */
     private void createPlayingSack(){
         sack = new Sack(24);
+    }
+
+    /**
+     * Checks whether a professor needs to change hands by comparing the respective tables
+     * in the players' boards
+     * @param professor the professor who needs to checked for updates
+     */
+    public void updateProfessor(StudentEnum professor){
+        int maximumStudents = 0;
+        int numberOfStudents;
+        PlayerEnum currentWinner = PlayerEnum.NOPLAYER;
+
+        for(Player player : players){
+            numberOfStudents = player.getBoard().getStudentsPerTable(professor);
+            if (numberOfStudents > maximumStudents){
+                maximumStudents = numberOfStudents;
+                currentWinner = player.getPlayerId();
+            }
+            if (numberOfStudents == maximumStudents){
+                currentWinner = PlayerEnum.NOPLAYER;
+            }
+        }
+        if(!currentWinner.equals(PlayerEnum.NOPLAYER)) {
+            assignProfessor(professor, currentWinner);
+        }
+    }
+
+    /**
+     * Updates the professor assigning it to the player chosen
+     * @param professor the professor's color
+     * @param player the player to assign it to
+     */
+    private void assignProfessor(StudentEnum professor, PlayerEnum player){
+        this.professors.set(professor.ordinal(), player);
+    }
+
+    public void sortPlayers(){
+        List<Player> newPlayerOrder = new ArrayList<>();
+
+        // We need to account for the possibility of two (or more) players playing the same card
+        // so we need to remember the previous turn order
+        // we do this by using the player List, which will be kept in this order until
+        // the end of this method
+        newPlayerOrder.addAll(players);
+        newPlayerOrder.sort(Comparator.comparingInt((Player p) -> p.getAssistantPlayed().getTurnOrder()));
+
+        // We check for possible duplicate cards played, and if that's the case we
+        // make sure the first player who played the card goes first
+
+        int firstDuplicate = 0, lastDuplicate = 0;
+        List<Player> sameCardsPlayers = new ArrayList<>();
+        for(int curPlayer = 0; curPlayer < numPlayers; curPlayer++){
+            if (curPlayer != numPlayers-1 && // To make sure every case is covered, while also avoiding
+                                             // out of bounds indexing
+                    newPlayerOrder.get(curPlayer).getAssistantPlayed().getTurnOrder() ==
+                    newPlayerOrder.get(curPlayer+1).getAssistantPlayed().getTurnOrder()){
+                sameCardsPlayers.add(newPlayerOrder.get(curPlayer));
+            }
+            else { // We end one batch of players who played the same card
+                sameCardsPlayers.add(newPlayerOrder.get(curPlayer));
+                if(sameCardsPlayers.size() > 1){   // If only one person played that card,
+                                                    // it's not a problem
+                    // TODO search in old players to find correct order
+                    //  and order newPlayerOrder accordingly
+                }
+                sameCardsPlayers = new ArrayList<>(); // We reset the control list
+            }
+        }
+        this.players = newPlayerOrder;
     }
 
     @Deprecated
