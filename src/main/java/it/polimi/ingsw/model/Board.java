@@ -8,17 +8,17 @@ import java.util.List;
 public class Board {
 
     private int numberOfTowers;
-    private TeamEnum towerColor;
+    private final TeamEnum towerColor;
     private List<StudentEnum> studentsAtEntrance;
     private List<Integer> studentsPerTable;
     private Integer selectedEntranceStudentPos;
 
-    public Board(int numTowers, TeamEnum colorTeam){
+    public Board(int numTowers, TeamEnum teamColor){
         numberOfTowers = numTowers;
-        towerColor = colorTeam;
+        towerColor = teamColor;
         studentsAtEntrance = new ArrayList<StudentEnum>();
         studentsPerTable = new ArrayList<Integer>();
-        for(int position = 0; position < StudentEnum.values().length; position++){
+        for(int position = 0; position < StudentEnum.getNumStudentTypes(); position++){
             studentsPerTable.add(0);
         }
         selectedEntranceStudentPos = null;
@@ -27,10 +27,12 @@ public class Board {
     /**
      * sets numberOfTowers
      * @param numTowers the value to assign to numberOfTowers
+     * @return true if out of towers
      */
-    public void updateTowers(int numTowers){
-        numberOfTowers = numTowers;
-        //TODO should notify the controller that the game is over
+    public boolean updateTowers(int numTowers){
+
+        numberOfTowers += numTowers;
+        return numberOfTowers <= 0;
     }
 
     public void setSelectedEntranceStudentPos(int pos){
@@ -86,18 +88,6 @@ public class Board {
         chosenIsland.addStudent(student);
     }
 
-    //should this method be here?YES
-    public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
-
-        //TODO remove hardcoding
-        if (studentsAtEntrance.size() == 7) throw new FullEntranceException();
-
-        int studentsOnTable = studentsPerTable.get(chosenTable.ordinal());
-        studentsPerTable.set(chosenTable.ordinal(), studentsOnTable - 1);
-
-        studentsAtEntrance.add(chosenTable);
-    }
-
     /**
      * call empty from chosenCloud and add the elements of the obtained collection to studentsAtEntrance collection
      * @param chosenCloud the Cloud chosen by the current player
@@ -109,6 +99,17 @@ public class Board {
 
         //adds the returned students to the Entrance
         studentsAtEntrance.addAll(students);
+    }
+
+    public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
+
+        //TODO remove hardcoding
+        if (entranceSize() == 7) throw new FullEntranceException();
+
+        int studentsOnTable = studentsPerTable.get(chosenTable.ordinal());
+        studentsPerTable.set(chosenTable.ordinal(), studentsOnTable - 1);
+
+        studentsAtEntrance.add(chosenTable);
     }
 
     public List<StudentEnum> removeNStudentsFromHall(StudentEnum colorStudent, int numToSubtract){
@@ -126,25 +127,30 @@ public class Board {
     public void addToHall(StudentEnum student){
 
         Integer previousNumStudents = studentsPerTable.get(student.index);
-        previousNumStudents = new Integer(previousNumStudents.intValue() + 1);
+        previousNumStudents = previousNumStudents + 1;
         studentsPerTable.set(student.index, previousNumStudents);
     }
 
     public StudentEnum removeFromHall(StudentEnum color){
         Integer previousNumStudents = studentsPerTable.get(color.index);
-        studentsPerTable.set(color.index, previousNumStudents--);
+        studentsPerTable.set(color.index, previousNumStudents - 1);
         return color;
+    }
+
+    public List<StudentEnum> getStudentsAtEntrance(){
+        return studentsAtEntrance;
     }
 
     public StudentEnum getAtEntrance(int index){
         return studentsAtEntrance.get(index);
     }
 
-    public int EntranceSize(){
+    public int entranceSize(){
         return studentsAtEntrance.size();
     }
 
-    public Integer getStudentsPerTable(StudentEnum color) {
+    public Integer getStudentsAtTable(StudentEnum color) {
         return studentsPerTable.get(color.index);
     }
+
 }
