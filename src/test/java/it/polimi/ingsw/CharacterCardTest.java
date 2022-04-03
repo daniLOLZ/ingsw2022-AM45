@@ -38,7 +38,13 @@ public class CharacterCardTest {
     @Test
     public  void incrementCost(){
         CharacterCard card = FactoryCharacterCard.getCharacterCard();
-        AdvancedGame game = new AdvancedGame(2, 20,3);
+        AdvancedGame game = null;
+        try {
+            game = new AdvancedGame(2, 20,3);
+        }
+        catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }
         int costBefore = card.getCardCost();
         card.activateEffect(game);
         int costNow = card.getCardCost();
@@ -47,8 +53,13 @@ public class CharacterCardTest {
 
     @Test
     public void oneTimeIncrementCost(){
-        AdvancedGame game = new AdvancedGame(2,20,3);
-        List<CharacterCard> cards = new ArrayList<>();
+        AdvancedGame game = null;
+        try {
+            game = new AdvancedGame(2, 20,3);
+        }
+        catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }        List<CharacterCard> cards = new ArrayList<>();
         cards.addAll(FactoryCharacterCard.getAllCards());
         int costBefore;
         int costNow;
@@ -75,8 +86,13 @@ public class CharacterCardTest {
     public void InitialEffectCards(){
         List<CharacterCard> cards = new ArrayList<>();
         cards.addAll(FactoryCharacterCard.getInitialEffectCards());
-        AdvancedGame game = new AdvancedGame(2,20,3);
-        game.setCurrentPlayer(new Player(game,PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true));
+        AdvancedGame game = null;
+        try {
+            game = new AdvancedGame(2, 20,3);
+        }
+        catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }        game.setCurrentPlayer(new Player(game,PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true));
         StudentEnum studentSel;
         Board board = game.getCurrentPlayer().getBoard();
         IslandGroup island = new IslandGroup(game,0,null,null,
