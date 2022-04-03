@@ -3,6 +3,9 @@ package it.polimi.ingsw.model;
 public class MotherNature {
     private IslandGroup position;
 
+    public MotherNature(IslandGroup initPosition){
+        position = initPosition;
+    }
     /**
      * Moves Mother Nature across IslandGroups, the movement happens via the nextIslandGroup pointers;
      * @requires steps != 0

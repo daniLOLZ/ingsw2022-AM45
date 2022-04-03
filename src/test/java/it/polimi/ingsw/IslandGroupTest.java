@@ -13,7 +13,8 @@ import java.util.List;
 
 public class IslandGroupTest {
 
-    SimpleGame game = new SimpleGame(2);
+
+    SimpleGame game;
     List<IslandGroup> group;
     int numIslands = 10; //random amount of islands
     int islandGroupId = 0;
@@ -21,6 +22,12 @@ public class IslandGroupTest {
     @BeforeEach
     public void initializeIslandGroup(){
 
+        try{
+            game = new SimpleGame(2);
+        }
+        catch (IncorrectPlayersException e){
+            e.printStackTrace();
+        }
         group = IslandGroup.getCollectionOfIslandGroup(game,0, 10);
 
     }
@@ -56,5 +63,7 @@ public class IslandGroupTest {
         assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(islandGroupId));
 
     }
-    
+
+
+
 }

@@ -20,7 +20,7 @@ public class AdvancedGame extends SimpleGame{
     private final List<CharacterCard> CharacterCards;
     private AdvancedIslandGroup choosenIsland;             //useful for FlagBearer, Herbalist
 
-    public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards){
+    public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
         sack = new AdvancedSack(26);
         this.numCoins = numCoins;
