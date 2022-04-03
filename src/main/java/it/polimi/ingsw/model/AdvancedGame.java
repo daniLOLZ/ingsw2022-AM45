@@ -40,6 +40,9 @@ public class AdvancedGame extends SimpleGame{
         for(int card= 0; card < numCharacterCards; card++){
             CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards));
         }
+        for(int card= 0; card < numCharacterCards; card++){
+            CharacterCards.get(card).initialise(this);
+        }
 
     }
 
@@ -118,6 +121,51 @@ public class AdvancedGame extends SimpleGame{
 
     public boolean IslandToEvaluateDue() {
         return IslandToEvaluateDue;
+    }
+
+    public CharacterCard getCharacterCard(int position) {
+        return CharacterCards.get(position);
+    }
+
+    public int getNumCoins() {
+        return numCoins;
+    }
+
+    public void addCoin(int coinsToAdd){
+        numCoins+= coinsToAdd;
+    }
+
+    public void subtractCoin(int coinsToSubtract ){
+        numCoins -= coinsToSubtract;
+    }
+
+    public boolean isCountTowers() {
+        return CountTowers;
+    }
+
+    public boolean isDrawIsWin() {
+        return drawIsWin;
+    }
+
+    public boolean isIgnoredStudent() {
+        return isIgnoredStudent;
+    }
+
+    public boolean isIslandToEvaluateDue() {
+        return IslandToEvaluateDue;
+    }
+
+    public int getMNAdditionalSteps() {
+        return MNAdditionalSteps;
+    }
+
+    public int getAdditionalInfluence() {
+        return AdditionalInfluence;
+    }
+
+    public void playCharacterCard(int positionCard){
+
+        CharacterCards.get(positionCard).activateEffect(this);
     }
 }
 

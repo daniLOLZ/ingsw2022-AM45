@@ -21,7 +21,7 @@ public class Minstrel extends CharacterCard {
 
 
     public void tradeStudents(Player player, int indexStudentEntrance, StudentEnum colorHall){
-        if(trades > 2)
+        if(trades > maxTradeableStudents)
             return;
 
         Board board = player.getBoard();
