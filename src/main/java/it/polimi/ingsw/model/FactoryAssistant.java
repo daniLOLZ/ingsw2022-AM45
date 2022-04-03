@@ -5,16 +5,20 @@ import java.io.IOException;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 public class FactoryAssistant {
 
     public static Assistant getAssistant(int id){
+        Path path = FileSystems.getDefault().getPath("");
+        String directoryName = path.toAbsolutePath().toString();
         long turn, steps;
         turn = 0;
         steps = 0;
         JSONParser parser = new JSONParser();
         try {
-            Object obj = parser.parse(new FileReader("C:\\Users\\User\\IdeaProjects\\ingsw2022-AM45" +
+            Object obj = parser.parse(new FileReader(directoryName +
                     "\\src\\main\\java\\it\\polimi\\ingsw\\model\\AssistantsCards.json"));
             JSONObject JsonObject = (JSONObject)  obj;
             JSONArray turnOrderList = (JSONArray)  JsonObject.get("turnOrder");

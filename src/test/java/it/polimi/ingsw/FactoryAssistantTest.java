@@ -1,3 +1,5 @@
+package it.polimi.ingsw;
+
 import it.polimi.ingsw.model.Assistant;
 import it.polimi.ingsw.model.FactoryAssistant;
 import org.junit.jupiter.api.Test;
