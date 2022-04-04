@@ -1,20 +1,30 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.Board;
-import it.polimi.ingsw.model.StudentEnum;
-import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTest {
 
+    Board board = null;
+    StudentEnum student = null;
+
+    @BeforeEach
+    public void initialise(){
+        board = new Board(8,TeamEnum.WHITE);
+        student = StudentEnum.GREEN;
+    }
 
     /**
      * Tests if updateTowers returns the correct boolean value
      */
     @Test
     public void updateTowersTest(){
-        Board board = new Board(8,TeamEnum.WHITE);
         assertFalse(board.updateTowers(-2),"Returned true when not out of towers");
         assertTrue(board.updateTowers(-6),"Returned false when out of towers");
     }
@@ -25,10 +35,6 @@ public class BoardTest {
      */
     @Test
     public void moveFromEntranceToHallTest(){
-
-        Board board = new Board(8,TeamEnum.WHITE);
-        StudentEnum student = StudentEnum.GREEN;
-
         board.addToEntrance(student); //this method shouldn't be public
         board.setSelectedEntranceStudentPos(0);
         assertEquals(board.moveFromEntranceToHall(),student,"Not corresponding Student types");
@@ -41,5 +47,102 @@ public class BoardTest {
 
             assertEquals(board.getStudentsAtTable(table),0,"Student was probably moved on the wrong table");
         }
+    }
+
+    /**
+     * Tests if movement to a full table is rejected
+     */
+    @Test
+    public void moveFromEntranceToHallFullTableTest(){
+        for(int count = 0; count < 10; count++){
+            board.addToEntrance(student);
+            board.setSelectedEntranceStudentPos(0);
+            board.moveFromEntranceToHall();
+        }
+
+        board.addToEntrance(student);
+        board.setSelectedEntranceStudentPos(0);
+        assertEquals(board.moveFromEntranceToHall(),StudentEnum.NOSTUDENT,"Student table overflown");
+    }
+
+    /**
+     * Tests correct placing from Entrance to IslandGroup
+     */
+    @Test
+    public void moveFromEntranceToIslandTest(){
+        SimpleGame game = null;
+        Island island = new Island(0);
+        List<Island> islands = new ArrayList<>();
+        islands.add(island);
+        try {
+            game = new SimpleGame(2);
+        } catch (IncorrectPlayersException e){
+            e.printStackTrace();
+        }
+
+        IslandGroup islandGroup = new IslandGroup(game,0,islands,null,null,new ArrayList<StudentEnum>(),TeamEnum.NOTEAM);
+
+        board.addToEntrance(student);
+        board.setSelectedEntranceStudentPos(0);
+        board.moveFromEntranceToIsland(islandGroup);
+
+        assertEquals(board.getStudentsAtEntrance().size(),0,"Student is still at the Entrance");
+        assertEquals(islandGroup.getStudents().get(0),student,"Not corresponding type of student");
+    }
+
+    /**
+     * Tests if students are correctly collected from Cloud
+     */
+    @Test
+    public void moveFromCloudTest(){
+        Cloud cloud = new Cloud(0,3);
+        List<StudentEnum> students = new ArrayList<>();
+
+        while (students.size() < 3) students.add(student);
+        cloud.fill(students);
+        board.moveFromCloud(cloud);
+
+        assertTrue(cloud.isEmpty(),"Students weren't removed from Cloud");
+        assertEquals(board.getStudentsAtEntrance().size(),3,"Moved wrong number of students");
+        for (int count = 0; count < 3; count++) assertEquals(board.getStudentsAtEntrance().get(count),student,"There's an impostor among us");
+    }
+
+    /**
+     * Tests if student is correctly moved from the Hall to the entrance
+     */
+    @Test
+    public void moveFromHallToEntranceTest(){
+        board.addToEntrance(student);
+        board.setSelectedEntranceStudentPos(0);
+        board.moveFromEntranceToHall();
+
+        try {
+            board.moveFromHallToEntrance(student);
+        } catch (FullEntranceException e){
+            e.printStackTrace();
+        }
+
+        assertEquals(board.getAtEntrance(0),student,"Wrong student type at Entrance");
+        assertEquals(board.getStudentsAtEntrance().size(),1,"There is not exactly 1 student at the Entrance");
+        assertEquals(board.getStudentsAtTable(student),0,"Student is still in the Hall");
+
+        for (StudentEnum studentEnum : StudentEnum.values()){
+
+            if (studentEnum == student || studentEnum == StudentEnum.NOSTUDENT) continue;
+
+            assertEquals(board.getStudentsAtTable(studentEnum),0,"Somehow another table was modified");
+        }
+    }
+
+    /**
+     * Tests correct throw of FullEntranceException
+     */
+    @Test
+    public void moveFromHallToFullEntranceTest(){
+        while (board.getStudentsAtEntrance().size() < 7) board.addToEntrance(student);
+        board.setSelectedEntranceStudentPos(0);
+        board.moveFromEntranceToHall();
+        board.addToEntrance(student);
+        assertThrows(FullEntranceException.class, () -> board.moveFromHallToEntrance(student),"Method did not interrupt on faulty call");
     }
 }
