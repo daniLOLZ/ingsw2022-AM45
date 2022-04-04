@@ -26,7 +26,7 @@ public class FactoryAssistant {
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(new FileReader(directoryName +
-                    "\\src\\main\\java\\it\\polimi\\ingsw\\model\\AssistantsCards.json"));
+                    "\\src\\resources\\AssistantsCards.json"));
             JSONObject JsonObject = (JSONObject)  obj;
             JSONArray turnOrderList = (JSONArray)  JsonObject.get("turnOrder");
             JSONArray stepsList = (JSONArray) JsonObject.get("steps");

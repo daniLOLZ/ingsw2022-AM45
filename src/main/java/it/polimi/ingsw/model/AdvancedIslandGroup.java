@@ -7,6 +7,15 @@ public class AdvancedIslandGroup extends IslandGroup {
 
     private List<BlockTile> blockTiles;
 
+    /**
+     * default constructor
+     * useful for test
+     */
+    public AdvancedIslandGroup(){
+        super();
+        blockTiles = new ArrayList<>();
+    }
+
     public AdvancedIslandGroup(IslandGroup island, ArrayList<BlockTile> blockTiles){
         super(island);
         this.blockTiles = new ArrayList<>(blockTiles);
@@ -60,4 +69,11 @@ public class AdvancedIslandGroup extends IslandGroup {
         }
     }
 
+    public BlockTile getBlockTiles(int id) {
+        return blockTiles.get(id);
+    }
+
+    public int getNumBlockTiles(){
+        return blockTiles.size();
+    }
 }

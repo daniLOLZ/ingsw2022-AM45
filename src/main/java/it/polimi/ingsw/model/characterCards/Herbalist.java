@@ -58,6 +58,7 @@ public class Herbalist extends CharacterCard {
             if(!tile.isAssigned()){
                 tileToUse = tile;
                 chosenIsland.block(tileToUse);
+                tile.setAssigned(true);
                 return;
             }
         }

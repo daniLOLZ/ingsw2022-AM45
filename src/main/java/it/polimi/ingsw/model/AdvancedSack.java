@@ -29,7 +29,7 @@ public class AdvancedSack extends Sack{
     }
 
     public void addStudents(List<StudentEnum> studentsToAdd){
-        for(StudentEnum istance: studentsToAdd)
-            addStudent(istance);
+        for(StudentEnum instance: studentsToAdd)
+            addStudent(instance);
     }
 }

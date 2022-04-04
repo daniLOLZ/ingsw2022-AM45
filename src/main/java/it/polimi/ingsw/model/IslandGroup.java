@@ -13,6 +13,21 @@ public class IslandGroup {
     private List<StudentEnum> students;
     private TeamEnum towerColor;
 
+    /**
+     * default constructor
+     * create a generic IslandGroup
+     * useful for test
+     */
+    public IslandGroup(){
+        game = null;
+        idGroup = 0;
+        islands = new ArrayList<>();
+        islands.add(new Island(0));
+        nextIslandGroup = null;
+        prevIslandGroup = null;
+        towerColor = TeamEnum.NOTEAM;
+    }
+
     public IslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor) {
         this.game = game;
         this.idGroup = idGroup;
