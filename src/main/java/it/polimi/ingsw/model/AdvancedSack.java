@@ -13,7 +13,7 @@ public class AdvancedSack extends Sack{
     /**
      * add  in a pseudorandom position param student to Sack, drawing a number of students from the Sack
      * then reinsert them with pseudorandom choice
-     * @param student
+     * @param student != NOSTUDENT
      */
     private void addStudent(StudentEnum student){
         List<StudentEnum> shuffleNeeds = new ArrayList<>();

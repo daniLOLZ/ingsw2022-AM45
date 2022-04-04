@@ -23,7 +23,8 @@ public class Herbalist extends CharacterCard {
     }
 
     /**
-     *
+     *You can put one block Tile on a choosen Island
+     * You need to call blockIsland with island to block
      * @param game
      *
      */
@@ -32,7 +33,14 @@ public class Herbalist extends CharacterCard {
         super.activateEffect(game);
     }
 
-    public void blockIsland(AdvancedIslandGroup choosenIsland){
+    /**
+     * restore correct number of free tiles counting BlockTiles' isAssigned field as true
+     * if there is at least one free tile put one Blocktile on chosenIsland, adding it to
+     * chosenIsland's list of BlockTiles
+     * set isAssigned true
+     * @param chosenIsland
+     */
+    public void blockIsland(AdvancedIslandGroup chosenIsland){
 
         //RESTORE CORRECT NUMBER OF FREE TILES
         numBlockTiles = (int) blockTiles.stream().
@@ -49,7 +57,7 @@ public class Herbalist extends CharacterCard {
         for(BlockTile tile: blockTiles){
             if(!tile.isAssigned()){
                 tileToUse = tile;
-                choosenIsland.block(tileToUse);
+                chosenIsland.block(tileToUse);
                 return;
             }
         }

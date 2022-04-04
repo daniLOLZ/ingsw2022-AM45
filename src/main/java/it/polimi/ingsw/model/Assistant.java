@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Assistant {
     public final int id;
 
-    // Lucario: Si possono rendere private o c'è qualcuno a cui servono pubblici?
+
     public final int motherNatureSteps;
     public final int turnOrder;
 

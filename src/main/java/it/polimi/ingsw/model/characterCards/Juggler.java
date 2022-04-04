@@ -19,6 +19,11 @@ public class Juggler extends InitialEffect{
         addAllStudents(game.getSack().drawNStudents(startingStudents));
     }
 
+    /**
+     * You can take maximum maxTradeableStudents from this card and exchange them with
+     * currentPlayer students at Entrance
+     * @param game
+     */
     @Override
     public void activateEffect(AdvancedGame game) {
         super.activateEffect(game);
@@ -27,6 +32,14 @@ public class Juggler extends InitialEffect{
 
     }
 
+    /**
+     * Take one student from Juggler and one student from Player's Entrance and exchange them
+     * if the number of trades in this turn is grater than maxTradeableStudents do not
+     * exchange them
+     * @param studentToJuggler
+     * @param index
+     * @param player
+     */
     public void tradeStudents(StudentEnum studentToJuggler, int index, Player player){
 
         if(numTrades > maxTradeableStudents)

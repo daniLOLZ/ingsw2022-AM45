@@ -8,6 +8,11 @@ public class Fungalmancer extends CharacterCard {
         super(3,9);
     }
 
+    /**
+     * During this turn one color of students don't give influence points
+     * Set IgnoredStudent true
+     * @param game
+     */
     @Override
     public void activateEffect(AdvancedGame game) {
 

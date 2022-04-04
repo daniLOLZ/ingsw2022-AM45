@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 public class CloudTest {
 
+    /**
+     * tests if colud is correctly fill with right student
+     */
     @Test
     public void fillTest(){
         Cloud cloud = new Cloud(3,3);
@@ -22,6 +25,9 @@ public class CloudTest {
         assert (cloud.remove(0) == StudentEnum.GREEN);
     }
 
+    /**
+     * tests if cloud is empty after cloud.empty()
+     */
     @Test
     public void emptyTest(){
         Cloud cloud = new Cloud(3,3);

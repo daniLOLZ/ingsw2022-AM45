@@ -112,11 +112,25 @@ public class Board {
         studentsAtEntrance.add(chosenTable);
     }
 
+    /**
+     * Remove N strudents from Hall and
+     * if Hall.size() < N  remove all students in Hall
+     * @param colorStudent != NOSTUDENT
+     * @param numToSubtract >= 0
+     * @return List of students removed
+     */
     public List<StudentEnum> removeNStudentsFromHall(StudentEnum colorStudent, int numToSubtract){
         List<StudentEnum> returnList = new ArrayList<>();
+        StudentEnum studentLeaving = StudentEnum.NOSTUDENT;
 
-        //TODO
+        for(int draws=0; draws < numToSubtract; draws++){
+            studentLeaving = removeFromHall(colorStudent);
 
+            if(studentLeaving.index == StudentEnum.NOSTUDENT.index)
+                return returnList;
+            else
+                returnList.add(studentLeaving);
+        }
         return returnList;
     }
 
@@ -131,8 +145,18 @@ public class Board {
         studentsPerTable.set(student.index, previousNumStudents);
     }
 
+    /**
+     * Remove one student from Hall with chosen color
+     * If there is no students at Hall, return NOSTUDENT
+     * @param color
+     * @return Student with chosen color  if \old(Hall.size()) > 0
+     * @return NOSTUDENT if \old(Hall.size()) == 0
+     */
     public StudentEnum removeFromHall(StudentEnum color){
         Integer previousNumStudents = studentsPerTable.get(color.index);
+        if(previousNumStudents.intValue() == 0){
+            return StudentEnum.NOSTUDENT;
+        }
         studentsPerTable.set(color.index, previousNumStudents - 1);
         return color;
     }

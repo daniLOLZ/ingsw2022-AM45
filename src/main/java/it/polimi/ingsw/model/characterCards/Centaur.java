@@ -8,11 +8,16 @@ public class Centaur extends CharacterCard {
         super(3,6);
     }
 
+    /**
+     * During this turn the towers' contribution is zero.
+     * Set CountTowers true;
+     * @param game
+     */
     @Override
     public void activateEffect(AdvancedGame game) {
 
         super.activateEffect(game);
-        game.setCountTowers(false);
+        game.setCountTowers(true);
     }
 
 }
