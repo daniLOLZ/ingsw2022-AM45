@@ -1,5 +1,9 @@
 package it.polimi.ingsw.model;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum StudentEnum {
 
     GREEN(0, "Green"),
@@ -27,6 +31,16 @@ public enum StudentEnum {
      * If NOSTUDENT is always the last in the enumeration it is equal to the returned value.
      */
     public static int getNumStudentTypes() {
-        return StudentEnum.values().length;
+        return StudentEnum.values().length-1;
+    }
+
+    /**
+     *
+     * @return The values of the enum except the NOSTUDENT instance
+     */
+    public static List<StudentEnum> getStudents(){
+        return Arrays.stream(StudentEnum.values())
+                .filter( x -> !x.equals(NOSTUDENT))
+                .collect(Collectors.toList());
     }
 }

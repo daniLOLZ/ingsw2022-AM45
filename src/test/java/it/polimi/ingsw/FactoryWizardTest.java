@@ -4,11 +4,19 @@ import it.polimi.ingsw.model.Assistant;
 import it.polimi.ingsw.model.FactoryWizard;
 import it.polimi.ingsw.model.Wizard;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class FactoryWizardTest {
 
+    /**
+     * tests if FactoryWizard create two deck of cards Assistant
+     * with equal cards but different id
+     */
     @Test
     public void getWizard(){
         Wizard wizard = FactoryWizard.getWizard(0);
@@ -18,6 +26,29 @@ public class FactoryWizardTest {
 
         for(int i=0; i<10;i++){
             assertEquals(wizard.getAssistant(i),wizard1.getAssistant(i),"Wrong Card fit");
+            assertNotEquals(wizard.getAssistant(i).id, wizard1.getAssistant(i).id, "Two cards with same id but they " +
+                    "belong to 2 different wizard");
+        }
+    }
+
+    /**
+     * tests if all Assitants cards were created correctly
+     */
+    @Test
+    public void getAllWizard(){
+        List<Wizard> list = new ArrayList<>();
+        Wizard wizardTest = FactoryWizard.getWizard();
+        list.addAll(FactoryWizard.getAllWizards());
+
+        for(Wizard wizard : list){
+            for(int i=0;i<FactoryWizard.numOfCardsPerWizard;i++){
+                assertEquals(wizardTest.getAssistant(i),wizard.getAssistant(i),
+                        "Different expected card's values");
+                assertTrue((wizard.idWizard==0) || (wizard.idWizard > 0 &&
+                        wizard.getAssistant(i).id != wizardTest.getAssistant(i).id),
+                        "Wrong id");
+            }
+
         }
     }
 }

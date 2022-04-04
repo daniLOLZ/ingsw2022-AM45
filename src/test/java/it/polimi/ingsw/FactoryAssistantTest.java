@@ -8,6 +8,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FactoryAssistantTest {
 
+    /**
+     * tests if file json is correctly read by FactoryAssistant.getAssistant() and
+     * if this one create the right card
+     */
     @Test
     public void getAssistant(){
         Assistant assistant = FactoryAssistant.getAssistant(1);

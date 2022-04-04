@@ -16,12 +16,23 @@ public class Priest extends InitialEffect{
         addAllStudents(game.getSack().drawNStudents(startingStudents));
     }
 
+    /**
+     * You can put one student from this card on an Island
+     * @param game
+     */
     @Override
     public void activateEffect(AdvancedGame game) {
         super.activateEffect(game);
 
     }
 
+    /**
+     * put studentIndex student from this card and put it on island, then take one student from the
+     * sack
+     * @param game
+     * @param island
+     * @param studentIndex
+     */
     public void placeStudentOnIsland(AdvancedGame game, IslandGroup island, int studentIndex){
         island.addStudent(removeStudent(studentIndex));
 

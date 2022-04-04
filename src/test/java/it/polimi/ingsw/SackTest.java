@@ -8,6 +8,10 @@ import java.util.ArrayList;
 
 public class SackTest {
 
+    /**
+     * test for correct creation of sack, with 5 total students, all different
+     * no empty, no equal students, no NOSTUDENT
+     */
     @Test
     public void simpleTest(){
         Sack sack = new Sack(1);
@@ -20,6 +24,9 @@ public class SackTest {
         assert (studentA != studentB);
     }
 
+    /**
+     * test for NoStudents presence
+     */
     @Test
     public void thereIsnoNOSTUDENTS(){
         Sack sack = new Sack(10);
@@ -30,6 +37,9 @@ public class SackTest {
         }
     }
 
+    /**
+     * tests for equal number of student per color
+     */
     @Test
     public void equalNumberStudents(){
         int num = 10;

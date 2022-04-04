@@ -16,6 +16,10 @@ public abstract class CharacterCard {
 
     }
 
+    /**
+     * Initialise CharacterChard fields where this operation is useful
+     * @param game
+     */
     public void initialise(AdvancedGame game){
 
     }
@@ -37,7 +41,9 @@ public abstract class CharacterCard {
      * CharacterCard set field idCharacterCardActive of AdvancedGame with Card's id,
      * in this way Controller, when check Model's state, understand which Card has been
      * used and implements the Card's logic, calling human's participation and modifying
-     * Model state
+     * Model state.
+     * Increment cardCost if it is the first time in the game that the effect is activated
+     * Set HasBeenUsed true
      * @param game
      */
     public  void activateEffect(AdvancedGame game){

@@ -32,8 +32,6 @@ public class SimpleGame {
         }
 
         //TODO change this constructor into a JSON reader to remove magic numbers
-        //TODO see if possible to not hardcode player constructors
-        //TODO handle nicknames
         int numberOfClouds = numPlayers;
         this.hasBeenInitialized = false;
         this.amountOfIslands = 12;
@@ -57,33 +55,21 @@ public class SimpleGame {
         //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
         this.sack = new Sack(2);
         switch(numPlayers){
-            case 2:
+            case 2: case 4:
                 this.maxStudentsEntrance = 7;
                 this.numTowers = 8;
                 this.studentsPerCloud = 3;
-                players.add(new Player(this, PlayerEnum.PLAYER1, "mockNickname1", TeamEnum.WHITE, true));
-                players.add(new Player(this, PlayerEnum.PLAYER2, "mockNickname2", TeamEnum.BLACK, true));
                 break;
 
             case 3:
                 this.maxStudentsEntrance = 9;
                 this.numTowers = 6;
                 this.studentsPerCloud = 4;
-                players.add(new Player(this, PlayerEnum.PLAYER1, "mockNickname1", TeamEnum.WHITE, true));
-                players.add(new Player(this, PlayerEnum.PLAYER2, "mockNickname2", TeamEnum.GREY, true));
-                players.add(new Player(this, PlayerEnum.PLAYER3, "mockNickname3", TeamEnum.BLACK, true));
                 break;
 
-            case 4:
-                this.maxStudentsEntrance = 7;
-                this.numTowers = 8;
-                this.studentsPerCloud = 3;
-                players.add(new Player(this, PlayerEnum.PLAYER1, "mockNickname1", TeamEnum.WHITE, true));
-                players.add(new Player(this, PlayerEnum.PLAYER2, "mockNickname2", TeamEnum.WHITE, false));
-                players.add(new Player(this, PlayerEnum.PLAYER3, "mockNickname3", TeamEnum.BLACK, true));
-                players.add(new Player(this, PlayerEnum.PLAYER4, "mockNickname4", TeamEnum.BLACK, false));
-                break;
         }
+        this.players = FactoryPlayer.getNPlayers(this, numPlayers);
+
     }
 
     //TODO add an override within AdvancedGame
@@ -113,7 +99,7 @@ public class SimpleGame {
      * Creates the Sack that will be used during the game and assigns it
      * to this game's sack. Can be overridden
      */
-    private void createPlayingSack(){
+    protected void createPlayingSack(){
         sack = new Sack(24);
     }
 

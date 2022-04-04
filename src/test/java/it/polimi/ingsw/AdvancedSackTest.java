@@ -9,6 +9,11 @@ import java.util.ArrayList;
 
 public class AdvancedSackTest {
 
+    /**
+     * tests if AddStudent add correctly one student,
+     * with correct increment of size and
+     * correct increment of added student's color occurrences
+     */
     @Test
     public void addStudentTest(){
         AdvancedSack sack = new AdvancedSack(10);

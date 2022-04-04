@@ -5,6 +5,10 @@ import it.polimi.ingsw.model.StudentEnum;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class has the list of students presents on specific CharacterCards,
+ * give all method useful for manipulate and observe the list
+ */
 public abstract class InitialEffect extends CharacterCard{
 
     private List<StudentEnum> students;

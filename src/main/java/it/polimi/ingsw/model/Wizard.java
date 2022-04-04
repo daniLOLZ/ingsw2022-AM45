@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class Wizard {
-    private final int idWizard;                 //ID    0   10  20  30
+    public final int idWizard;                 //ID    0   10  20  30
     private List<Assistant> assistants;
 
     public Wizard(int idWizard, List<Assistant> assistants){
