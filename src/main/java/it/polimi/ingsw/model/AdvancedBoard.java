@@ -15,7 +15,7 @@ public class AdvancedBoard extends Board{
         super(numTowers,teamColor);
 
         coinsOnBoard = new ArrayList<>();
-        for (int table = 0; table < 5; table++){//TODO remove hardcoding
+        for (StudentEnum studentEnum : StudentEnum.getStudents()){
             coinsOnBoard.add(new Stack<>());
         }
 

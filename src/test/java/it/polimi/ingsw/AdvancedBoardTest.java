@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +14,7 @@ public class AdvancedBoardTest {
     StudentEnum student = null;
 
     @BeforeEach
-    public void initalise(){
+    public void initialise(){
         board = new AdvancedBoard(8, TeamEnum.WHITE);
         student = StudentEnum.GREEN;
     }

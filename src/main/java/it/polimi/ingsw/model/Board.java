@@ -18,7 +18,7 @@ public class Board {
         towerColor = teamColor;
         studentsAtEntrance = new ArrayList<StudentEnum>();
         studentsPerTable = new ArrayList<Integer>();
-        for(int position = 0; position < StudentEnum.getNumStudentTypes(); position++){
+        for(StudentEnum table : StudentEnum.getStudents()){
             studentsPerTable.add(0);
         }
         selectedEntranceStudentPos = null;
@@ -148,9 +148,8 @@ public class Board {
     /**
      * Remove one student from Hall with chosen color
      * If there is no students at Hall, return NOSTUDENT
-     * @param color
-     * @return Student with chosen color  if \old(Hall.size()) > 0
-     * @return NOSTUDENT if \old(Hall.size()) == 0
+     * @param color the table which to remove the student
+     * @return Student with chosen color or NOSTUDENT if the table is already empty
      */
     public StudentEnum removeFromHall(StudentEnum color){
         Integer previousNumStudents = studentsPerTable.get(color.index);

@@ -44,7 +44,7 @@ public class FactoryWizardTest {
             for(int i=0;i<FactoryWizard.numOfCardsPerWizard;i++){
                 assertEquals(wizardTest.getAssistant(i),wizard.getAssistant(i),
                         "Different expected card's values");
-                assertTrue((wizard.idWizard==0) || (wizard.idWizard > 0 &&
+                assertTrue((wizard.getIdWizard()==0) || (wizard.getIdWizard() > 0 &&
                         wizard.getAssistant(i).id != wizardTest.getAssistant(i).id),
                         "Wrong id");
             }
