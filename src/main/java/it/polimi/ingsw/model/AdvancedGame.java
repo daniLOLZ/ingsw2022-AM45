@@ -16,13 +16,12 @@ public class AdvancedGame extends SimpleGame{
     private boolean CountTowers;                           //Centaur effect active
     private int AdditionalInfluence;                       //Knight effect active when != 0
     private boolean isIgnoredStudent;                      //Fungalmacer effect active
-    private StudentEnum ChoosenStudentType;                //useful for LoanShark,Fungalmancer
+    private StudentEnum ChosenStudentType;                 //useful for LoanShark,Fungalmancer
     private final List<CharacterCard> CharacterCards;
-    private AdvancedIslandGroup choosenIsland;             //useful for FlagBearer, Herbalist
+    private AdvancedIslandGroup chosenIsland;              //useful for FlagBearer, Herbalist
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
-        sack = new AdvancedSack(26);
         this.numCoins = numCoins;
         drawIsWin = false;
         MNAdditionalSteps = 0;
@@ -32,8 +31,8 @@ public class AdvancedGame extends SimpleGame{
         IslandToEvaluateDue = false;
         AdditionalInfluence = 0;
         TradeableStudent = 0;
-        choosenIsland = null;
-        ChoosenStudentType = StudentEnum.NOSTUDENT;
+        chosenIsland = null;
+        ChosenStudentType = StudentEnum.NOSTUDENT;
         CharacterCards = new ArrayList<>();
 
 
@@ -55,8 +54,8 @@ public class AdvancedGame extends SimpleGame{
         IslandToEvaluateDue = false;
         AdditionalInfluence = 0;
         TradeableStudent = 0;
-        ChoosenStudentType = StudentEnum.NOSTUDENT;
-        choosenIsland = null;
+        ChosenStudentType = StudentEnum.NOSTUDENT;
+        chosenIsland = null;
     }
 
     public void setAdditionalInfluence(int additionalInfluence) {
@@ -72,7 +71,7 @@ public class AdvancedGame extends SimpleGame{
     }
 
     public void setChoosenStudentType(StudentEnum type) {
-        ChoosenStudentType = type;
+        ChosenStudentType = type;
     }
 
     public void setMNAdditionalSteps(int MNAdditionalSteps) {
@@ -80,11 +79,11 @@ public class AdvancedGame extends SimpleGame{
     }
 
     public void setIslandToEvaluate(AdvancedIslandGroup choosenIsland) {
-        this.choosenIsland = choosenIsland;
+        this.chosenIsland = choosenIsland;
     }
 
     public AdvancedIslandGroup getChoosenIsland() {
-        return choosenIsland;
+        return chosenIsland;
     }
 
     public void setIgnoredStudent(boolean ignoredStudent) {
@@ -108,11 +107,11 @@ public class AdvancedGame extends SimpleGame{
     }
 
     public void setChoosenIsland(AdvancedIslandGroup choosenIsland) {
-        this.choosenIsland = choosenIsland;
+        this.chosenIsland = choosenIsland;
     }
 
     public StudentEnum getChoosenStudentType() {
-        return ChoosenStudentType;
+        return ChosenStudentType;
     }
 
     public void setIslandToEvaluateDue(boolean islandToEvaluateDue) {
@@ -166,6 +165,11 @@ public class AdvancedGame extends SimpleGame{
     public void playCharacterCard(int positionCard){
 
         CharacterCards.get(positionCard).activateEffect(this);
+    }
+
+    @Override
+    protected void createPlayingSack() {
+        sack = new AdvancedSack(24);
     }
 }
 

@@ -11,6 +11,11 @@ public class Minstrel extends CharacterCard {
         super(1,10);
     }
 
+
+    /**
+     * You can exchange  maxTradeableStudents students from Hall to Entrance or vice-versa
+     * @param game
+     */
     @Override
     public void activateEffect(AdvancedGame game) {
         super.activateEffect(game);
@@ -19,7 +24,14 @@ public class Minstrel extends CharacterCard {
     }
 
 
-
+    /**
+     * Exchange one student at Entrance with one at Hall.
+     * Increment trades
+     * If trades are grater than maxTradeableStudents return
+     * @param player
+     * @param indexStudentEntrance >= 0
+     * @param colorHall != NOSTUDENT
+     */
     public void tradeStudents(Player player, int indexStudentEntrance, StudentEnum colorHall){
         if(trades > maxTradeableStudents)
             return;

@@ -63,6 +63,11 @@ public class FactoryCharacterCard {
         return x;
     }
 
+    /**
+     * Get specific CharacterCard with id selected
+     * @param id
+     * @return
+     */
     public static CharacterCard getSpecificCard(int id){
         if(id == 1)
             return  new Priest();
@@ -92,11 +97,20 @@ public class FactoryCharacterCard {
         return new Glutton();
     }
 
+    /**
+     * Get a random CharacterCard
+     * @return
+     */
     public static CharacterCard getCharacterCard(){
         List<CharacterCard> list = new ArrayList<>();
         return getCharacterCard(list);
     }
 
+
+    /**
+     *Get all CharacterCards
+     * @return
+     */
     public static List<CharacterCard> getAllCards(){
         List<CharacterCard> listCards = new ArrayList<>();
         listCards.add(new Priest());
@@ -115,6 +129,11 @@ public class FactoryCharacterCard {
         return  listCards;
     }
 
+    /**
+     * Get CharacterCards with InitialEffect as mother class.
+     * Those cards that have students on themselves
+     * @return
+     */
     public static List<CharacterCard> getInitialEffectCards(){
         List<CharacterCard> listCards = new ArrayList<>();
         listCards.add(new Juggler());

@@ -8,6 +8,11 @@ public class FlagBearer extends CharacterCard {
         super(3,3);
     }
 
+    /**
+     * Now you must calculate influence of a specific IslandGroup wit all consequences
+     * Set IslandToEvaluate true
+     * @param game
+     */
     @Override
     public void activateEffect(AdvancedGame game) {
 

@@ -22,6 +22,13 @@ public class Dame extends InitialEffect{
         super.activateEffect(game);
     }
 
+    /**
+     * Take  student indexStudentDame from this Card ant put it in player's Hall.
+     * Draw a new student from sack and put it on this card
+     * @param player
+     * @param indexStudenDame
+     * @param sack
+     */
     public void placeStudentToHall(Player player, int indexStudenDame, Sack sack){
         player.getBoard().addToHall(removeStudent(indexStudenDame));
         addAllStudents(sack.drawNStudents(1));

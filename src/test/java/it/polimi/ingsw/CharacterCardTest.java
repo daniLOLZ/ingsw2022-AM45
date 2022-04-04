@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CharacterCardTest {
 
+    /**
+     * tests if FactoryCharacterCard create a card correctly, with right id and cost
+     */
     @Test
     public void createCard(){
 
@@ -22,6 +25,9 @@ public class CharacterCardTest {
 
     }
 
+    /**
+     * tests if FactoryCharacterCard return 3 random and different cards
+     */
     @Test
     public void randomCards(){
         List<CharacterCard> listCards = new ArrayList<>();
@@ -35,6 +41,9 @@ public class CharacterCardTest {
         assertNotEquals(card1,card3,"Two equals cards");
     }
 
+    /**
+     * tests if after activate effect of a card, this one increment his cost by one
+     */
     @Test
     public  void incrementCost(){
         CharacterCard card = FactoryCharacterCard.getCharacterCard();
@@ -51,6 +60,9 @@ public class CharacterCardTest {
         assertEquals(costBefore + 1, costNow, "Cost updating not correct");
     }
 
+    /**
+     * tests if cost increment is applied one time
+     */
     @Test
     public void oneTimeIncrementCost(){
         AdvancedGame game = null;
@@ -82,6 +94,9 @@ public class CharacterCardTest {
 
     }
 
+    /**
+     * tests InitialEffect Cards, if after using their methods they still have a consistent state
+     */
     @Test
     public void InitialEffectCards(){
         List<CharacterCard> cards = new ArrayList<>();
@@ -114,7 +129,7 @@ public class CharacterCardTest {
                 //TESTS
                 assertEquals(juggler.getStudents(0), StudentEnum.BLUE,
                         "Wrong student added to Juggler");
-                assertEquals(studentSel,board.getAtEntrance(board.EntranceSize() - 1),
+                assertEquals(studentSel,board.getAtEntrance(board.entranceSize() - 1),
                         "Wrong student at Entrance");
             }
 
@@ -142,13 +157,13 @@ public class CharacterCardTest {
                 dame.removeAll();
                 dame.addStudent(StudentEnum.RED);
                 studentSel = dame.getStudents(0);
-                int studentAtTable = board.getStudentsPerTable(studentSel).intValue();
+                int studentAtTable = board.getStudentsAtTable(studentSel).intValue();
 
                 //DAME METHOD
                 dame.placeStudentToHall(game.getCurrentPlayer(),0,game.getSack());
 
                 //TESTS
-                assertEquals(studentAtTable + 1, board.getStudentsPerTable(studentSel).intValue(),
+                assertEquals(studentAtTable + 1, board.getStudentsAtTable(studentSel).intValue(),
                         "Wrong number of students in Hall");
                 assertTrue(!dame.isEmpty(), "Did not draw from sack");
             }

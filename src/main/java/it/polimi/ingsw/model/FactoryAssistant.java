@@ -10,6 +10,13 @@ import java.nio.file.Path;
 
 public class FactoryAssistant {
 
+    private final static int numCards = 40;
+    /**
+     * create and return Assistant corresponding with chosen id
+     * @param id > 0 &&
+     *           < numCards
+     * @return
+     */
     public static Assistant getAssistant(int id){
         Path path = FileSystems.getDefault().getPath("");
         String directoryName = path.toAbsolutePath().toString();

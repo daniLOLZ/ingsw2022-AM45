@@ -1,8 +1,5 @@
 package it.polimi.ingsw.model;
 
-import com.sun.jdi.ArrayReference;
-import jdk.vm.ci.aarch64.AArch64;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -116,7 +113,7 @@ public class SimpleGame {
      * Creates the Sack that will be used during the game and assigns it
      * to this game's sack. Can be overridden
      */
-    private void createPlayingSack(){
+    protected void createPlayingSack(){
         sack = new Sack(24);
     }
 
