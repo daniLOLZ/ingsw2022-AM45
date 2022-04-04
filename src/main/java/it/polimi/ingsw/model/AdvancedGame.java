@@ -22,7 +22,8 @@ public class AdvancedGame extends SimpleGame{
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
-        sack = new AdvancedSack(26);
+        sack = new AdvancedSack(26); // Lucario: l'inizializzazione del sack
+                                                     // (da 2 pedine) c'è già nel costruttore super
         this.numCoins = numCoins;
         drawIsWin = false;
         MNAdditionalSteps = 0;

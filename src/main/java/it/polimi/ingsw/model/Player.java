@@ -22,9 +22,6 @@ public class Player {
      * @param leader true if the player is the leader of their team (has the towers on their board)
      */
     public Player(SimpleGame game, PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader) {
-        //TODO this constructor will change in case SimpleGame creates everything and doesn't
-        // delegate to its subclasses
-
         this.game = game;
         this.playerId = playerId;
         this.nickname = nickname;

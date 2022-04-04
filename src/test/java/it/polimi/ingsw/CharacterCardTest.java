@@ -114,7 +114,7 @@ public class CharacterCardTest {
                 //TESTS
                 assertEquals(juggler.getStudents(0), StudentEnum.BLUE,
                         "Wrong student added to Juggler");
-                assertEquals(studentSel,board.getAtEntrance(board.EntranceSize() - 1),
+                assertEquals(studentSel,board.getAtEntrance(board.entranceSize() - 1), //Lucario: aggiustato visto che era cambiato il nome del metodo
                         "Wrong student at Entrance");
             }
 
@@ -142,13 +142,13 @@ public class CharacterCardTest {
                 dame.removeAll();
                 dame.addStudent(StudentEnum.RED);
                 studentSel = dame.getStudents(0);
-                int studentAtTable = board.getStudentsPerTable(studentSel).intValue();
+                int studentAtTable = board.getStudentsAtTable(studentSel).intValue(); //Lucario: aggiustato visto che era cambiato il nome del metodo
 
                 //DAME METHOD
                 dame.placeStudentToHall(game.getCurrentPlayer(),0,game.getSack());
 
                 //TESTS
-                assertEquals(studentAtTable + 1, board.getStudentsPerTable(studentSel).intValue(),
+                assertEquals(studentAtTable + 1, board.getStudentsAtTable(studentSel).intValue(), //Lucario: aggiustato visto che era cambiato il nome del metodo
                         "Wrong number of students in Hall");
                 assertTrue(!dame.isEmpty(), "Did not draw from sack");
             }
