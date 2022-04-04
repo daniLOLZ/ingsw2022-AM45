@@ -1,8 +1,10 @@
 package it.polimi.ingsw.model;
 
 import com.sun.jdi.ArrayReference;
+import jdk.vm.ci.aarch64.AArch64;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class SimpleGame {
@@ -129,7 +131,7 @@ public class SimpleGame {
         PlayerEnum currentWinner = PlayerEnum.NOPLAYER;
 
         for(Player player : players){
-            numberOfStudents = player.getBoard().getStudentsPerTable(professor);
+            numberOfStudents = player.getBoard().getStudentsAtTable(professor);
             if (numberOfStudents > maximumStudents){
                 maximumStudents = numberOfStudents;
                 currentWinner = player.getPlayerId();
@@ -165,8 +167,8 @@ public class SimpleGame {
         // We check for possible duplicate cards played, and if that's the case we
         // make sure the first player who played the card goes first
 
-        int firstDuplicate = 0, lastDuplicate = 0;
         List<Player> sameCardsPlayers = new ArrayList<>();
+        List<Player> toSubstitute = new ArrayList<>();
         for(int curPlayer = 0; curPlayer < numPlayers; curPlayer++){
             if (curPlayer != numPlayers-1 && // To make sure every case is covered, while also avoiding
                                              // out of bounds indexing
@@ -176,10 +178,18 @@ public class SimpleGame {
             }
             else { // We end one batch of players who played the same card
                 sameCardsPlayers.add(newPlayerOrder.get(curPlayer));
+                final List<Player> playersToSort = sameCardsPlayers;
                 if(sameCardsPlayers.size() > 1){   // If only one person played that card,
                                                     // it's not a problem
-                    // TODO search in old players to find correct order
-                    //  and order newPlayerOrder accordingly
+                    // We get the ordered list of duplicates
+                    sameCardsPlayers = players.stream()
+                            .filter(x -> playersToSort.contains(x))
+                            .collect(Collectors.toList());
+                    // And substitute it to the old semi-sorted list
+                    for(int index = 0; index < sameCardsPlayers.size(); index++){
+                        newPlayerOrder.set(curPlayer+1-sameCardsPlayers.size()+index, sameCardsPlayers.get(index));
+                    }
+
                 }
                 sameCardsPlayers = new ArrayList<>(); // We reset the control list
             }
@@ -187,7 +197,17 @@ public class SimpleGame {
         this.players = newPlayerOrder;
     }
 
-    @Deprecated
+    public void setLastTurn(boolean isLast) {
+        isLastTurn = isLast;
+    }
+
+    public void fillClouds(){
+        for(Cloud cloud : clouds){
+            cloud.fill(sack.drawNStudents(studentsPerCloud));
+        }
+    }
+
+
     /*
      * increments by one the current group id and returns it
      * this way there won't be, two equal IDs
