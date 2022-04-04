@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class IslandGroup {
-    private SimpleGame game;
+    private final SimpleGame game;
     private final int idGroup;
-    private List<Island> islands;
+    private final List<Island> islands;
     private IslandGroup nextIslandGroup;
     private IslandGroup prevIslandGroup;
     private List<StudentEnum> students;
@@ -33,6 +33,7 @@ public class IslandGroup {
         this.towerColor = island.towerColor;
     }
 
+    // Maybe useless, semi-factory method for IslandGroup
     public static IslandGroup getIslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor){
         return new IslandGroup(game, idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor);
     }
@@ -131,19 +132,6 @@ public class IslandGroup {
                 currentInfluence += numOfIslandsInGroup();
             }
 
-            /* Check influence of students
-            for (StudentEnum s : StudentEnum.values()){
-                professorOwner = game.getProfessors().get(s.ordinal());
-
-                for (Player player : game.getPlayers()){
-                    if(player.getPlayerId().equals(professorOwner)){ // if a player owns the current professor
-                       if(currentTeam.equals(player.getTeamColor())) { // and if the player is of the current team that's being checked
-                           currentInfluence += numberOfStudentsOfColor(s);
-                       }
-                    }
-                }
-            }
-            */
             // Checks influence of students
             for(StudentEnum stud : students){
                 professorOwner = game.getProfessors().get(stud.ordinal());
@@ -164,7 +152,7 @@ public class IslandGroup {
                 maximumInfluence = currentInfluence;
                 mostInfluentialTeam = currentTeam;
             }
-            if(currentInfluence == maximumInfluence){
+            else if(currentInfluence == maximumInfluence){
                 mostInfluentialTeam = TeamEnum.NOTEAM;
             }
         }
@@ -243,12 +231,16 @@ public class IslandGroup {
             // Same as before
             game.getIslandGroups().remove(prevIslandGroup);
         }
+        // Finally, remove this island
+        game.getIslandGroups().remove(this);
 
         // prepare pointers
         IslandGroup nextPointer = successor.nextIslandGroup;
         IslandGroup previousPointer = predecessor.prevIslandGroup;
 
+
         IslandGroup mergedGroup = new IslandGroup(game, newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
+        //IslandGroup mergedGroup = getIslandGroup(game, newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
 
         game.getIslandGroups().add(mergedGroup); // possibly unsafe handling of game attribute
     }
