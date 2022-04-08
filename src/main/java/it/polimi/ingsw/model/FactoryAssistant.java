@@ -30,9 +30,15 @@ public class FactoryAssistant {
             JSONObject JsonObject = (JSONObject)  obj;
             JSONArray turnOrderList = (JSONArray)  JsonObject.get("turnOrder");
             JSONArray stepsList = (JSONArray) JsonObject.get("steps");
-            obj =  turnOrderList.get(id % FactoryWizard.numOfCardsPerWizard);
+            int position;
+            position= id % FactoryWizard.numOfCardsPerWizard;
+
+            if(position == 0)
+                position = 10;
+
+            obj =  turnOrderList.get(position);
             turn =(long) obj;
-            obj =  stepsList.get(id % FactoryWizard.numOfCardsPerWizard);
+            obj =  stepsList.get(position);
             steps = (long) obj;
 
         } catch (IOException e) {

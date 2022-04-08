@@ -23,7 +23,7 @@ public class FactoryWizard {
 
         List<Assistant> assistants = new ArrayList<>();
 
-        for(int cards = 0; cards < 10; cards++){
+        for(int cards = 1; cards <= 10; cards++){
             assistants.add(FactoryAssistant.getAssistant(cards + idWizard));
         }
 
