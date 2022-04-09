@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FactoryPlayerTest {
 
+    SimpleGame game = null;
     //TODO nickname testing will be added when nickname handling is available
 
     /**
@@ -17,7 +18,12 @@ public class FactoryPlayerTest {
     @Test
     public void get2PlayersTest() {
 
-        List<Player> players = FactoryPlayer.getNPlayers(null, 2);
+        try {
+            game = new SimpleGame(2);
+        } catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }
+        List<Player> players = FactoryPlayer.getNPlayers(game, 2);
 
         assertEquals(players.get(0).getPlayerId(), PlayerEnum.PLAYER1, "Wrong PlayerID assigned");
         assertEquals(players.get(1).getPlayerId(), PlayerEnum.PLAYER2, "Wrong PlayerID assigned");
@@ -36,6 +42,11 @@ public class FactoryPlayerTest {
     @Test
     public void get3PlayersTest(){
 
+        try {
+            game = new SimpleGame(3);
+        } catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }
         List<Player> players = FactoryPlayer.getNPlayers(null,3);
 
         assertEquals(players.get(0).getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerID assigned");
@@ -57,6 +68,11 @@ public class FactoryPlayerTest {
     @Test
     public void get4PlayersTest(){
 
+        try {
+            game = new SimpleGame(4);
+        } catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }
         List<Player> players = FactoryPlayer.getNPlayers(null,4);
 
         assertEquals(players.get(0).getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerID assigned");
