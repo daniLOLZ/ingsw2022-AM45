@@ -181,4 +181,29 @@ public class BoardTest {
         board.addToEntrance(student);
         assertThrows(FullEntranceException.class, () -> board.moveFromHallToEntrance(student),"Method did not interrupt on faulty call");
     }
+
+    /**
+     * Test if Students are correctly removed from the Hall
+     */
+    /* no need to test the case of an empty Hall because it is already handled by
+    removeFromHall which is method simple enough to not require testing */
+    @Test
+    public void removeNStudentsFromHallTest(){
+
+        int numStudents = 3;
+
+        for (int i = 0; i < numStudents; i++) {
+            board.addToHall(student);
+        }
+
+        List<StudentEnum> students;
+
+        students = board.removeNStudentsFromHall(student, numStudents);
+
+        assertEquals(board.getStudentsAtTable(student).intValue(),0,"Not all students were removed");
+
+        for (int pos = 0; pos < numStudents; pos++) {
+            assertEquals(students.get(pos), student,"There's an impostor among us");
+        }
+    }
 }
