@@ -54,8 +54,8 @@ public class FactoryPlayerTest {
         assertEquals(players.get(2).getPlayerId(),PlayerEnum.PLAYER3,"Wrong PlayerID assigned");
 
         assertEquals(players.get(0).getTeamColor(),TeamEnum.WHITE,"Wrong Color assigned");
-        assertEquals(players.get(1).getTeamColor(),TeamEnum.BLACK,"Wrong Color assigned");
-        assertEquals(players.get(2).getTeamColor(),TeamEnum.GREY,"Wrong Color assigned");
+        assertEquals(players.get(1).getTeamColor(),TeamEnum.GREY,"Wrong Color assigned");
+        assertEquals(players.get(2).getTeamColor(),TeamEnum.BLACK,"Wrong Color assigned");
 
         for (Player player: players) {
             assertTrue(player.isLeader(),"Wrong Leader assignment");
