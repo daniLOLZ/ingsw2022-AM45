@@ -35,7 +35,7 @@ public class BoardTest {
      */
     @Test
     public void moveFromEntranceToHallTest(){
-        board.addToEntrance(student); //this method shouldn't be public
+        board.addToEntrance(student);
         board.setSelectedEntranceStudentPos(0);
         assertEquals(board.moveFromEntranceToHall(),student,"Not corresponding Student types");
         assertEquals(board.entranceSize(),0,"Student is still at the Entrance");
@@ -66,6 +66,18 @@ public class BoardTest {
     }
 
     /**
+     * Tests if selectedEntranceStudentPos is correctly reset.
+     */
+    @Test
+    public void moveFromEntranceToHallResetTest(){
+        board.addToEntrance(student);
+        board.setSelectedEntranceStudentPos(0);
+        board.moveFromEntranceToHall();
+
+        assertEquals(board.moveFromEntranceToHall(),StudentEnum.NOSTUDENT,"Selected student has not been reset");
+    }
+
+    /**
      * Tests correct placing from Entrance to IslandGroup
      */
     @Test
@@ -80,14 +92,39 @@ public class BoardTest {
             e.printStackTrace();
         }
 
-        IslandGroup islandGroup = new IslandGroup(game,0,islands,null,null,new ArrayList<StudentEnum>(),TeamEnum.NOTEAM);
+        IslandGroup islandGroup = new IslandGroup(game,0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM);
 
         board.addToEntrance(student);
         board.setSelectedEntranceStudentPos(0);
         board.moveFromEntranceToIsland(islandGroup);
 
         assertEquals(board.getStudentsAtEntrance().size(),0,"Student is still at the Entrance");
-        assertEquals(islandGroup.getStudents().get(0),student,"Not corresponding type of student");
+    }
+
+    /**
+     * Tests if selectedEntranceStudentPos is correctly reset.
+     */
+    @Test
+    public void moveFromEntranceToIslandResetTest(){
+        SimpleGame game = null;
+        Island island = new Island(0);
+        List<Island> islands = new ArrayList<>();
+        islands.add(island);
+        try {
+            game = new SimpleGame(2);
+        } catch (IncorrectPlayersException e){
+            e.printStackTrace();
+        }
+
+        IslandGroup islandGroup = new IslandGroup(game,0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM);
+
+        board.addToEntrance(student);
+        board.setSelectedEntranceStudentPos(0);
+        board.moveFromEntranceToIsland(islandGroup);
+        board.addToEntrance(student);
+        board.moveFromEntranceToIsland(islandGroup);
+
+        assertEquals(board.getStudentsAtEntrance().size(),1,"Selected student has not been reset");
     }
 
     /**
@@ -102,7 +139,6 @@ public class BoardTest {
         cloud.fill(students);
         board.moveFromCloud(cloud);
 
-        assertTrue(cloud.isEmpty(),"Students weren't removed from Cloud");
         assertEquals(board.getStudentsAtEntrance().size(),3,"Moved wrong number of students");
         for (int count = 0; count < 3; count++) assertEquals(board.getStudentsAtEntrance().get(count),student,"There's an impostor among us");
     }

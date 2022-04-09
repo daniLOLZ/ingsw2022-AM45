@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Board {
 
+    private static final int tableSize = 10;
+
     private int numberOfTowers;
     private final TeamEnum towerColor;
     private List<StudentEnum> studentsAtEntrance;
@@ -16,8 +18,8 @@ public class Board {
     public Board(int numTowers, TeamEnum teamColor){
         numberOfTowers = numTowers;
         towerColor = teamColor;
-        studentsAtEntrance = new ArrayList<StudentEnum>();
-        studentsPerTable = new ArrayList<Integer>();
+        studentsAtEntrance = new ArrayList<>();
+        studentsPerTable = new ArrayList<>();
         for(StudentEnum table : StudentEnum.getStudents()){
             studentsPerTable.add(0);
         }
@@ -44,27 +46,23 @@ public class Board {
     public TeamEnum getTowerColor() {return towerColor;}
 
     /**
-     * remove Student from studentsAtEntrance
-     * add 1 Student to right position of StudentsPerTable
-     * calls updateProfessors
-     * resets selectedEntranceStudentPos
+     * Remove Student from studentsAtEntrance.
+     * Add 1 Student to right position of StudentsPerTable.
+     * Resets selectedEntranceStudentPos.
      * @return moved student's type
      */
     public StudentEnum moveFromEntranceToHall(){
 
+        //no selected student
+        if (selectedEntranceStudentPos == null) return StudentEnum.NOSTUDENT;
+
         StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos);
 
-        int studentsOnTable = studentsPerTable.get(student.ordinal());
-
         //table is full
-        //TODO remove hardcoding
-        if (studentsOnTable >= 10) return StudentEnum.NOSTUDENT;
+        if (studentsPerTable.get(student.ordinal()) >= tableSize) return StudentEnum.NOSTUDENT;
 
-        //remove student from entrance
-        studentsAtEntrance.remove(selectedEntranceStudentPos.intValue());
-
-        //add student to table
-        studentsPerTable.set(student.ordinal(), studentsOnTable + 1);
+        removeFromEntrance(selectedEntranceStudentPos);
+        addToHall(student);
 
         selectedEntranceStudentPos = null;
 
@@ -73,19 +71,23 @@ public class Board {
 
 
     /**
-     * removes the right student from studentsAtEntrance
-     * adds 1 student, of the right type, in chosenIsland
+     * Removes the right student from studentsAtEntrance.
+     * Adds 1 student, of the right type, in chosenIsland.
+     * Resets selectedEntranceStudentPos.
      * @param chosenIsland the IslandGroup selected by the current player
      */
     public void moveFromEntranceToIsland(IslandGroup chosenIsland){
 
+        //no selected student
+        if(selectedEntranceStudentPos == null) return;
+
         StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos);
 
-        //remove student from entrance
-        studentsAtEntrance.remove(selectedEntranceStudentPos.intValue());
+        removeFromEntrance(selectedEntranceStudentPos);
 
-        //adds the student to the IslandGroup
         chosenIsland.addStudent(student);
+
+        selectedEntranceStudentPos = null;
     }
 
     /**
@@ -106,10 +108,9 @@ public class Board {
         //TODO remove hardcoding
         if (entranceSize() == 7) throw new FullEntranceException();
 
-        int studentsOnTable = studentsPerTable.get(chosenTable.ordinal());
-        studentsPerTable.set(chosenTable.ordinal(), studentsOnTable - 1);
+        removeFromHall(chosenTable);
 
-        studentsAtEntrance.add(chosenTable);
+        addToEntrance(chosenTable);
     }
 
     /**
@@ -121,7 +122,7 @@ public class Board {
      */
     public List<StudentEnum> removeNStudentsFromHall(StudentEnum colorStudent, int numToSubtract){
         List<StudentEnum> returnList = new ArrayList<>();
-        StudentEnum studentLeaving = StudentEnum.NOSTUDENT;
+        StudentEnum studentLeaving;
 
         for(int draws=0; draws < numToSubtract; draws++){
             studentLeaving = removeFromHall(colorStudent);
@@ -136,6 +137,19 @@ public class Board {
 
     public void addToEntrance(StudentEnum studentToAdd){
         studentsAtEntrance.add(studentToAdd);
+    }
+
+    /**
+     * Removes the selected student from the Entrance.
+     * @param position The position of the student to remove
+     * @return The removed student
+     */
+    public StudentEnum removeFromEntrance(int position){
+
+        //position out of bounds
+        if(position >= studentsAtEntrance.size()) return StudentEnum.NOSTUDENT;
+
+        return studentsAtEntrance.remove(position);
     }
 
     public void addToHall(StudentEnum student){
@@ -153,7 +167,7 @@ public class Board {
      */
     public StudentEnum removeFromHall(StudentEnum color){
         Integer previousNumStudents = studentsPerTable.get(color.index);
-        if(previousNumStudents.intValue() == 0){
+        if(previousNumStudents == 0){
             return StudentEnum.NOSTUDENT;
         }
         studentsPerTable.set(color.index, previousNumStudents - 1);
