@@ -47,7 +47,7 @@ public class FactoryPlayerTest {
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
-        List<Player> players = FactoryPlayer.getNPlayers(null,3);
+        List<Player> players = FactoryPlayer.getNPlayers(game,3);
 
         assertEquals(players.get(0).getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerID assigned");
         assertEquals(players.get(1).getPlayerId(),PlayerEnum.PLAYER2,"Wrong PlayerID assigned");
@@ -73,7 +73,7 @@ public class FactoryPlayerTest {
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
-        List<Player> players = FactoryPlayer.getNPlayers(null,4);
+        List<Player> players = FactoryPlayer.getNPlayers(game,4);
 
         assertEquals(players.get(0).getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerID assigned");
         assertEquals(players.get(1).getPlayerId(),PlayerEnum.PLAYER2,"Wrong PlayerID assigned");
