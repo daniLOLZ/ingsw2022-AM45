@@ -25,6 +25,12 @@ public class SimpleGame {
 
     private boolean hasBeenInitialized;
 
+    /**
+     * Must be initialized after creation via the initializeGame() function
+     * @param numPlayers the number of players in the game [2,4]
+     * @throws IncorrectPlayersException the number of players isn't in the
+     * allowed range
+     */
     public SimpleGame(int numPlayers) throws  IncorrectPlayersException{
 
         if(numPlayers > 4 || numPlayers < 2){
@@ -72,7 +78,11 @@ public class SimpleGame {
 
     }
 
-    //TODO add an override within AdvancedGame
+    //TODO this could become a private method called from the constructor;
+    // for testing purposes, it's kept separate
+    /**
+     * Initializes the current game, mimics the setting up of the board
+     */
     public void initializeGame(){
         //We must not initialize twice
         if (hasBeenInitialized == true) return;
@@ -119,7 +129,7 @@ public class SimpleGame {
                 maximumStudents = numberOfStudents;
                 currentWinner = player.getPlayerId();
             }
-            if (numberOfStudents == maximumStudents){
+            else if (numberOfStudents == maximumStudents){
                 currentWinner = PlayerEnum.NOPLAYER;
             }
         }
@@ -134,9 +144,14 @@ public class SimpleGame {
      * @param player the player to assign it to
      */
     private void assignProfessor(StudentEnum professor, PlayerEnum player){
-        this.professors.set(professor.ordinal(), player);
+        this.professors.set(professor.index, player);
     }
 
+
+    /**
+     * Sorts the players based on the assistant they played in the planning phase
+     * Accounts for the possibility of players playing the same valued assistants in the same turn
+     */
     public void sortPlayers(){
         List<Player> newPlayerOrder = new ArrayList<>();
 
@@ -233,6 +248,10 @@ public class SimpleGame {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public boolean isHasBeenInitialized() {
+        return hasBeenInitialized;
     }
 
     public void setCurrentPlayer(Player currentPlayer) {

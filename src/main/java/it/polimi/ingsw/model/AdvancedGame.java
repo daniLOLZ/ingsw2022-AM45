@@ -171,5 +171,6 @@ public class AdvancedGame extends SimpleGame{
     protected void createPlayingSack() {
         sack = new AdvancedSack(24);
     }
+
 }
 

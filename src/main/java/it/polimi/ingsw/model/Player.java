@@ -28,9 +28,8 @@ public class Player {
         this.teamColor = teamColor;
         this.leader = leader;
         this.board = new Board(game.getNumTowers(), teamColor);
-        List<Assistant> assistants = new ArrayList<>();
-        //TODO create the list of assistants via factoryAssistant
-        this.wizard = new Wizard(playerId.ordinal(), assistants);
+        //TODO make the player choose which wizard they want to pick
+        this.wizard = FactoryWizard.getWizard(playerId.index*10);
     }
 
     public Board getBoard() {
