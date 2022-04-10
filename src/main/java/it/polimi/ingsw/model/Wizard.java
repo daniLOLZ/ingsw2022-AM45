@@ -19,13 +19,9 @@ public class Wizard {
      * @exception NoSuchAssistantException The Assistant card is not in the deck
      */
     public Assistant playCard(int id) throws NoSuchAssistantException {
-        for (Assistant assistant : assistants) {
-            if (assistant.getId() == id){ //look for the Assistant card
-                assistants.remove(assistant);
-                return assistant;
-            }
-        }
-        throw new NoSuchAssistantException();
+        Assistant assistant = getAssistantByID(id);
+        assistants.remove(assistant);
+        return assistant;
     }
 
     public boolean isEmpty(){
@@ -38,6 +34,16 @@ public class Wizard {
 
     public Assistant getAssistant(int index){
         return assistants.get(index);
+    }
+
+    public Assistant getAssistantByID(int id) throws NoSuchAssistantException{
+        for (Assistant assistant : assistants) {
+            if (assistant.getId() == id){ //look for the Assistant card
+                assistants.remove(assistant);
+                return assistant;
+            }
+        }
+        throw new NoSuchAssistantException();
     }
 
     public int getIdWizard(){return idWizard;}

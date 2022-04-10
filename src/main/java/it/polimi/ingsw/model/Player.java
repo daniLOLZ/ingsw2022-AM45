@@ -52,6 +52,10 @@ public class Player {
         return assistantPlayed;
     }
 
+    public Wizard getWizard(){
+        return wizard;
+    }
+
     private void setAssistantPlayed(Assistant assistant){
         this.assistantPlayed = assistant;
     }

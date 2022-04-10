@@ -5,7 +5,6 @@ import java.util.Objects;
 public class Assistant {
     public final int id;
 
-
     public final int motherNatureSteps;
     public final int turnOrder;
 
