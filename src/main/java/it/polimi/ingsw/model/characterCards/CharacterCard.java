@@ -18,7 +18,7 @@ public abstract class CharacterCard {
 
     /**
      * Initialise CharacterChard fields where this operation is useful
-     * @param game
+     * @param game != null
      */
     public void initialise(AdvancedGame game){
 
@@ -44,7 +44,7 @@ public abstract class CharacterCard {
      * Model state.
      * Increment cardCost if it is the first time in the game that the effect is activated
      * Set HasBeenUsed true
-     * @param game
+     * @param game != null
      */
     public  void activateEffect(AdvancedGame game){
         if(!HasBeenUsed()){

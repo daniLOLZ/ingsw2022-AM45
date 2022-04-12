@@ -28,7 +28,7 @@ public class SackTest {
      * test for NoStudents presence
      */
     @Test
-    public void thereIsnoNOSTUDENTS(){
+    public void thereIsNoNOSTUDENTS(){
         Sack sack = new Sack(10);
         int x ;
         while(!sack.isEmpty()){

@@ -68,6 +68,9 @@ public class FactoryAssistantTest {
         }
     }
 
+    /**
+     * tests if wrong id parameter is managed well
+     */
     @Test
     public void wrongId(){
         try {

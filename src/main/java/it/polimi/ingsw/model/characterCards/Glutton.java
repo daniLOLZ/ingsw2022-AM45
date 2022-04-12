@@ -11,7 +11,7 @@ public class Glutton extends CharacterCard {
     /**
      * During this turn Current player gain the professor even if he has equal number of students at Hall
      * Set DrawIsWin true
-     * @param game
+     * @param game != null
      */
     @Override
     public void activateEffect(AdvancedGame game) {

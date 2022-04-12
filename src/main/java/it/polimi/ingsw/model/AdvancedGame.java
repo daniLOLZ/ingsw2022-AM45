@@ -70,7 +70,7 @@ public class AdvancedGame extends SimpleGame{
         this.drawIsWin = drawIsWin;
     }
 
-    public void setChoosenStudentType(StudentEnum type) {
+    public void setChosenStudentType(StudentEnum type) {
         ChosenStudentType = type;
     }
 
@@ -82,7 +82,7 @@ public class AdvancedGame extends SimpleGame{
         this.chosenIsland = choosenIsland;
     }
 
-    public AdvancedIslandGroup getChoosenIsland() {
+    public AdvancedIslandGroup getChosenIsland() {
         return chosenIsland;
     }
 
@@ -106,11 +106,11 @@ public class AdvancedGame extends SimpleGame{
         TradeableStudent = tradeableStudent;
     }
 
-    public void setChoosenIsland(AdvancedIslandGroup choosenIsland) {
+    public void setChosenIsland(AdvancedIslandGroup choosenIsland) {
         this.chosenIsland = choosenIsland;
     }
 
-    public StudentEnum getChoosenStudentType() {
+    public StudentEnum getChosenStudentType() {
         return ChosenStudentType;
     }
 
@@ -118,10 +118,12 @@ public class AdvancedGame extends SimpleGame{
         IslandToEvaluateDue = islandToEvaluateDue;
     }
 
-    public boolean IslandToEvaluateDue() {
-        return IslandToEvaluateDue;
-    }
 
+    /**
+     *
+     * @param position >= 0 && position < CharacterCards.size()
+     * @return Character card in position 'position'
+     */
     public CharacterCard getCharacterCard(int position) {
         return CharacterCards.get(position);
     }
@@ -162,6 +164,10 @@ public class AdvancedGame extends SimpleGame{
         return AdditionalInfluence;
     }
 
+    /**
+     *
+     * @param positionCard >= 0 && positionCard < CharacterCard.size()
+     */
     public void playCharacterCard(int positionCard){
 
         CharacterCards.get(positionCard).activateEffect(this);
