@@ -22,6 +22,7 @@ public class PlayerTest {
         player = new Player(game,PlayerEnum.PLAYER1,"mock",TeamEnum.WHITE,true);
 
         wizard = player.getWizard();
+
     }
 
     /**
@@ -30,10 +31,12 @@ public class PlayerTest {
     @Test
     public void playAssistantTest(){
 
+        if(game.getErrorState() == null){
         Assistant assistant = wizard.getAssistant(2);
         player.playAssistant(assistant.id);
 
         assertEquals(player.getAssistantPlayed(),assistant,"Wrong Assistant was played");
+        }
     }
 
     /**
@@ -41,7 +44,9 @@ public class PlayerTest {
      */
     @Test
     public void playInvalidAssistantTest(){
+        if(game.getErrorState() == null){
         player.playAssistant(1000);
         assertNull(player.getAssistantPlayed(),"Played Assistant with invalid ID");
+        }
     }
 }

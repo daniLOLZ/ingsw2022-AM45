@@ -1,6 +1,10 @@
 package it.polimi.ingsw.model;
 
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FactoryWizard {
@@ -10,31 +14,34 @@ public class FactoryWizard {
 
     /**
      * create and return Wizard's deck corresponding with chosen id
-     * @param idWizard == 0 ||
+     * @param wizard == 0 ||
      *                 == 10 ||
      *                 == 20 ||
      *                 == 30
-     * @return
+     * @return Wizard deck(with numOfCardsPerWizard Assistant cards)
+     * with chosen id if this one is an available parameter
+     * return Wizard with id == 0 otherwise
      */
-    public static Wizard getWizard(int idWizard){
+    public static Wizard getWizard(int wizard) throws IOException, ParseException {
 
-        if(idWizard !=0 && idWizard != 10 && idWizard != 20 && idWizard != 30)
-            idWizard = 0;
+        final int wizardToMatch = wizard;
+        if(Arrays.stream(idWizard).noneMatch(id -> id == wizardToMatch))
+            wizard = 0;
 
         List<Assistant> assistants = new ArrayList<>();
 
-        for(int cards = 1; cards <= 10; cards++){
-            assistants.add(FactoryAssistant.getAssistant(cards + idWizard));
+        for(int cards = 1; cards <= numOfCardsPerWizard; cards++){
+            assistants.add(FactoryAssistant.getAssistant(cards + wizard));
         }
 
-        return new Wizard(idWizard,assistants);
+        return new Wizard(wizard,assistants);
     }
 
-    public static Wizard getWizard(){
+    public static Wizard getWizard() throws IOException, ParseException {
         return getWizard(0);
     }
 
-    public static List<Wizard> getAllWizards(){
+    public static List<Wizard> getAllWizards() throws IOException, ParseException {
         List<Wizard> listToReturn = new ArrayList<>();
         for(int i: idWizard)
             listToReturn.add(getWizard(i));

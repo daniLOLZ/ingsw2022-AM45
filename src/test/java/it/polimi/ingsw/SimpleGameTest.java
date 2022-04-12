@@ -65,15 +65,17 @@ public class SimpleGameTest {
      * based on the assistants played
      */
     @Test
-    public void checkPlayerOrderAllDifferentCards(){
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).playAssistant(5); //Should have turn order 5
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(13); //Should have turn order 3
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(22); //Should have turn order 2
-        game.sortPlayers();
-        //The order should be 3 > 2 > 1
-        assertTrue(game.getPlayers().get(0).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3))
+    public void checkPlayerOrderAllDifferentCards() {
+        if (game.getErrorState() == null) {
+            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).playAssistant(5); //Should have turn order 5
+            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(13); //Should have turn order 3
+            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(22); //Should have turn order 2
+            game.sortPlayers();
+            //The order should be 3 > 2 > 1
+            assertTrue(game.getPlayers().get(0).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3))
                     && game.getPlayers().get(1).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2))
                     && game.getPlayers().get(2).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1)));
+        }
     }
 
     /**
@@ -82,6 +84,7 @@ public class SimpleGameTest {
      */
     @Test
     public void checkPlayerOrderTwoEqualCards(){
+        if(game.getErrorState() == null){
         //We begin with the case of all different cards, to set the player array
         GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).playAssistant(5); //Should have turn order 5
         GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(13); //Should have turn order 3
@@ -99,6 +102,7 @@ public class SimpleGameTest {
         assertTrue(game.getPlayers().get(0).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2))
                 && game.getPlayers().get(1).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3))
                 && game.getPlayers().get(2).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1)));
+        }
     }
 
 

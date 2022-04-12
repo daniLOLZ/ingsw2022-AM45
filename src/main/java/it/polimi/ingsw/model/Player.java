@@ -1,5 +1,8 @@
 package it.polimi.ingsw.model;
 
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +32,22 @@ public class Player {
         this.leader = leader;
         this.board = new Board(game.getNumTowers(), teamColor);
         //TODO make the player choose which wizard they want to pick
-        this.wizard = FactoryWizard.getWizard(playerId.index*10);
+
+        //I catch these exceptions here to not throw them too many times in code
+        //Player modify SimpleGame to notify the error presence and in this way
+        //View can see the error and show to User what goes wrong, then View
+        //notify to Controller that the game should be closed
+        try {
+            this.wizard = FactoryWizard.getWizard(playerId.index*10);
+        } catch (IOException e) {
+            ErrorState error = new ErrorState(e.getMessage());
+            game.setErrorState(error);
+            e.printStackTrace();        //TO DELETE, for now it can be useful
+        } catch (ParseException e) {
+            ErrorState error = new ErrorState(e.getMessage());
+            game.setErrorState(error);
+            e.printStackTrace();         //TO DELETE, for now it can be useful
+        }
     }
 
     public Board getBoard() {

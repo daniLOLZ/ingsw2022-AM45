@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 
 public class SimpleGame {
+    private ErrorState errorState;
     private final int numPlayers;
     private int maxStudentsEntrance;
     private final int maxStudentsByType;
@@ -256,5 +257,12 @@ public class SimpleGame {
 
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public void setErrorState(ErrorState errorState) {
+        this.errorState = errorState;
+    }
+    public ErrorState getErrorState() {
+        return errorState;
     }
 }
