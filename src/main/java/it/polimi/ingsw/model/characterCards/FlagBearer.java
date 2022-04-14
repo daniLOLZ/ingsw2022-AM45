@@ -1,11 +1,12 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
+import it.polimi.ingsw.model.AdvancedParameterHandler;
 
 public class FlagBearer extends CharacterCard {
 
-    public FlagBearer(){
-        super(3,3);
+    public FlagBearer(AdvancedParameterHandler advancedParameters){
+        super(3,3, advancedParameters);
     }
 
     /**
@@ -13,10 +14,11 @@ public class FlagBearer extends CharacterCard {
      * Set IslandToEvaluate true
      * @param game
      */
-    @Override
+    //@Override
+    //TODO I'm not touching this but it needs to be changed
     public void activateEffect(AdvancedGame game) {
 
-        super.activateEffect(game);
+        super.activateEffect();
         game.setIslandToEvaluateDue(true);
 
     }

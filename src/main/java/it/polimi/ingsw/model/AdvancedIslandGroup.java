@@ -5,24 +5,28 @@ import java.util.List;
 
 public class AdvancedIslandGroup extends IslandGroup {
 
+    private AdvancedParameterHandler advancedParameters;
     private List<BlockTile> blockTiles;
 
     /**
      * default constructor
      * useful for test
      */
-    public AdvancedIslandGroup(){
+    public AdvancedIslandGroup(AdvancedParameterHandler advancedParameters){
         super();
         blockTiles = new ArrayList<>();
+       this.advancedParameters = advancedParameters;
     }
 
-    public AdvancedIslandGroup(IslandGroup island, ArrayList<BlockTile> blockTiles){
+    public AdvancedIslandGroup(IslandGroup island, ArrayList<BlockTile> blockTiles, AdvancedParameterHandler advancedParameters){
         super(island);
         this.blockTiles = new ArrayList<>(blockTiles);
+        this.advancedParameters = advancedParameters;
     }
-    public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ArrayList<BlockTile> blockTiles, ParameterHandler parameters){
+    public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ArrayList<BlockTile> blockTiles, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor, parameters);
         this.blockTiles = new ArrayList<>(blockTiles);
+        this.advancedParameters = advancedParameters;
     }
 
     /**
@@ -33,12 +37,12 @@ public class AdvancedIslandGroup extends IslandGroup {
      *               the single island group in the collection
      * @return a collection of AdvancedIslandGroup
      */
-    public List<AdvancedIslandGroup> getCollectionAdvancedIslandGroup(ParameterHandler parameters, int startingId, int amount){
+    public List<AdvancedIslandGroup> getCollectionAdvancedIslandGroup(AdvancedParameterHandler advancedParameters,ParameterHandler parameters, int startingId, int amount){
         List<IslandGroup> simpleIslands = getCollectionOfIslandGroup(parameters ,startingId, amount);
         List<AdvancedIslandGroup> advancedIslands = new ArrayList<>();
         AdvancedIslandGroup decoratedIsland;
         for(IslandGroup s_group : simpleIslands){
-            decoratedIsland = new AdvancedIslandGroup(s_group, new ArrayList<BlockTile>());
+            decoratedIsland = new AdvancedIslandGroup(s_group, new ArrayList<BlockTile>(), advancedParameters);
             advancedIslands.add(decoratedIsland);
         }
         return advancedIslands;

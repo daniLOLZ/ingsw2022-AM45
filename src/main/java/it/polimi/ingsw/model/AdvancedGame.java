@@ -19,9 +19,11 @@ public class AdvancedGame extends SimpleGame{
     private StudentEnum ChosenStudentType;                 //useful for LoanShark,Fungalmancer
     private final List<CharacterCard> CharacterCards;
     private AdvancedIslandGroup chosenIsland;              //useful for FlagBearer, Herbalist
+    private AdvancedParameterHandler advancedParameters;   //TODO move above parameters here
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
+        advancedParameters = new AdvancedParameterHandler(numCoins);
         this.numCoins = numCoins;
         drawIsWin = false;
         MNAdditionalSteps = 0;
@@ -37,7 +39,7 @@ public class AdvancedGame extends SimpleGame{
 
 
         for(int card= 0; card < numCharacterCards; card++){
-            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards));
+            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards, advancedParameters));
         }
         for(int card= 0; card < numCharacterCards; card++){
             CharacterCards.get(card).initialise(this);
@@ -162,9 +164,13 @@ public class AdvancedGame extends SimpleGame{
         return AdditionalInfluence;
     }
 
+    public AdvancedParameterHandler getAdvancedParameters(){
+        return advancedParameters;
+    }
+
     public void playCharacterCard(int positionCard){
 
-        CharacterCards.get(positionCard).activateEffect(this);
+        CharacterCards.get(positionCard).activateEffect();
     }
 
     @Override

@@ -17,8 +17,8 @@ public class CharacterCardTest {
     @Test
     public void createCard(){
 
-        CharacterCard card = FactoryCharacterCard.getSpecificCard(1);
-        CharacterCard priest = new Priest();
+        CharacterCard card = FactoryCharacterCard.getSpecificCard(1,null);
+        CharacterCard priest = new Priest(null);
         assertEquals(card, priest, "Wrong card");
         assertEquals(card.id, priest.id, "Wrong id");
         assertEquals(card.getCardCost(), priest.getCardCost(), "Wrong cost");
@@ -31,11 +31,11 @@ public class CharacterCardTest {
     @Test
     public void randomCards(){
         List<CharacterCard> listCards = new ArrayList<>();
-        CharacterCard card1 = FactoryCharacterCard.getCharacterCard(listCards);
+        CharacterCard card1 = FactoryCharacterCard.getCharacterCard(listCards,null);
         listCards.add(card1);
-        CharacterCard card2 = FactoryCharacterCard.getCharacterCard(listCards);
+        CharacterCard card2 = FactoryCharacterCard.getCharacterCard(listCards,null);
         listCards.add(card2);
-        CharacterCard card3 = FactoryCharacterCard.getCharacterCard(listCards);
+        CharacterCard card3 = FactoryCharacterCard.getCharacterCard(listCards,null);
         assertNotEquals(card1,card2, "Two equal cards");
         assertNotEquals(card2,card3,"Two equals cards");
         assertNotEquals(card1,card3,"Two equals cards");
@@ -46,7 +46,6 @@ public class CharacterCardTest {
      */
     @Test
     public  void incrementCost(){
-        CharacterCard card = FactoryCharacterCard.getCharacterCard();
         AdvancedGame game = null;
         try {
             game = new AdvancedGame(2, 20,3);
@@ -54,8 +53,9 @@ public class CharacterCardTest {
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
+        CharacterCard card = FactoryCharacterCard.getCharacterCard(game.getAdvancedParameters());
         int costBefore = card.getCardCost();
-        card.activateEffect(game);
+        card.activateEffect();
         int costNow = card.getCardCost();
         assertEquals(costBefore + 1, costNow, "Cost updating not correct");
     }
@@ -72,14 +72,14 @@ public class CharacterCardTest {
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }        List<CharacterCard> cards = new ArrayList<>();
-        cards.addAll(FactoryCharacterCard.getAllCards());
+        cards.addAll(FactoryCharacterCard.getAllCards(game.getAdvancedParameters()));
         int costBefore;
         int costNow;
 
         //TIME WHERE INCREMENT
         for(CharacterCard cardSel: cards){
             costBefore = cardSel.getCardCost();
-            cardSel.activateEffect(game);
+            cardSel.activateEffect();
             costNow = cardSel.getCardCost();
             assertEquals(costBefore + 1, costNow, "Wrong cost with" + cardSel.id + "card");
         }
@@ -87,7 +87,7 @@ public class CharacterCardTest {
         //TIME WHERE DO NOT INCREMENT
         for(CharacterCard cardSel: cards){
             costBefore = cardSel.getCardCost();
-            cardSel.activateEffect(game);
+            cardSel.activateEffect();
             costNow = cardSel.getCardCost();
             assertEquals(costBefore, costNow, "Wrong cost with" + cardSel.id + "card");
         }
@@ -100,7 +100,6 @@ public class CharacterCardTest {
     @Test
     public void InitialEffectCards(){
         List<CharacterCard> cards = new ArrayList<>();
-        cards.addAll(FactoryCharacterCard.getInitialEffectCards());
         AdvancedGame game = null;
         try {
             game = new AdvancedGame(2, 20,3);
@@ -108,6 +107,7 @@ public class CharacterCardTest {
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
+        cards.addAll(FactoryCharacterCard.getInitialEffectCards(game.getAdvancedParameters()));
         ParameterHandler parameters = new ParameterHandler(2);
         game.setCurrentPlayer(new Player(PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true,parameters));
         StudentEnum studentSel;

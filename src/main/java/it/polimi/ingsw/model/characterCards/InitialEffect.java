@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.characterCards;
 
+import it.polimi.ingsw.model.AdvancedParameterHandler;
 import it.polimi.ingsw.model.StudentEnum;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ public abstract class InitialEffect extends CharacterCard{
 
     private List<StudentEnum> students;
 
-    public InitialEffect(int cost, int id){
+    public InitialEffect(int cost, int id, AdvancedParameterHandler advancedParameters){
 
-        super(cost, id);
+        super(cost, id, advancedParameters);
         students = new ArrayList<>();
     }
 
