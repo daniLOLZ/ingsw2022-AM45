@@ -39,7 +39,7 @@ public class AdvancedGame extends SimpleGame{
 
 
         for(int card= 0; card < numCharacterCards; card++){
-            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards, advancedParameters));
+            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
         }
         for(int card= 0; card < numCharacterCards; card++){
             CharacterCards.get(card).initialise(this);

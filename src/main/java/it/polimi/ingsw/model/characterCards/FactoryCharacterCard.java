@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.ParameterHandler;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,37 +24,37 @@ public class FactoryCharacterCard {
      * @param advancedParameters
      * @return CharacterCard
      */
-    public static CharacterCard getCharacterCard(List<CharacterCard> listCardsGot, AdvancedParameterHandler advancedParameters){
+    public static CharacterCard getCharacterCard(List<CharacterCard> listCardsGot, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
 
-        CharacterCard x = new Glutton(advancedParameters); //placeholder
+        CharacterCard x = new Glutton(parameters, advancedParameters); //placeholder
         int times=0;
         int random = (int) Instant.now().getEpochSecond() % numCharacterCards;
 
         while(times < numCharacterCards){
             if(random == 0)
-                x = new Priest(advancedParameters);
+                x = new Priest(parameters ,advancedParameters);
             if(random == 1)
-                x = new Glutton(advancedParameters);
+                x = new Glutton(parameters ,advancedParameters);
             if(random == 2)
-                x = new FlagBearer(advancedParameters);
+                x = new FlagBearer(parameters ,advancedParameters);
             if(random == 3)
-                x = new Mailman(advancedParameters);
+                x = new Mailman(parameters ,advancedParameters);
             if(random == 4)
-                x = new Herbalist(advancedParameters);
+                x = new Herbalist(parameters ,advancedParameters);
             if(random == 5)
-                x = new Centaur(advancedParameters);
+                x = new Centaur(parameters ,advancedParameters);
             if(random == 6)
-                x = new Juggler(advancedParameters);
+                x = new Juggler(parameters ,advancedParameters);
             if(random == 7)
-                x = new Knight(advancedParameters);
+                x = new Knight(parameters ,advancedParameters);
             if(random == 8)
-                x = new Fungalmancer(advancedParameters);
+                x = new Fungalmancer(parameters ,advancedParameters);
             if(random == 9)
-                x = new Minstrel(advancedParameters);
+                x = new Minstrel(parameters ,advancedParameters);
             if(random == 10)
-                x = new Dame(advancedParameters);
+                x = new Dame(parameters ,advancedParameters);
             if(random == 11)
-                x = new LoanShark(advancedParameters);
+                x = new LoanShark(parameters ,advancedParameters);
 
 
             if(listCardsGot.contains(x)){
@@ -69,45 +70,46 @@ public class FactoryCharacterCard {
     /**
      * Get specific CharacterCard with id selected
      * @param id
+     * @param parameters
      * @param advancedParameters
      * @return
      */
-    public static CharacterCard getSpecificCard(int id, AdvancedParameterHandler advancedParameters){
+    public static CharacterCard getSpecificCard(int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         if(id == 1)
-            return  new Priest(advancedParameters);
+            return  new Priest(parameters, advancedParameters);
         if(id == 2)
-            return  new Glutton(advancedParameters);
+            return  new Glutton(parameters ,advancedParameters);
         if(id == 3)
-            return  new FlagBearer(advancedParameters);
+            return  new FlagBearer(parameters, advancedParameters);
         if(id == 4)
-            return  new Mailman(advancedParameters);
+            return  new Mailman(parameters, advancedParameters);
         if(id == 5)
-            return  new Herbalist(advancedParameters);
+            return  new Herbalist(parameters, advancedParameters);
         if(id == 6)
-            return  new Centaur(advancedParameters);
+            return  new Centaur(parameters, advancedParameters);
         if(id == 7)
-            return  new Juggler(advancedParameters);
+            return  new Juggler(parameters, advancedParameters);
         if(id == 8)
-            return  new Knight(advancedParameters);
+            return  new Knight(parameters, advancedParameters);
         if(id == 9)
-            return  new Fungalmancer(advancedParameters);
+            return  new Fungalmancer(parameters, advancedParameters);
         if(id == 10)
-            return  new Minstrel(advancedParameters);
+            return  new Minstrel(parameters, advancedParameters);
         if(id == 11)
-            return  new Dame(advancedParameters);
+            return  new Dame(parameters, advancedParameters);
         if(id == 12)
-            return  new LoanShark(advancedParameters);
+            return  new LoanShark(parameters, advancedParameters);
 
-        return new Glutton(advancedParameters);
+        return new Glutton(parameters, advancedParameters);
     }
 
     /**
      * Get a random CharacterCard
      * @return
      */
-    public static CharacterCard getCharacterCard(AdvancedParameterHandler advancedParameters){
+    public static CharacterCard getCharacterCard(ParameterHandler parameters ,AdvancedParameterHandler advancedParameters){
         List<CharacterCard> list = new ArrayList<>();
-        return getCharacterCard(list, advancedParameters);
+        return getCharacterCard(list, parameters, advancedParameters);
     }
 
 
@@ -115,20 +117,20 @@ public class FactoryCharacterCard {
      *Get all CharacterCards
      * @return
      */
-    public static List<CharacterCard> getAllCards(AdvancedParameterHandler advancedParameters){
+    public static List<CharacterCard> getAllCards(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         List<CharacterCard> listCards = new ArrayList<>();
-        listCards.add(new Priest(advancedParameters));
-        listCards.add(new Glutton(advancedParameters));
-        listCards.add(new FlagBearer(advancedParameters));
-        listCards.add(new Mailman(advancedParameters));
-        listCards.add(new Herbalist(advancedParameters));
-        listCards.add(new Centaur(advancedParameters));
-        listCards.add(new Juggler(advancedParameters));
-        listCards.add(new Knight(advancedParameters));
-        listCards.add(new Fungalmancer(advancedParameters));
-        listCards.add(new Minstrel(advancedParameters));
-        listCards.add(new Dame(advancedParameters));
-        listCards.add(new LoanShark(advancedParameters));
+        listCards.add(new Priest(parameters, advancedParameters));
+        listCards.add(new Glutton(parameters, advancedParameters));
+        listCards.add(new FlagBearer(parameters, advancedParameters));
+        listCards.add(new Mailman(parameters, advancedParameters));
+        listCards.add(new Herbalist(parameters, advancedParameters));
+        listCards.add(new Centaur(parameters, advancedParameters));
+        listCards.add(new Juggler(parameters, advancedParameters));
+        listCards.add(new Knight(parameters, advancedParameters));
+        listCards.add(new Fungalmancer(parameters, advancedParameters));
+        listCards.add(new Minstrel(parameters, advancedParameters));
+        listCards.add(new Dame(parameters, advancedParameters));
+        listCards.add(new LoanShark(parameters, advancedParameters));
 
         return  listCards;
     }
@@ -138,11 +140,11 @@ public class FactoryCharacterCard {
      * Those cards that have students on themselves
      * @return
      */
-    public static List<CharacterCard> getInitialEffectCards(AdvancedParameterHandler advancedParameterHandler){
+    public static List<CharacterCard> getInitialEffectCards(ParameterHandler parameters ,AdvancedParameterHandler advancedParameterHandler){
         List<CharacterCard> listCards = new ArrayList<>();
-        listCards.add(new Juggler(advancedParameterHandler));
-        listCards.add(new Dame(advancedParameterHandler));
-        listCards.add(new Priest(advancedParameterHandler));
+        listCards.add(new Juggler(parameters ,advancedParameterHandler));
+        listCards.add(new Dame(parameters ,advancedParameterHandler));
+        listCards.add(new Priest(parameters ,advancedParameterHandler));
 
         return  listCards;
     }

@@ -2,11 +2,12 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
 import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.ParameterHandler;
 
 public class Centaur extends CharacterCard {
 
-    public Centaur(AdvancedParameterHandler advancedParameters){
-        super(3,6, advancedParameters);
+    public Centaur(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(3,6, parameters, advancedParameters);
     }
 
     /**

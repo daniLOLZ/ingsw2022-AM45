@@ -1,9 +1,6 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedIslandGroup;
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.BlockTile;
+import it.polimi.ingsw.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +11,8 @@ public class Herbalist extends CharacterCard {
     private int numBlockTiles;
     private List<BlockTile> blockTiles;
 
-    public Herbalist(AdvancedParameterHandler advancedParameters){
-        super(2,5, advancedParameters);
+    public Herbalist(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(2,5, parameters, advancedParameters);
         numBlockTiles = maxBlockTiles;
         blockTiles = new ArrayList<>();
 

@@ -7,8 +7,8 @@ public class Minstrel extends CharacterCard {
     private final int maxTradeableStudents = 2;
     private int trades;
 
-    public Minstrel(AdvancedParameterHandler advancedParameters){
-        super(1,10,advancedParameters);
+    public Minstrel(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(1,10,parameters, advancedParameters);
     }
 
 

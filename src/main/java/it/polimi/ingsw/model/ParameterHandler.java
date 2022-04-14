@@ -16,6 +16,10 @@ public class ParameterHandler {
     private final int numTowers;
     private Map<PlayerEnum, TeamEnum> playersAllegiance;
 
+    private Optional<List<IslandGroup>> selectedIslands;
+    private Optional<List<Integer>> selectedEntranceStudents;
+    private Optional<List<StudentEnum>> selectedStudentTypes;
+
     private String errorMessage = "";
 
     public ParameterHandler(int numPlayers){
@@ -31,6 +35,8 @@ public class ParameterHandler {
         }
 
         playersAllegiance = new HashMap<>();
+
+        undoSelection();
     }
 
     public int getStudentsPerCloud() {
@@ -81,5 +87,50 @@ public class ParameterHandler {
 
     public void setErrorState(String error){
         errorMessage = error;
+    }
+
+    public void selectIsland(IslandGroup island){
+        selectedIslands.ifPresent(islandGroups -> islandGroups.add(island));
+    }
+
+    public void setSelectedIslands(List<IslandGroup> islands){
+        selectedIslands = Optional.of(new ArrayList<>());
+        for (IslandGroup island : islands) selectIsland(island);
+    }
+
+    public void selectEntranceStudent(int studentPos){
+        selectedEntranceStudents.ifPresent(studentsPositions -> studentsPositions.add(studentPos));
+    }
+
+    public void setSelectedEntranceStudents(List<Integer> studentsPos){
+        selectedEntranceStudents= Optional.of(new ArrayList<>());
+        for (Integer studentPos : studentsPos) selectEntranceStudent(studentPos);
+    }
+
+    public void selectStudentType(StudentEnum studentType){
+        selectedStudentTypes.ifPresent(students -> students.add(studentType));
+    }
+
+    public void setSelectedStudentTypes(List<StudentEnum> students){
+        selectedStudentTypes = Optional.of(new ArrayList<>());
+        for (StudentEnum studentType : students) selectStudentType(studentType);
+    }
+
+    public Optional<List<IslandGroup>> getSelectedIslands() {
+        return selectedIslands;
+    }
+
+    public Optional<List<Integer>> getSelectedEntranceStudents() {
+        return selectedEntranceStudents;
+    }
+
+    public Optional<List<StudentEnum>> getSelectedStudentTypes() {
+        return selectedStudentTypes;
+    }
+
+    public void undoSelection(){
+        selectedIslands = Optional.empty();
+        selectedEntranceStudents = Optional.empty();
+        selectedStudentTypes = Optional.empty();
     }
 }

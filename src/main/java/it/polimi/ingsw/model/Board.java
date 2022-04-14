@@ -3,6 +3,7 @@ package it.polimi.ingsw.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 
 public class Board {
@@ -14,7 +15,7 @@ public class Board {
     private List<StudentEnum> studentsAtEntrance;
     private List<Integer> studentsPerTable;
     private ParameterHandler parameters;
-    private Integer selectedEntranceStudentPos;
+    private Optional<Integer> selectedEntranceStudentPos;
 
     public Board(TeamEnum teamColor, ParameterHandler parameters){
         numberOfTowers = parameters.getNumTowers();
@@ -25,7 +26,7 @@ public class Board {
         for(StudentEnum table : StudentEnum.getStudents()){
             studentsPerTable.add(0);
         }
-        selectedEntranceStudentPos = null;
+        selectedEntranceStudentPos = Optional.empty();
     }
 
     /**
@@ -40,7 +41,7 @@ public class Board {
     }
 
     public void setSelectedEntranceStudentPos(int pos){
-        selectedEntranceStudentPos = pos;
+        selectedEntranceStudentPos = Optional.of(pos);
     }
 
     public int getNumberOfTowers() {return numberOfTowers;}
@@ -56,17 +57,17 @@ public class Board {
     public StudentEnum moveFromEntranceToHall(){
 
         //no selected student
-        if (selectedEntranceStudentPos == null) return StudentEnum.NOSTUDENT;
+        if (studentsAtEntrance.isEmpty()) return StudentEnum.NOSTUDENT;
 
-        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos);
+        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos.get());
 
         //table is full
         if (studentsPerTable.get(student.ordinal()) >= tableSize) return StudentEnum.NOSTUDENT;
 
-        removeFromEntrance(selectedEntranceStudentPos);
+        removeFromEntrance(selectedEntranceStudentPos.get());
         addToHall(student);
 
-        selectedEntranceStudentPos = null;
+        selectedEntranceStudentPos = Optional.empty();
 
         return student;
     }
@@ -81,15 +82,15 @@ public class Board {
     public void moveFromEntranceToIsland(IslandGroup chosenIsland){
 
         //no selected student
-        if(selectedEntranceStudentPos == null) return;
+        if(selectedEntranceStudentPos.isEmpty()) return;
 
-        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos);
+        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos.get());
 
-        removeFromEntrance(selectedEntranceStudentPos);
+        removeFromEntrance(selectedEntranceStudentPos.get());
 
         chosenIsland.addStudent(student);
 
-        selectedEntranceStudentPos = null;
+        selectedEntranceStudentPos = Optional.empty();
     }
 
     /**

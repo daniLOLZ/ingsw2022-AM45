@@ -2,11 +2,12 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
 import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.ParameterHandler;
 
 public class FlagBearer extends CharacterCard {
 
-    public FlagBearer(AdvancedParameterHandler advancedParameters){
-        super(3,3, advancedParameters);
+    public FlagBearer(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(3,3, parameters, advancedParameters);
     }
 
     /**

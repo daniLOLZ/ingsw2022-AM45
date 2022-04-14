@@ -1,15 +1,12 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedIslandGroup;
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.IslandGroup;
+import it.polimi.ingsw.model.*;
 
 public class Priest extends InitialEffect{
     private final int startingStudents = 4;
 
-    public Priest(AdvancedParameterHandler advancedParameters){
-        super(1,1,advancedParameters);
+    public Priest(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(1,1, parameters,advancedParameters);
     }
 
     @Override

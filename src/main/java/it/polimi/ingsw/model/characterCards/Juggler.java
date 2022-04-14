@@ -1,9 +1,6 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.*;
 
 public class Juggler extends InitialEffect{
 
@@ -11,8 +8,8 @@ public class Juggler extends InitialEffect{
     private final int maxTradeableStudents = 3;
     private int numTrades;
 
-    public Juggler(AdvancedParameterHandler advancedParameters){
-        super(1,7, advancedParameters);
+    public Juggler(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(1,7, parameters, advancedParameters);
     }
 
     @Override

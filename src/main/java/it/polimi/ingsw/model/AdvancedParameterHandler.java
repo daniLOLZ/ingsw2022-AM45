@@ -1,5 +1,9 @@
 package it.polimi.ingsw.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class AdvancedParameterHandler {
 
     private int numCoins;
@@ -8,6 +12,8 @@ public class AdvancedParameterHandler {
     private boolean countTowers;
     private int additionalInfluence;
     private StudentEnum ignoredStudentType;
+
+    private Optional<List<Integer>> selectedStudentsOnCard;
 
     public AdvancedParameterHandler(int numCoins){
         this.numCoins = numCoins;
@@ -36,6 +42,10 @@ public class AdvancedParameterHandler {
 
     public StudentEnum getIgnoredStudentType() {
         return ignoredStudentType;
+    }
+
+    public Optional<List<Integer>> getSelectedStudentsOnCard(){
+        return selectedStudentsOnCard;
     }
 
     /**
@@ -87,6 +97,15 @@ public class AdvancedParameterHandler {
         ignoredStudentType = studentType;
     }
 
+    public void selectStudentOnCard(int studentPos){
+        selectedStudentsOnCard.ifPresent(studentsPos -> studentsPos.add(studentPos));
+    }
+
+    public void setSelectedStudentsOnCard(List<Integer> studentsPos){
+        selectedStudentsOnCard = Optional.of(new ArrayList<>());
+        for (Integer studentPos: studentsPos) selectStudentOnCard(studentPos);
+    }
+
     /**
      * Sets every card effect parameter to its default value
      */
@@ -96,5 +115,10 @@ public class AdvancedParameterHandler {
         countTowers = true;
         additionalInfluence = 0;
         ignoredStudentType = StudentEnum.NOSTUDENT;
+        undoSelection();
+    }
+
+    public void undoSelection(){
+        selectedStudentsOnCard = Optional.empty();
     }
 }

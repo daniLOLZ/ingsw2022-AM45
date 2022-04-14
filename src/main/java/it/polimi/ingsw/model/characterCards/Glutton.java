@@ -2,11 +2,12 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
 import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.ParameterHandler;
 
 public class Glutton extends CharacterCard {
 
-    public Glutton(AdvancedParameterHandler advancedParameters){
-        super(2,2, advancedParameters);
+    public Glutton(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(2,2, parameters, advancedParameters);
     }
 
     /**

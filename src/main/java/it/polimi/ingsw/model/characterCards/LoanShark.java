@@ -8,8 +8,8 @@ public class LoanShark extends CharacterCard {
 
     private final int numStudentToSubtract = 3;
 
-    public LoanShark(AdvancedParameterHandler advancedParameters){
-        super(3,12, advancedParameters);
+    public LoanShark(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(3,12, parameters, advancedParameters);
     }
 
     /**

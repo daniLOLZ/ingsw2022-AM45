@@ -2,11 +2,12 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
 import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.ParameterHandler;
 
 public class Fungalmancer extends CharacterCard {
 
-    public Fungalmancer(AdvancedParameterHandler advancedParameters){
-        super(3,9,advancedParameters);
+    public Fungalmancer(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(3,9, parameters,advancedParameters);
     }
 
     /**

@@ -12,7 +12,7 @@ public class HerbalistTest {
      */
     @Test
     public void blockTest(){
-        Herbalist herbalist = new Herbalist(null);
+        Herbalist herbalist = new Herbalist(null,null);
         AdvancedIslandGroup island = new AdvancedIslandGroup(null);
         int numBlock = island.getNumBlockTiles();
         herbalist.blockIsland(island);
@@ -26,7 +26,7 @@ public class HerbalistTest {
      */
     @Test
     public void unblockTest(){
-        Herbalist herbalist = new Herbalist(null);
+        Herbalist herbalist = new Herbalist(null,null);
         AdvancedIslandGroup island = new AdvancedIslandGroup(null);
         int numBlock = island.getNumBlockTiles();
         herbalist.blockIsland(island);

@@ -17,8 +17,8 @@ public class CharacterCardTest {
     @Test
     public void createCard(){
 
-        CharacterCard card = FactoryCharacterCard.getSpecificCard(1,null);
-        CharacterCard priest = new Priest(null);
+        CharacterCard card = FactoryCharacterCard.getSpecificCard(1,null, null);
+        CharacterCard priest = new Priest(null, null);
         assertEquals(card, priest, "Wrong card");
         assertEquals(card.id, priest.id, "Wrong id");
         assertEquals(card.getCardCost(), priest.getCardCost(), "Wrong cost");
@@ -31,11 +31,11 @@ public class CharacterCardTest {
     @Test
     public void randomCards(){
         List<CharacterCard> listCards = new ArrayList<>();
-        CharacterCard card1 = FactoryCharacterCard.getCharacterCard(listCards,null);
+        CharacterCard card1 = FactoryCharacterCard.getCharacterCard(listCards,null, null);
         listCards.add(card1);
-        CharacterCard card2 = FactoryCharacterCard.getCharacterCard(listCards,null);
+        CharacterCard card2 = FactoryCharacterCard.getCharacterCard(listCards,null, null);
         listCards.add(card2);
-        CharacterCard card3 = FactoryCharacterCard.getCharacterCard(listCards,null);
+        CharacterCard card3 = FactoryCharacterCard.getCharacterCard(listCards,null, null);
         assertNotEquals(card1,card2, "Two equal cards");
         assertNotEquals(card2,card3,"Two equals cards");
         assertNotEquals(card1,card3,"Two equals cards");
@@ -53,7 +53,7 @@ public class CharacterCardTest {
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
-        CharacterCard card = FactoryCharacterCard.getCharacterCard(game.getAdvancedParameters());
+        CharacterCard card = FactoryCharacterCard.getCharacterCard(game.getParameters() ,game.getAdvancedParameters());
         int costBefore = card.getCardCost();
         card.activateEffect();
         int costNow = card.getCardCost();
@@ -72,7 +72,7 @@ public class CharacterCardTest {
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }        List<CharacterCard> cards = new ArrayList<>();
-        cards.addAll(FactoryCharacterCard.getAllCards(game.getAdvancedParameters()));
+        cards.addAll(FactoryCharacterCard.getAllCards(game.getParameters() ,game.getAdvancedParameters()));
         int costBefore;
         int costNow;
 
@@ -107,7 +107,7 @@ public class CharacterCardTest {
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
-        cards.addAll(FactoryCharacterCard.getInitialEffectCards(game.getAdvancedParameters()));
+        cards.addAll(FactoryCharacterCard.getInitialEffectCards(game.getParameters(), game.getAdvancedParameters()));
         ParameterHandler parameters = new ParameterHandler(2);
         game.setCurrentPlayer(new Player(PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true,parameters));
         StudentEnum studentSel;
