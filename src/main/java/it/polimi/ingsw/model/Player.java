@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-    private final SimpleGame game;
     private PlayerEnum playerId;
     private String nickname;
     private Assistant assistantPlayed;
@@ -18,19 +17,17 @@ public class Player {
 
     /**
      * Basic Player constructor
-     * @param game game hosting the players
      * @param playerId id given by SimpleGame at initialization
      * @param nickname string chosen by the user, should not be equal to other players
      * @param teamColor the team's color
      * @param leader true if the player is the leader of their team (has the towers on their board)
      */
-    public Player(SimpleGame game, PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader) {
-        this.game = game;
+    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters) {
         this.playerId = playerId;
         this.nickname = nickname;
         this.teamColor = teamColor;
         this.leader = leader;
-        this.board = new Board(game.getNumTowers(), teamColor);
+        this.board = new Board(teamColor, parameters);
         //TODO make the player choose which wizard they want to pick
 
         //I catch these exceptions here to not throw them too many times in code
@@ -40,12 +37,12 @@ public class Player {
         try {
             this.wizard = FactoryWizard.getWizard(playerId.index*10);
         } catch (IOException e) {
-            ErrorState error = new ErrorState(e.getMessage());
-            game.setErrorState(error);
+            String error = e.getMessage();
+            parameters.setErrorState(error);
             e.printStackTrace();        //TO DELETE, for now it can be useful
         } catch (ParseException e) {
-            ErrorState error = new ErrorState(e.getMessage());
-            game.setErrorState(error);
+            String error = e.getMessage();
+            parameters.setErrorState(error);
             e.printStackTrace();         //TO DELETE, for now it can be useful
         }
     }

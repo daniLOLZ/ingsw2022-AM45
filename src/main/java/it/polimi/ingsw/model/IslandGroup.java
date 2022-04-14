@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class IslandGroup {
-    private final SimpleGame game;
+    private ParameterHandler parameters;
     private final int idGroup;
     private final List<Island> islands;
     private IslandGroup nextIslandGroup;
@@ -19,38 +19,38 @@ public class IslandGroup {
      * useful for test
      */
     public IslandGroup(){
-        game = null;
         idGroup = 0;
         islands = new ArrayList<>();
         islands.add(new Island(0));
         nextIslandGroup = null;
         prevIslandGroup = null;
         towerColor = TeamEnum.NOTEAM;
+        parameters = new ParameterHandler(2);
     }
 
-    public IslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor) {
-        this.game = game;
+    public IslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ParameterHandler parameters) {
         this.idGroup = idGroup;
         this.islands = islands;
         this.nextIslandGroup = nextIslandGroup;
         this.prevIslandGroup = prevIslandGroup;
         this.students = students;
         this.towerColor = towerColor;
+        this.parameters = parameters;
     }
 
     public IslandGroup(IslandGroup island){
-        this.game = island.game;
         this.idGroup = island.idGroup;
         this.islands = island.islands;
         this.nextIslandGroup = island.nextIslandGroup;
         this.prevIslandGroup = island.prevIslandGroup;
         this.students = island.students;
         this.towerColor = island.towerColor;
+        this.parameters = island.parameters;
     }
 
     // Maybe useless, semi-factory method for IslandGroup
-    public static IslandGroup getIslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor){
-        return new IslandGroup(game, idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor);
+    public static IslandGroup getIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ParameterHandler parameters){
+        return new IslandGroup(idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor, parameters);
     }
 
     /**
@@ -63,13 +63,13 @@ public class IslandGroup {
      *               the single island group in the collection
      * @return A collection of island groups, ordered cyclically
      */
-    public static List<IslandGroup> getCollectionOfIslandGroup(SimpleGame game, int startingId, int amount){
+    public static List<IslandGroup> getCollectionOfIslandGroup(ParameterHandler parameters, int startingId, int amount){
 
         List<IslandGroup> returnList = new ArrayList<>();
         for (int islandGroupId = startingId; islandGroupId < startingId+amount; islandGroupId++){
             List<Island> islList = new ArrayList<>();
             islList.add(new Island(islandGroupId));
-            returnList.add(new IslandGroup(game, islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.NOTEAM));
+            returnList.add(new IslandGroup(islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.NOTEAM, parameters));
         }
 
         IslandGroup first = returnList.get(0);
@@ -124,7 +124,7 @@ public class IslandGroup {
      * If two or more teams have the same influence, returns TeamEnum.NOTEAM
      * @return the Team with the most influence on this IslandGroup
      */
-    public TeamEnum evaluateMostInfluential(){
+    public TeamEnum evaluateMostInfluential(List<PlayerEnum> professors){
         int maximumInfluence = 0;
         TeamEnum mostInfluentialTeam = TeamEnum.NOTEAM;
         PlayerEnum professorOwner;
@@ -149,14 +149,13 @@ public class IslandGroup {
 
             // Checks influence of students
             for(StudentEnum stud : students){
-                professorOwner = game.getProfessors().get(stud.ordinal());
+                professorOwner = professors.get(stud.ordinal());
+
+                //There's no point in adding influence to NOPLAYER
+                if (professorOwner == PlayerEnum.NOPLAYER) continue;
 
                 //Finds which team that owner is part of
-                for (Player player : game.getPlayers()){
-                    if(player.getPlayerId().equals(professorOwner)){
-                        owningTeam = player.getTeamColor();
-                    }
-                }
+                owningTeam = parameters.getPlayerTeamById(professorOwner);
 
                 // adds one to the influence if it's the current team being checked
                 if (owningTeam.equals(currentTeam)) currentInfluence++;
@@ -211,7 +210,7 @@ public class IslandGroup {
      * @param newId the id to assign the newly formed group
      * @exception  UnmergeableException The island groups have different tower colors
      */
-    public void mergeAdjacent(int newId) throws UnmergeableException{
+    public void mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
 
         //Checks if the island has a tower built on top of it
         if(towerColor.equals(TeamEnum.NOTEAM)){
@@ -237,27 +236,27 @@ public class IslandGroup {
             mergedIslands.addAll(nextIslandGroup.islands);
             mergedStudents.addAll(nextIslandGroup.students);
             // Once we know the island must be merged, we remove it from the group
-            game.getIslandGroups().remove(nextIslandGroup);
+            islandGroups.remove(nextIslandGroup);
         }
         if(prevIslandGroup.towerColor.equals(towerColor)){
             predecessor = prevIslandGroup;
             mergedIslands.addAll(prevIslandGroup.islands);
             mergedStudents.addAll(prevIslandGroup.students);
             // Same as before
-            game.getIslandGroups().remove(prevIslandGroup);
+            islandGroups.remove(prevIslandGroup);
         }
         // Finally, remove this island
-        game.getIslandGroups().remove(this);
+        islandGroups.remove(this);
 
         // prepare pointers
         IslandGroup nextPointer = successor.nextIslandGroup;
         IslandGroup previousPointer = predecessor.prevIslandGroup;
 
 
-        IslandGroup mergedGroup = new IslandGroup(game, newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
+        IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor, parameters);
         //IslandGroup mergedGroup = getIslandGroup(game, newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
 
-        game.getIslandGroups().add(mergedGroup); // possibly unsafe handling of game attribute
+        islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
     }
 
     /**

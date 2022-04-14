@@ -3,8 +3,8 @@ package it.polimi.ingsw.model;
 public class AdvancedPlayer extends Player{
     private int numCoins;
 
-    public AdvancedPlayer(SimpleGame game, PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader){
-        super(game, playerId, nickname, teamColor, leader);
+    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters){
+        super(playerId, nickname, teamColor, leader, parameters);
         this.numCoins = 1;
     }
 

@@ -11,8 +11,8 @@ public class AdvancedBoard extends Board{
 
     private List<Stack<Integer>> coinsOnBoard;
 
-    public AdvancedBoard(int numTowers, TeamEnum teamColor){
-        super(numTowers,teamColor);
+    public AdvancedBoard(TeamEnum teamColor, ParameterHandler parameters){
+        super(teamColor, parameters);
 
         coinsOnBoard = new ArrayList<>();
         for (StudentEnum studentEnum : StudentEnum.getStudents()){

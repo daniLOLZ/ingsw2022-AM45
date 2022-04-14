@@ -107,11 +107,13 @@ public class CharacterCardTest {
         }
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
-        }        game.setCurrentPlayer(new Player(game,PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true));
+        }
+        ParameterHandler parameters = new ParameterHandler(2);
+        game.setCurrentPlayer(new Player(PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true,parameters));
         StudentEnum studentSel;
         Board board = game.getCurrentPlayer().getBoard();
-        IslandGroup island = new IslandGroup(game,0,null,null,
-                                            null, new ArrayList<>(),TeamEnum.NOTEAM);
+        IslandGroup island = new IslandGroup(0,null,null,
+                                            null, new ArrayList<>(),TeamEnum.NOTEAM,parameters);
 
 
         for(CharacterCard cardSel: cards){

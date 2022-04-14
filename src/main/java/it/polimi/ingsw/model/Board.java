@@ -13,13 +13,15 @@ public class Board {
     private final TeamEnum towerColor;
     private List<StudentEnum> studentsAtEntrance;
     private List<Integer> studentsPerTable;
+    private ParameterHandler parameters;
     private Integer selectedEntranceStudentPos;
 
-    public Board(int numTowers, TeamEnum teamColor){
-        numberOfTowers = numTowers;
+    public Board(TeamEnum teamColor, ParameterHandler parameters){
+        numberOfTowers = parameters.getNumTowers();
         towerColor = teamColor;
         studentsAtEntrance = new ArrayList<>();
         studentsPerTable = new ArrayList<>();
+        this.parameters = parameters;
         for(StudentEnum table : StudentEnum.getStudents()){
             studentsPerTable.add(0);
         }
@@ -105,8 +107,7 @@ public class Board {
 
     public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
 
-        //TODO remove hardcoding
-        if (entranceSize() == 7) throw new FullEntranceException();
+        if (entranceSize() == parameters.getMaxStudentsAtEntrance()) throw new FullEntranceException();
 
         removeFromHall(chosenTable);
 

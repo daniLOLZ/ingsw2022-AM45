@@ -14,6 +14,7 @@ public class IslandGroupTest {
 
 
     SimpleGame game;
+    ParameterHandler parameters;
     List<IslandGroup> group;
     int numIslands = 12;
     int islandGroupId = 0;
@@ -27,7 +28,10 @@ public class IslandGroupTest {
         catch (IncorrectPlayersException e){
             e.printStackTrace();
         }
-        //group = IslandGroup.getCollectionOfIslandGroup(game, islandGroupId, numIslands);
+
+        parameters = game.getParameters();
+
+        group = IslandGroup.getCollectionOfIslandGroup(game.getParameters(),islandGroupId, numIslands);
         group = game.getIslandGroups();
         islandGroupId += numIslands;
 
@@ -60,7 +64,7 @@ public class IslandGroupTest {
     @Test
     public void UnmergeableExceptionNoTeamTest(){
         islandGroupId += 1;
-        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(islandGroupId));
+        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(islandGroupId, game.getIslandGroups()));
     }
 
     /**
@@ -72,7 +76,7 @@ public class IslandGroupTest {
         group.get(1).build(TeamEnum.WHITE, game.getPlayers());
 
         islandGroupId += 1;
-        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(islandGroupId));
+        assertThrows(UnmergeableException.class, () -> group.get(1).mergeAdjacent(islandGroupId, game.getIslandGroups()));
     }
 
 
@@ -93,15 +97,15 @@ public class IslandGroupTest {
         IslandGroup gMerged = null;
 
         List<Player> players = new ArrayList<>();
-        players.add(new Player(game, PlayerEnum.PLAYER1, "pp1", TeamEnum.WHITE, true));
-        players.add(new Player(game, PlayerEnum.PLAYER2, "pp2", TeamEnum.BLACK, true));
+        players.add(new Player(PlayerEnum.PLAYER1, "pp1", TeamEnum.WHITE, true, parameters));
+        players.add(new Player(PlayerEnum.PLAYER2, "pp2", TeamEnum.BLACK, true, parameters));
 
         g1.build(TeamEnum.WHITE, players);
         g2.build(TeamEnum.WHITE, players);
         g3.build(TeamEnum.WHITE, players);
 
         try {
-            group.get(2).mergeAdjacent(islandGroupId+1);
+            group.get(2).mergeAdjacent(islandGroupId+1, game.getIslandGroups());
             islandGroupId++;
         }
         catch(UnmergeableException e){
@@ -142,7 +146,7 @@ public class IslandGroupTest {
         game.getProfessors().set(StudentEnum.GREEN.index, PlayerEnum.PLAYER1); // Player 1 controls the green professor
         game.getProfessors().set(StudentEnum.RED.index, PlayerEnum.PLAYER2); // Player 2 controls the red professor
         //Player 1's team should have more influence
-        assertTrue(group.get(0).evaluateMostInfluential().equals(
+        assertTrue(group.get(0).evaluateMostInfluential(game.getProfessors()).equals(
                 GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).getTeamColor())
         );
 

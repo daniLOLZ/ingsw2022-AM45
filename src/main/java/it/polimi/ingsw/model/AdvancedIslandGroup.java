@@ -20,22 +20,21 @@ public class AdvancedIslandGroup extends IslandGroup {
         super(island);
         this.blockTiles = new ArrayList<>(blockTiles);
     }
-    public AdvancedIslandGroup(SimpleGame game, int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ArrayList<BlockTile> blockTiles){
-        super(game, idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor);
+    public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ArrayList<BlockTile> blockTiles, ParameterHandler parameters){
+        super(idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor, parameters);
         this.blockTiles = new ArrayList<>(blockTiles);
     }
 
     /**
      *
-     * @param game The game hosting the collection
      * @param startingId Starting id for the IslandGroups
      * @param amount Amount of IslandGroups to have in the collection.
      *               if the amount is 1, the next and previous pointers will refer to
      *               the single island group in the collection
      * @return a collection of AdvancedIslandGroup
      */
-    public List<AdvancedIslandGroup> getCollectionAdvancedIslandGroup(AdvancedGame game, int startingId, int amount){
-        List<IslandGroup> simpleIslands = getCollectionOfIslandGroup(game, startingId, amount);
+    public List<AdvancedIslandGroup> getCollectionAdvancedIslandGroup(ParameterHandler parameters, int startingId, int amount){
+        List<IslandGroup> simpleIslands = getCollectionOfIslandGroup(parameters ,startingId, amount);
         List<AdvancedIslandGroup> advancedIslands = new ArrayList<>();
         AdvancedIslandGroup decoratedIsland;
         for(IslandGroup s_group : simpleIslands){
@@ -46,7 +45,7 @@ public class AdvancedIslandGroup extends IslandGroup {
     }
     // TODO check stability of factory methods
     @Override
-    public void mergeAdjacent(int newId){
+    public void mergeAdjacent(int newId, List<IslandGroup> islandGroups){
         //TODO
     }
 

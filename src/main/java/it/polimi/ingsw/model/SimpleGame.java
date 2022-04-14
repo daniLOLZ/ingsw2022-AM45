@@ -7,15 +7,12 @@ import java.util.stream.Collectors;
 public class SimpleGame {
     private ErrorState errorState;
     private final int numPlayers;
-    private int maxStudentsEntrance;
     private final int maxStudentsByType;
     private final int amountOfIslands;
     private List<PlayerEnum> professors;
     private Player currentPlayer;
     private TeamEnum currentTeam;
     private boolean isLastTurn;
-    private int numTowers;
-    private int studentsPerCloud;
     private int currentIslandGroupId;
     private List<IslandGroup> islandGroups; // These are not in order of navigation, the order
                                             // is given by the pointers
@@ -23,6 +20,7 @@ public class SimpleGame {
     private List<Cloud> clouds;
     private MotherNature MN;
     protected Sack sack;
+    private ParameterHandler parameters;
 
     private boolean hasBeenInitialized;
 
@@ -48,35 +46,24 @@ public class SimpleGame {
         for (StudentEnum studEnum : StudentEnum.values()){
             professors.add(PlayerEnum.NOPLAYER);
         }
+        this.parameters = new ParameterHandler(numPlayers);
         this.isLastTurn = false;
         this.currentIslandGroupId = 0;
-        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(this, currentIslandGroupId, amountOfIslands);
+        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters, currentIslandGroupId, amountOfIslands);
         currentIslandGroupId += amountOfIslands;
         this.players = new ArrayList<>();
         this.clouds = new ArrayList<>();
         for (int cloudNumber = 0; cloudNumber < numberOfClouds; cloudNumber++){
-            clouds.add(new Cloud(cloudNumber, studentsPerCloud));
+            clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud()));
         }
-        // Mother Nature starts on the first island group, will get moved in the initalization of the game
+        // Mother Nature starts on the first island group, will get moved in the initialization of the game
         this.MN = new MotherNature(islandGroups.get(0));
         //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
         this.sack = new Sack(2);
-        switch(numPlayers){
-            case 2: case 4:
-                this.maxStudentsEntrance = 7;
-                this.numTowers = 8;
-                this.studentsPerCloud = 3;
-                break;
 
-            case 3:
-                this.maxStudentsEntrance = 9;
-                this.numTowers = 6;
-                this.studentsPerCloud = 4;
-                break;
+        this.players = FactoryPlayer.getNPlayers(numPlayers, parameters);
 
-        }
-        this.players = FactoryPlayer.getNPlayers(this, numPlayers);
-
+        parameters.setPlayersAllegiance(players);
     }
 
     //TODO this could become a private method called from the constructor;
@@ -202,7 +189,7 @@ public class SimpleGame {
 
     public void fillClouds(){
         for(Cloud cloud : clouds){
-            cloud.fill(sack.drawNStudents(studentsPerCloud));
+            cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
         }
     }
 
@@ -217,9 +204,6 @@ public class SimpleGame {
         return currentIslandGroupId;
     }
 
-    public int getNumTowers() {
-        return numTowers;
-    }
 
     public List<PlayerEnum> getProfessors() {
         return professors;
@@ -264,5 +248,9 @@ public class SimpleGame {
     }
     public ErrorState getErrorState() {
         return errorState;
+    }
+
+    public ParameterHandler getParameters() {
+        return parameters;
     }
 }
