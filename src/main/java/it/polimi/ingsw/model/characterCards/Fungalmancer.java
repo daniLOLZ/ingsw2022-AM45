@@ -1,11 +1,13 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
+import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.ParameterHandler;
 
 public class Fungalmancer extends CharacterCard {
 
-    public Fungalmancer(){
-        super(3,9);
+    public Fungalmancer(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(3,9, parameters,advancedParameters);
     }
 
     /**
@@ -13,10 +15,11 @@ public class Fungalmancer extends CharacterCard {
      * Set IgnoredStudent true
      * @param game
      */
-    @Override
+    //@Override
+    //TODO I'm not touching this but it needs to be changed
     public void activateEffect(AdvancedGame game) {
 
-        super.activateEffect(game);
+        super.activateEffect();
 
         game.setIgnoredStudent(true);
     }

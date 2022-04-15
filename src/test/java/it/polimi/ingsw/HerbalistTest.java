@@ -7,14 +7,13 @@ import it.polimi.ingsw.model.characterCards.Herbalist;
 import org.junit.jupiter.api.Test;
 
 public class HerbalistTest {
-
     /**
      * Tests if herbalist block correctly a islandGroup
      */
     @Test
     public void blockTest(){
-        Herbalist herbalist = new Herbalist();
-        AdvancedIslandGroup island = new AdvancedIslandGroup();
+        Herbalist herbalist = new Herbalist(null,null);
+        AdvancedIslandGroup island = new AdvancedIslandGroup(null);
         int numBlock = island.getNumBlockTiles();
         herbalist.blockIsland(island);
         assertEquals(numBlock + 1, island.getNumBlockTiles(), "Block tile is not added to Island" );
@@ -27,8 +26,8 @@ public class HerbalistTest {
      */
     @Test
     public void unblockTest(){
-        Herbalist herbalist = new Herbalist();
-        AdvancedIslandGroup island = new AdvancedIslandGroup();
+        Herbalist herbalist = new Herbalist(null,null);
+        AdvancedIslandGroup island = new AdvancedIslandGroup(null);
         int numBlock = island.getNumBlockTiles();
         herbalist.blockIsland(island);
         BlockTile tile = island.getBlockTiles(0);

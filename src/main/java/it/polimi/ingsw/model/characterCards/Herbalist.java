@@ -1,8 +1,6 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedIslandGroup;
-import it.polimi.ingsw.model.BlockTile;
+import it.polimi.ingsw.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +11,8 @@ public class Herbalist extends CharacterCard {
     private int numBlockTiles;
     private List<BlockTile> blockTiles;
 
-    public Herbalist(){
-        super(2,5);
+    public Herbalist(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(2,5, parameters, advancedParameters);
         numBlockTiles = maxBlockTiles;
         blockTiles = new ArrayList<>();
 
@@ -25,12 +23,10 @@ public class Herbalist extends CharacterCard {
     /**
      *You can put one block Tile on a choosen Island
      * You need to call blockIsland with island to block
-     * @param game
-     *
      */
     @Override
-    public void activateEffect(AdvancedGame game) {
-        super.activateEffect(game);
+    public void activateEffect() {
+        super.activateEffect();
     }
 
     /**
@@ -52,7 +48,7 @@ public class Herbalist extends CharacterCard {
             return;
 
 
-        //ASSIGN BLOCKTILE TO CHOOSEN ISLAND
+        //ASSIGN BLOCKTILE TO CHOSEN ISLAND
         BlockTile tileToUse;
         for(BlockTile tile: blockTiles){
             if(!tile.isAssigned()){

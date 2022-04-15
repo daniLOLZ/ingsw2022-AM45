@@ -19,9 +19,11 @@ public class AdvancedGame extends SimpleGame{
     private StudentEnum ChosenStudentType;                 //useful for LoanShark,Fungalmancer
     private final List<CharacterCard> CharacterCards;
     private AdvancedIslandGroup chosenIsland;              //useful for FlagBearer, Herbalist
+    private AdvancedParameterHandler advancedParameters;   //TODO move above parameters here
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
+        advancedParameters = new AdvancedParameterHandler(numCoins);
         this.numCoins = numCoins;
         drawIsWin = false;
         MNAdditionalSteps = 0;
@@ -37,7 +39,7 @@ public class AdvancedGame extends SimpleGame{
 
 
         for(int card= 0; card < numCharacterCards; card++){
-            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards));
+            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
         }
         for(int card= 0; card < numCharacterCards; card++){
             CharacterCards.get(card).initialise(this);
@@ -70,7 +72,7 @@ public class AdvancedGame extends SimpleGame{
         this.drawIsWin = drawIsWin;
     }
 
-    public void setChosenStudentType(StudentEnum type) {
+    public void setChoosenStudentType(StudentEnum type) {
         ChosenStudentType = type;
     }
 
@@ -82,7 +84,7 @@ public class AdvancedGame extends SimpleGame{
         this.chosenIsland = choosenIsland;
     }
 
-    public AdvancedIslandGroup getChosenIsland() {
+    public AdvancedIslandGroup getChoosenIsland() {
         return chosenIsland;
     }
 
@@ -106,11 +108,11 @@ public class AdvancedGame extends SimpleGame{
         TradeableStudent = tradeableStudent;
     }
 
-    public void setChosenIsland(AdvancedIslandGroup choosenIsland) {
+    public void setChoosenIsland(AdvancedIslandGroup choosenIsland) {
         this.chosenIsland = choosenIsland;
     }
 
-    public StudentEnum getChosenStudentType() {
+    public StudentEnum getChoosenStudentType() {
         return ChosenStudentType;
     }
 
@@ -118,12 +120,10 @@ public class AdvancedGame extends SimpleGame{
         IslandToEvaluateDue = islandToEvaluateDue;
     }
 
+    public boolean IslandToEvaluateDue() {
+        return IslandToEvaluateDue;
+    }
 
-    /**
-     *
-     * @param position >= 0 && position < CharacterCards.size()
-     * @return Character card in position 'position'
-     */
     public CharacterCard getCharacterCard(int position) {
         return CharacterCards.get(position);
     }
@@ -164,13 +164,13 @@ public class AdvancedGame extends SimpleGame{
         return AdditionalInfluence;
     }
 
-    /**
-     *
-     * @param positionCard >= 0 && positionCard < CharacterCard.size()
-     */
+    public AdvancedParameterHandler getAdvancedParameters(){
+        return advancedParameters;
+    }
+
     public void playCharacterCard(int positionCard){
 
-        CharacterCards.get(positionCard).activateEffect(this);
+        CharacterCards.get(positionCard).activateEffect();
     }
 
     @Override

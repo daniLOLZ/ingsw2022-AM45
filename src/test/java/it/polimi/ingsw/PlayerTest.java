@@ -10,16 +10,12 @@ public class PlayerTest {
 
     Player player;
     Wizard wizard;
-    SimpleGame game;
+    ParameterHandler parameters;
 
     @BeforeEach
     public void initialise(){
-        try {
-            game=new SimpleGame(2);
-        } catch (IncorrectPlayersException e) {
-            e.printStackTrace();
-        }
-        player = new Player(game,PlayerEnum.PLAYER1,"mock",TeamEnum.WHITE,true);
+        parameters = new ParameterHandler(2);
+        player = new Player(PlayerEnum.PLAYER1,"mock",TeamEnum.WHITE,true, parameters);
 
         wizard = player.getWizard();
 
@@ -31,7 +27,7 @@ public class PlayerTest {
     @Test
     public void playAssistantTest(){
 
-        if(game.getErrorState() == null){
+        if(parameters.getErrorState() == null){
         Assistant assistant = wizard.getAssistant(2);
         player.playAssistant(assistant.id);
 
@@ -44,7 +40,7 @@ public class PlayerTest {
      */
     @Test
     public void playInvalidAssistantTest(){
-        if(game.getErrorState() == null){
+        if(parameters.getErrorState() == null){
         player.playAssistant(1000);
         assertNull(player.getAssistantPlayed(),"Played Assistant with invalid ID");
         }

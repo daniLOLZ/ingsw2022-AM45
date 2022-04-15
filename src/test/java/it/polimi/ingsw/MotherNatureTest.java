@@ -11,12 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MotherNatureTest {
 
     int numIslands = 3;
+    ParameterHandler parameters = new ParameterHandler(2);
     List<IslandGroup> islandGroups;
     MotherNature motherNature;
 
     @BeforeEach
     public void initialise(){
-        islandGroups = IslandGroup.getCollectionOfIslandGroup(null,0,numIslands);
+        islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters,0,numIslands);
         motherNature = new MotherNature(islandGroups.get(0));
     }
 

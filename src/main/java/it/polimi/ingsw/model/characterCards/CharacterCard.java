@@ -1,24 +1,34 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.AdvancedGame;
+import it.polimi.ingsw.model.AdvancedParameterHandler;
+import it.polimi.ingsw.model.GameElementEnum;
+import it.polimi.ingsw.model.ParameterHandler;
 
+import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class CharacterCard {
     protected int cardCost;
     protected boolean hasBeenUsed;
     public final int id;
+    private ParameterHandler parameters;
+    private AdvancedParameterHandler advancedParameters;
+    private List<GameElementEnum> requirements; //TODO specify this attribute in lower classes
 
-    public CharacterCard(int cardCost, int id){
+    public CharacterCard(int cardCost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         this.cardCost = cardCost;
         hasBeenUsed = false;
         this.id = id;
+        this.parameters = parameters;
+        this.advancedParameters = advancedParameters;
 
     }
 
     /**
      * Initialise CharacterChard fields where this operation is useful
-     * @param game != null
+     * @param game
      */
     public void initialise(AdvancedGame game){
 
@@ -44,14 +54,14 @@ public abstract class CharacterCard {
      * Model state.
      * Increment cardCost if it is the first time in the game that the effect is activated
      * Set HasBeenUsed true
-     * @param game != null
      */
-    public  void activateEffect(AdvancedGame game){
+    //TODO fix javadoc
+    public  void activateEffect(){
         if(!HasBeenUsed()){
             hasBeenUsed = true;
             cardCost += 1;
         }
-        game.UsedCharacterCard(id);
+        //game.UsedCharacterCard(id); //probably won't be necessary anymore
 
     }
 
@@ -61,5 +71,13 @@ public abstract class CharacterCard {
 
     public boolean HasBeenUsed() {
         return hasBeenUsed;
+    }
+
+    public AdvancedParameterHandler getAdvancedParameters(){
+        return advancedParameters;
+    }
+
+    public List<GameElementEnum> getRequirements(){
+        return requirements;
     }
 }

@@ -7,8 +7,8 @@ public class Minstrel extends CharacterCard {
     private final int maxTradeableStudents = 2;
     private int trades;
 
-    public Minstrel(){
-        super(1,10);
+    public Minstrel(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(1,10,parameters, advancedParameters);
     }
 
 
@@ -16,9 +16,10 @@ public class Minstrel extends CharacterCard {
      * You can exchange  maxTradeableStudents students from Hall to Entrance or vice-versa
      * @param game
      */
-    @Override
+    //@Override
+    //TODO I'm not touching this but it needs to be changed
     public void activateEffect(AdvancedGame game) {
-        super.activateEffect(game);
+        super.activateEffect();
         trades = 0;
         game.setTradeableStudent(maxTradeableStudents);
     }

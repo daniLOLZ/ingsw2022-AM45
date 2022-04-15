@@ -1,9 +1,6 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedSack;
-import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.*;
 
 import java.util.List;
 
@@ -11,18 +8,17 @@ public class LoanShark extends CharacterCard {
 
     private final int numStudentToSubtract = 3;
 
-    public LoanShark(){
-        super(3,12);
+    public LoanShark(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+        super(3,12, parameters, advancedParameters);
     }
 
     /**
      * Select student color and each player put into the sack
      * numStudentToSubtract students from Hall with this color
-     * @param game
      */
     @Override
-    public void activateEffect(AdvancedGame game) {
-        super.activateEffect(game);
+    public void activateEffect() {
+        super.activateEffect();
     }
 
     /**
@@ -31,6 +27,7 @@ public class LoanShark extends CharacterCard {
      * @param game
      * @param sack
      */
+    //TODO modify this method to not have access to AdvancedGame
     public void extortStudents(StudentEnum colorStudent, AdvancedGame game, AdvancedSack sack){
 
         for(Player player: game.getPlayers()){

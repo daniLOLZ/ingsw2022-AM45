@@ -15,7 +15,7 @@ public class AdvancedBoardTest {
 
     @BeforeEach
     public void initialise(){
-        board = new AdvancedBoard(8, TeamEnum.WHITE);
+        board = new AdvancedBoard(TeamEnum.WHITE, new ParameterHandler(2));
         student = StudentEnum.GREEN;
     }
 

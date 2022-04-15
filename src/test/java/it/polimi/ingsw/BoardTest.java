@@ -13,10 +13,12 @@ public class BoardTest {
 
     Board board = null;
     StudentEnum student = null;
+    ParameterHandler parameters = null;
 
     @BeforeEach
     public void initialise(){
-        board = new Board(8,TeamEnum.WHITE);
+        parameters = new ParameterHandler(2);
+        board = new Board(TeamEnum.WHITE, parameters);
         student = StudentEnum.GREEN;
     }
 
@@ -82,17 +84,12 @@ public class BoardTest {
      */
     @Test
     public void moveFromEntranceToIslandTest(){
-        SimpleGame game = null;
+        ParameterHandler parameters = new ParameterHandler(2);
         Island island = new Island(0);
         List<Island> islands = new ArrayList<>();
         islands.add(island);
-        try {
-            game = new SimpleGame(2);
-        } catch (IncorrectPlayersException e){
-            e.printStackTrace();
-        }
 
-        IslandGroup islandGroup = new IslandGroup(game,0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM);
+        IslandGroup islandGroup = new IslandGroup(0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM,parameters);
 
         board.addToEntrance(student);
         board.setSelectedEntranceStudentPos(0);
@@ -106,17 +103,12 @@ public class BoardTest {
      */
     @Test
     public void moveFromEntranceToIslandResetTest(){
-        SimpleGame game = null;
+        ParameterHandler parameters = new ParameterHandler(2);
         Island island = new Island(0);
         List<Island> islands = new ArrayList<>();
         islands.add(island);
-        try {
-            game = new SimpleGame(2);
-        } catch (IncorrectPlayersException e){
-            e.printStackTrace();
-        }
 
-        IslandGroup islandGroup = new IslandGroup(game,0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM);
+        IslandGroup islandGroup = new IslandGroup(0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM,parameters);
 
         board.addToEntrance(student);
         board.setSelectedEntranceStudentPos(0);
@@ -175,7 +167,7 @@ public class BoardTest {
      */
     @Test
     public void moveFromHallToFullEntranceTest(){
-        while (board.getStudentsAtEntrance().size() < 7) board.addToEntrance(student);
+        while (board.getStudentsAtEntrance().size() < parameters.getMaxStudentsAtEntrance()) board.addToEntrance(student);
         board.setSelectedEntranceStudentPos(0);
         board.moveFromEntranceToHall();
         board.addToEntrance(student);
