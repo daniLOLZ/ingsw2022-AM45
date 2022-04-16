@@ -1,12 +1,12 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
+
 import it.polimi.ingsw.model.AdvancedParameterHandler;
 import it.polimi.ingsw.model.ParameterHandler;
 
 public class Knight extends CharacterCard {
 
-    private final int addableInfluence = 2;
+
 
     public Knight(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(2,8, parameters, advancedParameters);
@@ -19,7 +19,7 @@ public class Knight extends CharacterCard {
      */
     @Override
     public void activateEffect() {
-
+        final int addableInfluence = 2;
         super.activateEffect();
         super.getAdvancedParameters().addInfluence(addableInfluence);
     }

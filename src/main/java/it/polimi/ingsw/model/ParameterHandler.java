@@ -4,6 +4,7 @@ import java.util.*;
 
 public class ParameterHandler {
 
+    //STATIC PARAMETER FOR DIFFERENT GAME TYPE
     private static final int studentsPerCloud2or4Players = 3;
     private static final int studentsPerCloud3Players = 4;
     private static final int maxStudentsAtEntrance2or4Players = 7;
@@ -11,15 +12,22 @@ public class ParameterHandler {
     private static final int numTowers2or4Players = 8;
     private static final int numTowers3Players = 6;
 
+    //STATIC PARAMETERS
     private final int studentsPerCloud;
     private final int maxStudentsAtEntrance;
     private final int numTowers;
     private Map<PlayerEnum, TeamEnum> playersAllegiance;
 
+    //DYNAMIC PARAMETERS
+    private Player currentPlayer;
+    private List<PlayerEnum> professors;
+
+    //SELECTION PARAMETERS
     private Optional<List<IslandGroup>> selectedIslands;
     private Optional<List<Integer>> selectedEntranceStudents;
     private Optional<List<StudentEnum>> selectedStudentTypes;
 
+    //ERROR PARAMETER
     private String errorMessage = "";
 
     public ParameterHandler(int numPlayers){
@@ -35,6 +43,7 @@ public class ParameterHandler {
         }
 
         playersAllegiance = new HashMap<>();
+        professors = new ArrayList<>();
 
         undoSelection();
     }
@@ -87,6 +96,24 @@ public class ParameterHandler {
 
     public void setErrorState(String error){
         errorMessage = error;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public List<PlayerEnum> getProfessors() {
+        return professors;
+    }
+
+    public void addProfessor(PlayerEnum player, StudentEnum color){
+        if(color == StudentEnum.NOSTUDENT || player == PlayerEnum.NOPLAYER)
+            return;
+        professors.add(color.index,player);
     }
 
     public void selectIsland(IslandGroup island){

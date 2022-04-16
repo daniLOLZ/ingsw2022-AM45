@@ -24,41 +24,6 @@ public class AdvancedGameTest {
         }
     }
 
-    /**
-     * Tests if reset correctly
-     */
-    @Test
-    public void resetTest(){
-        game.setTradeableStudent(3);
-        game.setDrawIsWin(true);
-        game.setIslandToEvaluateDue(true);
-        game.setAdditionalInfluence(2);
-        game.setIgnoredStudent(true);
-        game.setChosenStudentType(StudentEnum.RED);
-
-        game.resetCardEffect();
-
-        assertNull(game.getChosenIsland(),"Chosen Island was not reset");
-        assertFalse(game.isDrawIsWin(),"DrawIsWin was not reset");
-        assertEquals(0,game.getMNAdditionalSteps(),"MNAdditionalSteps was not reset");
-        assertFalse(game.isCountTowers(),"CountTowers was not reset");
-        assertFalse(game.isIgnoredStudent(),"IgnoredStudent was not reset");
-        assertEquals(0,game.getIdCharacterCardActive(),"Id Character Card active was not reset");
-        assertFalse(game.isIslandToEvaluateDue(),"IslandToEvalueteDue was not reset");
-        assertEquals(0,game.getAdditionalInfluence(),"Additional Influence was not reset");
-        assertEquals(0,game.getTradeableStudent(),"Tradeable student was not reset");
-        assertEquals(StudentEnum.NOSTUDENT,game.getChosenStudentType(),"Chosen student type was not reset");
-    }
-
-    /**
-     * Tests if game can play a Character Card and if, after
-     * playing a CharacterCard, game update correctly his state
-     */
-    @Test
-    public void playCharacterCardTest(){
-        game.playCharacterCard(0);
-        assertTrue(game.getIdCharacterCardActive() != 0, "Wrong id Character Card active");
-    }
 
 
 }

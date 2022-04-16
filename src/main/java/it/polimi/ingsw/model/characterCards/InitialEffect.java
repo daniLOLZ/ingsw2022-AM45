@@ -13,7 +13,7 @@ import java.util.List;
  */
 public abstract class InitialEffect extends CharacterCard{
 
-    private List<StudentEnum> students;
+    private final List<StudentEnum> students;
 
     public InitialEffect(int cost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
 
@@ -53,5 +53,9 @@ public abstract class InitialEffect extends CharacterCard{
         }
 
         return listToReturn;
+    }
+
+    public int size(){
+        return students.size();
     }
 }

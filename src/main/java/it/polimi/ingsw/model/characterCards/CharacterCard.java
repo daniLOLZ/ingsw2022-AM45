@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.GameElementEnum;
 import it.polimi.ingsw.model.ParameterHandler;
 
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,9 +14,9 @@ public abstract class CharacterCard {
     protected int cardCost;
     protected boolean hasBeenUsed;
     public final int id;
-    private ParameterHandler parameters;
-    private AdvancedParameterHandler advancedParameters;
-    private List<GameElementEnum> requirements; //TODO specify this attribute in lower classes
+    protected ParameterHandler parameters;
+    protected AdvancedParameterHandler advancedParameters;
+    protected Requirements requirements; //TODO specify this attribute in lower classes
 
     public CharacterCard(int cardCost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         this.cardCost = cardCost;
@@ -28,7 +29,7 @@ public abstract class CharacterCard {
 
     /**
      * Initialise CharacterChard fields where this operation is useful
-     * @param game
+     * @param game != null
      */
     public void initialise(AdvancedGame game){
 
@@ -48,21 +49,36 @@ public abstract class CharacterCard {
     }
 
     /**
-     * CharacterCard set field idCharacterCardActive of AdvancedGame with Card's id,
-     * in this way Controller, when check Model's state, understand which Card has been
-     * used and implements the Card's logic, calling human's participation and modifying
-     * Model state.
      * Increment cardCost if it is the first time in the game that the effect is activated
      * Set HasBeenUsed true
+     * Activate the effect of the card using parameters in parameterHandlers
      */
-    //TODO fix javadoc
     public  void activateEffect(){
         if(!HasBeenUsed()){
             hasBeenUsed = true;
             cardCost += 1;
         }
-        //game.UsedCharacterCard(id); //probably won't be necessary anymore
 
+        //PARAMETER NOT SET
+        if(requirements != null){
+            if(!requirements.satisfied){
+                parameters.setErrorState("PARAMETERS NOT SATISFIED");
+                return;
+            }
+
+            requirements.satisfied = false;
+        }
+
+    }
+
+    /**
+     * Update AdvancedParameterHandler saving this.id in characterCardId, in
+     * this way the view can see which card has been chosen and can see the
+     * requirements of the right card
+     */
+    public void select(){
+        advancedParameters.setCharacterCardId(id);
+        advancedParameters.setRequirementsForThisAction(requirements);
     }
 
     public int getCardCost() {
@@ -77,7 +93,4 @@ public abstract class CharacterCard {
         return advancedParameters;
     }
 
-    public List<GameElementEnum> getRequirements(){
-        return requirements;
-    }
 }

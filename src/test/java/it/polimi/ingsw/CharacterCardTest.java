@@ -11,14 +11,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CharacterCardTest {
 
+    ParameterHandler parameter = new ParameterHandler(2);
+    AdvancedParameterHandler advancedParameter = new AdvancedParameterHandler(20);
     /**
      * tests if FactoryCharacterCard create a card correctly, with right id and cost
      */
     @Test
     public void createCard(){
 
-        CharacterCard card = FactoryCharacterCard.getSpecificCard(1,null, null);
-        CharacterCard priest = new Priest(null, null);
+        CharacterCard card = FactoryCharacterCard.getSpecificCard(1,parameter, advancedParameter);
+        CharacterCard priest = new Priest(parameter, advancedParameter);
         assertEquals(card, priest, "Wrong card");
         assertEquals(card.id, priest.id, "Wrong id");
         assertEquals(card.getCardCost(), priest.getCardCost(), "Wrong cost");
@@ -46,14 +48,8 @@ public class CharacterCardTest {
      */
     @Test
     public  void incrementCost(){
-        AdvancedGame game = null;
-        try {
-            game = new AdvancedGame(2, 20,3);
-        }
-        catch (IncorrectPlayersException e) {
-            e.printStackTrace();
-        }
-        CharacterCard card = FactoryCharacterCard.getCharacterCard(game.getParameters() ,game.getAdvancedParameters());
+
+        CharacterCard card = FactoryCharacterCard.getCharacterCard(parameter ,advancedParameter);
         int costBefore = card.getCardCost();
         card.activateEffect();
         int costNow = card.getCardCost();
@@ -65,14 +61,8 @@ public class CharacterCardTest {
      */
     @Test
     public void oneTimeIncrementCost(){
-        AdvancedGame game = null;
-        try {
-            game = new AdvancedGame(2, 20,3);
-        }
-        catch (IncorrectPlayersException e) {
-            e.printStackTrace();
-        }        List<CharacterCard> cards = new ArrayList<>();
-        cards.addAll(FactoryCharacterCard.getAllCards(game.getParameters() ,game.getAdvancedParameters()));
+        List<CharacterCard> cards = new ArrayList<>
+                (FactoryCharacterCard.getAllCards(parameter, advancedParameter));
         int costBefore;
         int costNow;
 
@@ -106,14 +96,23 @@ public class CharacterCardTest {
         }
         catch (IncorrectPlayersException e) {
             e.printStackTrace();
+            return;
         }
-        cards.addAll(FactoryCharacterCard.getInitialEffectCards(game.getParameters(), game.getAdvancedParameters()));
-        ParameterHandler parameters = new ParameterHandler(2);
-        game.setCurrentPlayer(new Player(PlayerEnum.PLAYER1,"Bob", TeamEnum.BLACK, true,parameters));
+
+        Player player = new Player(PlayerEnum.PLAYER1,"Bob",TeamEnum.WHITE, true,game.getParameters());
+        Board board = player.getBoard();
         StudentEnum studentSel;
-        Board board = game.getCurrentPlayer().getBoard();
         IslandGroup island = new IslandGroup(0,null,null,
-                                            null, new ArrayList<>(),TeamEnum.NOTEAM,parameters);
+                null, new ArrayList<>(),TeamEnum.NOTEAM,game.getParameters());
+
+        game.setCurrentPlayer(player);
+        game.getParameters().setCurrentPlayer(player);
+        cards.addAll(FactoryCharacterCard.
+                getInitialEffectCards(game.getParameters(), game.getAdvancedParameters()));
+
+
+        for(CharacterCard card: cards)
+            card.initialise(game);
 
 
         for(CharacterCard cardSel: cards){
@@ -124,9 +123,10 @@ public class CharacterCardTest {
                 juggler.removeAll();
                 juggler.addStudent(StudentEnum.RED);
                 studentSel = juggler.getStudents(0);
+                board.addToEntrance(StudentEnum.BLUE);
 
                 //JUGGLER METHOD
-                juggler.tradeStudents(StudentEnum.BLUE, 0, game.getCurrentPlayer());
+                juggler.tradeStudents(0, 0);
 
                 //TESTS
                 assertEquals(juggler.getStudents(0), StudentEnum.BLUE,
@@ -143,13 +143,16 @@ public class CharacterCardTest {
                 priest.removeAll();
                 priest.addStudent(StudentEnum.RED);
                 studentSel = priest.getStudents(0);
+                List<IslandGroup> islands = new ArrayList<>();
+                islands.add(island);
+                game.getParameters().setSelectedIslands(islands);
 
                 //PRIEST METHOD
-                priest.placeStudentOnIsland(game,island,0);
+                priest.placeStudentOnIsland(game);
 
                 //TESTS
                 assertEquals(studentSel, island.getStudents().get(0), "Wrong student add to island");
-                assertTrue(!priest.isEmpty(),"Did not draw from sack");
+                assertFalse(priest.isEmpty(), "Did not draw from sack");
             }
 
             if(cardSel.id == 11){
@@ -159,15 +162,19 @@ public class CharacterCardTest {
                 dame.removeAll();
                 dame.addStudent(StudentEnum.RED);
                 studentSel = dame.getStudents(0);
-                int studentAtTable = board.getStudentsAtTable(studentSel).intValue();
+                int studentAtTable = board.getStudentsAtTable(studentSel);
+                Integer pos = 0;
+                List<Integer> positions = new ArrayList<>();
+                positions.add(pos);
+                game.getAdvancedParameters().setSelectedStudentsOnCard(positions);
 
                 //DAME METHOD
-                dame.placeStudentToHall(game.getCurrentPlayer(),0,game.getSack());
+                dame.placeStudentToHall(game.getSack());
 
                 //TESTS
                 assertEquals(studentAtTable + 1, board.getStudentsAtTable(studentSel).intValue(),
                         "Wrong number of students in Hall");
-                assertTrue(!dame.isEmpty(), "Did not draw from sack");
+                assertFalse(dame.isEmpty(), "Did not draw from sack");
             }
         }
 

@@ -1,26 +1,50 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.ParameterHandler;
+import it.polimi.ingsw.model.*;
+
+
 
 public class FlagBearer extends CharacterCard {
 
     public FlagBearer(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(3,3, parameters, advancedParameters);
+        requirements = new Requirements(1,0,0,0);
     }
 
     /**
-     * Now you must calculate influence of a specific IslandGroup wit all consequences
-     * Set IslandToEvaluate true
-     * @param game
+     *
+     *
      */
-    //@Override
-    //TODO I'm not touching this but it needs to be changed
-    public void activateEffect(AdvancedGame game) {
-
+    @Override
+    public void activateEffect() {
         super.activateEffect();
-        game.setIslandToEvaluateDue(true);
+
+    }
+
+    /**
+     * Controller call this method to use effect of this card and
+     * then Controller must check if Islands need to be merged
+     * @param game != null
+     */
+    public void evaluate(AdvancedGame game){
+        IslandGroup island;
+
+        //CHECK IF USER SELECT ISLAND
+        if(parameters.getSelectedIslands().isPresent())
+            island = parameters.getSelectedIslands().get().get(0);
+        else{
+            parameters.setErrorState("BAD PARAMETERS WITH SelectedIslands");
+            return;
+        }
+
+        //EVALUATE INFLUENCE OF ISLAND
+        TeamEnum winnerTeam;
+        winnerTeam = island.evaluateMostInfluential(parameters.getProfessors());
+
+        //BUILD TOWERS IF NECESSARY
+        if(winnerTeam != TeamEnum.NOTEAM){
+            island.build(winnerTeam,game.getPlayers());
+        }
 
     }
 }

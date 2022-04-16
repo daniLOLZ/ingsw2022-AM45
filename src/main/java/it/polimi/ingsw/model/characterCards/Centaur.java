@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
 import it.polimi.ingsw.model.AdvancedParameterHandler;
 import it.polimi.ingsw.model.ParameterHandler;
 
@@ -16,7 +15,6 @@ public class Centaur extends CharacterCard {
      */
     @Override
     public void activateEffect() {
-
         super.activateEffect();
         super.getAdvancedParameters().setCountTowers(false);
     }

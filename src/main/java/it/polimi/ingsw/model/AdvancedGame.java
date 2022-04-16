@@ -7,170 +7,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdvancedGame extends SimpleGame{
-    private int numCoins;
-    private boolean drawIsWin;                             //Glutton effect active
-    private int idCharacterCardActive;                     //CharacterCard active this round
-    private int TradeableStudent;                          //Minstrel(or Juggler) effect active when != 0
-    private boolean IslandToEvaluateDue;                   //FlagBearer effect active
-    private int MNAdditionalSteps;                         //Mailman effect active
-    private boolean CountTowers;                           //Centaur effect active
-    private int AdditionalInfluence;                       //Knight effect active when != 0
-    private boolean isIgnoredStudent;                      //Fungalmacer effect active
-    private StudentEnum ChosenStudentType;                 //useful for LoanShark,Fungalmancer
     private final List<CharacterCard> CharacterCards;
-    private AdvancedIslandGroup chosenIsland;              //useful for FlagBearer, Herbalist
-    private AdvancedParameterHandler advancedParameters;   //TODO move above parameters here
+    private  List<AdvancedPlayer> AdvancedPlayers;
+    private final AdvancedParameterHandler advancedParameters;
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
         advancedParameters = new AdvancedParameterHandler(numCoins);
-        this.numCoins = numCoins;
-        drawIsWin = false;
-        MNAdditionalSteps = 0;
-        CountTowers = false;
-        isIgnoredStudent = false;
-        idCharacterCardActive = 0;
-        IslandToEvaluateDue = false;
-        AdditionalInfluence = 0;
-        TradeableStudent = 0;
-        chosenIsland = null;
-        ChosenStudentType = StudentEnum.NOSTUDENT;
         CharacterCards = new ArrayList<>();
 
-
         for(int card= 0; card < numCharacterCards; card++){
-            CharacterCards.add(FactoryCharacterCard.getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+            CharacterCards.add(FactoryCharacterCard.
+                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
         }
         for(int card= 0; card < numCharacterCards; card++){
             CharacterCards.get(card).initialise(this);
         }
 
-    }
+        createPlayingSack();
 
-    public void resetCardEffect(){
-        drawIsWin = false;
-        MNAdditionalSteps = 0;
-        CountTowers = false;
-        isIgnoredStudent = false;
-        idCharacterCardActive = 0;
-        IslandToEvaluateDue = false;
-        AdditionalInfluence = 0;
-        TradeableStudent = 0;
-        ChosenStudentType = StudentEnum.NOSTUDENT;
-        chosenIsland = null;
-    }
-
-    public void setAdditionalInfluence(int additionalInfluence) {
-        AdditionalInfluence = additionalInfluence;
-    }
-
-    public void setCountTowers(boolean countTowers) {
-        CountTowers = countTowers;
-    }
-
-    public void setDrawIsWin(boolean drawIsWin) {
-        this.drawIsWin = drawIsWin;
-    }
-
-    public void setChoosenStudentType(StudentEnum type) {
-        ChosenStudentType = type;
-    }
-
-    public void setMNAdditionalSteps(int MNAdditionalSteps) {
-        this.MNAdditionalSteps = MNAdditionalSteps;
-    }
-
-    public void setIslandToEvaluate(AdvancedIslandGroup choosenIsland) {
-        this.chosenIsland = choosenIsland;
-    }
-
-    public AdvancedIslandGroup getChoosenIsland() {
-        return chosenIsland;
-    }
-
-    public void setIgnoredStudent(boolean ignoredStudent) {
-        isIgnoredStudent = ignoredStudent;
-    }
-
-    public int getIdCharacterCardActive() {
-        return idCharacterCardActive;
-    }
-
-    public void UsedCharacterCard(int id) {
-        idCharacterCardActive= id;
-    }
-
-    public int getTradeableStudent() {
-        return TradeableStudent;
-    }
-
-    public void setTradeableStudent(int tradeableStudent) {
-        TradeableStudent = tradeableStudent;
-    }
-
-    public void setChoosenIsland(AdvancedIslandGroup choosenIsland) {
-        this.chosenIsland = choosenIsland;
-    }
-
-    public StudentEnum getChoosenStudentType() {
-        return ChosenStudentType;
-    }
-
-    public void setIslandToEvaluateDue(boolean islandToEvaluateDue) {
-        IslandToEvaluateDue = islandToEvaluateDue;
-    }
-
-    public boolean IslandToEvaluateDue() {
-        return IslandToEvaluateDue;
     }
 
     public CharacterCard getCharacterCard(int position) {
         return CharacterCards.get(position);
     }
 
-    public int getNumCoins() {
-        return numCoins;
-    }
-
-    public void addCoin(int coinsToAdd){
-        numCoins+= coinsToAdd;
-    }
-
-    public void subtractCoin(int coinsToSubtract ){
-        numCoins -= coinsToSubtract;
-    }
-
-    public boolean isCountTowers() {
-        return CountTowers;
-    }
-
-    public boolean isDrawIsWin() {
-        return drawIsWin;
-    }
-
-    public boolean isIgnoredStudent() {
-        return isIgnoredStudent;
-    }
-
-    public boolean isIslandToEvaluateDue() {
-        return IslandToEvaluateDue;
-    }
-
-    public int getMNAdditionalSteps() {
-        return MNAdditionalSteps;
-    }
-
-    public int getAdditionalInfluence() {
-        return AdditionalInfluence;
-    }
-
     public AdvancedParameterHandler getAdvancedParameters(){
         return advancedParameters;
     }
 
-    public void playCharacterCard(int positionCard){
 
-        CharacterCards.get(positionCard).activateEffect();
+    /**
+     * It was useful if also SimpleGame had this method, in this way I can
+     * override it and not create 2 times all players
+     * @param numPlayer > 1 useful for version with override
+     */
+    private void  createPlayers(int numPlayer){
+        AdvancedPlayers = new ArrayList<>();
+        for(Player player: players){
+            AdvancedPlayers.add(
+                    new AdvancedPlayer(
+                    player.getPlayerId(),
+                    player.getNickname(),
+                    player.getTeamColor(),
+                    player.isLeader(),
+                    getParameters()));
+        }
+
+        //TODO VERSION WITH OVERRIDE
+    }
+
+    public List<AdvancedPlayer> getAdvancedPlayers() {
+        return AdvancedPlayers;
     }
 
     @Override

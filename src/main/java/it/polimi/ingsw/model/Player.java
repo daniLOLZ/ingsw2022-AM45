@@ -91,5 +91,7 @@ public class Player {
         setAssistantPlayed(tempAssistant);
     }
 
-
+    public String getNickname() {
+        return nickname;
+    }
 }

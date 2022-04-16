@@ -8,6 +8,8 @@ public class AdvancedPlayer extends Player{
         this.numCoins = 1;
     }
 
+
+
     public void addCoin(){
         numCoins++;
     }

@@ -1,18 +1,27 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.characterCards.Requirements;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class AdvancedParameterHandler {
 
+    //STATIC PARAMETERS
+    public static final int numCharacterCardPerGame = 3;
+
+    //DYNAMIC PARAMETERS
     private int numCoins;
     private boolean drawIsWin;
     private int MNAdditionalSteps;
     private boolean countTowers;
     private int additionalInfluence;
     private StudentEnum ignoredStudentType;
+    private int characterCardId;
+    private Requirements requirementsForThisAction;
 
+    //CHOSEN PARAMETERS
     private Optional<List<Integer>> selectedStudentsOnCard;
 
     public AdvancedParameterHandler(int numCoins){
@@ -106,10 +115,27 @@ public class AdvancedParameterHandler {
         for (Integer studentPos: studentsPos) selectStudentOnCard(studentPos);
     }
 
+    public void setRequirementsForThisAction(Requirements requirementsForThisAction) {
+        this.requirementsForThisAction = requirementsForThisAction;
+    }
+
+    public Requirements getRequirementsForThisAction() {
+        return requirementsForThisAction;
+    }
+
+    public void setCharacterCardId(int characterCardId) {
+        this.characterCardId = characterCardId;
+    }
+
+    public int getCharacterCardId() {
+        return characterCardId;
+    }
+
     /**
      * Sets every card effect parameter to its default value
      */
     public void resetCardEffects(){
+        characterCardId = 0;
         drawIsWin = false;
         MNAdditionalSteps = 0;
         countTowers = true;

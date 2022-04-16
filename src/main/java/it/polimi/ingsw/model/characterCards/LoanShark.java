@@ -2,14 +2,14 @@ package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.*;
 
-import java.util.List;
 
 public class LoanShark extends CharacterCard {
 
-    private final int numStudentToSubtract = 3;
+
 
     public LoanShark(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(3,12, parameters, advancedParameters);
+        requirements = new Requirements(0,0,1,0);
     }
 
     /**
@@ -23,12 +23,25 @@ public class LoanShark extends CharacterCard {
 
     /**
      * Subtract students with colorStudent from Halls of each Player
-     * @param colorStudent
-     * @param game
-     * @param sack
+     * @param game != null
      */
-    //TODO modify this method to not have access to AdvancedGame
-    public void extortStudents(StudentEnum colorStudent, AdvancedGame game, AdvancedSack sack){
+    public void extortStudents( AdvancedGame game){
+        final int numStudentToSubtract = 3;
+        AdvancedSack sack = (AdvancedSack) game.getSack();  //IF THIS CARD EXISTS THE SACK IS AN ADVANCED SACK
+
+        //CHECK IF USER SELECT A STUDENT TYPE
+        if(parameters.getSelectedStudentTypes().isEmpty()){
+            parameters.setErrorState("BAD PARAMETERS WITH SelectedStudentType");
+            return;
+        }
+
+        StudentEnum colorStudent = parameters.getSelectedStudentTypes().get().get(0);
+
+        //CHECK IF COLOR IS NOT NO-STUDENT
+        if(colorStudent == StudentEnum.NOSTUDENT){
+            parameters.setErrorState("BAD PARAMETERS WITH SelectedStudentType");
+            return;
+        }
 
         for(Player player: game.getPlayers()){
             sack.addStudents(player.getBoard().

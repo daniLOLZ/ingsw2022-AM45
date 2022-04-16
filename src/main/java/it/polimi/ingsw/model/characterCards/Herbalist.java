@@ -7,17 +7,20 @@ import java.util.List;
 
 public class Herbalist extends CharacterCard {
 
-    private final int maxBlockTiles = 4;
+
     private int numBlockTiles;
-    private List<BlockTile> blockTiles;
+    private final List<BlockTile> blockTiles;
 
     public Herbalist(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(2,5, parameters, advancedParameters);
+        final int maxBlockTiles = 4;
         numBlockTiles = maxBlockTiles;
         blockTiles = new ArrayList<>();
 
         for(int tile= 0; tile < maxBlockTiles; tile++)
             blockTiles.add(new BlockTile());
+
+        requirements = new Requirements(1,0,0,0);
     }
 
     /**
@@ -34,9 +37,17 @@ public class Herbalist extends CharacterCard {
      * if there is at least one free tile put one Blocktile on chosenIsland, adding it to
      * chosenIsland's list of BlockTiles
      * set isAssigned true
-     * @param chosenIsland
      */
-    public void blockIsland(AdvancedIslandGroup chosenIsland){
+    public void blockIsland(){
+
+        if(parameters.getSelectedIslands().isEmpty()){
+            parameters.setErrorState("BAD PARAMETERS WITH SelectedIslands");
+            return;
+        }
+
+        //TAKE CHOSEN ISLAND FROM PARAMETERS UPDATED BY USER, SELECTED-ISLANDS
+        //RETURN ISLAND GROUP SO I NEED CAST
+        AdvancedIslandGroup chosenIsland = (AdvancedIslandGroup) parameters.getSelectedIslands().get().get(0);
 
         //RESTORE CORRECT NUMBER OF FREE TILES
         numBlockTiles = (int) blockTiles.stream().

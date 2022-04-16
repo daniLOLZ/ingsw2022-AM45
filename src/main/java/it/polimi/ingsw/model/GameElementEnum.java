@@ -1,5 +1,5 @@
 package it.polimi.ingsw.model;
-
+//TODO INUTILE (RIMPIAZZATA CON CLASSE REQUIREMENTS)
 public enum GameElementEnum {
     ISLAND_GROUP,
     STUDENT_AT_ENTRANCE,

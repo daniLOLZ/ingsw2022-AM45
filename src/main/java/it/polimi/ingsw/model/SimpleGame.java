@@ -16,7 +16,7 @@ public class SimpleGame {
     private int currentIslandGroupId;
     private List<IslandGroup> islandGroups; // These are not in order of navigation, the order
                                             // is given by the pointers
-    private List<Player> players; // These will not be in order, they will get shifted around
+    protected List<Player> players; // These will not be in order, they will get shifted around
     private List<Cloud> clouds;
     private MotherNature MN;
     protected Sack sack;

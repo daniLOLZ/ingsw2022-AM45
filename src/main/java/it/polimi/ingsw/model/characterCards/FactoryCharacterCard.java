@@ -21,8 +21,9 @@ public class FactoryCharacterCard {
      * if yes create another one
      * if no return the card
      * @param listCardsGot != null
-     * @param advancedParameters
-     * @return CharacterCard
+     * @param parameters != null
+     * @param advancedParameters != null
+     * @return one random CharacterCard that is not contained in listCardsGot
      */
     public static CharacterCard getCharacterCard(List<CharacterCard> listCardsGot, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
 
@@ -69,10 +70,10 @@ public class FactoryCharacterCard {
 
     /**
      * Get specific CharacterCard with id selected
-     * @param id
-     * @param parameters
-     * @param advancedParameters
-     * @return
+     * @param id > 0
+     * @param parameters != null
+     * @param advancedParameters != null
+     * @return CharacterCard with chosen id
      */
     public static CharacterCard getSpecificCard(int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         if(id == 1)
@@ -105,7 +106,7 @@ public class FactoryCharacterCard {
 
     /**
      * Get a random CharacterCard
-     * @return
+     * @return a random CharacterCard
      */
     public static CharacterCard getCharacterCard(ParameterHandler parameters ,AdvancedParameterHandler advancedParameters){
         List<CharacterCard> list = new ArrayList<>();
@@ -115,7 +116,7 @@ public class FactoryCharacterCard {
 
     /**
      *Get all CharacterCards
-     * @return
+     * @return list of all CharacterCard
      */
     public static List<CharacterCard> getAllCards(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         List<CharacterCard> listCards = new ArrayList<>();
@@ -138,7 +139,7 @@ public class FactoryCharacterCard {
     /**
      * Get CharacterCards with InitialEffect as mother class.
      * Those cards that have students on themselves
-     * @return
+     * @return list of CharacterCard with Initial effect
      */
     public static List<CharacterCard> getInitialEffectCards(ParameterHandler parameters ,AdvancedParameterHandler advancedParameterHandler){
         List<CharacterCard> listCards = new ArrayList<>();
