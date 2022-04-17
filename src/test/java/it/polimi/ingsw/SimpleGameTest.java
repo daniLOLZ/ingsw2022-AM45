@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SimpleGameTest {
 
     SimpleGame game;
+    ParameterHandler parameters;
 
     @BeforeEach
     public void createNewGame(){
@@ -20,8 +21,8 @@ public class SimpleGameTest {
         catch (IncorrectPlayersException e){
             e.printStackTrace();
         }
-        //game = new SimpleGame(3)
-        //game = new SimpleGame(4)
+        parameters = game.getParameters();
+
     }
 
     @Test
@@ -48,15 +49,15 @@ public class SimpleGameTest {
         game.initializeGame();
         game.getPlayers().get(0).getBoard().addToHall(StudentEnum.PINK); // Add a pink student to PLAYER 1 board
         game.updateProfessor(StudentEnum.PINK); //The pink professor should now belong to PLAYER1
-        assertTrue(game.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(0).getPlayerId()));
+        assertTrue(parameters.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(0).getPlayerId()));
 
         game.getPlayers().get(1).getBoard().addToHall(StudentEnum.PINK); // We give PLAYER 2 a pink student
         game.updateProfessor(StudentEnum.PINK); //The professor should still be PLAYER 1's
-        assertFalse(game.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(1).getPlayerId()));
+        assertFalse(parameters.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(1).getPlayerId()));
 
         game.getPlayers().get(1).getBoard().addToHall(StudentEnum.PINK); // We give PLAYER 2 ANOTHER pink student
         game.updateProfessor(StudentEnum.PINK); //The professor should switch sides
-        assertTrue(game.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(1).getPlayerId()));
+        assertTrue(parameters.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(1).getPlayerId()));
 
     }
 

@@ -39,7 +39,7 @@ public class FlagBearer extends CharacterCard {
 
         //EVALUATE INFLUENCE OF ISLAND
         TeamEnum winnerTeam;
-        winnerTeam = island.evaluateMostInfluential(parameters.getProfessors());
+        winnerTeam = island.evaluateMostInfluential(); //Lucario : tolto parametro ora inutile
 
         //BUILD TOWERS IF NECESSARY
         if(winnerTeam != TeamEnum.NOTEAM){

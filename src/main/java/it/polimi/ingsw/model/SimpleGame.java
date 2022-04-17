@@ -9,12 +9,11 @@ public class SimpleGame {
     private final int numPlayers;
     private final int maxStudentsByType;
     private final int amountOfIslands;
-    private List<PlayerEnum> professors;
     private Player currentPlayer;
     private TeamEnum currentTeam;
     private boolean isLastTurn;
     private int currentIslandGroupId;
-    private List<IslandGroup> islandGroups; // These are not in order of navigation, the order
+    protected List<IslandGroup> islandGroups; // These are not in order of navigation, the order
                                             // is given by the pointers
     protected List<Player> players; // These will not be in order, they will get shifted around
     private List<Cloud> clouds;
@@ -41,21 +40,17 @@ public class SimpleGame {
         this.hasBeenInitialized = false;
         this.amountOfIslands = 12;
         this.numPlayers = numPlayers;
-        this.maxStudentsByType = 120/StudentEnum.getNumStudentTypes();
-        this.professors = new ArrayList<PlayerEnum>();
-        for (StudentEnum studEnum : StudentEnum.values()){
-            professors.add(PlayerEnum.NOPLAYER);
-        }
+        this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
         this.parameters = new ParameterHandler(numPlayers);
         this.isLastTurn = false;
         this.currentIslandGroupId = 0;
-        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters, currentIslandGroupId, amountOfIslands);
-        currentIslandGroupId += amountOfIslands;
         this.players = new ArrayList<>();
         this.clouds = new ArrayList<>();
         for (int cloudNumber = 0; cloudNumber < numberOfClouds; cloudNumber++){
             clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud()));
         }
+        createIslandGroups();
+
         // Mother Nature starts on the first island group, will get moved in the initialization of the game
         this.MN = new MotherNature(islandGroups.get(0));
         //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
@@ -98,7 +93,16 @@ public class SimpleGame {
      * to this game's sack. Can be overridden
      */
     protected void createPlayingSack(){
-        sack = new Sack(24);
+        sack = new Sack(maxStudentsByType-2);
+    }
+
+    /**
+     * Creates the island groups of this game and assigns them to
+     * this.islandGroups. Can be overridden
+     */
+    protected void createIslandGroups(){
+        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters, currentIslandGroupId, amountOfIslands);
+        currentIslandGroupId += amountOfIslands;
     }
 
     /**
@@ -132,7 +136,7 @@ public class SimpleGame {
      * @param player the player to assign it to
      */
     private void assignProfessor(StudentEnum professor, PlayerEnum player){
-        this.professors.set(professor.index, player);
+        this.parameters.getProfessors().set(professor.index, player);
     }
 
 
@@ -204,11 +208,6 @@ public class SimpleGame {
         return currentIslandGroupId;
     }
 
-
-    public List<PlayerEnum> getProfessors() {
-        return professors;
-    }
-
     public List<Player> getPlayers() {
         return players;
     }
@@ -224,8 +223,10 @@ public class SimpleGame {
     public List<IslandGroup> getIslandGroups() {
         return islandGroups;
     }
-    //TODO implement the rest of the class
 
+    public int getAmountOfIslands() {
+        return amountOfIslands;
+    }
 
     public Sack getSack() {
         return sack;
@@ -239,8 +240,16 @@ public class SimpleGame {
         return hasBeenInitialized;
     }
 
+    public int getMaxStudentsByType() {
+        return maxStudentsByType;
+    }
+
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public void setCurrentIslandGroupId(int currentIslandGroupId) {
+        this.currentIslandGroupId = currentIslandGroupId;
     }
 
     public void setErrorState(ErrorState errorState) {

@@ -44,6 +44,9 @@ public class ParameterHandler {
 
         playersAllegiance = new HashMap<>();
         professors = new ArrayList<>();
+        for (StudentEnum studEnum : StudentEnum.values()){
+            professors.add(PlayerEnum.NOPLAYER);
+        }
 
         undoSelection();
     }

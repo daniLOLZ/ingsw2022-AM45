@@ -43,6 +43,9 @@ public class CharacterCardHandler {
         spendCoin();
         usingCard.activateEffect();
 
+            //Lucario : ma l'idea dietro lo strategy non era quello di poter chiamare activateEffect(),
+            // e poi quest'ultima funzione era ridefinita in ciascun personaggio per chiamare il
+            // proprio metodo caratteristico?
         //CAST WITH CORRECT AND SPECIFIC CHARACTER CARD TO USE MORE SPECIFIC ACTION
         //WHERE THESE ARE NECESSARY
         switch (usingCard.id){

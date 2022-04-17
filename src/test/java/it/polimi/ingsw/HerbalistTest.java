@@ -25,7 +25,7 @@ public class HerbalistTest {
         int numBlock = island.getNumBlockTiles();
         herbalist.blockIsland();
         assertEquals(numBlock + 1, island.getNumBlockTiles(), "Block tile is not added to Island" );
-        assertTrue(island.getBlockTiles(0).isAssigned(), "Wrong setting assigned in Block Tile");
+        assertTrue(island.getBlockTileById(0).isAssigned(), "Wrong setting assigned in Block Tile");
 
     }
 
@@ -41,7 +41,7 @@ public class HerbalistTest {
         parameter.setSelectedIslands(islands);
         int numBlock = island.getNumBlockTiles();
         herbalist.blockIsland();
-        BlockTile tile = island.getBlockTiles(0);
+        BlockTile tile = island.getBlockTileById(0);
         island.unblock();
         assertEquals(numBlock, island.getNumBlockTiles(), "Block tile is nor removed from island");
         assertFalse(tile.isAssigned(), "Wrong setting assigned in Block Tile");

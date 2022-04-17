@@ -38,6 +38,10 @@ public class IslandGroup {
         this.parameters = parameters;
     }
 
+    /**
+     * Creates a copy of the island parameter
+     * @param island the IslandGroup to create a new object out of
+     */
     public IslandGroup(IslandGroup island){
         this.idGroup = island.idGroup;
         this.islands = island.islands;
@@ -87,11 +91,11 @@ public class IslandGroup {
 
     }
 
-    private void setNextIslandGroup(IslandGroup nextIslandGroup) {
+    protected void setNextIslandGroup(IslandGroup nextIslandGroup) {
         this.nextIslandGroup = nextIslandGroup;
     }
 
-    private void setPrevIslandGroup(IslandGroup prevIslandGroup) {
+    protected void setPrevIslandGroup(IslandGroup prevIslandGroup) {
         this.prevIslandGroup = prevIslandGroup;
     }
 
@@ -119,12 +123,16 @@ public class IslandGroup {
         return idGroup;
     }
 
+    public ParameterHandler getParameters() {
+        return parameters;
+    }
+
     /**
      * Evaluates which team has the most influence
      * If two or more teams have the same influence, returns TeamEnum.NOTEAM
      * @return the Team with the most influence on this IslandGroup
      */
-    public TeamEnum evaluateMostInfluential(List<PlayerEnum> professors){
+    public TeamEnum evaluateMostInfluential(){
         int maximumInfluence = 0;
         TeamEnum mostInfluentialTeam = TeamEnum.NOTEAM;
         PlayerEnum professorOwner;
@@ -149,10 +157,10 @@ public class IslandGroup {
 
             // Checks influence of students
             for(StudentEnum stud : students){
-                professorOwner = professors.get(stud.ordinal());
+                professorOwner = parameters.getProfessors().get(stud.ordinal());
 
-                //There's no point in adding influence to NOPLAYER
-                if (professorOwner == PlayerEnum.NOPLAYER) continue;
+                // There's no point in adding influence to NOPLAYER     //redundant
+                // if (professorOwner == PlayerEnum.NOPLAYER) continue;
 
                 //Finds which team that owner is part of
                 owningTeam = parameters.getPlayerTeamById(professorOwner);
@@ -254,7 +262,6 @@ public class IslandGroup {
 
 
         IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor, parameters);
-        //IslandGroup mergedGroup = getIslandGroup(game, newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor);
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
     }
@@ -270,7 +277,7 @@ public class IslandGroup {
     /**
      * Returns the amount of islands in this IslandGroup
      */
-    private int numOfIslandsInGroup(){
+    public int numOfIslandsInGroup(){
         return islands.size();
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 public class FactoryPlayer {
     public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters){
         List<Player> playerList = new ArrayList<>();
-        //TODO handle nicknames
+        //TODO handle nicknames and assignment of player to team
         switch (numberOfPlayers){
             case 2:
                 playerList.add(new Player(PlayerEnum.PLAYER1, "mockNickname1", TeamEnum.WHITE, true, parameters));

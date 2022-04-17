@@ -31,7 +31,7 @@ public class IslandGroupTest {
 
         parameters = game.getParameters();
 
-        group = IslandGroup.getCollectionOfIslandGroup(game.getParameters(),islandGroupId, numIslands);
+        // group = IslandGroup.getCollectionOfIslandGroup(game.getParameters(),islandGroupId, numIslands);
         group = game.getIslandGroups();
         islandGroupId += numIslands;
 
@@ -143,10 +143,10 @@ public class IslandGroupTest {
         group.get(0).addStudent(StudentEnum.GREEN);
         group.get(0).addStudent(StudentEnum.GREEN);
         group.get(0).addStudent(StudentEnum.RED);
-        game.getProfessors().set(StudentEnum.GREEN.index, PlayerEnum.PLAYER1); // Player 1 controls the green professor
-        game.getProfessors().set(StudentEnum.RED.index, PlayerEnum.PLAYER2); // Player 2 controls the red professor
+        parameters.getProfessors().set(StudentEnum.GREEN.index, PlayerEnum.PLAYER1); // Player 1 controls the green professor
+        parameters.getProfessors().set(StudentEnum.RED.index, PlayerEnum.PLAYER2); // Player 2 controls the red professor
         //Player 1's team should have more influence
-        assertTrue(group.get(0).evaluateMostInfluential(game.getProfessors()).equals(
+        assertTrue(group.get(0).evaluateMostInfluential().equals(
                 GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).getTeamColor())
         );
 
