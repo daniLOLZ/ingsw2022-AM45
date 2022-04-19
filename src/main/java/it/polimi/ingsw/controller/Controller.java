@@ -11,6 +11,7 @@ public class Controller {
     protected AdvancedGame advancedGame;
     protected CharacterCardHandler characterCardHandler;
     protected AssistantHandler assistantHandler;
+    protected BoardHandler boardHandler;
 
     public void createSimpleGame(int numPlayers){
         try {
@@ -39,6 +40,7 @@ public class Controller {
 
     public void createBasicHandlers(){
         characterCardHandler = new CharacterCardHandler(this);
+        boardHandler = new BoardHandler(this);
     }
 
     private void createView(){
