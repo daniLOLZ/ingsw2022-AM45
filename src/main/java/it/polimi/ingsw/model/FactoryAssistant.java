@@ -25,7 +25,7 @@ public class FactoryAssistant {
      * //@throws IOException if file is not found
      * //@throws ParseException if something goes wrong reading file json
      */
-    public static Assistant getAssistant(int id) throws IOException, ParseException {
+    public static Assistant getAssistant(int id)  {
         if(id<=0 || id > numCards)
             return standardAssistant;
 

@@ -22,7 +22,7 @@ public class FactoryWizard {
      * with chosen id if this one is an available parameter
      * return Wizard with id == 0 otherwise
      */
-    public static Wizard getWizard(int wizard) throws IOException, ParseException {
+    public static Wizard getWizard(int wizard)  {
 
         final int wizardToMatch = wizard;
         if(Arrays.stream(idWizard).noneMatch(id -> id == wizardToMatch))
@@ -37,11 +37,11 @@ public class FactoryWizard {
         return new Wizard(wizard,assistants);
     }
 
-    public static Wizard getWizard() throws IOException, ParseException {
+    public static Wizard getWizard()  {
         return getWizard(0);
     }
 
-    public static List<Wizard> getAllWizards() throws IOException, ParseException {
+    public static List<Wizard> getAllWizards()  {
         List<Wizard> listToReturn = new ArrayList<>();
         for(int i: idWizard)
             listToReturn.add(getWizard(i));

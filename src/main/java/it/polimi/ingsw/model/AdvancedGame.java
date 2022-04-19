@@ -44,7 +44,10 @@ public class AdvancedGame extends SimpleGame{
      * override it and not create 2 times all players
      * @param numPlayer > 1 useful for version with override
      */
-    private void  createPlayers(int numPlayer){ // Lucario: la creazione dei giocatori l'ho fatta con FactoryPlayer, se togliamo advancedPlayer non servirà questo metodo visto che saranno inizializzati nel super()
+    private void  createPlayers(int numPlayer){
+        // Lucario: la creazione dei giocatori l'ho fatta con FactoryPlayer, se togliamo advancedPlayer non servirà questo metodo visto che saranno inizializzati nel super()
+        //RISPOSTA: ok se proprio vogliamo togliere AdvancedPlayer. Prima si sistema Player, poi si sistema
+        //il resto usando il nuovo Player e alla fine si toglie Advanced Player.
         AdvancedPlayers = new ArrayList<>();
         for(Player player: players){
             AdvancedPlayers.add(
@@ -67,17 +70,23 @@ public class AdvancedGame extends SimpleGame{
     protected void createPlayingSack() {
         sack = new AdvancedSack(super.getMaxStudentsByType()-2);
     } // Lucario : ho cambiato qui, invece che usare 24 fisso, per usare il parametro in simpleGame
+        //RISPOSTA: ok. A sto punto si può sostituire anche il 2 (visto che anche lui è un mezzo magic number)
 
 
     // Lucario : per ragioni simili a quelle di Sack ho fatto creare a parte le isole
     // non dovrebbero esserci altre modifiche da fare in questa classe
+    //RISPOSTA: ok
     /**
      * Creates the island groups of this game in their advanced form.
      */
-
     @Override
     protected void createIslandGroups(){
-        this.islandGroups = AdvancedIslandGroup.getCollectionAdvancedIslandGroup(getAdvancedParameters(), getParameters(), getCurrentIslandGroupId(), getAmountOfIslands());
+        this.islandGroups = AdvancedIslandGroup.
+                getCollectionAdvancedIslandGroup(
+                        getAdvancedParameters(),
+                        getParameters(),
+                        getCurrentIslandGroupId(),
+                        getAmountOfIslands());
         setCurrentIslandGroupId(getCurrentIslandGroupId() + getAmountOfIslands());
     }
 

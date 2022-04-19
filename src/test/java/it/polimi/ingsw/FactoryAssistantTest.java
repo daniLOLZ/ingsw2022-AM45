@@ -19,27 +19,20 @@ public class FactoryAssistantTest {
      */
     @Test
     public void getAssistant(){
-        try{
-            Assistant assistant = FactoryAssistant.getAssistant(18);
-            assertEquals(4,assistant.motherNatureSteps, "Wrong steps");
-            assertEquals(8,assistant.turnOrder, "Wrong turnOrder");
 
-            assistant = FactoryAssistant.getAssistant(1);
-            assertEquals(1,assistant.motherNatureSteps, "Wrong steps");
-            assertEquals(1,assistant.turnOrder, "Wrong turnOrder");
+        Assistant assistant = FactoryAssistant.getAssistant(18);
+        assertEquals(4,assistant.motherNatureSteps, "Wrong steps");
+        assertEquals(8,assistant.turnOrder, "Wrong turnOrder");
 
-            assistant = FactoryAssistant.getAssistant(40);
-            assertEquals(5,assistant.motherNatureSteps, "Wrong steps");
-            assertEquals(10,assistant.turnOrder, "Wrong turnOrder");
-        }
-        catch (
-        IOException e) {
-            e.printStackTrace();
-        }
-        catch (
-        ParseException e) {
-            e.printStackTrace();
-        }
+        assistant = FactoryAssistant.getAssistant(1);
+        assertEquals(1,assistant.motherNatureSteps, "Wrong steps");
+        assertEquals(1,assistant.turnOrder, "Wrong turnOrder");
+
+        assistant = FactoryAssistant.getAssistant(40);
+        assertEquals(5,assistant.motherNatureSteps, "Wrong steps");
+        assertEquals(10,assistant.turnOrder, "Wrong turnOrder");
+
+
     }
 
     /**
@@ -56,16 +49,12 @@ public class FactoryAssistantTest {
             if (position == 0)
                 position = FactoryWizard.numOfCardsPerWizard;
 
-            try {
-                card = FactoryAssistant.getAssistant(id);
-                assertEquals(steps[position], card.motherNatureSteps, "Wrong steps with " + id + "card");
-                assertEquals(turn[position], card.turnOrder, "Wrong turn with " + id + "card");
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+
+            card = FactoryAssistant.getAssistant(id);
+            assertEquals(steps[position], card.motherNatureSteps, "Wrong steps with " + id + "card");
+            assertEquals(turn[position], card.turnOrder, "Wrong turn with " + id + "card");
         }
+
     }
 
     /**
@@ -73,15 +62,11 @@ public class FactoryAssistantTest {
      */
     @Test
     public void wrongId(){
-        try {
+
             Assistant assistant = FactoryAssistant.getAssistant(-1);
             assertEquals(FactoryAssistant.standardAssistant,assistant,"Wrong card returned");
             assistant = FactoryAssistant.getAssistant(FactoryAssistant.numCards +1);
             assertEquals(FactoryAssistant.standardAssistant,assistant,"Wrong card returned");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+
     }
 }

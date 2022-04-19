@@ -40,6 +40,7 @@ public class FlagBearer extends CharacterCard {
         //EVALUATE INFLUENCE OF ISLAND
         TeamEnum winnerTeam;
         winnerTeam = island.evaluateMostInfluential(); //Lucario : tolto parametro ora inutile
+                                                        //RISPOSTA: non ho idea a cosa ti riferisci.
 
         //BUILD TOWERS IF NECESSARY
         if(winnerTeam != TeamEnum.NOTEAM){

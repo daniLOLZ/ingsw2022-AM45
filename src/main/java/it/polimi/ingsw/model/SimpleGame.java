@@ -140,6 +140,8 @@ public class SimpleGame {
     }
 
 
+    //LUXRAY: Sicuro che non dovrebbe farlo il Controller?
+    //Intendo dire, il Controller fa l'operazione e poi passa la lista ordinata al model.
     /**
      * Sorts the players based on the assistant they played in the planning phase
      * Accounts for the possibility of players playing the same valued assistants in the same turn

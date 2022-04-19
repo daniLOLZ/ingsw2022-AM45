@@ -46,6 +46,24 @@ public class CharacterCardHandler {
             //Lucario : ma l'idea dietro lo strategy non era quello di poter chiamare activateEffect(),
             // e poi quest'ultima funzione era ridefinita in ciascun personaggio per chiamare il
             // proprio metodo caratteristico?
+
+            //RISPOSTA: lo avevo già detto.
+            //Nella maggior parte dei casi basta chiamare activate effect ma in alcuni casi particolari
+            //questo non basta e servono azioni aggiuntive proprie del controller impossibili da effettuare
+            //nel model (per come lo abbiamo pensato).
+
+            //ESEMPIO: La carta FlagBearer deve calcolare l'influenza di un'isola scelta dall'User, con
+            //tutte le conseguenze che questo comporta. Ma FlagBearer può al massimo calcolare l'influenza
+            // nell'isola e vedere se c'è da costruire le torri, vedere se bisogna mergiare delle isole
+            //non può farlo. Per farlo avrebbe bisogno di tutte le isole, che in parameter non ci sono.
+            //Poichè in activate effect non si passa Game, la carta non ha modo di fare ciò (e non sarebbe
+            //nemmeno suo compito, controllare è compito del Controller).
+            //Stesso discorso per le carte che pescano dal sacchetto (non presente in parameter), e per
+            //le carte che hanno bisogno di tutti i Player.
+            //Non si possono inserire tutti questi oggetti in parameter perchè altrimenti tenevamo Game.
+            //In altre parole la logica della carta è gestita dal Controller (che necessita di sapere
+            //che carta è) laddove la carta non si limita ad attivare un flag o altre azioni semplici.
+            //Lo Strategy fa tanto ma non può fare tutto.
         //CAST WITH CORRECT AND SPECIFIC CHARACTER CARD TO USE MORE SPECIFIC ACTION
         //WHERE THESE ARE NECESSARY
         switch (usingCard.id){

@@ -30,22 +30,11 @@ public class Player {
         this.board = new Board(teamColor, parameters);
         //TODO make the player choose which wizard they want to pick
 
-        //I catch these exceptions here to not throw them too many times in code
-        //Player modify SimpleGame to notify the error presence and in this way
-        //View can see the error and show to User what goes wrong, then View
-        //notify to Controller that the game should be closed
-        try {
-            this.wizard = FactoryWizard.getWizard(playerId.index*10);
-        } catch (IOException e) {
-            String error = e.getMessage();
-            parameters.setErrorState(error);
-            e.printStackTrace();        //TO DELETE, for now it can be useful
-        } catch (ParseException e) {
-            String error = e.getMessage();
-            parameters.setErrorState(error);
-            e.printStackTrace();         //TO DELETE, for now it can be useful
-        }
+
+        this.wizard = FactoryWizard.getWizard(playerId.index*10);
     }
+
+
 
     public Board getBoard() {
         return board;

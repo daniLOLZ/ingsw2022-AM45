@@ -18,37 +18,8 @@ public class WizardTest {
 
     @BeforeEach
     public void initialise()  {
-        try {
-            wizard = FactoryWizard.getWizard();
-        } catch (IOException e) {
-            e.printStackTrace();
-            List<Assistant> list = new ArrayList<>();
-            list.add(new Assistant(1,1,1));
-            list.add(new Assistant(2,1,2));
-            list.add(new Assistant(3,2,3));
-            list.add(new Assistant(4,2,4));
-            list.add(new Assistant(5,3,5));
-            list.add(new Assistant(6,3,6));
-            list.add(new Assistant(7,4,7));
-            list.add(new Assistant(8,4,8));
-            list.add(new Assistant(9,5,9));
-            list.add(new Assistant(10,5,10));
-            wizard = new Wizard(0,list);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            List<Assistant> list = new ArrayList<>();
-            list.add(new Assistant(1,1,1));
-            list.add(new Assistant(2,1,2));
-            list.add(new Assistant(3,2,3));
-            list.add(new Assistant(4,2,4));
-            list.add(new Assistant(5,3,5));
-            list.add(new Assistant(6,3,6));
-            list.add(new Assistant(7,4,7));
-            list.add(new Assistant(8,4,8));
-            list.add(new Assistant(9,5,9));
-            list.add(new Assistant(10,5,10));
-            wizard = new Wizard(0,list);
-        }
+
+        wizard = FactoryWizard.getWizard();
         assistant = wizard.getAssistant(0);
     }
 

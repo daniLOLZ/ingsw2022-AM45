@@ -47,4 +47,13 @@ public class Wizard {
     }
 
     public int getIdWizard(){return idWizard;}
+
+    /**
+     *
+     * @param id > 0
+     * @return true <=> a Card with id == param is contained in this deck
+     */
+    public boolean contains(int id){
+        return assistants.stream().anyMatch(card -> card.id == id);
+    }
 }
