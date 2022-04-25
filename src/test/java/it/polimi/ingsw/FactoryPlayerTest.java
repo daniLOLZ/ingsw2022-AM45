@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.*;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,6 +12,52 @@ public class FactoryPlayerTest {
 
     ParameterHandler parameters = null;
     //TODO nickname testing will be added when nickname handling is available
+
+
+    /**
+     * Test creation of single Player
+     */
+    @Test
+    void getPlayerTest(){
+
+        parameters = new ParameterHandler(2);
+
+        Player player = FactoryPlayer.getPlayer("mock",PlayerEnum.PLAYER1,TeamEnum.WHITE,true,parameters,false);
+
+        assertEquals(player.getNickname(),"mock","Wrong nickname assigned");
+        assertEquals(player.getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerId assigned");
+        assertEquals(player.getTeamColor(),TeamEnum.WHITE,"assigned to wrong Team");
+        assertTrue(player.isLeader(),"Wrong leader value");
+        assertFalse(player instanceof AdvancedPlayer,"Returned wrong type of Player");
+
+        assertFalse(FactoryPlayer.validNickname("mock"),"Nickname is not in already-used-nickname list");
+
+        //FactoryPlayer is static
+        //and needs resetting after tests
+        FactoryPlayer.removeNickname("mock");
+    }
+
+    /**
+     * Test creation of single AdvancedPlayer
+     */
+    @Test
+    void getAdvancedPlayerTest(){
+
+        parameters = new ParameterHandler(2);
+
+        Player player = FactoryPlayer.getPlayer("mock",PlayerEnum.PLAYER1,TeamEnum.WHITE,true,parameters,true);
+        assertEquals(player.getNickname(),"mock","Wrong nickname assigned");
+        assertEquals(player.getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerId assigned");
+        assertEquals(player.getTeamColor(),TeamEnum.WHITE,"assigned to wrong Team");
+        assertTrue(player.isLeader(),"Wrong leader value");
+        assertTrue(player instanceof AdvancedPlayer,"Returned wrong type of Player");
+
+        assertFalse(FactoryPlayer.validNickname("mock"),"Nickname is not in already-used-nickname list");
+
+        //FactoryPlayer is static
+        //and needs resetting after tests
+        FactoryPlayer.removeNickname("mock");
+    }
 
     /**
      * Tests creation of Players for a 2-player game
@@ -77,4 +124,6 @@ public class FactoryPlayerTest {
             assertEquals(player.isLeader(),player.getPlayerId().ordinal() % 2 == 0,"Wrong Leader assignment");
         }
     }
+
+
 }

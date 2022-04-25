@@ -78,4 +78,11 @@ public class FactoryPlayer {
         }
         return playerList;
     }
+
+
+    //MIGHT BE CHANGED TO PRIVATE
+    public static void removeNickname(String nick){
+
+        usedNicknames.remove(nick);
+    }
 }
