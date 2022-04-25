@@ -24,6 +24,9 @@ public class AdvancedGameTest {
         }
     }
 
-
+    @Test
+    public void checkCorrectNumberCoins(){
+        assertTrue(game.getAdvancedParameters().getNumCoins() >= 0);
+    }
 
 }

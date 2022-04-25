@@ -8,14 +8,17 @@ import java.util.List;
 
 public class AdvancedGame extends SimpleGame{
     private final List<CharacterCard> CharacterCards;
-    private  List<AdvancedPlayer> AdvancedPlayers;
-    private final AdvancedParameterHandler advancedParameters;
+    private  List<AdvancedPlayer> AdvancedPlayers; // Lucario : Non è meglio mettere advancedPlayers in players invece di avere una lista apposita?
+    private  AdvancedParameterHandler advancedParameters;
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
         super(numPlayers);
-        advancedParameters = new AdvancedParameterHandler(numCoins);
+        advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
+                                                    // time because we need to create parameters before
+                                                    // creating the islands, this happens in the createParameters()
+                                                    // method, which don't have the number of coins as input
         CharacterCards = new ArrayList<>();
-
+        // TODO what about these advancedPlayers?
         for(int card= 0; card < numCharacterCards; card++){
             CharacterCards.add(FactoryCharacterCard.
                     getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
@@ -90,8 +93,10 @@ public class AdvancedGame extends SimpleGame{
         setCurrentIslandGroupId(getCurrentIslandGroupId() + getAmountOfIslands());
     }
 
-
-
-
+    @Override
+    protected void createParameters() {
+        super.createParameters();
+        this.advancedParameters = new AdvancedParameterHandler(-1);
+    }
 }
 

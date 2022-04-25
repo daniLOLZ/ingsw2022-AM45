@@ -56,6 +56,7 @@ public class PlayerCreation {
      * @param user > 0
      * @return true if nick is correctly set
      */
+    // Lucario : probabilmente dev'essere synchronized
     public boolean setNickname(String nick, int user){
         if(FactoryPlayer.validNickname(nick)){
             nicknames.add(user,nick);
@@ -68,6 +69,8 @@ public class PlayerCreation {
      * replace nickname chosen by user with null
      * @param user > 0
      */
+    // Lucario : in quali occasioni dobbiamo mantenere il giocatore ma con un nick null?
+    // Non è meglio cancellarlo direttamente? Non credo di aver capito questi metodi di clear
     public void clearNickname(int user){
         nicknames.add(user, null);
     }

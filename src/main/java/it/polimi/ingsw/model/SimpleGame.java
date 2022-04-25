@@ -9,7 +9,7 @@ public class SimpleGame {
     private final int numPlayers;
     private final int maxStudentsByType;
     private final int amountOfIslands;
-    private Player currentPlayer;
+//    private Player currentPlayer;  // Moved to parameters
     private TeamEnum currentTeam;
     private boolean isLastTurn;
     private int currentIslandGroupId;
@@ -35,13 +35,14 @@ public class SimpleGame {
             throw new IncorrectPlayersException();
         }
 
-        //TODO change this constructor into a JSON reader to remove magic numbers
+        // (Maybe unnecessary) change this constructor into a JSON reader to remove magic numbers
         int numberOfClouds = numPlayers;
         this.hasBeenInitialized = false;
         this.amountOfIslands = 12;
         this.numPlayers = numPlayers;
         this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
-        this.parameters = new ParameterHandler(numPlayers);
+        createParameters();
+        //this.parameters = new ParameterHandler(numPlayers);
         this.isLastTurn = false;
         this.currentIslandGroupId = 0;
         this.players = new ArrayList<>();
@@ -56,6 +57,7 @@ public class SimpleGame {
         //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
         this.sack = new Sack(2);
 
+        // TODO creation of players may be handled by someone else
         this.players = FactoryPlayer.getNPlayers(numPlayers, parameters);
 
         parameters.setPlayersAllegiance(players);
@@ -105,6 +107,14 @@ public class SimpleGame {
         currentIslandGroupId += amountOfIslands;
     }
 
+    /**
+     * This method initializes the parameters of the game
+     * This is meant to be overridden in the advancedIslandGroup class to
+     * build both types of parameters
+     */
+    protected void createParameters(){
+        this.parameters = new ParameterHandler(numPlayers);
+    }
     /**
      * Checks whether a professor needs to change hands by comparing the respective tables
      * in the players' boards
@@ -234,20 +244,12 @@ public class SimpleGame {
         return sack;
     }
 
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
     public boolean isHasBeenInitialized() {
         return hasBeenInitialized;
     }
 
     public int getMaxStudentsByType() {
         return maxStudentsByType;
-    }
-
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
     }
 
     public void setCurrentIslandGroupId(int currentIslandGroupId) {

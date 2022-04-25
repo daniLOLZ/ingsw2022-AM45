@@ -33,6 +33,8 @@ public class AdvancedParameterHandler {
         return numCoins;
     }
 
+    public void setNumCoins(int numCoins) { this.numCoins = numCoins; }
+
     public boolean isDrawIsWin() {
         return drawIsWin;
     }

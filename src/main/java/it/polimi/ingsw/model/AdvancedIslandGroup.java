@@ -36,7 +36,7 @@ public class AdvancedIslandGroup extends IslandGroup {
     }
 
     /**
-     *
+     * Creates and returns a List of AdvancedIslands
      * @param startingId Starting id for the IslandGroups
      * @param amount Amount of IslandGroups to have in the collection.
      *               if the amount is 1, the next and previous pointers will refer to
@@ -201,6 +201,10 @@ public class AdvancedIslandGroup extends IslandGroup {
             BlockTile tileToRemove = blockTiles.remove(0);
             tileToRemove.setAssigned(false);
         }
+    }
+
+    public AdvancedParameterHandler getAdvancedParameters() {
+        return advancedParameters;
     }
 
     public BlockTile getBlockTileById(int id) {

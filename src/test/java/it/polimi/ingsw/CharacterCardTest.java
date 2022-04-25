@@ -105,7 +105,7 @@ public class CharacterCardTest {
         IslandGroup island = new IslandGroup(0,null,null,
                 null, new ArrayList<>(),TeamEnum.NOTEAM,game.getParameters());
 
-        game.setCurrentPlayer(player);
+        game.getParameters().setCurrentPlayer(player);
         game.getParameters().setCurrentPlayer(player);
         cards.addAll(FactoryCharacterCard.
                 getInitialEffectCards(game.getParameters(), game.getAdvancedParameters()));
