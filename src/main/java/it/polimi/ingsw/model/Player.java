@@ -83,4 +83,10 @@ public class Player {
     public String getNickname() {
         return nickname;
     }
+
+    //LUXRAY: con questo metodo possiamo creare il player e indipendentemente il Wizard.
+    //In questo modo possiamo dare la possibilità di scegliere il wizard che si vuole.
+    public void setWizard(Wizard wizard){
+        this.wizard = wizard;
+    }
 }

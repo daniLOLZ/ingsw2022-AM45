@@ -34,4 +34,15 @@ public enum PlayerEnum {
                 .filter( x -> !x.equals(NOPLAYER))
                 .collect(Collectors.toList());
     }
+
+    public static PlayerEnum getPlayer(int id){
+        switch(id){
+            case 0: return PLAYER1;
+            case 1: return PLAYER2;
+            case 2: return PLAYER3;
+            case 3: return PLAYER4;
+        }
+
+        return NOPLAYER;
+    }
 }

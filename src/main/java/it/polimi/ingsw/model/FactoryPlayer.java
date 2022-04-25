@@ -4,6 +4,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FactoryPlayer {
+    private static List<String> usedNicknames;
+
+    /**
+     *
+     * @param nick != null
+     * @return true if nick is not present in usedNicknames
+     */
+    public static boolean validNickname(String nick){
+        return ! usedNicknames.contains(nick);
+    }
+
+    //LUXRAY: creare un player alla volta permette di gestire meglio l'arrivo degli Utenti.
+    //Grazie alla classe PlayerCreation si possono gestire tutte le scelte dell'utente, se sono
+    //ammissibili o meno, e infine usare queste scelte per creare il giocatore con la classe FactoryPlayer.
+    //La classe PlayerCreation è propria di ogni partita e gestirà le scelte del giocatore per quella
+    //relativa partita, mentre la classe factoryPlayer vedrà tutti i game e potrà gestire l'unicità dei
+    //nickname.
+    //La creazione del Wizard è lasciata a PlayerCreation che da la possibilità di scegliere quale mazzo
+    //avere e controlla eventuali ripetizioni, successivamente verrà assegnato al player il Wizard scelto.
+    //La classe PlayerCreation gestisce sia le scelte già consolidate (quindi di player già creati e che sono
+    //nella partita), sia scelte che arrivano da utenti che sono ancora in fase di creazione.
+    /**
+     *
+     * @param nick != null
+     * @param playerId != NoPlayer
+     * @param teamColor != NoTeam
+     * @param leader .
+     * @param parameter != null
+     * @param advanced .
+     * @return a Player if advanced is false and nick is not contained in usedNicknames
+     *         an AdvancedPlayer if advanced is true and nick is not contained in usedNicknames
+     *         null if nick is contained in usedNicknames
+     */
+    public static Player getPlayer(String nick, PlayerEnum playerId, TeamEnum teamColor,
+                                   boolean leader, ParameterHandler parameter, boolean advanced){
+        Player player;
+        if(usedNicknames == null){
+            usedNicknames = new ArrayList<>();
+        }
+        if(usedNicknames.contains(nick))
+            return null;
+
+        if(advanced){
+            player = new AdvancedPlayer(playerId,nick,teamColor,leader,parameter);
+        }
+        else{
+            player = new Player(playerId,nick,teamColor,leader,parameter);
+        }
+        usedNicknames.add(nick);
+        return player;
+
+    }
     public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters){
         List<Player> playerList = new ArrayList<>();
         //TODO handle nicknames and assignment of player to team
