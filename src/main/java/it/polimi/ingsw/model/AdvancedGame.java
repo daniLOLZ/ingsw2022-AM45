@@ -8,7 +8,9 @@ import java.util.List;
 
 public class AdvancedGame extends SimpleGame{
     private final List<CharacterCard> CharacterCards;
-    private  List<AdvancedPlayer> AdvancedPlayers; // Lucario : Non è meglio mettere advancedPlayers in players invece di avere una lista apposita?
+    private  List<AdvancedPlayer> AdvancedPlayers; // Lucario : Non è meglio mettere advancedPlayers in players invece
+                                                    // di avere una lista apposita? O lo usi per facilità nel gestirli
+                                                    // col controller? In ogni caso si può vedere se servono davvero
     private  AdvancedParameterHandler advancedParameters;
 
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
@@ -45,12 +47,14 @@ public class AdvancedGame extends SimpleGame{
     /**
      * It was useful if also SimpleGame had this method, in this way I can
      * override it and not create 2 times all players
-     * @param numPlayer > 1 useful for version with override
+     * @param numPlayers > 1 useful for version with override
      */
-    private void  createPlayers(int numPlayer){
+    @Override
+    protected void createPlayers(int numPlayers){
         // Lucario: la creazione dei giocatori l'ho fatta con FactoryPlayer, se togliamo advancedPlayer non servirà questo metodo visto che saranno inizializzati nel super()
         //RISPOSTA: ok se proprio vogliamo togliere AdvancedPlayer. Prima si sistema Player, poi si sistema
         //il resto usando il nuovo Player e alla fine si toglie Advanced Player.
+        players = FactoryPlayer.getNPlayers(numPlayers, getParameters());
         AdvancedPlayers = new ArrayList<>();
         for(Player player: players){
             AdvancedPlayers.add(

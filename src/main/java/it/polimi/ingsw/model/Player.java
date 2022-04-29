@@ -34,6 +34,23 @@ public class Player {
         this.wizard = FactoryWizard.getWizard(playerId.index*10);
     }
 
+    /**
+     * Player constructor which features all choices made by the user: nickname, tower color and wizard
+     * @param playerId
+     * @param nickname
+     * @param teamColor
+     * @param leader
+     * @param parameters
+     * @param wizard
+     */
+    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters, Wizard wizard){
+        this.playerId = playerId;
+        this.nickname = nickname;
+        this.teamColor = teamColor;
+        this.leader = leader;
+        this.board = new Board(teamColor, parameters);
+        this.wizard = wizard;
+    }
 
 
     public Board getBoard() {

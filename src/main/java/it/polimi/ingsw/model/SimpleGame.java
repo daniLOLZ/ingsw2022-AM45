@@ -58,8 +58,7 @@ public class SimpleGame {
         this.sack = new Sack(2);
 
         // TODO creation of players may be handled by someone else
-        this.players = FactoryPlayer.getNPlayers(numPlayers, parameters);
-
+        createPlayers(numPlayers);
         parameters.setPlayersAllegiance(players);
     }
 
@@ -115,6 +114,16 @@ public class SimpleGame {
     protected void createParameters(){
         this.parameters = new ParameterHandler(numPlayers);
     }
+
+    /**
+     * This method initializes the players held in the game
+     * it can be overridden to account for the creation of AdvancedPlayers in advanced games
+     * @param numPlayers the number of players to create
+     */
+    protected void createPlayers(int numPlayers){
+        this.players = FactoryPlayer.getNPlayers(numPlayers, parameters);
+    }
+
     /**
      * Checks whether a professor needs to change hands by comparing the respective tables
      * in the players' boards

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FactoryPlayer {
-    private static List<String> usedNicknames;
+
+    private static List<String> usedNicknames; // Lucario: Il controllo nickname va fatto a livello più alto
 
     /**
      *
@@ -28,13 +29,13 @@ public class FactoryPlayer {
     /**
      *
      * @param nick != null
-     * @param playerId != NoPlayer
-     * @param teamColor != NoTeam
+     * @param playerId != NOPLAYER
+     * @param teamColor != NOTEAM
      * @param leader .
      * @param parameter != null
      * @param advanced .
-     * @return a Player if advanced is false and nick is not contained in usedNicknames
-     *         an AdvancedPlayer if advanced is true and nick is not contained in usedNicknames
+     * @return a Player if advanced is false and nick is not contained in usedNicknames;
+     *         an AdvancedPlayer if advanced is true and nick is not contained in usedNicknames;
      *         null if nick is contained in usedNicknames
      */
     public static Player getPlayer(String nick, PlayerEnum playerId, TeamEnum teamColor,
@@ -56,10 +57,12 @@ public class FactoryPlayer {
         return player;
 
     }
-    public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters){
+    // stub function
+    //TODO handle nicknames and assignment of player to team to make a proper player creation
+    public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters) {
         List<Player> playerList = new ArrayList<>();
-        //TODO handle nicknames and assignment of player to team
-        switch (numberOfPlayers){
+
+        switch (numberOfPlayers) {
             case 2:
                 playerList.add(new Player(PlayerEnum.PLAYER1, "mockNickname1", TeamEnum.WHITE, true, parameters));
                 playerList.add(new Player(PlayerEnum.PLAYER2, "mockNickname2", TeamEnum.BLACK, true, parameters));
@@ -79,10 +82,8 @@ public class FactoryPlayer {
         return playerList;
     }
 
-
     //MIGHT BE CHANGED TO PRIVATE
     public static void removeNickname(String nick){
-
         usedNicknames.remove(nick);
     }
 }
