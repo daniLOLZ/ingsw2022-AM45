@@ -50,6 +50,7 @@ public class AdvancedGame extends SimpleGame{
      * @param numPlayers > 1 useful for version with override
      */
     @Override
+    @Deprecated
     protected void createPlayers(int numPlayers){
         // Lucario: la creazione dei giocatori l'ho fatta con FactoryPlayer, se togliamo advancedPlayer non servirà questo metodo visto che saranno inizializzati nel super()
         //RISPOSTA: ok se proprio vogliamo togliere AdvancedPlayer. Prima si sistema Player, poi si sistema
@@ -67,6 +68,24 @@ public class AdvancedGame extends SimpleGame{
         }
 
         //TODO VERSION WITH OVERRIDE
+    }
+
+    @Override
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) {
+        super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
+        AdvancedPlayers = new ArrayList<>();
+        for(Player player: players){ // Unhappy cast that could be resolved by separating
+                                     // into two methods : getPlayer and getAdvancedPlayer
+            AdvancedPlayers.add(
+                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                            player.getNickname(),
+                            player.getPlayerId(),
+                            player.getTeamColor(),
+                            player.getWizard(),
+                            player.isLeader(),
+                            getParameters(),
+                            true));
+        }
     }
 
     public List<AdvancedPlayer> getAdvancedPlayers() {

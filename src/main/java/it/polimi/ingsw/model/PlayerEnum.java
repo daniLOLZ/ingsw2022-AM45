@@ -35,6 +35,11 @@ public enum PlayerEnum {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns an Enum that corresponds to the id provided
+     * @param id the id of the player to return
+     * @return A PlayerEnum with the id incremented by one (ex. id = 0 -> returns PLAYER1)
+     */
     public static PlayerEnum getPlayer(int id){
         switch(id){
             case 0: return PLAYER1;

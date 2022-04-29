@@ -57,6 +57,29 @@ public class FactoryPlayer {
         return player;
 
     }
+
+    /**
+     * Creates a new player from the given parameters
+     * @param nick the nickname of the player
+     * @param playerId the id of the player
+     * @param teamColor the color of the towers of the player
+     * @param wizard the wizard chosen by the player
+     * @param leader indicates whether the player is the leader of their team or not
+     * @param parameters parameters of the game
+     * @param advanced true if the player should be its advanced version
+     * @return a new player with the given characteristics
+     */
+    public static Player getPlayer(String nick, PlayerEnum playerId, TeamEnum teamColor, Wizard wizard,
+                                   boolean leader, ParameterHandler parameters, boolean advanced){
+        Player player;
+        if(advanced){
+            player = new AdvancedPlayer(playerId, nick, teamColor, wizard, leader, parameters);
+        }
+        else player = new Player(playerId, nick, teamColor, wizard, leader, parameters);
+
+        return player;
+    }
+
     // stub function
     //TODO handle nicknames and assignment of player to team to make a proper player creation
     public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters) {

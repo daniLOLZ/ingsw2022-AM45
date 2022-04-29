@@ -9,7 +9,10 @@ public class PlayerCreation {
     private final Controller controller;
     private final List<TeamEnum> teamColor ;
     private final List<String> nicknames;
-    private final List<Wizard> wizards;
+    private final List<Wizard> wizards; // Lucario : This should be a list of wizard ids rather than actual wizards,
+                                        // the real ones will be created in the game, not in the controller
+
+    // Lucario : i metodi get/set per i vari parametri vanno bene, ma la creazione vera e propria non deve avvenire qui
 
     public PlayerCreation(Controller controller){
         this.controller = controller;
@@ -18,6 +21,7 @@ public class PlayerCreation {
         wizards = new ArrayList<>();
     }
 
+    //Lucario : player creation shouldn't happen here
     /**
      *
      * @param user > 0
@@ -56,7 +60,7 @@ public class PlayerCreation {
      * @param user > 0
      * @return true if nick is correctly set
      */
-    // Lucario : probabilmente dev'essere synchronized
+    // Lucario : probabilmente dev'essere synchronized, same per gli altri
     public boolean setNickname(String nick, int user){
         if(FactoryPlayer.validNickname(nick)){
             nicknames.add(user,nick);
@@ -124,6 +128,7 @@ public class PlayerCreation {
         teamColor.add(user, null);
     }
 
+    // Lucario : non capisco cosa fa questo metodo
     /**
      *
      * @return (in ascending order) PlayerEnum with correct id, based on other players in Game.
@@ -153,6 +158,7 @@ public class PlayerCreation {
         return players.stream().noneMatch(player -> player.getTeamColor() == color );
     }
 
+    // Lucario : wizards shouldn't be created in the controller
     /**
      * create e set a new wizard only if there not are others equal to it
      * @param idWizard == 0 , 10, 20 ,30
