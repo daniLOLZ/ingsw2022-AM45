@@ -13,6 +13,7 @@ public class ClientMain {
     private String hostname;
     private int portNumber;
     private String nickname;
+    private MessageBroker broker;
     // private MessageBroker broker; // we will need a way to couple this broker to the one in ClientHandler
     private int idUser;  // May be removed
 
@@ -20,6 +21,7 @@ public class ClientMain {
         this.hostname = hostname;
         this.portNumber = portNumber;
         this.nickname = nickname;
+        this.broker = new MessageBroker();
     }
 
     public static void main(String[] args){
@@ -29,6 +31,7 @@ public class ClientMain {
             System.err.println("Error logging in");
             return;
         }
+        System.out.println("Username " + client.nickname + "was accepted");
 
     }
 
@@ -36,16 +39,16 @@ public class ClientMain {
      * Connects to a Server and sends the user nickname via private methods
      * @param hostname the host to connect to
      * @param port the host's port to connect to
-     * @param username a nickname chosen by the user to be used during the game
+     * @param nickname a nickname chosen by the user to be used during the game
      */
-    public boolean login(String hostname, int port, String username){
+    public boolean login(String hostname, int port, String nickname){
 
         if(!connect(hostname, port)){ // Might be substituted with an exception
             System.err.println("Couldn't connect to host " + hostname + "on port " + port);
             return false;
         }
-        if(!sendNickname(username)){
-            System.err.println("Username rejected");
+        if(!sendNickname(nickname)){
+            System.err.println("Nickname rejected");
             try{
                 socket.close();
             } catch (IOException e){
@@ -85,29 +88,30 @@ public class ClientMain {
     /**
      * Sends the chosen nickname to the server to evaluate whether it's acceptable or not
      * @param nickname the nickname chosen by the user
-     * @return a boolean : true if the username was accepted
+     * @return a boolean : true if the nickname was accepted
      */
     private boolean sendNickname(String nickname){
-        ObjectOutputStream serverOut;
-        ObjectInputStream serverIn;
-        boolean returnValue = false;
 
+        broker.addToMessage("command", CommandEnum.CONNECTION_REQUEST);
+        broker.addToMessage("nickname", nickname);
+        ObjectOutputStream outStream;
+        ObjectInputStream inStream;
         try {
-            serverOut = new ObjectOutputStream(socket.getOutputStream());
-            serverIn = new ObjectInputStream(socket.getInputStream());
+            outStream = new ObjectOutputStream(socket.getOutputStream());
+            inStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Couldn't get input/output streams");
             e.printStackTrace();
             return false;
         }
-        try {
-            serverOut.writeChars(nickname);
-            returnValue = serverIn.readBoolean();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return returnValue; //TODO very quick and dirty implementation, to fix
+        broker.send(outStream);
+        System.out.println("Sent message to the server");
+        broker.receive(inStream);
+        System.out.println("Received reply from the server");
+
+        return "OK".equals(
+                (String) broker.readField("serverReplyMessage")); // TODO maybe we should have this be less hardcoded?
+
     }
 
     public String getNickname() {

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.network.connectionState.Authentication;
+import it.polimi.ingsw.network.connectionState.ConnectionState;
 import org.json.simple.JSONObject;
 
 import java.io.*;
@@ -10,37 +12,105 @@ public class ClientHandler implements Runnable{
     private Socket socket;
     private boolean isConnected;
     private int idUser;
+    private MessageBroker broker;
+    private ConnectionState connectionState;
 
+    /**
+     * Creates a new client handler with its own message broker and set to state Authentication
+     * @param socket the socket of the connection that's been created in the server
+     */
     public ClientHandler(Socket socket) {
         this.socket = socket;
+        this.broker = new MessageBroker();
+        this.connectionState = new Authentication();
     }
 
     @Override
     public void run(){
+        ObjectInputStream clientInput;
+        ObjectOutputStream clientOutput;
+
+        idUser = LoginHandler.getNewUserId();
         try {
-//          idUser = LoginHandler.getNewUserId();
-
-            // Testing if objects can be read to and from, to be deleted
-            /* This block will later be handled by the MessageBroker */
-            ObjectInputStream clientInput = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream clientOutput = new ObjectOutputStream(socket.getOutputStream());
-
-            String testString = (String) clientInput.readObject();
-            System.out.println(testString);
-            boolean toReturn;
-            if(!testString.equals("mock1")){
-                toReturn = false;
-            }
-            else toReturn = true;
-
-            clientOutput.writeBoolean(toReturn);
-            /* end of block */
-
-            socket.close();
+            clientInput = new ObjectInputStream(socket.getInputStream());
+            clientOutput = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
+            System.err.println("Error obtaining streams");
             System.err.println(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            quitGame(); // Maybe useless
+            return;
+        }
+        while(true){ // Message listener loop
+
+            if(!broker.receive(clientInput)){ // Received an invalid message
+                continue;
+            }
+
+            CommandEnum command = (CommandEnum) broker.readField("command");
+            if(command != null){
+                System.out.println(command);
+            }
+
+            if(!connectionState.isAllowed(command)){ // Trashes a command given at the wrong time
+                continue;
+            }
+            handleCommand(command); // runs the appropriate routine depending on the command received
+            // Sends a reply to the client
+            broker.send(clientOutput);
+
+        }
+        // This point should never be reached in normal circumstances
+    }
+
+    /**
+     * Adds the reply fields in the server message in case of a successful operation (Message and status)
+     */
+    private void notifySuccessfulOperation(){
+        broker.addToMessage("serverReplyMessage", "OK");
+        broker.addToMessage("serverReplyStatus", 0);
+    }
+
+    /**
+     * Adds the reply fields in the server message in case of a failed operation (Message and status)
+     * @param errorMessage A verbose message describing the error
+     */
+    private void notifyError(String errorMessage){
+        broker.addToMessage("serverReplyMessage", "ERR");
+        broker.addToMessage("serverReplyStatus", 1);
+        broker.addToMessage("errorState", errorMessage);
+    }
+
+    /**
+     * Finds the command that's been given and runs the appropriate methods
+     */
+    public void handleCommand(CommandEnum command){
+        switch(command){
+//          case QUIT -> quitGame();
+            case CONNECTION_REQUEST -> connectionRequest();
+//          case PLAY_GAME -> playGame();
+            //TODO rest of commands
         }
     }
+
+    /**
+     * Closes the connection for this user
+     */
+    public void quitGame(){
+        //TODO
+    }
+
+    /**
+     * Handles the connections of a new user, checking whether their nickname
+     * satisfies the requirement of uniqueness
+     */
+    public void connectionRequest(){
+        boolean loginSuccessful;
+        loginSuccessful= LoginHandler.login((String)broker.readField("nickname"), idUser);
+        if(!loginSuccessful){
+            notifyError("Nickname already taken");
+            quitGame();
+        }
+        notifySuccessfulOperation();
+    }
+
 }

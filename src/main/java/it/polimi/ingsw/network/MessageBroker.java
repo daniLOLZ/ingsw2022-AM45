@@ -3,6 +3,9 @@ package it.polimi.ingsw.network;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Type;
 
 import java.util.HashMap;
@@ -40,6 +43,10 @@ public class MessageBroker {
         outgoingMessage.put(fieldName, messageObject);
     }
 
+    public Object readField(String fieldName){
+        return incomingMessage.get(fieldName);
+    }
+
     private void outFlush(){
         outgoingMessage = new HashMap<>();
     }
@@ -49,26 +56,46 @@ public class MessageBroker {
     }
 
     /**
-     * Send the message stored in the object as a JSON file to the specified IP
-     * @param ReceiverIP The IP to send the message to
+     * Send the message stored in the object as a JSON file to the specified output stream
+     * @param destinationOutput the ObjectOutputStream of the host to send the message to
      */
-    public void send(String ReceiverIP){
+    public void send(ObjectOutputStream destinationOutput){
 
         String sendable = serialise(outgoingMessage);
 
-        //TODO actually send the message
-        System.out.println("sending" + sendable + " to " + ReceiverIP);
+        System.out.println("sending" + sendable + " to " + "???");
 
+        try {
+            destinationOutput.writeChars(sendable);
+            destinationOutput.flush();
+        } catch (IOException e) {
+            System.err.println("Couldn't send the message via the network");
+            e.printStackTrace();
+        }
         outFlush();
     }
 
     /**
-     * Stores the received message as an HashMap in the incoming message attribute
-     * @param JSONString The received JSONString
+     * Receives and stores the received message as an HashMap in the incoming message attribute
+     * @param sourceInput the ObjectInputStream of the host to read the message from
+     * @return true if the message received is valid
      */
-    public boolean receive(String JSONString){
+    public boolean receive(ObjectInputStream sourceInput){
+        String receivedMessage;
 
-        incomingMessage = deserialize(JSONString);
+        try {
+            receivedMessage = (String) sourceInput.readObject();
+            System.out.println("message received");
+        } catch (IOException e) {
+            System.err.println("Error reading message from the network");
+            e.printStackTrace();
+            return false;
+        } catch (ClassNotFoundException e) {
+            System.err.println("The received object was not a string");
+            e.printStackTrace();
+            return false;
+        }
+        incomingMessage = deserialize(receivedMessage);
 
         return checkValidity();
     }
@@ -79,7 +106,35 @@ public class MessageBroker {
      */
     public boolean checkValidity(){
 
-        //TODO
+        String field;
+        Object object;
+        // For each field, check whether it can be cast and return false if an exception is raised
+        for(int fieldNumber = 0; fieldNumber < incomingMessage.size(); fieldNumber++){
+            field = incomingMessage.keySet().iterator().next();
+            object = incomingMessage.get(field);
+
+            switch (field){
+                case "idUser" : {
+                    try{
+                        int primitveInt = (int) object;
+                    } catch(ClassCastException e) {
+                        return false;
+                    }
+                }
+                case "nickname" : {
+                    try{
+                        String string = (String) object;
+                    } catch(ClassCastException e) {
+                        return false;
+                    }
+                }
+                // TODO add other fields
+                // TODO check for cleaner implementation
+            }
+        }
         return true;
     }
+
+    //TODO IMPLEMENT IDREQUEST CHECKS
+
 }
