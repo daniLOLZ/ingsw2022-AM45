@@ -122,7 +122,31 @@ public class Player {
         }
     }
 
+    /**
+     *
+     * @return true if player's wizard is empty
+     */
     public boolean noMoreAssistant(){
         return wizard.isEmpty();
+    }
+
+    /**
+     *
+     * @return false if player is not leader or if he has at least 1 tower
+     *  true if player is a leader, and he has not towers
+     */
+    public boolean noMoreTowers(){
+        if(!leader)
+            return false;
+
+        return board.getNumberOfTowers() == 0;
+    }
+
+    public int getNumTowers(){
+        return board.getNumberOfTowers();
+    }
+
+    public void moveFromEntranceToHall(){
+        board.moveFromEntranceToHall();
     }
 }

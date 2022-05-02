@@ -312,6 +312,134 @@ public class SimpleGame {
 
     /**
      *
+     * @return the team that has zero towers
+     */
+    public TeamEnum noMoreTowers(){
+        TeamEnum winnerTeam = TeamEnum.NOTEAM;
+
+        for(Player player: players){
+            if(player.noMoreTowers())
+                winnerTeam = player.getTeamColor();
+        }
+
+        return winnerTeam;
+    }
+
+    /**
+     *
+     * @return true if there are less than 'criticalIslandsNumber' (3) islandGroups
+     */
+    public boolean islandShortage(){
+        final int criticalIslandsNumber = 3;
+        return islandGroups.size() <= criticalIslandsNumber;
+    }
+
+    public boolean isLastTurn() {
+        return isLastTurn;
+    }
+
+    /**
+     *
+     * @return a Map with placed towers per team
+     */
+    public Map<TeamEnum, Integer> towersOnIslands(){
+        Map<TeamEnum, Integer> numTowerOnIslands = new HashMap<>();
+        int towersPerPlayer = parameters.getNumTowers();
+        int placedTowers;
+        TeamEnum team;
+        for(Player player: players){
+            if(player.isLeader()){
+                team = player.getTeamColor();
+                placedTowers = towersPerPlayer - player.getNumTowers();
+                numTowerOnIslands.put(team, placedTowers);
+            }
+        }
+        return numTowerOnIslands;
+    }
+
+    /**
+     *
+     * @return a Map of  the professors' numbers  owned by each team
+     */
+    public Map<TeamEnum, Integer> professorsPerTeam(){
+        Map<TeamEnum, Integer> numProfessorsPerTeam = new HashMap<>();
+        List<PlayerEnum> professors = parameters.getProfessors();
+        TeamEnum team;
+        int previous;
+
+        //INITIALISE NUM OF OWNED PROFESSORS
+        for(Player player: players){
+            team = parameters.getPlayerTeamById(player.getPlayerId());
+            numProfessorsPerTeam.put(team,0);
+        }
+
+        for (PlayerEnum playerWithProfessor : professors) {
+            team = parameters.getPlayerTeamById(playerWithProfessor);
+            previous = numProfessorsPerTeam.get(team);
+            previous++;
+            numProfessorsPerTeam.put(team, previous);
+        }
+
+        return numProfessorsPerTeam;
+    }
+
+    /**
+     * player's turn starts and this player becomes the current player and the current phase
+     * becomes PLAN
+     * @param player != null
+     */
+    public void startPhase(int player){
+        parameters.setCurrentPlayer(players.get(player));
+        parameters.setCurrentPhase(PhaseEnum.PLAN);
+    }
+
+    /**
+     * current phase becomes ACTION
+     */
+    public void movePhase(){
+        parameters.setCurrentPhase(PhaseEnum.ACTION);
+    }
+
+    public void moveFromEntranceToHall(Player player){
+        player.moveFromEntranceToHall();
+    }
+
+
+    public void selectIslandGroup(int idIslandGroup){
+        IslandGroup islandGroup = islandGroups.get(idIslandGroup);
+        if(parameters.getSelectedIslands().isEmpty()){
+            List<IslandGroup> dummyListForDummyCoder = new ArrayList<>();
+            dummyListForDummyCoder.add(islandGroup);
+            parameters.setSelectedIslands(dummyListForDummyCoder);
+        }
+        else
+        parameters.selectIsland(islandGroup);
+    }
+
+    public void selectEntranceStudent(int position){
+
+        if(parameters.getSelectedEntranceStudents().isEmpty()){
+            List<Integer> dummyListForDummyCoder = new ArrayList<>();
+            dummyListForDummyCoder.add(position);
+            parameters.setSelectedEntranceStudents(dummyListForDummyCoder);
+        }
+        else
+        parameters.selectEntranceStudent(position);
+    }
+
+    public void selectStudentType(StudentEnum type){
+        if(parameters.getSelectedStudentTypes().isEmpty()){
+            List<StudentEnum> dummyListForDummyCoder = new ArrayList<>();
+            dummyListForDummyCoder.add(type);
+            parameters.setSelectedStudentTypes(dummyListForDummyCoder);
+        }
+        else
+        parameters.selectStudentType(type);
+    }
+
+
+    /**
+     *
      * @return true if sack is empty
      */
     public boolean emptySack(){
