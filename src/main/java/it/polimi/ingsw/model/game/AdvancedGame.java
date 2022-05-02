@@ -154,5 +154,15 @@ public class AdvancedGame extends SimpleGame {
 
         return true;
     }
+
+    public void selectStudentOnCard(int position){
+        if(advancedParameters.getSelectedStudentsOnCard().isEmpty()){
+            List<Integer> dummyListForDummyCoder = new ArrayList<>();
+            dummyListForDummyCoder.add(position);
+            advancedParameters.setSelectedStudentsOnCard(dummyListForDummyCoder);
+        }
+        else
+            advancedParameters.selectStudentOnCard(position);
+    }
 }
 

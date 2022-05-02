@@ -37,6 +37,8 @@ public class BoardTest {
     }
 
 
+
+
     /**
      * Tests if the selected student is correctly moved from the Entrance to the right table
      */

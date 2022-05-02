@@ -11,6 +11,8 @@ public class TurnHandler {
         currentTurn = 0;
         playersPlayedInThisTurn = 0;
         int players = controller.gameRule.id;
+
+        //EXTRACT FROM ID THE NUMBER OF PLAYERS
         if(players > 10)
             numPlayers = players / 10;
         else
@@ -34,6 +36,14 @@ public class TurnHandler {
      */
     public void endPlayerPhases(){
         playersPlayedInThisTurn++;
+    }
+
+    /**
+     * Start a new player's turn, now player
+     * in position 'playersPlayedInThisTurn' can play
+     */
+    public void startPlayerPhase(){
+        controller.simpleGame.startPhase(playersPlayedInThisTurn);
     }
 
     /**

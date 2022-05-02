@@ -26,6 +26,7 @@ public class ParameterHandler {
 
     //DYNAMIC PARAMETERS
     private Player currentPlayer;
+    private PhaseEnum currentPhase;
     private List<PlayerEnum> professors;
     private int turn;
 
@@ -98,6 +99,14 @@ public class ParameterHandler {
         }
 
         return teamPlayers;
+    }
+
+    public PhaseEnum getCurrentPhase() {
+        return currentPhase;
+    }
+
+    public void setCurrentPhase(PhaseEnum currentPhase) {
+        this.currentPhase = currentPhase;
     }
 
     public String getErrorState(){
