@@ -1,7 +1,11 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.*;
-import org.junit.Assert;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
+import it.polimi.ingsw.model.player.FactoryPlayer;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,7 +26,7 @@ public class FactoryPlayerTest {
 
         parameters = new ParameterHandler(2);
 
-        Player player = FactoryPlayer.getPlayer("mock",PlayerEnum.PLAYER1,TeamEnum.WHITE,true,parameters,false);
+        Player player = FactoryPlayer.getPlayer("mock", PlayerEnum.PLAYER1,TeamEnum.WHITE,true,parameters,false);
 
         assertEquals(player.getNickname(),"mock","Wrong nickname assigned");
         assertEquals(player.getPlayerId(),PlayerEnum.PLAYER1,"Wrong PlayerId assigned");

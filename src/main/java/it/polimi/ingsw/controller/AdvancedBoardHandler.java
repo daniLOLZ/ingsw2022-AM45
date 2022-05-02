@@ -1,8 +1,8 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.model.AdvancedPlayer;
-import it.polimi.ingsw.model.Board;
-import it.polimi.ingsw.model.Player;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
+import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.StudentEnum;
 
 import java.util.ArrayList;

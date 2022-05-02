@@ -1,13 +1,9 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.GameElementEnum;
-import it.polimi.ingsw.model.ParameterHandler;
+import it.polimi.ingsw.model.game.AdvancedGame;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.ParameterHandler;
 
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public abstract class CharacterCard {
@@ -16,7 +12,7 @@ public abstract class CharacterCard {
     public final int id;
     protected ParameterHandler parameters;
     protected AdvancedParameterHandler advancedParameters;
-    protected Requirements requirements; //TODO specify this attribute in lower classes
+    protected Requirements requirements;
 
     public CharacterCard(int cardCost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         this.cardCost = cardCost;

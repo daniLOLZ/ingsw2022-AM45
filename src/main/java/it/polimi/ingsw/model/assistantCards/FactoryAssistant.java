@@ -1,13 +1,4 @@
-package it.polimi.ingsw.model;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
+package it.polimi.ingsw.model.assistantCards;
 
 public class FactoryAssistant {
 

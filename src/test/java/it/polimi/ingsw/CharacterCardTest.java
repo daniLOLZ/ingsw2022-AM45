@@ -1,7 +1,15 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.characterCards.*;
+import it.polimi.ingsw.model.game.AdvancedGame;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.IncorrectPlayersException;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

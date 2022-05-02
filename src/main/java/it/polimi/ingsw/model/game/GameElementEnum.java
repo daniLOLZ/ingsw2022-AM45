@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.game;
 //TODO INUTILE (RIMPIAZZATA CON CLASSE REQUIREMENTS)
 public enum GameElementEnum {
     ISLAND_GROUP,

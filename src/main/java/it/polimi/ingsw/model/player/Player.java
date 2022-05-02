@@ -1,9 +1,13 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.player;
 
-import org.json.simple.parser.ParseException;
+import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryWizard;
+import it.polimi.ingsw.model.assistantCards.NoSuchAssistantException;
+import it.polimi.ingsw.model.assistantCards.Wizard;
+import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.game.ParameterHandler;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
@@ -105,5 +109,20 @@ public class Player {
     //In questo modo possiamo dare la possibilità di scegliere il wizard che si vuole.
     public void setWizard(Wizard wizard){
         this.wizard = wizard;
+    }
+
+    /**
+     * Get from cloud the students to add at Entrance
+     * @param cloud != null
+     */
+    public void getFromCloud(Cloud cloud){
+        List<StudentEnum> students = cloud.empty();
+        for(StudentEnum stud: students){
+            board.addToEntrance(stud);
+        }
+    }
+
+    public boolean noMoreAssistant(){
+        return wizard.isEmpty();
     }
 }

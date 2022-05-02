@@ -1,6 +1,11 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.FullEntranceException;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.player.Player;
 
 import java.util.Iterator;
 import java.util.List;

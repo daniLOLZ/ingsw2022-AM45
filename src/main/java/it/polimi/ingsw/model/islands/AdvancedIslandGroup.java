@@ -1,4 +1,9 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.islands;
+
+import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.player.PlayerEnum;
 
 import java.util.ArrayList;
 import java.util.List;

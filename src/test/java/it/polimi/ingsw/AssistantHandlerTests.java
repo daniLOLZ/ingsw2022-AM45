@@ -1,10 +1,10 @@
 package it.polimi.ingsw;
 import it.polimi.ingsw.controller.AssistantHandler;
 import it.polimi.ingsw.controller.Controller;
-import it.polimi.ingsw.model.Assistant;
-import it.polimi.ingsw.model.FactoryAssistant;
-import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.Wizard;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.assistantCards.Wizard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

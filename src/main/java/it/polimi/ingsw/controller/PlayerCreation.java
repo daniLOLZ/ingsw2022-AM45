@@ -1,6 +1,13 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.assistantCards.FactoryWizard;
+import it.polimi.ingsw.model.assistantCards.Wizard;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.game.SimpleGame;
+import it.polimi.ingsw.model.player.FactoryPlayer;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +64,9 @@ public class PlayerCreation {
      * @return true if nick is correctly set
      */
     // Lucario : probabilmente dev'essere synchronized
+    /*
+    pensavo di sincronizzare la chiamata al controller
+     */
     public boolean setNickname(String nick, int user){
         if(FactoryPlayer.validNickname(nick)){
             nicknames.add(user,nick);
@@ -71,6 +81,13 @@ public class PlayerCreation {
      */
     // Lucario : in quali occasioni dobbiamo mantenere il giocatore ma con un nick null?
     // Non è meglio cancellarlo direttamente? Non credo di aver capito questi metodi di clear
+    /*
+    Il player non è ancora stato creato in questa fase. L'ho fatto per permettere all'utente di modificare
+    le proprie scelte di nickname, colore team ecc..., durante la fase di creazione.
+    Qua non stiamo creando il giocatore, stiamo raccogliendo le sue scelte dunque non vi è incosistenza,
+    il fatto di avere null significa che l'utente non ha ancora fatto una scelta su un determinato parametro
+    e per tanto non va ancora permessa la creazione del player
+     */
     public void clearNickname(int user){
         nicknames.add(user, null);
     }

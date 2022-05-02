@@ -1,6 +1,11 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.FullEntranceException;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.Island;
+import it.polimi.ingsw.model.islands.IslandGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -5,6 +5,15 @@ import it.polimi.ingsw.model.characterCards.Centaur;
 import it.polimi.ingsw.model.characterCards.Fungalmancer;
 import it.polimi.ingsw.model.characterCards.Herbalist;
 import it.polimi.ingsw.model.characterCards.Knight;
+import it.polimi.ingsw.model.game.AdvancedGame;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.IncorrectPlayersException;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
+import it.polimi.ingsw.model.islands.BlockTile;
+import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.islands.UnmergeableException;
+import it.polimi.ingsw.model.player.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

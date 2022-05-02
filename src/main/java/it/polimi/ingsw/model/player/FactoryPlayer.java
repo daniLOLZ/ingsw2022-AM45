@@ -1,4 +1,7 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.player;
+
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.TeamEnum;
 
 import java.util.ArrayList;
 import java.util.List;

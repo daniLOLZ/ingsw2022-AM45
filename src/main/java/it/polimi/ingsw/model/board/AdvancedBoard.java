@@ -1,11 +1,15 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.board;
+
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-public class AdvancedBoard extends Board{
+public class AdvancedBoard extends Board {
 
     private static final Integer[] positionOfCoins = {9, 6, 3};
 

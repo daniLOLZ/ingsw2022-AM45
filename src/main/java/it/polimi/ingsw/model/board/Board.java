@@ -1,4 +1,8 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.board;
+
+import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.IslandGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -106,7 +110,7 @@ public class Board {
         studentsAtEntrance.addAll(students);
     }
 
-    public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException{
+    public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException {
 
         if (entranceSize() == parameters.getMaxStudentsAtEntrance()) throw new FullEntranceException();
 

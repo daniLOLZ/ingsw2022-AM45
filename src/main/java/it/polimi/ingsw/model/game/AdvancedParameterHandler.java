@@ -1,5 +1,6 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.characterCards.Requirements;
 
 import java.util.ArrayList;

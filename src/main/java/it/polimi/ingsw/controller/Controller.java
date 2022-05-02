@@ -1,8 +1,8 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.IncorrectPlayersException;
-import it.polimi.ingsw.model.SimpleGame;
+import it.polimi.ingsw.model.game.AdvancedGame;
+import it.polimi.ingsw.model.game.IncorrectPlayersException;
+import it.polimi.ingsw.model.game.SimpleGame;
 
 //TODO
 public class Controller {

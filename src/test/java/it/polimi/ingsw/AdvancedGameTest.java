@@ -1,10 +1,8 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.AdvancedGame;
+import it.polimi.ingsw.model.game.AdvancedGame;
 import static org.junit.jupiter.api.Assertions.*;
-import it.polimi.ingsw.model.IncorrectPlayersException;
-import it.polimi.ingsw.model.StudentEnum;
-import it.polimi.ingsw.model.characterCards.Glutton;
+import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

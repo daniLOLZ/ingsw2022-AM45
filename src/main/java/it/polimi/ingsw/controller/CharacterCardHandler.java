@@ -1,9 +1,9 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.AdvancedPlayer;
-import it.polimi.ingsw.model.ParameterHandler;
+import it.polimi.ingsw.model.game.AdvancedGame;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
+import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.characterCards.*;
 
 import java.util.ArrayList;
@@ -200,10 +200,9 @@ public class CharacterCardHandler {
 
         //IF THIS CLASS EXIST CURRENT PLAYER IS AN ADVANCED-PLAYER
         AdvancedPlayer player = (AdvancedPlayer) controller.simpleGame.getParameters().getCurrentPlayer();
-        AdvancedParameterHandler parameter = controller.advancedGame.getAdvancedParameters();
+        AdvancedGame game = controller.advancedGame;
 
-        parameter.addCoins(usingCard.getCardCost());                    //GAME RECEIVE COINS
-        for(int times=0; times < usingCard.getCardCost(); times++)      //PLAYER LOSE COINS
-            player.useCoin();
+        game.spendCoin(player, usingCard.getCardCost());
+
     }
 }

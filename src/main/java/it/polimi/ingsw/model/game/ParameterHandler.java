@@ -1,4 +1,10 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.game;
+
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 
 import java.util.*;
 
@@ -21,6 +27,7 @@ public class ParameterHandler {
     //DYNAMIC PARAMETERS
     private Player currentPlayer;
     private List<PlayerEnum> professors;
+    private int turn;
 
     //SELECTION PARAMETERS
     private Optional<List<IslandGroup>> selectedIslands;
@@ -162,5 +169,13 @@ public class ParameterHandler {
         selectedIslands = Optional.empty();
         selectedEntranceStudents = Optional.empty();
         selectedStudentTypes = Optional.empty();
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
     }
 }

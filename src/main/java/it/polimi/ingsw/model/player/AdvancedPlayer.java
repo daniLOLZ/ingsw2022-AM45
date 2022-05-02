@@ -1,6 +1,9 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.player;
 
-public class AdvancedPlayer extends Player{
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.TeamEnum;
+
+public class AdvancedPlayer extends Player {
     private int numCoins;
 
     public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters){

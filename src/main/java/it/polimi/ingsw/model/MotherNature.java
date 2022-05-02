@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.islands.IslandGroup;
+
 public class MotherNature {
     private IslandGroup position;
 

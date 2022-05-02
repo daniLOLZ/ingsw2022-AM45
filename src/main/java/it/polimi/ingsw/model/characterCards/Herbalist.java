@@ -1,6 +1,9 @@
 package it.polimi.ingsw.model.characterCards;
 
-import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
+import it.polimi.ingsw.model.islands.BlockTile;
 
 import java.util.ArrayList;
 import java.util.List;

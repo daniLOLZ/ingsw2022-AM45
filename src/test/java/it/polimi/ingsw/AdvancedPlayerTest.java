@@ -1,8 +1,8 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.AdvancedGame;
-import it.polimi.ingsw.model.AdvancedPlayer;
-import it.polimi.ingsw.model.IncorrectPlayersException;
+import it.polimi.ingsw.model.game.AdvancedGame;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
+import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import org.junit.Before;
 
 public class AdvancedPlayerTest {

@@ -1,8 +1,5 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.assistantCards;
 
-import org.json.simple.parser.ParseException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

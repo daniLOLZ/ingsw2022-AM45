@@ -1,4 +1,12 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.game;
+
+import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.game.IncorrectPlayersException;
+import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.player.FactoryPlayer;
+import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -274,5 +282,39 @@ public class SimpleGame {
 
     public ParameterHandler getParameters() {
         return parameters;
+    }
+
+    /**
+     * Get students from a cloud aand put them at player's entrance
+     * @param player!=null
+     * @param cloudId >=0 && < clouds.size()
+     */
+    public void getFromCloud(Player player, int cloudId){
+        Cloud cloud = clouds.get(cloudId);
+        player.getFromCloud(cloud);
+    }
+
+    /**
+     *
+     * @return true if there is a player with no assistant cards
+     */
+    public boolean noMoreAssistant(){
+        boolean noMoreAssistant = false;
+        for(Player player: players){
+            if(player.noMoreAssistant()){
+                noMoreAssistant = true;
+                break;
+            }
+        }
+
+        return noMoreAssistant;
+    }
+
+    /**
+     *
+     * @return true if sack is empty
+     */
+    public boolean emptySack(){
+        return sack.isEmpty();
     }
 }

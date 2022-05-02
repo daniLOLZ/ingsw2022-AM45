@@ -1,8 +1,8 @@
 package it.polimi.ingsw.model.characterCards;
 
 
-import it.polimi.ingsw.model.AdvancedParameterHandler;
-import it.polimi.ingsw.model.ParameterHandler;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
+import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Knight extends CharacterCard {
 

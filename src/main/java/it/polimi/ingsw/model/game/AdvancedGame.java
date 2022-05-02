@@ -1,19 +1,28 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
+import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
+import it.polimi.ingsw.model.player.FactoryPlayer;
+import it.polimi.ingsw.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdvancedGame extends SimpleGame{
+public class AdvancedGame extends SimpleGame {
     private final List<CharacterCard> CharacterCards;
     private  List<AdvancedPlayer> AdvancedPlayers; // Lucario : Non è meglio mettere advancedPlayers in players invece
                                                     // di avere una lista apposita? O lo usi per facilità nel gestirli
                                                     // col controller? In ogni caso si può vedere se servono davvero
-    private  AdvancedParameterHandler advancedParameters;
+    private AdvancedParameterHandler advancedParameters;
 
-    public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException{
+    /*
+    forse è meglio che il construttore di game abbia come parametro passato una lista di giocatori
+    invece che crearseli lui.
+     */
+    public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException {
         super(numPlayers);
         advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
                                                     // time because we need to create parameters before
@@ -33,12 +42,47 @@ public class AdvancedGame extends SimpleGame{
 
     }
 
+    /**
+     * AdvanceGame's constructor.
+     * Get a players List of AdvancedPlayer (created in network state) and num of coins and num of character
+     * cards and create the model of the game
+     * @param numCoins > 0
+     * @param numCharacterCards > 0
+     * @param players != null
+     * @throws IncorrectPlayersException if players.size() <= 0 || players.size() > 4
+     */
+    public AdvancedGame(int numCoins, int numCharacterCards, List<Player> players) throws IncorrectPlayersException {
+        super(players.size());
+        this.players = players;
+        advancedParameters.setNumCoins(numCoins);
+
+        CharacterCards = new ArrayList<>();
+        for(int card= 0; card < numCharacterCards; card++){
+            CharacterCards.add(FactoryCharacterCard.
+                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+        }
+        for(int card= 0; card < numCharacterCards; card++){
+            CharacterCards.get(card).initialise(this);
+        }
+
+        createPlayingSack();
+
+    }
 
 
+    /**
+     *
+     * @param position > 0 && < Charactercards.size()
+     * @return Character card in requested position
+     */
     public CharacterCard getCharacterCard(int position) {
         return CharacterCards.get(position);
     }
 
+    /**
+     *
+     * @return advanced parameter of this game
+     */
     public AdvancedParameterHandler getAdvancedParameters(){
         return advancedParameters;
     }
@@ -51,9 +95,7 @@ public class AdvancedGame extends SimpleGame{
      */
     @Override
     protected void createPlayers(int numPlayers){
-        // Lucario: la creazione dei giocatori l'ho fatta con FactoryPlayer, se togliamo advancedPlayer non servirà questo metodo visto che saranno inizializzati nel super()
-        //RISPOSTA: ok se proprio vogliamo togliere AdvancedPlayer. Prima si sistema Player, poi si sistema
-        //il resto usando il nuovo Player e alla fine si toglie Advanced Player.
+
         players = FactoryPlayer.getNPlayers(numPlayers, getParameters());
         AdvancedPlayers = new ArrayList<>();
         for(Player player: players){
@@ -76,13 +118,8 @@ public class AdvancedGame extends SimpleGame{
     @Override
     protected void createPlayingSack() {
         sack = new AdvancedSack(super.getMaxStudentsByType()-2);
-    } // Lucario : ho cambiato qui, invece che usare 24 fisso, per usare il parametro in simpleGame
-        //RISPOSTA: ok. A sto punto si può sostituire anche il 2 (visto che anche lui è un mezzo magic number)
+    }
 
-
-    // Lucario : per ragioni simili a quelle di Sack ho fatto creare a parte le isole
-    // non dovrebbero esserci altre modifiche da fare in questa classe
-    //RISPOSTA: ok
     /**
      * Creates the island groups of this game in their advanced form.
      */
@@ -100,7 +137,22 @@ public class AdvancedGame extends SimpleGame{
     @Override
     protected void createParameters() {
         super.createParameters();
-        this.advancedParameters = new AdvancedParameterHandler(-1);
+        advancedParameters = new AdvancedParameterHandler(-1);
+    }
+
+    public boolean spendCoin(AdvancedPlayer player, int coin){
+        int playerCoin = player.getNumCoins();
+
+        if(playerCoin < coin){
+            return false;
+        }
+
+        for(int times=0;times<coin;times++){
+            player.useCoin();
+            advancedParameters.addCoins(1);
+        }
+
+        return true;
     }
 }
 

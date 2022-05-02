@@ -1,13 +1,11 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.*;
-import org.json.simple.parser.ParseException;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryWizard;
+import it.polimi.ingsw.model.assistantCards.NoSuchAssistantException;
+import it.polimi.ingsw.model.assistantCards.Wizard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

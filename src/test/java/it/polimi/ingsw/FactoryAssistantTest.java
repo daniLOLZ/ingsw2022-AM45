@@ -1,12 +1,9 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.Assistant;
-import it.polimi.ingsw.model.FactoryAssistant;
-import it.polimi.ingsw.model.FactoryWizard;
-import org.json.simple.parser.ParseException;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
+import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
