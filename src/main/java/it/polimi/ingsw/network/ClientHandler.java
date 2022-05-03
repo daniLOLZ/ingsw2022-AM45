@@ -27,13 +27,13 @@ public class ClientHandler implements Runnable{
 
     @Override
     public void run(){
-        ObjectInputStream clientInput;
-        ObjectOutputStream clientOutput;
+        InputStream clientInput;
+        OutputStream clientOutput;
 
         idUser = LoginHandler.getNewUserId();
         try {
-            clientInput = new ObjectInputStream(socket.getInputStream());
-            clientOutput = new ObjectOutputStream(socket.getOutputStream());
+            clientInput = socket.getInputStream();
+            clientOutput = socket.getOutputStream();
         } catch (IOException e) {
             System.err.println("Error obtaining streams");
             System.err.println(e.getMessage());
@@ -45,11 +45,7 @@ public class ClientHandler implements Runnable{
             if(!broker.receive(clientInput)){ // Received an invalid message
                 continue;
             }
-
-            CommandEnum command = (CommandEnum) broker.readField("command");
-            if(command != null){
-                System.out.println(command);
-            }
+            CommandEnum command = CommandEnum.valueOf((String)broker.readField("command"));
 
             if(!connectionState.isAllowed(command)){ // Trashes a command given at the wrong time
                 continue;
@@ -74,7 +70,7 @@ public class ClientHandler implements Runnable{
      * Adds the reply fields in the server message in case of a failed operation (Message and status)
      * @param errorMessage A verbose message describing the error
      */
-    private void notifyError(String errorMessage){
+    private void notifyError(String errorMessage){ // parametrize reply status as well
         broker.addToMessage("serverReplyMessage", "ERR");
         broker.addToMessage("serverReplyStatus", 1);
         broker.addToMessage("errorState", errorMessage);
@@ -110,7 +106,7 @@ public class ClientHandler implements Runnable{
             notifyError("Nickname already taken");
             quitGame();
         }
-        notifySuccessfulOperation();
+        else notifySuccessfulOperation();
     }
 
 }

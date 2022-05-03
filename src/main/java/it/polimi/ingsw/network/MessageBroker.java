@@ -3,11 +3,10 @@ package it.polimi.ingsw.network;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Type;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +43,8 @@ public class MessageBroker {
     }
 
     public Object readField(String fieldName){
-        return incomingMessage.get(fieldName);
+        Object fieldValue = incomingMessage.get(fieldName);
+        return fieldValue;
     }
 
     private void outFlush(){
@@ -57,16 +57,16 @@ public class MessageBroker {
 
     /**
      * Send the message stored in the object as a JSON file to the specified output stream
-     * @param destinationOutput the ObjectOutputStream of the host to send the message to
+     * @param destinationOutput the OutputStream of the host to send the message to
      */
-    public void send(ObjectOutputStream destinationOutput){
+    public void send(OutputStream destinationOutput){
 
         String sendable = serialise(outgoingMessage);
 
         System.out.println("sending" + sendable + " to " + "???");
 
         try {
-            destinationOutput.writeChars(sendable);
+            destinationOutput.write(sendable.getBytes(StandardCharsets.UTF_8));
             destinationOutput.flush();
         } catch (IOException e) {
             System.err.println("Couldn't send the message via the network");
@@ -77,21 +77,34 @@ public class MessageBroker {
 
     /**
      * Receives and stores the received message as an HashMap in the incoming message attribute
-     * @param sourceInput the ObjectInputStream of the host to read the message from
+     * @param sourceInput the InputStream of the host to read the message from
      * @return true if the message received is valid
      */
-    public boolean receive(ObjectInputStream sourceInput){
+    public boolean receive(InputStream sourceInput){
         String receivedMessage;
-
+        StringBuilder tempString = new StringBuilder();
+        int rawReadInt;
+        char rawChar;
+        boolean endOfMessage = false;
+        int numberOfOpenCurlyBrackets = 0;
         try {
-            receivedMessage = (String) sourceInput.readObject();
+            while(!endOfMessage){
+                rawReadInt = sourceInput.read();
+                rawChar = (char)rawReadInt;
+
+                // Signals the end of the message based on the amount of curly bracket pairs
+                if(rawChar == '{') numberOfOpenCurlyBrackets++;
+                else if (rawChar == '}') numberOfOpenCurlyBrackets--;
+                if (numberOfOpenCurlyBrackets == 0) {
+                    endOfMessage = true;
+                }
+                tempString.append(rawChar);
+            }
+            receivedMessage = tempString.toString();
+
             System.out.println("message received");
         } catch (IOException e) {
             System.err.println("Error reading message from the network");
-            e.printStackTrace();
-            return false;
-        } catch (ClassNotFoundException e) {
-            System.err.println("The received object was not a string");
             e.printStackTrace();
             return false;
         }

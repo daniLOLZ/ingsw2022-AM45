@@ -1,9 +1,6 @@
 package it.polimi.ingsw.network;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -31,8 +28,10 @@ public class ClientMain {
             System.err.println("Error logging in");
             return;
         }
-        System.out.println("Username " + client.nickname + "was accepted");
+        System.out.println("Username " + client.nickname + " was accepted");
+        while(true){ // generic game loop
 
+        }
     }
 
     /**
@@ -94,11 +93,11 @@ public class ClientMain {
 
         broker.addToMessage("command", CommandEnum.CONNECTION_REQUEST);
         broker.addToMessage("nickname", nickname);
-        ObjectOutputStream outStream;
-        ObjectInputStream inStream;
+        OutputStream outStream;
+        InputStream inStream;
         try {
-            outStream = new ObjectOutputStream(socket.getOutputStream());
-            inStream = new ObjectInputStream(socket.getInputStream());
+            outStream = socket.getOutputStream();
+            inStream = socket.getInputStream();
         } catch (IOException e) {
             System.err.println("Couldn't get input/output streams");
             e.printStackTrace();
