@@ -206,11 +206,11 @@ public class IslandGroup {
         for (Player p : players) {
             if (p.getTeamColor().equals(previousTeam) && p.isLeader()) {
                 oldTowers = p.getBoard().getNumberOfTowers();
-                p.getBoard().updateTowers(oldTowers-numOfIslandsInGroup());
+                p.getBoard().updateTowers(-numOfIslandsInGroup());
             }
             if (p.getTeamColor().equals(team) && p.isLeader()){
                 oldTowers = p.getBoard().getNumberOfTowers();
-                p.getBoard().updateTowers(oldTowers+numOfIslandsInGroup());
+                p.getBoard().updateTowers(numOfIslandsInGroup());
             }
         }
         towerColor = team;
