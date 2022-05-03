@@ -148,6 +148,14 @@ public class MessageBroker {
         return true;
     }
 
-    //TODO IMPLEMENT IDREQUEST CHECKS
 
+    public static boolean isOfType(Object object, Type type){
+        return object.getClass().getTypeName().equals(type.getTypeName());
+    }
+
+    public static boolean isOfTheSameType(Object object, Object sample){
+        return object.getClass().getTypeName().equals(sample.getClass().getTypeName());
+    }
+
+    //TODO IMPLEMENT IDREQUEST CHECKS
 }
