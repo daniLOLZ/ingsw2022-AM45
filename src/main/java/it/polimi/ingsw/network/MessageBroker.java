@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Type;
 
+import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -137,4 +138,12 @@ public class MessageBroker {
 
     //TODO IMPLEMENT IDREQUEST CHECKS
 
+
+    public static boolean isOfType(Object object, Type type){
+        return object.getClass().getTypeName().equals(type.getTypeName());
+    }
+
+    public static boolean isOfTheSameType(Object object, Object sample){
+        return object.getClass().getTypeName().equals(sample.getClass().getTypeName());
+    }
 }
