@@ -6,9 +6,14 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 
+import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MessageBroker {
 
@@ -88,26 +93,31 @@ public class MessageBroker {
         boolean endOfMessage = false;
         int numberOfOpenCurlyBrackets = 0;
         try {
-            while(!endOfMessage){
+            while(!endOfMessage) {
                 rawReadInt = sourceInput.read();
-                rawChar = (char)rawReadInt;
+                rawChar = (char) rawReadInt;
 
                 // Signals the end of the message based on the amount of curly bracket pairs
-                if(rawChar == '{') numberOfOpenCurlyBrackets++;
+                if (rawChar == '{') numberOfOpenCurlyBrackets++;
                 else if (rawChar == '}') numberOfOpenCurlyBrackets--;
                 if (numberOfOpenCurlyBrackets == 0) {
                     endOfMessage = true;
                 }
                 tempString.append(rawChar);
             }
-            receivedMessage = tempString.toString();
-
-            System.out.println("message received");
+        } catch (SocketException e) {
+            System.err.println("Socket error, couldn't read the message");
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            return false;
         } catch (IOException e) {
             System.err.println("Error reading message from the network");
             e.printStackTrace();
             return false;
         }
+        receivedMessage = tempString.toString();
+
+        System.out.println("message received");
         incomingMessage = deserialize(receivedMessage);
 
         return checkValidity();
@@ -119,17 +129,16 @@ public class MessageBroker {
      */
     public boolean checkValidity(){
 
-        String field;
         Object object;
         // For each field, check whether it can be cast and return false if an exception is raised
-        for(int fieldNumber = 0; fieldNumber < incomingMessage.size(); fieldNumber++){
-            field = incomingMessage.keySet().iterator().next();
+        List<String> keyArray = new ArrayList<>(incomingMessage.keySet());
+        for(String field : keyArray){
             object = incomingMessage.get(field);
 
             switch (field){
                 case "idUser" : {
                     try{
-                        int primitveInt = (int) object;
+                        int primitiveInt = (int) object;
                     } catch(ClassCastException e) {
                         return false;
                     }
