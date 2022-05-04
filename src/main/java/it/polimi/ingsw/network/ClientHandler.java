@@ -2,11 +2,10 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.network.connectionState.Authentication;
 import it.polimi.ingsw.network.connectionState.ConnectionState;
-import org.json.simple.JSONObject;
+import it.polimi.ingsw.network.connectionState.LookingForLobby;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner; // For Testing
 
 public class ClientHandler implements Runnable{
     private Socket socket;
@@ -81,11 +80,42 @@ public class ClientHandler implements Runnable{
      */
     public void handleCommand(CommandEnum command){
         switch(command){
-//          case QUIT -> quitGame();
+            case QUIT -> quitGame();
             case CONNECTION_REQUEST -> connectionRequest();
-//          case PLAY_GAME -> playGame();
+            case PLAY_GAME -> playGame();
+            case READY_TO_START -> sendReady();
+            case NOT_READY -> sendNotReady();
+            case LEAVE_LOBBY -> requestLeaveLobby();
             //TODO rest of commands
         }
+    }
+
+    /**
+     * The user requests to play a game with the given rules
+     */
+    private void playGame() {
+
+    }
+
+    /**
+     * The user requests to leave the current lobby
+     */
+    private void requestLeaveLobby() {
+
+    }
+
+    /**
+     * Sends a message to the server letting it know the user is not ready to start the game
+     */
+    private void sendNotReady() {
+        // TODO
+    }
+
+    /**
+     * Sends a message to the server letting it know the user is ready to start the game
+     */
+    private void sendReady() {
+        // TODO
     }
 
     /**
@@ -107,6 +137,10 @@ public class ClientHandler implements Runnable{
             quitGame();
         }
         else notifySuccessfulOperation();
+        setConnectionState(new LookingForLobby());
     }
 
+    public void setConnectionState(ConnectionState connectionState) {
+        this.connectionState = connectionState;
+    }
 }

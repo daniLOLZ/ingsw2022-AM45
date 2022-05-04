@@ -3,6 +3,7 @@ package it.polimi.ingsw.network;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class ClientMain {
 
@@ -22,15 +23,23 @@ public class ClientMain {
     }
 
     public static void main(String[] args){
-        ClientMain client = new ClientMain("127.0.0.1", 54321, "mock1"); //TODO remove hardcoded network parameters
+        ClientMain client = new ClientMain("127.0.0.1", 54321, "username"); //TODO remove hardcoded network parameters
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Insert your username");
+        String inputNickname = scanner.nextLine();
+        client.setNickname(inputNickname);
 
         if(!client.login(client.getHostname(), client.getPortNumber(), client.getNickname())){
             System.err.println("Error logging in");
             return;
         }
         System.out.println("Username " + client.nickname + " was accepted");
-        while(true){ // generic game loop
 
+        String userInput;
+        while(true){ // generic game loop
+            userInput = scanner.nextLine();
         }
     }
 
@@ -115,6 +124,10 @@ public class ClientMain {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getHostname() {
