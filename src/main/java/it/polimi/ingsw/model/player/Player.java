@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.assistantCards.NoSuchAssistantException;
 import it.polimi.ingsw.model.assistantCards.Wizard;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.islands.IslandGroup;
 
 import java.util.List;
 
@@ -142,11 +143,29 @@ public class Player {
         return board.getNumberOfTowers() == 0;
     }
 
+    /**
+     *
+     * @return the number of towers in player's board
+     */
     public int getNumTowers(){
         return board.getNumberOfTowers();
     }
 
+    /**
+     * Move the student  from position parameter.selectedEntranceStudents
+     * to Hall
+     */
     public void moveFromEntranceToHall(){
         board.moveFromEntranceToHall();
     }
+
+    /**
+     *
+     * @param island != null
+     */
+    public void moveFromEntranceToIsland(IslandGroup island){
+        board.moveFromEntranceToIsland(island);
+    }
+
+
 }

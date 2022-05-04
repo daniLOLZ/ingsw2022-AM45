@@ -33,8 +33,7 @@ public class Board {
         selectedEntranceStudentPos = Optional.empty();
     }
 
-    //HAI IL JAVADOC SBAGLIATO. DICI DI FARE UNA COSA E NE FAI UN'ALTRA.
-    //NON ASSEGNI IL VALORE MA LO SOMMI AL PRECEDENTE.
+
     /**
      * sets numberOfTowers
      * @param numTowers the value to assign to numberOfTowers

@@ -14,16 +14,18 @@ public class BoardHandler {
     }
 
     //GET THE CURRENT PLAYER
-    private void init(){
+    private void getCurrentPlayer(){
         currentPlayer =controller.simpleGame.getParameters().getCurrentPlayer();
     }
+
+    public void addToHall(StudentEnum student){}
 
     /**
      * Empty chosen cloud and add the students at currentPlayer's entrance
      * @param idCloud >=0 && < number of clouds
      */
     public void takeFromCloud(int idCloud){
-        init();
+        getCurrentPlayer();
         controller.simpleGame.getFromCloud(currentPlayer,idCloud);
     }
 
@@ -35,7 +37,29 @@ public class BoardHandler {
     }
 
 
-    public void addToHall(StudentEnum student){
-        //TODO
+    /**
+     * move a student from currentPlayer's entrance to hall.
+     *
+     */
+    public void moveFromEntranceToHall(int position){
+        getCurrentPlayer();
+        controller.simpleGame.selectEntranceStudent(position);
+        controller.simpleGame.moveFromEntranceToHall(currentPlayer);
+    }
+
+    /**
+     * move the student in chosen position from currentPlayer's entrance to
+     * the islandGroup with chosen id
+     * @param position > 0
+     * @param idIslandGroup > 0
+     */
+    public void moveFromEntranceToIsland(int position, int idIslandGroup){
+        getCurrentPlayer();
+        if(! controller.simpleGame.checkValidIdIsland(idIslandGroup)){
+            controller.simpleGame.getParameters().setErrorState("WRONG ID ISLAND-GROUP");
+            return;
+        }
+        controller.simpleGame.selectEntranceStudent(position);
+        controller.simpleGame.moveFromEntranceToIsland(currentPlayer, idIslandGroup);
     }
 }

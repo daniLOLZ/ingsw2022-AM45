@@ -1,8 +1,6 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.*;
-import it.polimi.ingsw.model.game.IncorrectPlayersException;
-import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
@@ -385,32 +383,49 @@ public class SimpleGame {
 
     /**
      * player's turn starts and this player becomes the current player and the current phase
-     * becomes PLAN
+     * becomes PLANNING
      * @param player != null
      */
     public void startPhase(int player){
         parameters.setCurrentPlayer(players.get(player));
-        parameters.setCurrentPhase(PhaseEnum.PLAN);
+        parameters.setCurrentPhase(PhaseEnum.PLANNING);
     }
 
     /**
      * current phase becomes ACTION
      */
-    public void movePhase(){
+    public void actionPhase(){
         parameters.setCurrentPhase(PhaseEnum.ACTION);
     }
 
+    /**
+     * In the player's board:
+     * move the student  from position parameter.selectedEntranceStudents
+     * into the correct Hall's table
+     * @param player != null
+     */
     public void moveFromEntranceToHall(Player player){
         player.moveFromEntranceToHall();
     }
+
+    /**
+     * Move the student  from position parameter.selectedEntranceStudents
+     * to islandGroup with chosen idIslandGroup
+     * @param player != null
+     * @param idIslandGroup > 0 && < islandGroups.size()
+     */
+    public void moveFromEntranceToIsland(Player player, int idIslandGroup){
+        IslandGroup island = islandGroups.get(idIslandGroup);
+        player.moveFromEntranceToIsland(island);
+    };
 
 
     public void selectIslandGroup(int idIslandGroup){
         IslandGroup islandGroup = islandGroups.get(idIslandGroup);
         if(parameters.getSelectedIslands().isEmpty()){
-            List<IslandGroup> dummyListForDummyCoder = new ArrayList<>();
-            dummyListForDummyCoder.add(islandGroup);
-            parameters.setSelectedIslands(dummyListForDummyCoder);
+            List<IslandGroup> islandList = new ArrayList<>();
+            islandList.add(islandGroup);
+            parameters.setSelectedIslands(islandList);
         }
         else
         parameters.selectIsland(islandGroup);
@@ -419,9 +434,9 @@ public class SimpleGame {
     public void selectEntranceStudent(int position){
 
         if(parameters.getSelectedEntranceStudents().isEmpty()){
-            List<Integer> dummyListForDummyCoder = new ArrayList<>();
-            dummyListForDummyCoder.add(position);
-            parameters.setSelectedEntranceStudents(dummyListForDummyCoder);
+            List<Integer> positionList = new ArrayList<>();
+            positionList.add(position);
+            parameters.setSelectedEntranceStudents(positionList);
         }
         else
         parameters.selectEntranceStudent(position);
@@ -429,9 +444,9 @@ public class SimpleGame {
 
     public void selectStudentType(StudentEnum type){
         if(parameters.getSelectedStudentTypes().isEmpty()){
-            List<StudentEnum> dummyListForDummyCoder = new ArrayList<>();
-            dummyListForDummyCoder.add(type);
-            parameters.setSelectedStudentTypes(dummyListForDummyCoder);
+            List<StudentEnum> typeList = new ArrayList<>();
+            typeList.add(type);
+            parameters.setSelectedStudentTypes(typeList);
         }
         else
         parameters.selectStudentType(type);
@@ -445,4 +460,14 @@ public class SimpleGame {
     public boolean emptySack(){
         return sack.isEmpty();
     }
+
+    /**
+     *
+     * @param idIslandGroup
+     * @return true if there is an islandGroup that has the chosen id
+     */
+    public boolean checkValidIdIsland(final int idIslandGroup){
+        return islandGroups.stream().anyMatch(island -> island.getIdGroup() == idIslandGroup);
+    }
+
 }

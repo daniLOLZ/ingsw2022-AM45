@@ -157,9 +157,9 @@ public class AdvancedGame extends SimpleGame {
 
     public void selectStudentOnCard(int position){
         if(advancedParameters.getSelectedStudentsOnCard().isEmpty()){
-            List<Integer> dummyListForDummyCoder = new ArrayList<>();
-            dummyListForDummyCoder.add(position);
-            advancedParameters.setSelectedStudentsOnCard(dummyListForDummyCoder);
+            List<Integer> positionList = new ArrayList<>();
+            positionList.add(position);
+            advancedParameters.setSelectedStudentsOnCard(positionList);
         }
         else
             advancedParameters.selectStudentOnCard(position);
