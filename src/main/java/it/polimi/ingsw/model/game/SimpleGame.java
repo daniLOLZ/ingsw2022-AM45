@@ -15,7 +15,6 @@ public class SimpleGame {
     private final int numPlayers;
     private final int maxStudentsByType;
     private final int amountOfIslands;
-//    private Player currentPlayer;  // Moved to parameters
     private TeamEnum currentTeam;
     private boolean isLastTurn;
     private int currentIslandGroupId;
@@ -468,6 +467,14 @@ public class SimpleGame {
      */
     public boolean checkValidIdIsland(final int idIslandGroup){
         return islandGroups.stream().anyMatch(island -> island.getIdGroup() == idIslandGroup);
+    }
+
+    /**
+     *
+     * @return islandGroup id where MN is placed
+     */
+    public int getIdIslandMN(){
+        return MN.getPosition().getIdGroup();
     }
 
 }

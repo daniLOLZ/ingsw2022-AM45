@@ -6,4 +6,8 @@ public class Island {
     public Island(int id) {
         this.id = id;
     }
+
+    public int getId() {
+        return id;
+    }
 }

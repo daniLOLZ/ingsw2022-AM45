@@ -34,7 +34,7 @@ public class PlayerCreation {
      * @param user > 0
      * @return true if nick is correctly set
      */
-    public boolean setNickname(String nick, int user){
+    public synchronized boolean setNickname(String nick, int user){
             nicknames.add(user,nick);
             return true;
 
@@ -50,7 +50,7 @@ public class PlayerCreation {
      * @param user > 0
      * @return true if team is correctly set.
      */
-    public boolean setTeamColor(final TeamEnum team, int user){
+    public synchronized boolean setTeamColor(final TeamEnum team, int user){
         GameRule rule = controller.gameRule;
         final int numPlayersForTeam = 4;
         final int numPlayersForGrey = 3;
@@ -88,7 +88,7 @@ public class PlayerCreation {
      * replace team chosen by user with null
      * @param user > 0
      */
-    public void clearTeamColor(int user){
+    public synchronized void clearTeamColor(int user){
         teamColor.add(user, null);
     }
 
@@ -100,7 +100,7 @@ public class PlayerCreation {
      * @param user > 0
      * @return true if wizard is set correctly
      */
-    public boolean setWizard(final int idWizard, int user){
+    public synchronized boolean setWizard(final int idWizard, int user){
         if(!FactoryWizard.checkCorrectId(idWizard))
             return false;
 
@@ -115,7 +115,7 @@ public class PlayerCreation {
      * replace wizard chosen by user with null
      * @param user > 0
      */
-    public void clearWizard(int user){
+    public synchronized void clearWizard(int user){
         wizards.add(user, null);
     }
 
@@ -125,7 +125,7 @@ public class PlayerCreation {
      * their players.
      * Nickname, team color and wizard id.
      */
-    public boolean allSet(){
+    public synchronized boolean allSet(){
         int numPlayers = GameRule.getNumPlayers(controller.gameRule.id);
 
         for(int user=0; user < numPlayers; user++){
