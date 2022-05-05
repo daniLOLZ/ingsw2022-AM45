@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class ClientMain {
 
+    private int progressiveIdRequest;
     private Socket socket;
     private String hostname;
     private int portNumber;
@@ -20,6 +21,11 @@ public class ClientMain {
         this.portNumber = portNumber;
         this.nickname = nickname;
         this.broker = new MessageBroker();
+        this.progressiveIdRequest = 0;
+    }
+
+    private int increaseRequestId(){
+        return progressiveIdRequest++;
     }
 
     public static void main(String[] args){
@@ -55,17 +61,18 @@ public class ClientMain {
             System.err.println("Couldn't connect to host " + hostname + "on port " + port);
             return false;
         }
-        if(!sendNickname(nickname)){
+        if(!sendNickname(nickname)) {
             System.err.println("Nickname rejected");
-            try{
+            try {
                 socket.close();
-            } catch (IOException e){
+            } catch (IOException e) {
                 System.err.println(e.getMessage());
             } finally {
                 System.err.println("Connection closed");
             }
             return false;
         }
+
         return true;
     }
 
@@ -102,6 +109,8 @@ public class ClientMain {
 
         broker.addToMessage("command", CommandEnum.CONNECTION_REQUEST);
         broker.addToMessage("nickname", nickname);
+        broker.addToMessage("idRequest", increaseRequestId()); //TODO incapsulate idRequest adding to message
+        increaseRequestId();
         OutputStream outStream;
         InputStream inStream;
         try {

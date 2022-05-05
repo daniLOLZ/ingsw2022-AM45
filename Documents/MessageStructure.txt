@@ -3,6 +3,7 @@
 command 	    : 	CommandEnum			//comando che si vuole che il server esegua
 idGame		    :	int				    //idendificativo della partita
 idPlayer	    :	int				    //identificativo del Player che richiede il comando
+idRequest       :   int                 //identificativo della richiesta
 idConnection	:	int				    //idendificativo della connessione tra User e Server
 nickname 	    :	String			    //Nome fornito dall'User per il proprio Player
 gameRule	    :	int				    //Idendificativo tipo partita

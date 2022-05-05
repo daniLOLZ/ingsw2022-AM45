@@ -1,7 +1,9 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.controller.GameRule;
 import it.polimi.ingsw.network.connectionState.Authentication;
 import it.polimi.ingsw.network.connectionState.ConnectionState;
+import it.polimi.ingsw.network.connectionState.InLobby;
 import it.polimi.ingsw.network.connectionState.LookingForLobby;
 
 import java.io.*;
@@ -13,6 +15,7 @@ public class ClientHandler implements Runnable{
     private int idUser;
     private MessageBroker broker;
     private ConnectionState connectionState;
+    private Lobby userLobby;
 
     /**
      * Creates a new client handler with its own message broker and set to state Authentication
@@ -22,6 +25,7 @@ public class ClientHandler implements Runnable{
         this.socket = socket;
         this.broker = new MessageBroker();
         this.connectionState = new Authentication();
+        this.userLobby = null;
     }
 
     @Override
@@ -61,6 +65,7 @@ public class ClientHandler implements Runnable{
      * Adds the reply fields in the server message in case of a successful operation (Message and status)
      */
     private void notifySuccessfulOperation(){
+        broker.addToMessage("idRequest", broker.readField("idRequest"));
         broker.addToMessage("serverReplyMessage", "OK");
         broker.addToMessage("serverReplyStatus", 0);
     }
@@ -95,6 +100,11 @@ public class ClientHandler implements Runnable{
      */
     private void playGame() {
 
+        GameRule rules = GameRule.valueOf(broker.readField("rules").toString());
+
+        userLobby = ActiveLobbies.assignLobby(rules);
+        setConnectionState(new InLobby());
+        notifySuccessfulOperation();
     }
 
     /**
