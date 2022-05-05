@@ -3,6 +3,7 @@ package it.polimi.ingsw.network;
 public enum NetworkFieldEnum {
     COMMAND("command"),
     ID_USER("idUser"),
+    ID_REQUEST("idRequest"),
     NICKNAME("nickname"),
     GAME_RULE("gameRule"),
     ID_TOWER_COLOR("idTowerColor"),
