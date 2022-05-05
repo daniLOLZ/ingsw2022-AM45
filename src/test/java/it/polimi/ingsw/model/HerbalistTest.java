@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import it.polimi.ingsw.model.characterCards.Herbalist;

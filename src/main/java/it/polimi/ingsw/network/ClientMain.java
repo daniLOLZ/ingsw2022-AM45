@@ -113,8 +113,8 @@ public class ClientMain {
      */
     private boolean sendNickname(String nickname){
 
-        broker.addToMessage("command", CommandEnum.CONNECTION_REQUEST);
-        broker.addToMessage("nickname", nickname);
+        broker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CONNECTION_REQUEST);
+        broker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
         addIdRequest();
         OutputStream outStream;
         InputStream inStream;
@@ -132,7 +132,7 @@ public class ClientMain {
         System.out.println("Received reply from the server");
 
         return "OK".equals(
-                (String) broker.readField("serverReplyMessage")); // TODO maybe we should have this be less hardcoded?
+                (String) broker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE));
 
     }
 

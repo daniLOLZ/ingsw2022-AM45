@@ -1,23 +1,22 @@
 - Client message fields -
 // TODO translate
-command 	    : 	CommandEnum			//comando che si vuole che il server esegua
-idGame		    :	int				    //idendificativo della partita
-idPlayer	    :	int				    //identificativo del Player che richiede il comando
-idRequest       :   int                 //identificativo della richiesta
-idConnection	:	int				    //idendificativo della connessione tra User e Server
-nickname 	    :	String			    //Nome fornito dall'User per il proprio Player
-gameRule	    :	int				    //Idendificativo tipo partita
-idTowerColor	:	int				    //idendificativo colore Torri
-idWizard	    :	int				    //identificativo mazzo assistenti
-idAssistant	    :	int				    //idenficativo assistente scelto
-idCharacter	    :	int				    //idendificativo carta personaggio scelta
-idCloud		    :	int				    //idendificativo nuvola
-stepsMN		    :	int				    //numore di passi che si vuole faccia MN
-posEntrance	    :	int[]				//posizioni studenti scelti all'entrata
-islands		    :	int[]				//id gruppi di isole scelti
-posOnCard	    :	int[]				//posizioni studenti scelti sulla carta personaggio
-studentColor	:	int[]				//id colori studente scelti
-numPlayers	    :	int				    // numero di giocatori per questa partita
+command 	                : 	CommandEnum			//comando che si vuole che il server esegua
+idPlayer	                :	int				    //identificativo del Player che richiede il comando
+idUser      	            :	int				    //idendificativo della connessione tra User e Server
+idRequest                   :   int                 //identificativo della richiesta
+nickname 	                :	String			    //Nome fornito dall'User per il proprio Player
+gameRule	                :	int				    //Idendificativo tipo partita
+idTowerColor	            :	int				    //idendificativo colore Torri
+idWizard	                :	int				    //identificativo mazzo assistenti
+idAssistant	                :	int				    //idenficativo assistente scelto
+idCharacter	                :	int				    //idendificativo carta personaggio scelta
+idCloud		                :	int				    //idendificativo nuvola
+stepsMN		                :	int				    //numore di passi che si vuole faccia MN
+chosenEntrancePositions	    :	int[]				//posizioni studenti scelti all'entrata
+chosenIslands		        :	int[]				//id gruppi di isole scelti
+chosenCardPositions	        :	int[]				//posizioni studenti scelti sulla carta personaggio
+chosenStudentColors	        :	int[]				//id colori studente scelti
+numPlayers	                :	int				    // numero di giocatori per questa partita
 
 - Server message fields -
 

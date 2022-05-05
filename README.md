@@ -11,10 +11,10 @@
 | Basic rules    |  🟢   |
 | Complete rules |  🟡   |
 | Controller     |  🟡   |
-| Socket         |  🔴   |
+| Socket         |  🟡   |
 | CLI            |  🔴   |
 | GUI            |  🔴   |
-| Multiple games |  🔴   |
+| Multiple games |  🟡   |
 
 
 🔴

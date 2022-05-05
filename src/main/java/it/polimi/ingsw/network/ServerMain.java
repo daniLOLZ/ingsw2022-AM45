@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class ServerMain {
     private int portNumber; // java doesn't support unsigned int
-    ServerSocket serverSocket;
+    private ServerSocket serverSocket;
 
     public ServerMain(int port){
         this.portNumber = port;

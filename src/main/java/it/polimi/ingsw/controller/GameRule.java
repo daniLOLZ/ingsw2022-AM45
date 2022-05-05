@@ -1,5 +1,8 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.network.CommandEnum;
+
+//TODO change name to GameRuleEnum
 public enum GameRule {
     NO_RULE(0),
     SIMPLE_2(2),
@@ -43,4 +46,9 @@ public enum GameRule {
     public static boolean isAdvanced(int id){
         return id > 4;
     }
+
+    public static GameRule fromObjectToEnum (Object rule){
+        return GameRule.valueOf((String)rule);
+    }
+
 }
