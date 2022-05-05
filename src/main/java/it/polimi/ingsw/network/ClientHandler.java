@@ -1,8 +1,11 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRule;
+import it.polimi.ingsw.controller.GameRule;
 import it.polimi.ingsw.network.connectionState.Authentication;
 import it.polimi.ingsw.network.connectionState.ConnectionState;
+import it.polimi.ingsw.network.connectionState.InLobby;
+import it.polimi.ingsw.network.connectionState.InLobby;
 import it.polimi.ingsw.network.connectionState.LookingForLobby;
 
 import java.io.*;
@@ -14,6 +17,7 @@ public class ClientHandler implements Runnable{
     private int idUser;
     private MessageBroker broker;
     private ConnectionState connectionState;
+    private Lobby userLobby;
 
     /**
      * Creates a new client handler with its own message broker and set to state Authentication
@@ -23,6 +27,7 @@ public class ClientHandler implements Runnable{
         this.socket = socket;
         this.broker = new MessageBroker();
         this.connectionState = new Authentication();
+        this.userLobby = null;
     }
 
     @Override
@@ -64,6 +69,7 @@ public class ClientHandler implements Runnable{
     private void notifySuccessfulOperation(){
         broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "OK");
         broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 0);
+        broker.addToMessage(NetworkFieldEnum.ID_REQUEST, broker.readField(NetworkFieldEnum.ID_REQUEST));
     }
 
     /**
@@ -95,9 +101,12 @@ public class ClientHandler implements Runnable{
      * The user requests to play a game with the given rules
      */
     private void playGame() {
-        ActiveLobbies.assignLobby(GameRule.fromObjectToEnum(
-                        (String)broker.readField(NetworkFieldEnum.GAME_RULE)
-                        ));
+
+        GameRule rules = GameRule.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
+
+        userLobby = ActiveLobbies.assignLobby(rules);
+        setConnectionState(new InLobby());
+        notifySuccessfulOperation();
     }
 
     /**
