@@ -30,11 +30,19 @@ public class Lobby {
         return emptySeats == 0;
     }
 
+    /**
+     * Adds a player to the ready players' list
+     * @param idUser The idUser of the player to add (must be in the lobby)
+     */
     public void addReady(int idUser){
         if (players.contains(idUser)) playersReady.add(idUser);
         else ;//maybe handle case of idUser not present
     }
 
+    /**
+     * Removes a player from the ready players' list
+     * @param idUser The idUser of the player to remove
+     */
     public void removeReady(int idUser){
 
         Integer integer = idUser;
@@ -45,6 +53,12 @@ public class Lobby {
         return gameType;
     }
 
+
+    /**
+     * Removes a player from the Lobby.
+     * If he was the host, the role is reassigned.
+     * @param idUser The idUser of the player to remove (must be in the lobby)
+     */
     public synchronized void removePlayer(int idUser){
 
         if (players.contains(idUser)) {
@@ -55,6 +69,11 @@ public class Lobby {
         }
     }
 
+    /**
+     * Adds a player to the Lobby.
+     * If he's the first player added, it becomes the host.
+     * @param idUser The idUser of the player to add
+     */
     public synchronized void addPlayer(int idUser){
 
         players.add(idUser);
@@ -62,14 +81,15 @@ public class Lobby {
         assignHost();
     }
 
+    /**
+     *
+     */
     private void assignHost(){
 
-        if (host != null) return;
+        if (players.size() == 0) host = null;
 
-        if (players.size() == 0){
-            host = null;
-        }
+        if (!players.contains(host)) host = null;
 
-        else host = players.get(0);
+        if (host == null) host = players.get(0);
     }
 }

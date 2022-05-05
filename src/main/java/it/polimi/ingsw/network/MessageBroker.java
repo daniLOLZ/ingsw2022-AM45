@@ -157,7 +157,6 @@ public class MessageBroker {
         return true;
     }
 
-
     public static boolean isOfType(Object object, Type type){
         return object.getClass().getTypeName().equals(type.getTypeName());
     }

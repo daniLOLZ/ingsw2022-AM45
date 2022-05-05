@@ -24,8 +24,14 @@ public class ClientMain {
         this.progressiveIdRequest = 0;
     }
 
-    private int increaseRequestId(){
-        return progressiveIdRequest++;
+    /**
+     * Increases idRequest and returns it
+     * @return The increased idRequest
+     */
+    private int increaseAndGetRequestId(){
+
+        progressiveIdRequest++;
+        return progressiveIdRequest;
     }
 
     public static void main(String[] args){
@@ -109,8 +115,7 @@ public class ClientMain {
 
         broker.addToMessage("command", CommandEnum.CONNECTION_REQUEST);
         broker.addToMessage("nickname", nickname);
-        broker.addToMessage("idRequest", increaseRequestId()); //TODO incapsulate idRequest adding to message
-        increaseRequestId();
+        addIdRequest();
         OutputStream outStream;
         InputStream inStream;
         try {
@@ -129,6 +134,21 @@ public class ClientMain {
         return "OK".equals(
                 (String) broker.readField("serverReplyMessage")); // TODO maybe we should have this be less hardcoded?
 
+    }
+
+    /**
+     * Adds the idRequest field to the current outgoing message
+     */
+    private void addIdRequest(){
+        broker.addToMessage("idRequest", increaseAndGetRequestId());
+    }
+
+    /**
+     * Compares the idRequest of the Server reply and returns true if it matches with the current progressiveIdRequest
+     * @return true if the Server reply has the same idRequest as the last request that has been sent
+     */
+    private boolean checkIdRequest(){
+        return progressiveIdRequest == (int) broker.readField("idRequest");
     }
 
     public String getNickname() {
