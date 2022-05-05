@@ -14,7 +14,7 @@ public class SelectionHandler {
     public SelectionHandler(Controller controller){
         this.controller = controller;
         parameter = controller.simpleGame.getParameters();
-        if(controller.gameRule.id > 4){
+        if(GameRule.isAdvanced(controller.gameRule.id)){
             advancedParameter = controller.advancedGame.getAdvancedParameters();
         }
     }

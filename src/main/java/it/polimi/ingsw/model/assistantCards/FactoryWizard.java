@@ -44,4 +44,18 @@ public class FactoryWizard {
             listToReturn.add(getWizard(i));
         return listToReturn;
     }
+
+    /**
+     *
+     * @param id
+     * @return true if idWizard contains id
+     */
+    public static boolean checkCorrectId(int id){
+        for (int j : idWizard) {
+            if (j == id)
+                return true;
+        }
+
+        return false;
+    }
 }

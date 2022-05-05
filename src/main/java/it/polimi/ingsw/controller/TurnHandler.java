@@ -10,13 +10,8 @@ public class TurnHandler {
         this.controller = controller;
         currentTurn = 0;
         playersPlayedInThisTurn = 0;
-        int players = controller.gameRule.id;
-
-        //EXTRACT FROM ID THE NUMBER OF PLAYERS
-        if(players > 10)
-            numPlayers = players / 10;
-        else
-            numPlayers = players;
+        GameRule gameRule = controller.gameRule;
+        numPlayers = GameRule.getNumPlayers(gameRule.id);
     }
 
     /**

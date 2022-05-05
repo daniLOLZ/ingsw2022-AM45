@@ -14,15 +14,33 @@ public enum GameRule {
         this.id = id;
     }
 
-    public static GameRule getRule(int id){
-        switch ( id){
+    public static GameRule getBasicRule(int numPlayers){
+        switch ( numPlayers){
             case 2: return SIMPLE_2;
             case 3: return  SIMPLE_3;
             case 4: return  SIMPLE_4;
+
+        }
+        return NO_RULE;
+    }
+
+    public static GameRule getAdvancedRule(int numPlayers){
+        switch (numPlayers){
             case 20: return ADVANCED_2;
             case 30: return ADVANCED_3;
             case 40: return ADVANCED_4;
         }
-        return NO_RULE;
+        return  NO_RULE;
+    }
+
+    public static int getNumPlayers(int id){
+        int numPlayers = id;
+        if(numPlayers > 4)
+            numPlayers = numPlayers / 10;
+        return  numPlayers;
+    }
+
+    public static boolean isAdvanced(int id){
+        return id > 4;
     }
 }

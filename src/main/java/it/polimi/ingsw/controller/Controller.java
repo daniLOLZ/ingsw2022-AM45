@@ -14,6 +14,8 @@ public class Controller {
     protected CharacterCardHandler characterCardHandler;
     protected AssistantHandler assistantHandler;
     protected BoardHandler boardHandler;
+    protected TurnHandler turnHandler;
+    protected WinnerHandler winnerHandler;
 
     public void createPlayerCreation(){
         playerCreation = new PlayerCreation(this);
@@ -22,7 +24,7 @@ public class Controller {
     public void createSimpleGame(int numPlayers){
         try {
             simpleGame = new SimpleGame(numPlayers);
-            gameRule = GameRule.getRule(numPlayers);
+            gameRule = GameRule.getBasicRule(numPlayers);
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
@@ -36,7 +38,7 @@ public class Controller {
 
         try {
             advancedGame = new AdvancedGame(numPlayers, numCoins, numCharacterCards);
-            gameRule = GameRule.getRule(numPlayers * 10);
+            gameRule = GameRule.getAdvancedRule(numPlayers);
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
