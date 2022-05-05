@@ -140,7 +140,7 @@ public class ClientMain {
      * Adds the idRequest field to the current outgoing message
      */
     private void addIdRequest(){
-        broker.addToMessage("idRequest", increaseAndGetRequestId());
+        broker.addToMessage(NetworkFieldEnum.ID_REQUEST, increaseAndGetRequestId());
     }
 
     /**
@@ -148,7 +148,7 @@ public class ClientMain {
      * @return true if the Server reply has the same idRequest as the last request that has been sent
      */
     private boolean checkIdRequest(){
-        return progressiveIdRequest == (int) broker.readField("idRequest");
+        return progressiveIdRequest == (int) broker.readField(NetworkFieldEnum.ID_REQUEST);
     }
 
     public String getNickname() {
