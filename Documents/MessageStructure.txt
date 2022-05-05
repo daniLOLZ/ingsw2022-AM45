@@ -1,21 +1,19 @@
 - Client message fields -
 // TODO translate
-command 	    : 	CommandEnum			//comando che si vuole che il server esegua
-idGame		    :	int				    //idendificativo della partita
-idPlayer	    :	int				    //identificativo del Player che richiede il comando
-idConnection	:	int				    //idendificativo della connessione tra User e Server
-nickname 	    :	String			    //Nome fornito dall'User per il proprio Player
-gameRule	    :	int				    //Idendificativo tipo partita
-idTowerColor	:	int				    //idendificativo colore Torri
-idWizard	    :	int				    //identificativo mazzo assistenti
-idAssistant	    :	int				    //idenficativo assistente scelto
-idCharacter	    :	int				    //idendificativo carta personaggio scelta
-idCloud		    :	int				    //idendificativo nuvola
-stepsMN		    :	int				    //numore di passi che si vuole faccia MN
-posEntrance	    :	int[]				//posizioni studenti scelti all'entrata
-islands		    :	int[]				//id gruppi di isole scelti
-posOnCard	    :	int[]				//posizioni studenti scelti sulla carta personaggio
-studentColor	:	int[]				//id colori studente scelti
+command 	                : 	CommandEnum			//comando che si vuole che il server esegua
+idUser                    	:	int				    //idendificativo della connessione tra User e Server
+nickname 	                :	String			    //Nome fornito dall'User per il proprio Player
+gameRule            	    :	int				    //Idendificativo tipo partita
+idTowerColor	            :	int				    //idendificativo colore Torri
+idWizard	                :	int				    //identificativo mazzo assistenti
+idAssistant         	    :	int				    //idenficativo assistente scelto
+idCharacter	                :	int				    //idendificativo carta personaggio scelta
+idCloud         		    :	int				    //idendificativo nuvola
+stepsMN		                :	int				    //numore di passi che si vuole faccia MN
+chosenEntrancePositions	    :	int[]				//posizioni studenti scelti all'entrata
+chosenIslands		        :	int[]				//id gruppi di isole scelti
+chosenCardPositions 	    :	int[]				//posizioni studenti scelti sulla carta personaggio
+chosenStudentColors	        :	int[]				//id colori studente scelti
 numPlayers	    :	int				    // numero di giocatori per questa partita
 
 - Server message fields -
@@ -27,10 +25,10 @@ serverReplyStatus   :   int             // 0 for successful operation or acknowl
                                         // 1 for generic error
                                         // TODO standardise these values (maybe with an enum)
 
-idGame			    :	int
-idPlayer		    :	int
-idConnection		:	int
+
+idUser      		:	int
 errorState		    :	String			// Error Message
+{
 turn			    :	int				// Turn number
 posMN			    :	int				// Position (id of the island group) of mother nature
 numTowers		    :	int[]				// Number of towers for each player in order of ???
@@ -41,6 +39,7 @@ idsIslandGroup		:	int[]				// Ids of the island groups
 islandInGroup		:	int[int[]]			// Correlates each island group (id) with the islands it contains
 studOnIsland		:	int[int[]]			// Correlates each island group (id) with the students it contains
 professors		    :	int[]				// List of player ids owning the relative professor (ordered)
+} // Almeno queste dovrebbero rientrare nei bean
 idsCharacter		:	int[]				// Available character cards
 coinRequired		:	int				//Requirements. Coins required to activate a character card
 entranceRequired	:	int				//REQUISITI. Number of students at the board entrance that the card requires choosing

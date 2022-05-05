@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.controller.GameRule;
 import it.polimi.ingsw.network.connectionState.Authentication;
 import it.polimi.ingsw.network.connectionState.ConnectionState;
 import it.polimi.ingsw.network.connectionState.LookingForLobby;
@@ -44,7 +45,7 @@ public class ClientHandler implements Runnable{
             if(!broker.receive(clientInput)){ // Received an invalid message
                 continue;
             }
-            CommandEnum command = CommandEnum.valueOf((String)broker.readField("command"));
+            CommandEnum command = CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND));
 
             if(!connectionState.isAllowed(command)){ // Trashes a command given at the wrong time
                 continue;
@@ -61,8 +62,8 @@ public class ClientHandler implements Runnable{
      * Adds the reply fields in the server message in case of a successful operation (Message and status)
      */
     private void notifySuccessfulOperation(){
-        broker.addToMessage("serverReplyMessage", "OK");
-        broker.addToMessage("serverReplyStatus", 0);
+        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "OK");
+        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 0);
     }
 
     /**
@@ -70,9 +71,9 @@ public class ClientHandler implements Runnable{
      * @param errorMessage A verbose message describing the error
      */
     private void notifyError(String errorMessage){ // parametrize reply status as well
-        broker.addToMessage("serverReplyMessage", "ERR");
-        broker.addToMessage("serverReplyStatus", 1);
-        broker.addToMessage("errorState", errorMessage);
+        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
+        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
+        broker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
     }
 
     /**
@@ -94,7 +95,9 @@ public class ClientHandler implements Runnable{
      * The user requests to play a game with the given rules
      */
     private void playGame() {
-
+        ActiveLobbies.assignLobby(GameRule.fromObjectToEnum(
+                        (String)broker.readField(NetworkFieldEnum.GAME_RULE)
+                        ));
     }
 
     /**
@@ -123,6 +126,7 @@ public class ClientHandler implements Runnable{
      */
     public void quitGame(){
         //TODO
+
     }
 
     /**
@@ -131,7 +135,7 @@ public class ClientHandler implements Runnable{
      */
     public void connectionRequest(){
         boolean loginSuccessful;
-        loginSuccessful= LoginHandler.login((String)broker.readField("nickname"), idUser);
+        loginSuccessful= LoginHandler.login((String)broker.readField(NetworkFieldEnum.NICKNAME), idUser);
         if(!loginSuccessful){
             notifyError("Nickname already taken");
             quitGame();

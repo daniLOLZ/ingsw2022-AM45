@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.model;
 import it.polimi.ingsw.controller.AssistantHandler;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.model.assistantCards.Assistant;

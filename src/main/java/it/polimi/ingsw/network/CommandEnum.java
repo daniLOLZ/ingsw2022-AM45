@@ -28,6 +28,7 @@ public enum CommandEnum {
     SELECT_ISLAND_GROUP("Select Island Group",          new String[] {"idUser", "idRequest", "idIslandGroup"}),
     SELECT_STUDENT_ON_CARD("Select Student on Card",    new String[] {"idUser", "idRequest", "onCardSelected"}),
     PLAY_CHARACTER("Play Character",                    new String[] {"idUser", "idRequest", "characterCardPos"});
+    //TODO add commands to exchange game information (beans)
 
     public final String command;
     public final String[] allowedFields;
@@ -37,5 +38,8 @@ public enum CommandEnum {
         this.allowedFields = allowedFields;
     }
 
+    public static CommandEnum fromObjectToEnum (Object command){
+        return CommandEnum.valueOf((String)command);
+    }
 }
 

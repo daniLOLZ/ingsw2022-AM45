@@ -6,22 +6,21 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 
-import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MessageBroker {
 
     private final Gson gson;
-    private static final Type mapType = new TypeToken<Map<String, Object>>() {}.getType(); //Map<String, Object> is a generic Type. It needs to be specified
-                                                                                           //when using gson functions toJson and fromJson
+    private static final Type mapType = new TypeToken<Map<NetworkFieldEnum, Object>>() {}.getType();    //Map<NetworkFieldEnum, Object> is a generic Type. It needs to be specified
+                                                                                                        //when using gson functions toJson and fromJson
+    private final String connectionResetString = "Connection Reset";
 
-    private Map<String, Object> outgoingMessage, incomingMessage;
+    private Map<NetworkFieldEnum, Object> outgoingMessage, incomingMessage;
 
     public MessageBroker(){
         gson = new Gson();
@@ -29,11 +28,11 @@ public class MessageBroker {
         inFlush();
     }
 
-    private String serialise(Map<String, Object> map){
+    private String serialise(Map<NetworkFieldEnum, Object> map){
         return gson.toJson(map, mapType);
     }
 
-    private Map<String, Object> deserialize(String JSONString){
+    private Map<NetworkFieldEnum, Object> deserialize(String JSONString){
         return gson.fromJson(JSONString, mapType);
     }
 
@@ -42,12 +41,12 @@ public class MessageBroker {
      * @param fieldName The name used to identify the object
      * @param messageObject The object to be sent
      */
-    public void addToMessage(String fieldName, Object messageObject){
+    public void addToMessage(NetworkFieldEnum fieldName, Object messageObject){
 
         outgoingMessage.put(fieldName, messageObject);
     }
 
-    public Object readField(String fieldName){
+    public Object readField(NetworkFieldEnum fieldName){
         Object fieldValue = incomingMessage.get(fieldName);
         return fieldValue;
     }
@@ -68,7 +67,7 @@ public class MessageBroker {
 
         String sendable = serialise(outgoingMessage);
 
-        System.out.println("sending" + sendable + " to " + "???");
+        // System.out.println("sending" + sendable + " to " + "???"); // Either we get the ip via the socket or we don't log this line
 
         try {
             destinationOutput.write(sendable.getBytes(StandardCharsets.UTF_8));
@@ -108,6 +107,7 @@ public class MessageBroker {
         } catch (SocketException e) {
             System.err.println("Socket error, couldn't read the message");
             System.err.println(e.getMessage());
+            //TODO handle user disconnection by passing it to ClientHandler somehow
             e.printStackTrace();
             return false;
         } catch (IOException e) {
@@ -131,19 +131,19 @@ public class MessageBroker {
 
         Object object;
         // For each field, check whether it can be cast and return false if an exception is raised
-        List<String> keyArray = new ArrayList<>(incomingMessage.keySet());
-        for(String field : keyArray){
+        List<NetworkFieldEnum> keyArray = new ArrayList<>(incomingMessage.keySet());
+        for(NetworkFieldEnum field : keyArray){
             object = incomingMessage.get(field);
 
             switch (field){
-                case "idUser" : {
+                case ID_USER : {
                     try{
                         int primitiveInt = (int) object;
                     } catch(ClassCastException e) {
                         return false;
                     }
                 }
-                case "nickname" : {
+                case NICKNAME : {
                     try{
                         String string = (String) object;
                     } catch(ClassCastException e) {

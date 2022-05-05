@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Cloud;
 import it.polimi.ingsw.model.StudentEnum;
