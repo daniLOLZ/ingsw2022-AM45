@@ -1,9 +1,6 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.network.CommandEnum;
-
-//TODO change name to GameRuleEnum
-public enum GameRule {
+public enum GameRuleEnum {
     NO_RULE(0),
     SIMPLE_2(2),
     SIMPLE_3(3),
@@ -13,11 +10,11 @@ public enum GameRule {
     ADVANCED_4(40);
 
     public final int id;
-    GameRule(int id){
+    GameRuleEnum(int id){
         this.id = id;
     }
 
-    public static GameRule getBasicRule(int numPlayers){
+    public static GameRuleEnum getBasicRule(int numPlayers){
         switch ( numPlayers){
             case 2: return SIMPLE_2;
             case 3: return  SIMPLE_3;
@@ -27,7 +24,7 @@ public enum GameRule {
         return NO_RULE;
     }
 
-    public static GameRule getAdvancedRule(int numPlayers){
+    public static GameRuleEnum getAdvancedRule(int numPlayers){
         switch (numPlayers){
             case 20: return ADVANCED_2;
             case 30: return ADVANCED_3;
@@ -51,8 +48,8 @@ public enum GameRule {
         return id > 4;
     }
 
-    public static GameRule fromObjectToEnum (Object rule){
-        return GameRule.valueOf((String)rule);
+    public static GameRuleEnum fromObjectToEnum (Object rule){
+        return GameRuleEnum.valueOf((String)rule);
     }
 
 }

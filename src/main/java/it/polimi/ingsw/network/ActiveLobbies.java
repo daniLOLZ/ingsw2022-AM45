@@ -1,5 +1,5 @@
 package it.polimi.ingsw.network;
-import it.polimi.ingsw.controller.GameRule;
+import it.polimi.ingsw.controller.GameRuleEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class ActiveLobbies {
      * @param rules The rules of the wanted lobby
      * @return A lobby with the specified game rules
      */
-    public static Lobby assignLobby(GameRule rules){
+    public static Lobby assignLobby(GameRuleEnum rules){
 
         Lobby lobby = searchGame(rules);
 
@@ -33,7 +33,7 @@ public class ActiveLobbies {
      * @param rules The rules of the wanted lobby
      * @return The joinable lobby or null if there's none
      */
-    private static Lobby searchGame(GameRule rules){
+    private static Lobby searchGame(GameRuleEnum rules){
 
         for (Lobby lobby:
              lobbies) {
@@ -48,7 +48,7 @@ public class ActiveLobbies {
      * @param rules The game rules of the lobby
      * @return An empty lobby with the desired gamerules
      */
-    private static Lobby createLobby(GameRule rules){
+    private static Lobby createLobby(GameRuleEnum rules){
 
         Lobby lobby = new Lobby(rules);
 

@@ -7,7 +7,7 @@ import java.util.List;
 public class FactoryWizard {
 
     public static final int numOfCardsPerWizard = 10;
-    public static final int idWizard[] = {0,10,20,30};
+    public static final int[] idWizard = {0,10,20,30};
 
     /**
      * create and return Wizard's deck corresponding with chosen id
@@ -20,10 +20,11 @@ public class FactoryWizard {
      * return Wizard with id == 0 otherwise
      */
     public static Wizard getWizard(int wizard)  {
+        final int defaultWizard = idWizard[0];
 
         final int wizardToMatch = wizard;
         if(Arrays.stream(idWizard).noneMatch(id -> id == wizardToMatch))
-            wizard = 0;
+            wizard = defaultWizard;
 
         List<Assistant> assistants = new ArrayList<>();
 
@@ -47,7 +48,7 @@ public class FactoryWizard {
 
     /**
      *
-     * @param id
+     * @param id  > 0
      * @return true if idWizard contains id
      */
     public static boolean checkCorrectId(int id){

@@ -12,13 +12,13 @@ import it.polimi.ingsw.model.islands.IslandGroup;
 import java.util.List;
 
 public class Player {
-    private PlayerEnum playerId;
-    private String nickname;
-    private Assistant assistantPlayed;
-    private TeamEnum teamColor;
-    private boolean leader;
-    private Board board;
-    private Wizard wizard;
+    protected PlayerEnum playerId;
+    protected String nickname;
+    protected Assistant assistantPlayed;
+    protected TeamEnum teamColor;
+    protected boolean leader;
+    protected Board board;
+    protected Wizard wizard;
 
     /**
      * Basic Player constructor
@@ -53,8 +53,13 @@ public class Player {
         this.nickname = nickname;
         this.teamColor = teamColor;
         this.leader = leader;
-        this.board = new Board(teamColor, parameters);
+        this.board = createBoard(teamColor, parameters);
         this.wizard = wizard;
+    }
+
+
+    protected Board createBoard(TeamEnum teamColor, ParameterHandler parameters){
+        return new Board(teamColor, parameters);
     }
 
 
@@ -154,9 +159,10 @@ public class Player {
     /**
      * Move the student  from position parameter.selectedEntranceStudents
      * to Hall
+     * @return the moved student's color
      */
-    public void moveFromEntranceToHall(){
-        board.moveFromEntranceToHall();
+    public StudentEnum moveFromEntranceToHall(){
+        return board.moveFromEntranceToHall();
     }
 
     /**
@@ -165,6 +171,24 @@ public class Player {
      */
     public void moveFromEntranceToIsland(IslandGroup island){
         board.moveFromEntranceToIsland(island);
+    }
+
+    /**
+     *
+     * @param tableColor != NO_STUDENT && != null
+     * @return the num of student at table with chosen color
+     */
+    public int getNumStudentAtTable(StudentEnum tableColor){
+        return board.getStudentsAtTable(tableColor);
+    }
+
+    /**
+     *
+     * @param position > 0
+     * @return the student in chosen position at Entrance
+     */
+    public StudentEnum getStudentFromEntrance(int position){
+        return board.getAtEntrance(position);
     }
 
 

@@ -1,10 +1,8 @@
 package it.polimi.ingsw.network;
 
-import it.polimi.ingsw.controller.GameRule;
-import it.polimi.ingsw.controller.GameRule;
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.network.connectionState.Authentication;
 import it.polimi.ingsw.network.connectionState.ConnectionState;
-import it.polimi.ingsw.network.connectionState.InLobby;
 import it.polimi.ingsw.network.connectionState.InLobby;
 import it.polimi.ingsw.network.connectionState.LookingForLobby;
 
@@ -123,7 +121,7 @@ public class ClientHandler implements Runnable{
      */
     private void playGame() {
 
-        GameRule rules = GameRule.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
+        GameRuleEnum rules = GameRuleEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
 
         userLobby = ActiveLobbies.assignLobby(rules);
         userLobby.addPlayer(this.idUser);

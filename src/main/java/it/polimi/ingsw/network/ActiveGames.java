@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.Controller;
-import it.polimi.ingsw.controller.GameRule;
+import it.polimi.ingsw.controller.GameRuleEnum;
 
 import java.util.List;
 
@@ -16,12 +16,12 @@ public class ActiveGames {
     public static void createGame(Lobby lobby){
         Controller controller = new Controller();
         //todo
-        GameRule rule = lobby.getGameType();
-        int playerNumber = GameRule.getNumPlayers(rule.id);
-        if(GameRule.isSimple(rule.id)){
+        GameRuleEnum rule = lobby.getGameType();
+        int playerNumber = GameRuleEnum.getNumPlayers(rule.id);
+        if(GameRuleEnum.isSimple(rule.id)){
             controller.createSimpleGame(playerNumber);
         }
-        else if(GameRule.isAdvanced(rule.id)){
+        else if(GameRuleEnum.isAdvanced(rule.id)){
             controller.createAdvancedGame(playerNumber);
         }
         // todo ancora
