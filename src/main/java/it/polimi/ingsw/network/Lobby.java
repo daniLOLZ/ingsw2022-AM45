@@ -65,8 +65,11 @@ public class Lobby {
             Integer integer = idUser;
             players.remove(integer);
             playersReady.remove(integer);
+            emptySeats++;
             assignHost();
         }
+
+        if (players.size() == 0) destroyLobby();
     }
 
     /**
@@ -76,13 +79,17 @@ public class Lobby {
      */
     public synchronized void addPlayer(int idUser){
 
+        if (emptySeats == 0) return;
+
         players.add(idUser);
+
+        emptySeats--;
 
         assignHost();
     }
 
     /**
-     *
+     * Promotes a player as the host if the actual one left or has not been assigned yet
      */
     private void assignHost(){
 
@@ -91,5 +98,14 @@ public class Lobby {
         if (!players.contains(host)) host = null;
 
         if (host == null) host = players.get(0);
+    }
+
+
+    /**
+     * Removes the lobby from the global active lobbies' list
+     */
+    public void destroyLobby(){
+
+        ActiveLobbies.removeLobby(this);
     }
 }

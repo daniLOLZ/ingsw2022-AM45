@@ -61,7 +61,7 @@ public class ActiveLobbies {
      * Removes a lobby from the list of active lobbies
      * @param lobby The lobby to be removed
      */
-    private static void removeLobby(Lobby lobby){
+    public static void removeLobby(Lobby lobby){
         lobbies.remove(lobby);
     }
 
