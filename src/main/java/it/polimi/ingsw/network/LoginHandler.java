@@ -10,7 +10,6 @@ public class LoginHandler {
     private static Map<Integer, String> idUserToNickname = new HashMap<>();
 
     private static boolean checkIfNicknamePresent(String nickname){
-
         return idUserToNickname.containsValue(nickname);
     }
 
