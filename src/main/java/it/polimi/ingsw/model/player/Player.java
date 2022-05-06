@@ -5,15 +5,20 @@ import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import it.polimi.ingsw.model.assistantCards.NoSuchAssistantException;
 import it.polimi.ingsw.model.assistantCards.Wizard;
+import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.IslandGroup;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Player {
     protected PlayerEnum playerId;
     protected String nickname;
+    protected ParameterHandler parameters;
     protected Assistant assistantPlayed;
     protected TeamEnum teamColor;
     protected boolean leader;
@@ -32,6 +37,7 @@ public class Player {
         this.nickname = nickname;
         this.teamColor = teamColor;
         this.leader = leader;
+        this.parameters = parameters;
         this.board = new Board(teamColor, parameters);
         //TODO make the player choose which wizard they want to pick
 
@@ -189,6 +195,38 @@ public class Player {
      */
     public StudentEnum getStudentFromEntrance(int position){
         return board.getAtEntrance(position);
+    }
+
+    /**
+     * select a student at Entrance
+     * @param position >= 0
+     */
+    public void selectStudentAtEntrance(int position){
+        board.setSelectedEntranceStudentPos(position);
+    }
+
+    /**
+     *
+     * @return a bean of player
+     */
+    public GameElementBean toBean(){
+        int numTowers =getNumTowers();                                      //Get remaining towers
+        List<StudentEnum> studAtEntrance = board.getStudentsAtEntrance();   //Get students at entrance
+        List<Integer> studPerTable = new ArrayList<>();
+        List<StudentEnum> professors;
+        List<Integer> idAssistants = wizard.getRemainedAssistants();        //Get assistant cards id
+        for(StudentEnum color: StudentEnum.values()){                       //Get students per table
+            if(color != StudentEnum.NOSTUDENT)
+                studPerTable.add(board.getStudentsAtTable(color));
+        }
+
+        professors = parameters.getProfessorsByPlayer(playerId);            //Get professors
+
+
+
+        PlayerBean bean = new PlayerBean(nickname, playerId, leader, teamColor, numTowers,
+                studAtEntrance,studPerTable,professors, idAssistants);
+        return bean;
     }
 
 

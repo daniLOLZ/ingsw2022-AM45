@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.islands;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
@@ -286,7 +288,7 @@ public class IslandGroup {
     }
 
     /**
-     *  returns the amount of students of a given color on this IslandGroup
+     * returns the amount of students of a given color on this IslandGroup
      * @param color the color of the student to count
      * @return the amount of students of type color
      */
@@ -294,5 +296,19 @@ public class IslandGroup {
         return (int) students.stream()
                 .filter(x -> x.equals(color))
                 .count();
+    }
+
+    public GameElementBean toBean(){
+        int idIslandGroup = idGroup;
+        List<Integer> idIsland = new ArrayList<>();
+        List<StudentEnum> studentsOnIsland = students;
+        boolean isPresentMN = parameters.getIdIslandGroupMN() == idIslandGroup;
+        TeamEnum tower = towerColor;
+        for(Island island: islands)
+            idIsland.add(island.getId());
+
+
+        IslandGroupBean bean = new IslandGroupBean(idIslandGroup, idIsland, studentsOnIsland, isPresentMN, tower);
+        return bean;
     }
 }

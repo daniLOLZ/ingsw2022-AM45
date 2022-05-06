@@ -42,7 +42,7 @@ public class BoardHandler {
      */
     public void moveFromEntranceToHall(int position){
         getCurrentPlayer();
-        controller.simpleGame.selectEntranceStudent(position);
+        controller.simpleGame.selectStudentAtEntrance(currentPlayer,position);
         controller.simpleGame.moveFromEntranceToHall(currentPlayer);
     }
 
@@ -58,7 +58,7 @@ public class BoardHandler {
             controller.simpleGame.getParameters().setErrorState("WRONG ID ISLAND-GROUP");
             return;
         }
-        controller.simpleGame.selectEntranceStudent(position);
+        controller.simpleGame.selectStudentAtEntrance(currentPlayer, position);
         controller.simpleGame.moveFromEntranceToIsland(currentPlayer, idIslandGroup);
     }
 

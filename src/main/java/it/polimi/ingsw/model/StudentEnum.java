@@ -43,4 +43,21 @@ public enum StudentEnum {
                 .filter( x -> !x.equals(NOSTUDENT))
                 .collect(Collectors.toList());
     }
+
+    /**
+     *
+     * @param id >= 0
+     * @return Student enum with chosen id. No STUDENT if id is not correct
+     *
+     */
+    public static StudentEnum getColorById(int id){
+        return switch (id) {
+            case 0 -> GREEN;
+            case 1 -> RED;
+            case 2 -> YELLOW;
+            case 3 -> PINK;
+            case 4 -> BLUE;
+            default -> NOSTUDENT;
+        };
+    }
 }

@@ -24,6 +24,7 @@ public class AdvancedBoardHandler extends BoardHandler{
     @Override
     public void moveFromEntranceToHall(int position) {
         getCurrentPlayer();
+        controller.advancedGame.selectStudentAtEntrance(currentPlayer, position);
         controller.advancedGame.moveFromEntranceToHall(currentPlayer);
     }
 }

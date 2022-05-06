@@ -407,6 +407,16 @@ public class SimpleGame {
     }
 
     /**
+     * select a student in player's Entrance
+     * @param player != null
+     * @param position >= 0
+     */
+    public void selectStudentAtEntrance(Player player, int position){
+        player.selectStudentAtEntrance(position);
+        selectEntranceStudent(position);
+    }
+
+    /**
      * Move the student  from position parameter.selectedEntranceStudents
      * to islandGroup with chosen idIslandGroup
      * @param player != null
@@ -430,6 +440,7 @@ public class SimpleGame {
     }
 
     public void selectEntranceStudent(int position){
+
 
         if(parameters.getSelectedEntranceStudents().isEmpty()){
             List<Integer> positionList = new ArrayList<>();
@@ -499,6 +510,16 @@ public class SimpleGame {
 
         }
         return maxPlayer;
+    }
+
+    /**
+     * move Mother Nature across island groups.
+     * Update the currentPositionMN in parameters.
+     * @param steps >= 0
+     */
+    public void moveMN(int steps){
+        IslandGroup positionMN = MN.move(steps);
+        parameters.setIdIslandGroupMN(positionMN.getIdGroup());
     }
 
 }
