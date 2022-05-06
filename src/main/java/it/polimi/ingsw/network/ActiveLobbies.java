@@ -70,7 +70,7 @@ public class ActiveLobbies {
      * @param lobby The lobby in which all players all ready and want to start playing
      * @return true if the game started correctly. false instead
      */
-    private static boolean startGame(Lobby lobby){
+    public static boolean startGame(Lobby lobby){
 
         if (lobbies.contains(lobby)) return true; //TODO create everything
         //todo check if all players ready
