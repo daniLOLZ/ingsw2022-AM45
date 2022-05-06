@@ -8,6 +8,7 @@ public class FactoryWizard {
 
     public static final int numOfCardsPerWizard = 10;
     public static final int idWizard[] = {0,10,20,30};
+    private static final int defaultWizard = idWizard[0];
 
     /**
      * create and return Wizard's deck corresponding with chosen id
@@ -23,7 +24,7 @@ public class FactoryWizard {
 
         final int wizardToMatch = wizard;
         if(Arrays.stream(idWizard).noneMatch(id -> id == wizardToMatch))
-            wizard = 0;
+            wizard = defaultWizard;
 
         List<Assistant> assistants = new ArrayList<>();
 
