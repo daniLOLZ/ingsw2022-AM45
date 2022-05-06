@@ -108,4 +108,13 @@ public class Lobby {
 
         ActiveLobbies.removeLobby(this);
     }
+
+    /**
+     *
+     * @return the host of this lobby
+     */
+    public Integer getHost() {
+        return host;
+    }
+
 }

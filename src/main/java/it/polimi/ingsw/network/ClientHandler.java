@@ -93,7 +93,28 @@ public class ClientHandler implements Runnable{
             case READY_TO_START -> sendReady();
             case NOT_READY -> sendNotReady();
             case LEAVE_LOBBY -> requestLeaveLobby();
+            case START_GAME -> startGame();
+            case SELECT_WIZARD -> selectWizard();
+
             //TODO rest of commands
+        }
+    }
+
+    private void selectWizard() {
+
+    }
+
+    /**
+     * The users requests to start the game
+     * The request will be successful only if the host coincides with the user and all players are ready
+     */
+    private void startGame() {
+        if(this.idUser != userLobby.getHost()){
+            notifyError("You're not the host! You can't start the game.");
+        }
+        else {
+            ActiveLobbies.startGame(userLobby);
+            notifySuccessfulOperation();
         }
     }
 
@@ -105,6 +126,7 @@ public class ClientHandler implements Runnable{
         GameRule rules = GameRule.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
 
         userLobby = ActiveLobbies.assignLobby(rules);
+        userLobby.addPlayer(this.idUser);
         setConnectionState(new InLobby());
         notifySuccessfulOperation();
     }
@@ -113,29 +135,33 @@ public class ClientHandler implements Runnable{
      * The user requests to leave the current lobby
      */
     private void requestLeaveLobby() {
-
+        userLobby.removePlayer(this.idUser);
+        userLobby = null;
+        setConnectionState(new LookingForLobby());
+        notifySuccessfulOperation();
     }
 
     /**
      * Sends a message to the server letting it know the user is not ready to start the game
      */
     private void sendNotReady() {
-        // TODO
+        userLobby.removeReady(this.idUser);
+        notifySuccessfulOperation(); // other checks to do?
     }
 
     /**
      * Sends a message to the server letting it know the user is ready to start the game
      */
     private void sendReady() {
-        // TODO
+        userLobby.addReady(this.idUser);
+        notifySuccessfulOperation(); // other checks to do?
     }
 
     /**
      * Closes the connection for this user
      */
     public void quitGame(){
-        //TODO
-
+        //TODO later, when all cases have been accounted for
     }
 
     /**

@@ -21,6 +21,10 @@ public class Controller {
         playerCreation = new PlayerCreation(this);
     }
 
+    public Controller(){
+        //TODO
+    }
+
     public void createSimpleGame(int numPlayers){
         try {
             simpleGame = new SimpleGame(numPlayers);

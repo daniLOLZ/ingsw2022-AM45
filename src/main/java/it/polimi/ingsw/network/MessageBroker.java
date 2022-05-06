@@ -96,7 +96,8 @@ public class MessageBroker {
                 rawReadInt = sourceInput.read();
                 rawChar = (char) rawReadInt;
 
-                // Signals the end of the message based on the amount of curly bracket pairs
+                //TODO this will break in case some user sends a curly bracket
+                //Signals the end of the message based on the amount of curly bracket pairs
                 if (rawChar == '{') numberOfOpenCurlyBrackets++;
                 else if (rawChar == '}') numberOfOpenCurlyBrackets--;
                 if (numberOfOpenCurlyBrackets == 0) {

@@ -43,6 +43,10 @@ public enum GameRule {
         return  numPlayers;
     }
 
+    public static boolean isSimple(int id){
+        return id <= 4;
+    }
+
     public static boolean isAdvanced(int id){
         return id > 4;
     }
