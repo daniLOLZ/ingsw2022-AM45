@@ -61,7 +61,6 @@ public class FactoryPlayer {
 
     }
     // stub function
-    //TODO handle nicknames and assignment of player to team to make a proper player creation
     public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters) {
         List<Player> playerList = new ArrayList<>();
 

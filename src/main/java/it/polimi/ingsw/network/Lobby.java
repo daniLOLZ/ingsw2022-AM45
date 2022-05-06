@@ -53,6 +53,7 @@ public class Lobby {
             playersReady.remove(integer);
             assignHost();
         }
+        //todo maybe delete lobby when players reach 0
     }
 
     public synchronized void addPlayer(int idUser){
@@ -72,4 +73,13 @@ public class Lobby {
 
         else host = players.get(0);
     }
+
+    /**
+     *
+     * @return the host of this lobby
+     */
+    public Integer getHost() {
+        return host;
+    }
+
 }

@@ -44,9 +44,11 @@ public class ActiveLobbies {
         lobbies.remove(lobby);
     }
 
-    private static boolean startGame(Lobby lobby){
+    public static boolean startGame(Lobby lobby){
+
 
         if (lobbies.contains(lobby)) return true; //TODO create everything
+        //todo check if all players ready
         return false;
     }
 }
