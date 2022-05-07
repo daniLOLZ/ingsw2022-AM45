@@ -117,4 +117,11 @@ public class Lobby {
         return host;
     }
 
+    /**
+     * Returns the list of the current players' user IDs
+     * @return the idUser of this lobby's players
+     */
+    public List<Integer> getPlayers(){
+        return this.players;
+    }
 }

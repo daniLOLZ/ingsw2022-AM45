@@ -9,4 +9,8 @@ public enum PhaseEnum {
      PhaseEnum(int id){
         this.id = id;
     }
+
+    public static PhaseEnum fromObjectToEnum(Object field) {
+        return PhaseEnum.valueOf((String)field);
+    }
 }

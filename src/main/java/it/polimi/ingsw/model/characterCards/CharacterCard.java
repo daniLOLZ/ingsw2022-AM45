@@ -49,7 +49,7 @@ public abstract class CharacterCard {
      * Set HasBeenUsed true
      * Activate the effect of the card using parameters in parameterHandlers
      */
-    public  void activateEffect(){
+    public void activateEffect(){
         if(!HasBeenUsed()){
             hasBeenUsed = true;
             cardCost += 1;
