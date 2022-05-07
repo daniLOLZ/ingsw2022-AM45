@@ -17,7 +17,7 @@ public class PlayerCreation {
         teamColor = new ArrayList<>();
         nicknames = new ArrayList<>();
         wizards = new ArrayList<>();
-        int numPlayers = GameRule.getNumPlayers(controller.gameRule.id);
+        int numPlayers = GameRuleEnum.getNumPlayers(controller.gameRule.id);
 
         //IN THIS WAY THE LISTS ARE INITIALIZED
         for(int user=0; user < numPlayers; user++ ){
@@ -51,11 +51,11 @@ public class PlayerCreation {
      * @return true if team is correctly set.
      */
     public synchronized boolean setTeamColor(final TeamEnum team, int user){
-        GameRule rule = controller.gameRule;
+        GameRuleEnum rule = controller.gameRule;
         final int numPlayersForTeam = 4;
         final int numPlayersForGrey = 3;
-        int numPlayers = GameRule.getNumPlayers(rule.id);
-        boolean isAdvancedGame = GameRule.isAdvanced(rule.id);
+        int numPlayers = GameRuleEnum.getNumPlayers(rule.id);
+        boolean isAdvancedGame = GameRuleEnum.isAdvanced(rule.id);
 
         //GAME WITHOUT 2 PLAYERS TEAMS, ALL TEAM COLORS ARE DIFFERENT
         if( numPlayers != numPlayersForTeam)
@@ -126,7 +126,7 @@ public class PlayerCreation {
      * Nickname, team color and wizard id.
      */
     public synchronized boolean allSet(){
-        int numPlayers = GameRule.getNumPlayers(controller.gameRule.id);
+        int numPlayers = GameRuleEnum.getNumPlayers(controller.gameRule.id);
 
         for(int user=0; user < numPlayers; user++){
 

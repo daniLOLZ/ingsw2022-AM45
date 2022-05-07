@@ -163,9 +163,6 @@ public class SimpleGame {
         this.parameters.getProfessors().set(professor.index, player);
     }
 
-
-    //LUXRAY: Sicuro che non dovrebbe farlo il Controller?
-    //Intendo dire, il Controller fa l'operazione e poi passa la lista ordinata al model.
     /**
      * Sorts the players based on the assistant they played in the planning phase
      * Accounts for the possibility of players playing the same valued assistants in the same turn
@@ -400,11 +397,23 @@ public class SimpleGame {
     /**
      * In the player's board:
      * move the student  from position parameter.selectedEntranceStudents
-     * into the correct Hall's table
+     * into the correct Hall's table.
+     * Call updateProfessor
      * @param player != null
      */
     public void moveFromEntranceToHall(Player player){
-        player.moveFromEntranceToHall();
+        StudentEnum studentColor = player.moveFromEntranceToHall();
+        updateProfessor(studentColor);
+    }
+
+    /**
+     * select a student in player's Entrance
+     * @param player != null
+     * @param position >= 0
+     */
+    public void selectStudentAtEntrance(Player player, int position){
+        player.selectStudentAtEntrance(position);
+        selectEntranceStudent(position);
     }
 
     /**
@@ -431,6 +440,7 @@ public class SimpleGame {
     }
 
     public void selectEntranceStudent(int position){
+
 
         if(parameters.getSelectedEntranceStudents().isEmpty()){
             List<Integer> positionList = new ArrayList<>();
@@ -475,6 +485,41 @@ public class SimpleGame {
      */
     public int getIdIslandMN(){
         return MN.getPosition().getIdGroup();
+    }
+
+    /**
+     *
+     * @param studentColor != NO_STUDENT && != null
+     * @return the player's PlayerEnum with more students with chosen studentColor
+     */
+    public PlayerEnum playerWithMoreStudent(StudentEnum studentColor){
+        int max = 0;
+        int curr = 0;
+        PlayerEnum maxPlayer = PlayerEnum.NOPLAYER;
+
+        for(Player player: players){
+            curr = player.getNumStudentAtTable(studentColor);
+            if(curr > max){
+                max = curr;
+                maxPlayer = player.getPlayerId();
+            }
+
+            if(curr == max){
+                maxPlayer = PlayerEnum.NOPLAYER;
+            }
+
+        }
+        return maxPlayer;
+    }
+
+    /**
+     * move Mother Nature across island groups.
+     * Update the currentPositionMN in parameters.
+     * @param steps >= 0
+     */
+    public void moveMN(int steps){
+        IslandGroup positionMN = MN.move(steps);
+        parameters.setIdIslandGroupMN(positionMN.getIdGroup());
     }
 
 }

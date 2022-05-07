@@ -10,8 +10,8 @@ public class TurnHandler {
         this.controller = controller;
         currentTurn = 0;
         playersPlayedInThisTurn = 0;
-        GameRule gameRule = controller.gameRule;
-        numPlayers = GameRule.getNumPlayers(gameRule.id);
+        GameRuleEnum gameRule = controller.gameRule;
+        numPlayers = GameRuleEnum.getNumPlayers(gameRule.id);
     }
 
     /**

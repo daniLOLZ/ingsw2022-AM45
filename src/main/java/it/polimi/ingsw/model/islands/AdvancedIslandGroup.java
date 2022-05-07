@@ -70,13 +70,23 @@ public class AdvancedIslandGroup extends IslandGroup {
         }
         return advancedIslands;
     }
+
+    /**
+     * Merges this islandGroup with the neighboring islands and updates the IslandGroup collection in game
+     * @param newId the id to assign the newly formed group
+     * @param islandGroups the islandGroup list that the new island will need to check for possible mergings
+     * @return the new islandGroup created by the merging
+     * @throws UnmergeableException The island group can't be merged with any neighbors
+     */
     @Override
-    public void mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
+    public IslandGroup mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
+        //todo move to controller
         //Checks if the island has a tower built on top of it
         if(getTowerColor().equals(TeamEnum.NOTEAM)){
             throw new UnmergeableException();
         }
 
+        //todo move to controller
         //Checking if it can merge with any island at all
         if(!getTowerColor().equals(getNextIslandGroup().getTowerColor()) && !getTowerColor().equals(getPrevIslandGroup().getTowerColor())){
             throw new UnmergeableException();
@@ -121,6 +131,8 @@ public class AdvancedIslandGroup extends IslandGroup {
         AdvancedIslandGroup mergedGroup = new AdvancedIslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, getTowerColor(), mergedBlocks, getParameters(), advancedParameters);
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
+
+        return mergedGroup;
     }
 
     /**

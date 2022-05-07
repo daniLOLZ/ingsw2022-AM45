@@ -1,19 +1,19 @@
 package it.polimi.ingsw.network;
 
-import it.polimi.ingsw.controller.GameRule;
+import it.polimi.ingsw.controller.GameRuleEnum;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Lobby {
 
-    private final GameRule gameType;
+    private final GameRuleEnum gameType;
     private List<Integer> playersReady; //identified by idUser
     private List<Integer> players;
     private int emptySeats;
     private Integer host;
 
-    public Lobby(GameRule gameType){
+    public Lobby(GameRuleEnum gameType){
 
         this.gameType = gameType;
         players = new ArrayList<>();
@@ -49,7 +49,7 @@ public class Lobby {
         playersReady.remove(integer);
     }
 
-    public GameRule getGameType(){
+    public GameRuleEnum getGameType(){
         return gameType;
     }
 

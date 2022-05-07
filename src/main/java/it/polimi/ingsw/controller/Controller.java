@@ -8,7 +8,7 @@ import it.polimi.ingsw.model.game.SimpleGame;
 public class Controller {
 
     protected PlayerCreation playerCreation;
-    protected GameRule gameRule;
+    protected GameRuleEnum gameRule;
     protected SimpleGame simpleGame;
     protected AdvancedGame advancedGame;
     protected CharacterCardHandler characterCardHandler;
@@ -28,7 +28,7 @@ public class Controller {
     public void createSimpleGame(int numPlayers){
         try {
             simpleGame = new SimpleGame(numPlayers);
-            gameRule = GameRule.getBasicRule(numPlayers);
+            gameRule = GameRuleEnum.getBasicRule(numPlayers);
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
@@ -42,7 +42,7 @@ public class Controller {
 
         try {
             advancedGame = new AdvancedGame(numPlayers, numCoins, numCharacterCards);
-            gameRule = GameRule.getAdvancedRule(numPlayers);
+            gameRule = GameRuleEnum.getAdvancedRule(numPlayers);
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }

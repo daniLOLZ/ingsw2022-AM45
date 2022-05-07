@@ -26,6 +26,7 @@ public class ParameterHandler {
 
     //DYNAMIC PARAMETERS
     private Player currentPlayer;
+    private int idIslandGroupMN;
     private PhaseEnum currentPhase;
     private List<PlayerEnum> professors;
     private int turn;
@@ -75,6 +76,28 @@ public class ParameterHandler {
         for (Player player : players){
             playersAllegiance.put(player.getPlayerId(), player.getTeamColor());
         }
+    }
+
+    public void setIdIslandGroupMN(int idIslandGroupMN) {
+        this.idIslandGroupMN = idIslandGroupMN;
+    }
+
+    public int getIdIslandGroupMN() {
+        return idIslandGroupMN;
+    }
+
+    /**
+     *
+     * @param playerId != NO Player
+     * @return a list with chosen player's professors
+     */
+    public List<StudentEnum> getProfessorsByPlayer(PlayerEnum playerId){
+        List<StudentEnum> professorList = new ArrayList<>();
+        for(int color=0; color < professors.size(); color++){
+            if(professors.get(color) == playerId)
+                professorList.add(StudentEnum.getColorById(color));
+        }
+        return professorList;
     }
 
     /**

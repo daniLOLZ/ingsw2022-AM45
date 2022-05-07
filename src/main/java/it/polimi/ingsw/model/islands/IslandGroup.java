@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.islands;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
@@ -220,15 +222,19 @@ public class IslandGroup {
     /**
      * Merges this islandGroup with the neighboring islands and updates the IslandGroup collection in game
      * @param newId the id to assign the newly formed group
-     * @exception  UnmergeableException The island groups have different tower colors
+     * @param islandGroups the islandGroup list that the new island will need to check for possible mergings
+     * @throws  UnmergeableException The island group can't be merged with any neighbors
+     * @return the new islandGroup created by the merging
      */
-    public void mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
+    public IslandGroup mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
 
+        //todo move to controller
         //Checks if the island has a tower built on top of it
         if(towerColor.equals(TeamEnum.NOTEAM)){
             throw new UnmergeableException();
         }
 
+        //todo move to controller
         //Checking if it can merge with any island at all
         if(!towerColor.equals(nextIslandGroup.towerColor) && !towerColor.equals(prevIslandGroup.towerColor)){
             throw new UnmergeableException();
@@ -268,6 +274,8 @@ public class IslandGroup {
         IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor, parameters);
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
+
+        return mergedGroup;
     }
 
     /**
@@ -286,7 +294,7 @@ public class IslandGroup {
     }
 
     /**
-     *  returns the amount of students of a given color on this IslandGroup
+     * returns the amount of students of a given color on this IslandGroup
      * @param color the color of the student to count
      * @return the amount of students of type color
      */
@@ -294,5 +302,19 @@ public class IslandGroup {
         return (int) students.stream()
                 .filter(x -> x.equals(color))
                 .count();
+    }
+
+    public GameElementBean toBean(){
+        int idIslandGroup = idGroup;
+        List<Integer> idIsland = new ArrayList<>();
+        List<StudentEnum> studentsOnIsland = students;
+        boolean isPresentMN = parameters.getIdIslandGroupMN() == idIslandGroup;
+        TeamEnum tower = towerColor;
+        for(Island island: islands)
+            idIsland.add(island.getId());
+
+
+        IslandGroupBean bean = new IslandGroupBean(idIslandGroup, idIsland, studentsOnIsland, isPresentMN, tower);
+        return bean;
     }
 }

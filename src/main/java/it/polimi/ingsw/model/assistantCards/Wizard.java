@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.assistantCards;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Wizard {
@@ -55,4 +56,16 @@ public class Wizard {
     public boolean contains(int id){
         return assistants.stream().anyMatch(card -> card.id == id);
     }
+
+    /**
+     *
+     * @return a list with the remained Assistants' ids
+     */
+    public List<Integer> getRemainedAssistants(){
+        List<Integer> idList = new ArrayList<>();
+        for(Assistant assistant: assistants)
+            idList.add(assistant.id);
+        return idList;
+    }
+
 }

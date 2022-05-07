@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.AdvancedSack;
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
@@ -163,6 +165,24 @@ public class AdvancedGame extends SimpleGame {
         }
         else
             advancedParameters.selectStudentOnCard(position);
+    }
+
+    /**
+     * Move a student in selected position at Entrance in Hall table.
+     * If the player deserves a coin the game add 1 coin to player and
+     * remove 1 coin from advanced parameters
+     * @param player != null
+     */
+    @Override
+    public void moveFromEntranceToHall(Player player) {
+        AdvancedPlayer advancedPlayer = (AdvancedPlayer) player;         //IF WE HAVE ADVANCED GAME WE HAVE ADVANCED PLAYERS
+        StudentEnum studentColor = player.moveFromEntranceToHall();
+        AdvancedBoard board = (AdvancedBoard) player.getBoard();        //IF WE HAVE ADVANCED GAME WE HAVE ADVANCED BOARD
+        int positionAtTable = board.getStudentsAtTable(studentColor);
+        if(board.checkCoinSeat(studentColor, positionAtTable)){
+            advancedPlayer.addCoin();
+            advancedParameters.removeCoin();
+        }
     }
 }
 
