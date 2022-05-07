@@ -222,15 +222,19 @@ public class IslandGroup {
     /**
      * Merges this islandGroup with the neighboring islands and updates the IslandGroup collection in game
      * @param newId the id to assign the newly formed group
-     * @exception  UnmergeableException The island groups have different tower colors
+     * @param islandGroups the islandGroup list that the new island will need to check for possible mergings
+     * @throws  UnmergeableException The island group can't be merged with any neighbors
+     * @return the new islandGroup created by the merging
      */
-    public void mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
+    public IslandGroup mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
 
+        //todo move to controller
         //Checks if the island has a tower built on top of it
         if(towerColor.equals(TeamEnum.NOTEAM)){
             throw new UnmergeableException();
         }
 
+        //todo move to controller
         //Checking if it can merge with any island at all
         if(!towerColor.equals(nextIslandGroup.towerColor) && !towerColor.equals(prevIslandGroup.towerColor)){
             throw new UnmergeableException();
@@ -270,6 +274,8 @@ public class IslandGroup {
         IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor, parameters);
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
+
+        return mergedGroup;
     }
 
     /**
