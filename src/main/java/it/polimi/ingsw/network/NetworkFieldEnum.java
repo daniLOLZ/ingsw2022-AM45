@@ -4,6 +4,7 @@ public enum NetworkFieldEnum {
     COMMAND("command"),
     ID_USER("idUser"),
     ID_REQUEST("idRequest"),
+    ID_PING_REQUEST("idPingRequest"),
     NICKNAME("nickname"),
     GAME_RULE("gameRule"),
     ID_TOWER_COLOR("idTowerColor"),

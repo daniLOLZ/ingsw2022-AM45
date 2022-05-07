@@ -6,7 +6,9 @@ import static it.polimi.ingsw.network.NetworkFieldEnum.*;
 public enum CommandEnum {
 
     QUIT("Quit",                                        new NetworkFieldEnum[] {ID_USER}),
-    CONNECTION_REQUEST("Connection Request",            new NetworkFieldEnum[] {ID_REQUEST}),
+    PING("Ping",                                        new NetworkFieldEnum[] {ID_USER, ID_PING_REQUEST}),
+    PONG("Pong",                                        new NetworkFieldEnum[] {ID_USER, ID_PING_REQUEST}),
+    CONNECTION_REQUEST("Connection Request",            new NetworkFieldEnum[] {NICKNAME, ID_REQUEST}),
     PLAY_GAME("Play Game",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, GAME_RULE}),
     READY_TO_START("Ready to Start",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     NOT_READY("Not Ready",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
