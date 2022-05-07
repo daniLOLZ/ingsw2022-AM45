@@ -3,25 +3,34 @@ package it.polimi.ingsw.network;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 public class ClientMain {
 
-    private int progressiveIdRequest;
-    private Socket socket;
+    private static final int DEFAULT_PING_PORT_NUMBER = 54322;
+    private final Duration timeout = Duration.ofSeconds(5);
+
+    private int progressiveIdRequest, progressiveIdPingRequest;
+    private Socket mainSocket, pingSocket;
     private String hostname;
-    private int portNumber;
+    private int mainPortNumber, pingPortNumber;
     private String nickname;
-    private MessageBroker broker;
-    // private MessageBroker broker; // we will need a way to couple this broker to the one in ClientHandler
+    private MessageBroker mainBroker, pingBroker;
+    private boolean connected;
     private int idUser;  // May be removed
 
     public ClientMain(String hostname, int portNumber, String nickname) {
         this.hostname = hostname;
-        this.portNumber = portNumber;
+        this.mainPortNumber = portNumber;
+        this.pingPortNumber = DEFAULT_PING_PORT_NUMBER;
         this.nickname = nickname;
-        this.broker = new MessageBroker();
+        this.mainBroker = new MessageBroker();
+        this.pingBroker = new MessageBroker();
         this.progressiveIdRequest = 0;
+        this.progressiveIdPingRequest = 0;
+        this.connected = true; //the ping routine will start before this field has been checked
     }
 
     /**
@@ -32,6 +41,16 @@ public class ClientMain {
 
         progressiveIdRequest++;
         return progressiveIdRequest;
+    }
+
+    /**
+     * Increases idPingRequest and returns it
+     * @return The increased idPingRequest
+     */
+    private int increaseAndGetPingRequestId(){
+
+        progressiveIdPingRequest++;
+        return progressiveIdPingRequest;
     }
 
     public static void main(String[] args){
@@ -49,8 +68,10 @@ public class ClientMain {
         }
         System.out.println("Username " + client.nickname + " was accepted");
 
+        Thread thread = new Thread(client::ping);
+
         String userInput;
-        while(true){ // generic game loop
+        while(client.isConnected()){ // generic game loop
             userInput = scanner.nextLine();
         }
     }
@@ -63,14 +84,17 @@ public class ClientMain {
      */
     public boolean login(String hostname, int port, String nickname){
 
-        if(!connect(hostname, port)){ // Might be substituted with an exception
-            System.err.println("Couldn't connect to host " + hostname + "on port " + port);
+        try {
+            mainSocket = connect(hostname,port);
+        } catch (ConnectionFailedException e){
+            e.printErrorMessage();
             return false;
         }
+
         if(!sendNickname(nickname)) {
             System.err.println("Nickname rejected");
             try {
-                socket.close();
+                mainSocket.close();
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             } finally {
@@ -86,24 +110,23 @@ public class ClientMain {
      * Establishes a connection to a Server
      * @param hostname the host ip address
      * @param port the host's port to connect to
+     * @return The client's side socket of the established connection if successful
+     * @exception ConnectionFailedException Cointains a message error if the connection was unsuccessful
      */
-    private boolean connect(String hostname, int port){
+    private Socket connect(String hostname, int port) throws ConnectionFailedException{
+
+        Socket returnableSocket;
 
         try {
-            socket = new Socket(hostname, port);
+            returnableSocket = new Socket(hostname, port);
         }
         catch (UnknownHostException e){
-            System.err.println("Can't find host " + hostname);
-            System.exit(1);
-            return false;
+            throw new ConnectionFailedException("Can't find host " + hostname);
         }
         catch (IOException e){
-            System.err.println("Couldn't get I/O for the connection to " +
-                    hostname);
-            System.exit(1);
-            return false;
+            throw new ConnectionFailedException("Couldn't get I/O for the connection to " + hostname);
         }
-        return true;
+        return returnableSocket;
     }
 
     /**
@@ -113,26 +136,26 @@ public class ClientMain {
      */
     private boolean sendNickname(String nickname){
 
-        broker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CONNECTION_REQUEST);
-        broker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CONNECTION_REQUEST);
+        mainBroker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
         addIdRequest();
         OutputStream outStream;
         InputStream inStream;
         try {
-            outStream = socket.getOutputStream();
-            inStream = socket.getInputStream();
+            outStream = mainSocket.getOutputStream();
+            inStream = mainSocket.getInputStream();
         } catch (IOException e) {
             System.err.println("Couldn't get input/output streams");
             e.printStackTrace();
             return false;
         }
-        broker.send(outStream);
+        mainBroker.send(outStream);
         System.out.println("Sent message to the server");
-        broker.receive(inStream);
+        mainBroker.receive(inStream);
         System.out.println("Received reply from the server");
 
         return "OK".equals(
-                (String) broker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE));
+                (String) mainBroker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE));
 
     }
 
@@ -140,7 +163,7 @@ public class ClientMain {
      * Adds the idRequest field to the current outgoing message
      */
     private void addIdRequest(){
-        broker.addToMessage(NetworkFieldEnum.ID_REQUEST, increaseAndGetRequestId());
+        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, increaseAndGetRequestId());
     }
 
     /**
@@ -148,7 +171,60 @@ public class ClientMain {
      * @return true if the Server reply has the same idRequest as the last request that has been sent
      */
     private boolean checkIdRequest(){
-        return progressiveIdRequest == (int) broker.readField(NetworkFieldEnum.ID_REQUEST);
+        return progressiveIdRequest == (int) mainBroker.readField(NetworkFieldEnum.ID_REQUEST);
+    }
+
+    private void ping(){
+
+        OutputStream outStream;
+        InputStream inStream;
+
+        try {
+            inStream = pingSocket.getInputStream();
+            outStream = pingSocket.getOutputStream();
+        } catch (IOException e){
+            System.err.println("Couldn't get input/output streams");
+            e.printStackTrace();
+            connected = false;
+            return;
+        }
+
+        try {
+            pingSocket = connect(hostname, pingPortNumber);
+        } catch (ConnectionFailedException e) {
+            e.printErrorMessage();
+            return;
+        }
+
+        ExecutorService pingExecutor = Executors.newSingleThreadExecutor();
+
+        final Future<Void> handler = pingExecutor.submit(() -> {
+            while (!pingBroker.receive(inStream));
+            return null; //no need for a return value
+        });
+
+        do{
+            pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
+            pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
+            pingBroker.send(outStream);
+
+            try {
+                handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                handler.cancel(true);
+                connected = false;
+                System.err.println("Connection timed out");
+                break;
+            } catch (InterruptedException | ExecutionException e) {
+                handler.cancel(true);
+                connected = false;
+                e.printStackTrace();
+                break;
+            }
+            pingExecutor.shutdownNow();
+
+            //TODO implement the rest of the ping or pass the ball to the PongHandler
+        } while (connected);
     }
 
     public String getNickname() {
@@ -164,6 +240,10 @@ public class ClientMain {
     }
 
     public int getPortNumber() {
-        return portNumber;
+        return mainPortNumber;
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 public enum CommandEnum {
 
     QUIT("Quit",                                        new String[] {"idUser"}),
+    PING("Ping",                                        new String[] {"idUser", "idPingRequest"}),
+    PONG("Pong",                                        new String[] {"idUser", "idPingRequest"}),
     CONNECTION_REQUEST("Connection Request",            new String[] {"nickname", "idRequest"}),
     PLAY_GAME("Play Game",                              new String[] {"idUser", "idRequest", "rules"}),
     READY_TO_START("Ready to Start",                    new String[] {"idUser", "idRequest"}),
