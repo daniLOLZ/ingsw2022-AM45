@@ -15,15 +15,20 @@ import java.util.Map;
 
 public class MessageBroker {
 
+    private final static int FIRST_RECEIVED = 0;
+
     private final Gson gson;
     private static final Type mapType = new TypeToken<Map<NetworkFieldEnum, Object>>() {}.getType();    //Map<NetworkFieldEnum, Object> is a generic Type. It needs to be specified
                                                                                                         //when using gson functions toJson and fromJson
     private final String connectionResetString = "Connection Reset";
 
-    private Map<NetworkFieldEnum, Object> outgoingMessage, incomingMessage;
+    private List<Map<NetworkFieldEnum, Object>> incomingMessages;
+    private Map<NetworkFieldEnum, Object> outgoingMessage;
+    private boolean readyForNext;
 
     public MessageBroker(){
         gson = new Gson();
+        readyForNext = true;
         outFlush();
         inFlush();
     }
@@ -47,8 +52,16 @@ public class MessageBroker {
     }
 
     public Object readField(NetworkFieldEnum fieldName){
-        Object fieldValue = incomingMessage.get(fieldName);
-        return fieldValue;
+        return incomingMessages.get(FIRST_RECEIVED).get(fieldName);
+    }
+
+    /**
+     * Removes the oldest received message from the incoming messages buffer.
+     * Allows the broker to give access to next received message
+     */
+    private void flushFirstMessage(){
+        incomingMessages.remove(FIRST_RECEIVED);
+        readyForNext = true;
     }
 
     private void outFlush(){
@@ -56,7 +69,7 @@ public class MessageBroker {
     }
 
     private void inFlush(){
-        incomingMessage = new HashMap<>();
+        incomingMessages = new ArrayList<>();
     }
 
     /**
@@ -80,11 +93,13 @@ public class MessageBroker {
     }
 
     /**
-     * Receives and stores the received message as an HashMap in the incoming message attribute
+     * Receives and stores the received message as an HashMap in the incoming message buffer
      * @param sourceInput the InputStream of the host to read the message from
      * @return true if the message received is valid
      */
     public boolean receive(InputStream sourceInput){
+
+        readyForNext = false;
         String receivedMessage;
         StringBuilder tempString = new StringBuilder();
         int rawReadInt;
@@ -119,22 +134,22 @@ public class MessageBroker {
         receivedMessage = tempString.toString();
 
         System.out.println("message received");
-        incomingMessage = deserialize(receivedMessage);
+        incomingMessages.add(deserialize(receivedMessage));
 
-        return checkValidity();
+        return checkFirstValidity();
     }
 
     /**
-     * Check if the incoming message is in a valid format
+     * Check if the first received message is in a valid format
      * @return true if the message is valid, false otherwise
      */
-    public boolean checkValidity(){
+    public boolean checkFirstValidity(){
 
         Object object;
         // For each field, check whether it can be cast and return false if an exception is raised
-        List<NetworkFieldEnum> keyArray = new ArrayList<>(incomingMessage.keySet());
+        List<NetworkFieldEnum> keyArray = new ArrayList<>(incomingMessages.get(FIRST_RECEIVED).keySet());
         for(NetworkFieldEnum field : keyArray){
-            object = incomingMessage.get(field);
+            object = incomingMessages.get(FIRST_RECEIVED).get(field);
 
             switch (field){
                 case ID_USER : {
@@ -156,6 +171,10 @@ public class MessageBroker {
             }
         }
         return true;
+    }
+
+    public boolean isReadyForNext(){
+        return readyForNext;
     }
 
     public static boolean isOfType(Object object, Type type){

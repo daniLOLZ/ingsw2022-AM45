@@ -33,4 +33,8 @@ public enum TeamEnum {
                 .filter( x -> !x.equals(NOTEAM))
                 .collect(Collectors.toList());
     }
+
+    public static TeamEnum fromObjectToEnum(Object field) {
+        return TeamEnum.valueOf((String)field);
+    }
 }

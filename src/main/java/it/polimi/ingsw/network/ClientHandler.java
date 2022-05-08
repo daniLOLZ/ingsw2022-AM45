@@ -1,13 +1,17 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.GameRuleEnum;
-import it.polimi.ingsw.network.connectionState.Authentication;
-import it.polimi.ingsw.network.connectionState.ConnectionState;
-import it.polimi.ingsw.network.connectionState.InLobby;
-import it.polimi.ingsw.network.connectionState.LookingForLobby;
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.characterCards.Requirements;
+import it.polimi.ingsw.model.game.PhaseEnum;
+import it.polimi.ingsw.network.connectionState.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientHandler implements Runnable{
     private Socket socket;
@@ -16,6 +20,8 @@ public class ClientHandler implements Runnable{
     private MessageBroker broker;
     private ConnectionState connectionState;
     private Lobby userLobby;
+    private Controller userController;
+
 
     /**
      * Creates a new client handler with its own message broker and set to state Authentication
@@ -26,6 +32,7 @@ public class ClientHandler implements Runnable{
         this.broker = new MessageBroker();
         this.connectionState = new Authentication();
         this.userLobby = null;
+        this.userController = null;
     }
 
     @Override
@@ -77,11 +84,13 @@ public class ClientHandler implements Runnable{
     private void notifyError(String errorMessage){ // parametrize reply status as well
         broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
         broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
+        broker.addToMessage(NetworkFieldEnum.ID_REQUEST, broker.readField(NetworkFieldEnum.ID_REQUEST));
         broker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
     }
 
     /**
      * Finds the command that's been given and runs the appropriate methods
+     * @param command the command that was received by the client
      */
     public void handleCommand(CommandEnum command){
         switch(command){
@@ -93,13 +102,256 @@ public class ClientHandler implements Runnable{
             case LEAVE_LOBBY -> requestLeaveLobby();
             case START_GAME -> startGame();
             case SELECT_WIZARD -> selectWizard();
+            case SELECT_TOWER_COLOR -> selectTowerColor();
+            case ASK_FOR_CONTROL -> askForControl();
+            case CHOOSE_ASSISTANT -> chooseAssistant();
+            case SELECT_STUDENT -> selectEntranceStudent();
+            case PUT_IN_HALL -> putInHall();
+            case PUT_IN_ISLAND -> putInIsland();
+            case DESELECT_STUDENT -> deselectStudent();
+            case MOVE_MN_TO_ISLAND -> moveMNToIsland();
+            case CHOOSE_CLOUD -> chooseCloud();
+            case SELECT_CHARACTER -> selectCharacter();
+            case SELECT_STUDENT_COLOR -> selectStudentColor();
+            case SELECT_STUDENT_ON_CARD -> selectStudentOnCard();
+            case SELECT_ENTRANCE_STUDENTS -> selectEntranceStudents();
+            case SELECT_ISLAND_GROUP -> selectIslandGroup();
 
             //TODO rest of commands
         }
     }
 
-    private void selectWizard() {
+    /**
+     * Card requirements method.
+     * The user sends the selected islands
+     */
+    private void selectIslandGroup() {
+        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.CHOSEN_ISLANDS);
+        List<Integer> islandIds = new ArrayList<>();
+        for(Object o : objectArray){ //TODO could be wrong
+            islandIds.add((Integer)o);
+        }
+        if(userController.selectIslandGroups(islandIds)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't select the islands");
+        }
+    }
 
+    /**
+     * Card requirements method.
+     * The user sends the selected students at their entrance
+     */
+    private void selectEntranceStudents() {
+        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
+        List<Integer> students = new ArrayList<>();
+        for(Object o : objectArray){ //TODO could be wrong
+            students.add((Integer)o);
+        }
+        if(userController.selectEntranceStudents(students)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't select the students at the entrance");
+        }
+    }
+
+    /**
+     * Card requirements method.
+     * The user sends the selected students on the card they previously selected
+     */
+    private void selectStudentOnCard() {
+        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.CHOSEN_CARD_POSITIONS);
+        List<Integer> students = new ArrayList<>();
+        for(Object o : objectArray){ //TODO could be wrong
+            students.add((Integer)o);
+        }
+        if(userController.selectStudentOnCard(students)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't select the students on the card");
+        }
+    }
+
+    /**
+     * Card requirements method.
+     * The user sends the selected student color
+     */
+    private void selectStudentColor() {
+        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.COLORS_REQUIRED);
+        List<StudentEnum> colors = new ArrayList<>();
+        for(Object o : objectArray){ //TODO could be wrong
+            colors.add(StudentEnum.fromObjectToEnum(o));
+        }
+
+        if(userController.selectStudentColor(colors)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't select student color");
+        }
+    }
+
+    /**
+     * The user selects a character card to play
+     */
+    private void selectCharacter() {
+        Integer cardPosition = (Integer) broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
+        if(!userController.selectCard(cardPosition)){
+            notifyError("Couldn't play the card, not enough coins");
+        }
+        else {
+            notifySuccessfulOperation();
+            Requirements requirements = userController.getAdvancedGame()
+                                        .getAdvancedParameters().getRequirementsForThisAction();
+            broker.addToMessage(NetworkFieldEnum.ENTRANCE_REQUIRED, requirements.studentAtEntrance);
+            broker.addToMessage(NetworkFieldEnum.COLORS_REQUIRED, requirements.studentType);
+            broker.addToMessage(NetworkFieldEnum.ISLANDS_REQUIRED, requirements.islands);
+            broker.addToMessage(NetworkFieldEnum.ON_CARD_REQUIRED, requirements.studentOnCard);
+            //TODO maybe incapsulate somewhere else?
+
+            setConnectionState(new CharacterCardActivation());
+        }
+    }
+
+    /**
+     * The user chooses a cloud to refill their entrance with
+     */
+    private void chooseCloud() {
+        Integer idCloud = (Integer) broker.readField(NetworkFieldEnum.ID_CLOUD);
+        if(userController.chooseCloud(idCloud)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't select the cloud");
+        }
+    }
+
+    /**
+     * The user moves mother nature
+     */
+    private void moveMNToIsland() {
+        Integer steps = (Integer)broker.readField(NetworkFieldEnum.STEPS_MN);
+        if(userController.moveMNToIsland(steps)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't move mother nature");
+        }
+    }
+
+    /**
+     * The user deselects the student
+     */
+    private void deselectStudent() {
+        if(userController.deselectStudent()){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't deselect the student");
+        }
+    }
+
+    /**
+     * The user chooses to put the student on the selected island
+     */
+    private void putInIsland() {
+        Integer idIsland = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ISLAND);
+        if(userController.putInIsland(idIsland)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't put the student on the island");
+        }
+    }
+
+    /**
+     * The user chooses to put their student in their hall
+     */
+    private void putInHall() {
+        if(userController.putInHall()){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Couldn't put the student in the hall");
+        }
+    }
+
+    /**
+     * The user asks to select a student from their entrance
+     */
+    private void selectEntranceStudent() {
+        Integer selectedStudent = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
+        if(userController.selectStudent(selectedStudent)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("Error selecting the student");
+        }
+    }
+
+    /**
+     * The user selects which assistant they want to play, the server replies with an error
+     * if the assistant can't be played
+     */
+    private void chooseAssistant() {
+        Integer idAssistant = (Integer)broker.readField(NetworkFieldEnum.ID_ASSISTANT);
+        if(userController.playAssistant(idAssistant)){
+            notifySuccessfulOperation();
+            setConnectionState(new WaitingForControl());
+        }
+        else {
+            notifyError("The assistant couldn't be played");
+        }
+    }
+
+    /**
+     * While waiting for their turn, the user periodically sends this message to ask for their turn to start
+     */
+    private void askForControl() {
+        PhaseEnum gamePhase = PhaseEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_PHASE));
+        if(userController.askForControl(this.idUser, gamePhase)){
+            if(gamePhase.equals(PhaseEnum.PLANNING)){
+                setConnectionState(new PlanningPhaseTurn());
+            }
+            else if(gamePhase.equals(PhaseEnum.ACTION)){
+                setConnectionState(new ActionPhaseTurn());
+            }
+            notifySuccessfulOperation();
+        }
+        else{
+            notifyError("Not your turn to play");
+        }
+    }
+
+    /**
+     * The user selects a team to be part of, this method calls the game controller to know whether the
+     * team chosen is available, and notifies it to the user
+     */
+    private void selectTowerColor() {
+        TeamEnum teamColor = TeamEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
+        if(userController.setTeamColor(teamColor, this.idUser)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("The chosen team isn't available, please change your selection");
+        }
+    }
+
+    /**
+     * The user selects a wizard from the four available, this method calls the game controller to know whether the
+     * wizard chosen is available, and notifies it to the user
+     */
+    private void selectWizard() {
+        Integer idWizard = (Integer)broker.readField(NetworkFieldEnum.ID_WIZARD);
+        if(userController.setWizard(idWizard, this.idUser)){
+            notifySuccessfulOperation();
+        }
+        else {
+            notifyError("The chosen wizard isn't available, please change your selection");
+        }
     }
 
     /**
@@ -111,8 +363,14 @@ public class ClientHandler implements Runnable{
             notifyError("You're not the host! You can't start the game.");
         }
         else {
-            ActiveLobbies.startGame(userLobby);
-            notifySuccessfulOperation();
+            if(ActiveLobbies.startGame(userLobby)){
+                setConnectionState(new StartingGame());
+                this.userController = ActiveGames.getGameFromUserId(this.idUser);
+                notifySuccessfulOperation();
+            }
+            else {
+                notifyError("The game couldn't start, returning to lobby");
+            }
         }
     }
 
@@ -180,4 +438,5 @@ public class ClientHandler implements Runnable{
     public void setConnectionState(ConnectionState connectionState) {
         this.connectionState = connectionState;
     }
+
 }

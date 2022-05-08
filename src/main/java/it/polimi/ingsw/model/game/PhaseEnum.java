@@ -11,4 +11,8 @@ public enum PhaseEnum {
         this.id = id;
         this.name = name;
     }
+
+    public static PhaseEnum fromObjectToEnum(Object field) {
+        return PhaseEnum.valueOf((String)field);
+    }
 }

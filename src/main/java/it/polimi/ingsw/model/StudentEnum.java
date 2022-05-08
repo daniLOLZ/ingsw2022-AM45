@@ -60,4 +60,9 @@ public enum StudentEnum {
             default -> NOSTUDENT;
         };
     }
+
+    public static StudentEnum fromObjectToEnum (Object field){
+        return StudentEnum.valueOf((String)field);
+    }
+
 }
