@@ -5,15 +5,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public enum TeamEnum {
-    WHITE(0),
-    BLACK(1),
-    GREY(2),
-    NOTEAM(3);
+    WHITE(0, "White"),
+    BLACK(1, "Black"),
+    GREY(2,"Grey"),
+    NOTEAM(3, "No team");
 
     public final int index;
+    public final String name;
 
-     TeamEnum(int index){
+     TeamEnum(int index, String name){
         this.index = index;
+        this.name = name;
     }
 
     /**

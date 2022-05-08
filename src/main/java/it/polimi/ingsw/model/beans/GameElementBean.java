@@ -5,8 +5,15 @@ public abstract class GameElementBean {
 
     /**
      * Show in CLI the Bean information
+     * @return the string with information about that bean
      */
-    //public abstract void drawCLI();
+    public abstract String drawCLI();
 
-//todo
+
+
+    public int getPriority() {
+        return priority;
+    }
+
+    //todo
 }

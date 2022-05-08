@@ -5,16 +5,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public enum PlayerEnum {
-    PLAYER1(0),
-    PLAYER2(1),
-    PLAYER3(2),
-    PLAYER4(3),
-    NOPLAYER(4);
+    PLAYER1(0, "Player 1"),
+    PLAYER2(1, "Player 2"),
+    PLAYER3(2, "Player 3"),
+    PLAYER4(3, "Player 4"),
+    NOPLAYER(4, "No Player");
 
     public final int index;
+    public final String name;
 
-    PlayerEnum(int index){
+    PlayerEnum(int index, String name){
         this.index = index;
+        this.name = name;
     }
 
     /**

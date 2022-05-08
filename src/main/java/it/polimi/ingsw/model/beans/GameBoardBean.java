@@ -71,4 +71,20 @@ public class GameBoardBean extends GameElementBean{
     public String getPhase() {
         return phase;
     }
+
+    @Override
+    public String drawCLI() {
+        StringBuilder toReturn = new StringBuilder();
+
+        toReturn.append("\t____________________________________\t\n");
+        toReturn.append("\t|::ERYANTIS::").append("\n");
+        toReturn.append("\t|\tTURN: ").append(turn).append("\n");
+        toReturn.append("\t|\tPHASE: ").append(phase).append("\n");
+        toReturn.append("\t|\tCURRENT PLAYER: ").append(currentPlayerId).append("\n");
+        toReturn.append("\t|\tASSISTANTS PLAYED: ").append(idAssistantsPlayed).append("\n");
+        toReturn.append("\t____________________________________\t\n");
+
+        return toReturn.toString();
+    }
+
 }

@@ -107,4 +107,40 @@ public class PlayerBean extends GameElementBean{
         return leader;
     }
 
+    @Override
+    public String drawCLI() {
+        StringBuilder toReturn = new StringBuilder();
+
+        toReturn.append("\t____________________________________\t\n");
+        toReturn.append("\t|Nickname : ").append(nickname).append("\n");
+        toReturn.append("\t|\tPlayer id: ").append(playerId).append("\n");
+        toReturn.append("\t|\tTower color: ").append(towerColor).append("\n");
+        toReturn.append("\t|\tNumber of Towers: ").append(numTowers).append("\n");
+        toReturn.append("\t|\tEntrance: ").append(studentsAtEntrance).append("\n");
+        toReturn.append("\t|\t").
+                append(StudentEnum.RED).append(" Table: ").
+                append(studentsPerTable.get(StudentEnum.RED.index)).append("\n");
+
+        toReturn.append("\t|\t").
+                append(StudentEnum.GREEN).append(" Table: ").
+                append(studentsPerTable.get(StudentEnum.GREEN.index)).append("\n");
+
+        toReturn.append("\t|\t").
+                append(StudentEnum.BLUE).append(" Table: ").
+                append(studentsPerTable.get(StudentEnum.BLUE.index)).append("\n");
+
+        toReturn.append("\t|\t").
+                append(StudentEnum.YELLOW).append(" Table: ").
+                append(studentsPerTable.get(StudentEnum.YELLOW.index)).append("\n");
+
+        toReturn.append("\t|\t").
+                append(StudentEnum.PINK).append(" Table: ").
+                append(studentsPerTable.get(StudentEnum.PINK.index)).append("\n");
+        toReturn.append("\t|\tProfessors: ").append(professors).append("\n");
+        toReturn.append("\t|\tAssistants: ").append(idAssistants).append("\n");
+        toReturn.append("\t____________________________________\t\n");
+
+        return toReturn.toString();
+    }
+
 }
