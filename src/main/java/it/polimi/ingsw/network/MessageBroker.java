@@ -105,16 +105,23 @@ public class MessageBroker {
         int rawReadInt;
         char rawChar;
         boolean endOfMessage = false;
+        boolean inString = false; //signals whether we are reading the content of a String
+        boolean escaped = false; //signals whether the next character is meant to be read as raw text
         int numberOfOpenCurlyBrackets = 0;
         try {
             while(!endOfMessage) {
                 rawReadInt = sourceInput.read();
                 rawChar = (char) rawReadInt;
 
-                //TODO this will break in case some user sends a curly bracket
+                if (!escaped) {
+                    if (rawChar == '\\') escaped = true;
+                    if (rawChar == '"') inString = !inString;
+                }
+                else escaped = false;
+
                 //Signals the end of the message based on the amount of curly bracket pairs
-                if (rawChar == '{') numberOfOpenCurlyBrackets++;
-                else if (rawChar == '}') numberOfOpenCurlyBrackets--;
+                if (!inString && rawChar == '{') numberOfOpenCurlyBrackets++;
+                else if (!inString && rawChar == '}') numberOfOpenCurlyBrackets--;
                 if (numberOfOpenCurlyBrackets == 0) {
                     endOfMessage = true;
                 }

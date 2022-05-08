@@ -111,7 +111,7 @@ public class ClientMain {
      * @param hostname the host ip address
      * @param port the host's port to connect to
      * @return The client's side socket of the established connection if successful
-     * @exception ConnectionFailedException Cointains a message error if the connection was unsuccessful
+     * @exception ConnectionFailedException Contains a message error if the connection was unsuccessful
      */
     private Socket connect(String hostname, int port) throws ConnectionFailedException{
 
@@ -174,10 +174,20 @@ public class ClientMain {
         return progressiveIdRequest == (int) mainBroker.readField(NetworkFieldEnum.ID_REQUEST);
     }
 
+    /**
+     * Continuously sends ping messages to the server and sets connected field to false when connection is no longer stable
+     */
     private void ping(){
 
         OutputStream outStream;
         InputStream inStream;
+
+        try {
+            pingSocket = connect(hostname, pingPortNumber); //open connection
+        } catch (ConnectionFailedException e) {
+            e.printErrorMessage();
+            return;
+        }
 
         try {
             inStream = pingSocket.getInputStream();
@@ -189,25 +199,22 @@ public class ClientMain {
             return;
         }
 
-        try {
-            pingSocket = connect(hostname, pingPortNumber);
-        } catch (ConnectionFailedException e) {
-            e.printErrorMessage();
-            return;
-        }
-
         ExecutorService pingExecutor = Executors.newSingleThreadExecutor();
 
         final Future<Void> handler = pingExecutor.submit(() -> {
-            while (!pingBroker.receive(inStream));
+
+            while (!pingBroker.receive(inStream)); //operation to execute with timeout
+
             return null; //no need for a return value
         });
 
         do{
+            //send ping message
             pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
             pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
             pingBroker.send(outStream);
 
+            //receive pong message
             try {
                 handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
@@ -223,7 +230,23 @@ public class ClientMain {
             }
             pingExecutor.shutdownNow();
 
-            //TODO implement the rest of the ping or pass the ball to the PongHandler
+            //maybe encapsulate operations below
+
+            int receivedIdUser = (int) pingBroker.readField(NetworkFieldEnum.ID_USER);
+            int receivedIdPingRequest = (int) pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST);
+
+            if ( !(receivedIdUser  == idUser)){
+
+                System.err.println("Server Error: identification failed");
+                connected = false;
+            }
+
+            else if ( !( receivedIdPingRequest == progressiveIdPingRequest)){
+
+                System.err.println("Wrong Request Id. Expected: " + progressiveIdPingRequest + ". Received: " + receivedIdPingRequest);
+                connected = false;
+            }
+
         } while (connected);
     }
 
