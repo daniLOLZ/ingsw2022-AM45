@@ -16,6 +16,8 @@ public class IslandGroupBean extends GameElementBean {
                            List<StudentEnum> studentsOnIsland, boolean isPresentMN,
                            TeamEnum towersColor){
 
+        int mediumPriority = 2;
+        priority = mediumPriority;
         this.idIslandGroup = idIslandGroup;
         this.idIslands = idIslands;
         this.studentsOnIsland = studentsOnIsland;

@@ -21,6 +21,8 @@ public class PlayerBean extends GameElementBean{
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
                       int numTowers, List<StudentEnum> studentsAtEntrance,
                       List<Integer> studentsPerTable, List<StudentEnum> professors, List<Integer> idAssistants){
+        int lowPriority = 3;
+        priority = lowPriority;
         this.nickname = nickname;
         this.playerId = playerId;
         this.leader = leader;
@@ -104,4 +106,5 @@ public class PlayerBean extends GameElementBean{
     public boolean isLeader() {
         return leader;
     }
+
 }
