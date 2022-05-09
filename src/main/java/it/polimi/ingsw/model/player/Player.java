@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Player extends DrawableObject {
+public class Player implements DrawableObject {
     protected PlayerEnum playerId;
     protected String nickname;
     protected ParameterHandler parameters;
@@ -60,6 +60,7 @@ public class Player extends DrawableObject {
         this.teamColor = teamColor;
         this.leader = leader;
         this.board = createBoard(teamColor, parameters);
+        this.parameters = parameters;
         this.wizard = wizard;
     }
 
@@ -230,6 +231,10 @@ public class Player extends DrawableObject {
         PlayerBean bean = new PlayerBean(nickname, playerId, leader, teamColor, numTowers,
                 studAtEntrance,studPerTable,professors, idAssistants);
         return bean;
+    }
+
+    public void addEntrance(StudentEnum student){
+        board.addToEntrance(student);
     }
 
 

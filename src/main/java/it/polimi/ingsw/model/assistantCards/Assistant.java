@@ -38,4 +38,9 @@ public class Assistant {
     public int hashCode() {
         return Objects.hash(motherNatureSteps, turnOrder);
     }
+
+    @Override
+    public String toString() {
+        return "("+ motherNatureSteps + "," + turnOrder + ")";
+    }
 }

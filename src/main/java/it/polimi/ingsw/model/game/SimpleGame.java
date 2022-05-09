@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.islands.IslandGroup;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 import static java.lang.Math.abs;
 
 
-public class SimpleGame extends DrawableObject {
+public class SimpleGame implements DrawableObject {
     private ErrorState errorState;
     private final int numPlayers;
     private final int maxStudentsByType;
@@ -479,7 +480,7 @@ public class SimpleGame extends DrawableObject {
 
     /**
      *
-     * @param idIslandGroup
+     * @param idIslandGroup id of islandGroup
      * @return true if there is an islandGroup that has the chosen id
      */
     public boolean checkValidIdIsland(final int idIslandGroup){
@@ -541,14 +542,30 @@ public class SimpleGame extends DrawableObject {
         List<Integer> idIslands = new ArrayList<>();
         List<Integer> idAssistants = new ArrayList<>();
         List<Integer> idPlayers = new ArrayList<>();
-        int currentPlayerId = parameters.getCurrentPlayer().getPlayerId().index;
+
+        int currentPlayerId;
+        if( (parameters.getCurrentPlayer() != null))
+            currentPlayerId = parameters.getCurrentPlayer().getPlayerId().index;
+        else
+            currentPlayerId = 0;
+
         int turn = parameters.getTurn();
-        String phase = parameters.getCurrentPhase().name;
+
+        String phase;
+        if((parameters.getCurrentPhase() != null))
+             phase = parameters.getCurrentPhase().name;
+        else
+            phase = "No phase";
         for(IslandGroup islandGroup: islandGroups){
             idIslands.add(islandGroup.getIdGroup());
         }
+
         for(Player player: players){
-            idAssistants.add(player.getAssistantPlayed().id);
+            Assistant assistant = player.getAssistantPlayed();
+            if(assistant != null)
+                idAssistants.add(assistant.id);
+            else
+                idAssistants.add(0);
             idPlayers.add(player.getPlayerId().index);
         }
         GameBoardBean bean = new GameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,turn,phase);

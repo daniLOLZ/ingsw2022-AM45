@@ -5,11 +5,14 @@ import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Knight extends CharacterCard {
+    private static final String name ="KNIGHT";
+    private static final String description ="During the influence calculation this turn,\n" +
+                                         "\t|\tyou count as having 2 more influence";
 
 
 
     public Knight(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
-        super(2,8, parameters, advancedParameters);
+        super(2,8, parameters, advancedParameters,name,description);
     }
 
     /**

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.characterCards;
 
+import it.polimi.ingsw.model.beans.CharacterCardBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.StudentEnum;
@@ -15,9 +17,10 @@ public abstract class InitialEffect extends CharacterCard{
 
     private final List<StudentEnum> students;
 
-    public InitialEffect(int cost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+    public InitialEffect(int cost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters,
+                         String name, String description){
 
-        super(cost, id, parameters, advancedParameters);
+        super(cost, id, parameters, advancedParameters, name, description );
         students = new ArrayList<>();
     }
 
@@ -57,5 +60,10 @@ public abstract class InitialEffect extends CharacterCard{
 
     public int size(){
         return students.size();
+    }
+
+    @Override
+    public GameElementBean toBean() {
+        return new CharacterCardBean(id,name,description,students,cardCost);
     }
 }

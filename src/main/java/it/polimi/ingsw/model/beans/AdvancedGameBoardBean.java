@@ -1,5 +1,8 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.model.player.PlayerEnum;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdvancedGameBoardBean extends GameBoardBean{
@@ -31,4 +34,30 @@ public class AdvancedGameBoardBean extends GameBoardBean{
     public void setIdCharacterCards(List<Integer> idCharacterCards) {
         this.idCharacterCards = idCharacterCards;
     }
+
+    @Override
+    public String drawCLI() {
+        StringBuilder toReturn = new StringBuilder();
+        String currentPlayer = PlayerEnum.getPlayer(currentPlayerId).name;
+        List<String> players = new ArrayList<>();
+        for(Integer x: idPlayers){
+            players.add(PlayerEnum.getPlayer(x).name);
+        }
+
+
+        toReturn.append("\t____________________________________\t\n");
+        toReturn.append("\t|\t\t\t::ERYANTIS::").append("\n");
+        toReturn.append("\t|\t\t\t::ADVANCED::").append("\n");
+        toReturn.append("\t|\tTURN: ").append(turn).append("\n");
+        toReturn.append("\t|\tPHASE: ").append(phase).append("\n");
+        toReturn.append("\t|\tGAME COINS: ").append(numGameCoins).append("\n");
+        toReturn.append("\t|\tCHARACTER CARDS: ").append(idCharacterCards).append("\n");
+        toReturn.append("\t|\tCURRENT PLAYER: ").append(currentPlayer).append("\n");
+        toReturn.append("\t|\tPLAYERS: ").append(players).append("\n");
+        toReturn.append("\t|\tASSISTANTS PLAYED: ").append(idAssistantsPlayed).append("\n");
+        toReturn.append("\t____________________________________\t\n");
+
+        return toReturn.toString();
+    }
+
 }

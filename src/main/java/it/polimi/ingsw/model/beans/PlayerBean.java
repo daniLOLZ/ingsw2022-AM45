@@ -7,21 +7,21 @@ import it.polimi.ingsw.model.player.PlayerEnum;
 import java.util.List;
 
 public class PlayerBean extends GameElementBean{
-    private String nickname;
-    private PlayerEnum playerId;
-    private boolean leader;
-    private TeamEnum towerColor;
-    private int numTowers;
-    private List<StudentEnum> studentsAtEntrance;
-    private List<Integer> studentsPerTable;
-    private List<Integer> idAssistants;
-    private List<StudentEnum> professors;
+    protected String nickname;
+    protected PlayerEnum playerId;
+    protected boolean leader;
+    protected TeamEnum towerColor;
+    protected int numTowers;
+    protected List<StudentEnum> studentsAtEntrance;
+    protected List<Integer> studentsPerTable;
+    protected List<Integer> idAssistants;
+    protected List<StudentEnum> professors;
 
 
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
                       int numTowers, List<StudentEnum> studentsAtEntrance,
                       List<Integer> studentsPerTable, List<StudentEnum> professors, List<Integer> idAssistants){
-        int lowPriority = 3;
+        final int lowPriority = 5;
         priority = lowPriority;
         this.nickname = nickname;
         this.playerId = playerId;
@@ -111,7 +111,7 @@ public class PlayerBean extends GameElementBean{
     public String drawCLI() {
         StringBuilder toReturn = new StringBuilder();
 
-        toReturn.append("\t____________________________________\t\n");
+        toReturn.append("\t________________________________________________\t\n");
         toReturn.append("\t|Nickname : ").append(nickname).append("\n");
         toReturn.append("\t|\tPlayer id: ").append(playerId).append("\n");
         toReturn.append("\t|\tTower color: ").append(towerColor).append("\n");
@@ -138,7 +138,7 @@ public class PlayerBean extends GameElementBean{
                 append(studentsPerTable.get(StudentEnum.PINK.index)).append("\n");
         toReturn.append("\t|\tProfessors: ").append(professors).append("\n");
         toReturn.append("\t|\tAssistants: ").append(idAssistants).append("\n");
-        toReturn.append("\t____________________________________\t\n");
+        toReturn.append("\t________________________________________________\t\n");
 
         return toReturn.toString();
     }
