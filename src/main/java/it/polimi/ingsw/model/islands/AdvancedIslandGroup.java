@@ -1,6 +1,10 @@
 package it.polimi.ingsw.model.islands;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
+import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.PlayerEnum;
@@ -234,5 +238,28 @@ public class AdvancedIslandGroup extends IslandGroup {
 
     public int getNumBlockTiles(){
         return blockTiles.size();
+    }
+
+    /**
+     *
+     * @return a Java Bean with all information about this Island group,
+     *         its id, islands' ids, students on this island group, if MN is present,
+     *         tower color and num of block tiles on this island group
+     */
+    @Override
+    public GameElementBean toBean() {
+        int idIslandGroup = idGroup;
+        List<Integer> idIsland = new ArrayList<>();
+        List<StudentEnum> studentsOnIsland = students;
+        boolean isPresentMN = parameters.getIdIslandGroupMN() == idIslandGroup;
+        TeamEnum tower = towerColor;
+        int numBlockTiles = blockTiles.size();
+        for(Island island: islands)
+            idIsland.add(island.getId());
+
+
+        AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(idIslandGroup, idIsland,
+                studentsOnIsland, isPresentMN, tower, numBlockTiles);
+        return  bean;
     }
 }

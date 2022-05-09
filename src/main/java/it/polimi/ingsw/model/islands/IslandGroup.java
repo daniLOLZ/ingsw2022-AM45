@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IslandGroup {
-    private ParameterHandler parameters;
-    private final int idGroup;
-    private final List<Island> islands;
+    protected ParameterHandler parameters;
+    protected final int idGroup;
+    protected final List<Island> islands;
     private IslandGroup nextIslandGroup;
     private IslandGroup prevIslandGroup;
-    private List<StudentEnum> students;
-    private TeamEnum towerColor;
+    protected List<StudentEnum> students;
+    protected TeamEnum towerColor;
 
     /**
      * default constructor
@@ -304,6 +304,12 @@ public class IslandGroup {
                 .count();
     }
 
+    /**
+     *
+     * @return a Java Bean with all information about this Island group,
+     * its id, islands' ids, students on this island group, if MN is present,
+     * tower color
+     */
     public GameElementBean toBean(){
         int idIslandGroup = idGroup;
         List<Integer> idIsland = new ArrayList<>();
@@ -314,7 +320,8 @@ public class IslandGroup {
             idIsland.add(island.getId());
 
 
-        IslandGroupBean bean = new IslandGroupBean(idIslandGroup, idIsland, studentsOnIsland, isPresentMN, tower);
+        IslandGroupBean bean = new IslandGroupBean(idIslandGroup, idIsland,
+                studentsOnIsland, isPresentMN, tower);
         return bean;
     }
 }

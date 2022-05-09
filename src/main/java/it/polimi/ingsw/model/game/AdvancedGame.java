@@ -2,10 +2,13 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.beans.AdvancedGameBoardBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
+import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
@@ -183,6 +186,38 @@ public class AdvancedGame extends SimpleGame {
             advancedPlayer.addCoin();
             advancedParameters.removeCoin();
         }
+    }
+
+    /**
+     * a java Bean with all general information about this game,
+     * a list with island groups id, a list of played assistants,
+     * a list of players id, the current player id, current turn number,
+     * current phase, Game coins and Character Cards id of this game
+     * @return
+     */
+    @Override
+    public GameElementBean toBean() {
+        List<Integer> idIslands = new ArrayList<>();
+        List<Integer> idAssistants = new ArrayList<>();
+        List<Integer> idPlayers = new ArrayList<>();
+        int currentPlayerId = parameters.getCurrentPlayer().getPlayerId().index;
+        int turn = parameters.getTurn();
+        String phase = parameters.getCurrentPhase().name;
+        int numCoins = advancedParameters.getNumCoins();
+
+        List<Integer> idCharacterCards = CharacterCards.stream().mapToInt(card -> card.id).
+                                                collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        for(IslandGroup islandGroup: islandGroups){
+            idIslands.add(islandGroup.getIdGroup());
+        }
+        for(Player player: players){
+            idAssistants.add(player.getAssistantPlayed().id);
+            idPlayers.add(player.getPlayerId().index);
+        }
+        AdvancedGameBoardBean bean = new AdvancedGameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,
+                turn,phase, numCoins, idCharacterCards);
+        return bean;
     }
 }
 

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.beans.GameBoardBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
@@ -10,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class SimpleGame {
+public class SimpleGame extends DrawableObject {
     private ErrorState errorState;
     private final int numPlayers;
     private final int maxStudentsByType;
@@ -24,7 +26,7 @@ public class SimpleGame {
     private List<Cloud> clouds;
     private MotherNature MN;
     protected Sack sack;
-    private ParameterHandler parameters;
+    protected ParameterHandler parameters;
 
     private boolean hasBeenInitialized;
 
@@ -522,4 +524,29 @@ public class SimpleGame {
         parameters.setIdIslandGroupMN(positionMN.getIdGroup());
     }
 
+    /**
+     *
+     * @return a java Bean with all general information about this game,
+     * a list with island groups id, a list of played assistants,
+     * a list of players id, the current player id, current turn number,
+     * current phase
+     */
+    @Override
+    public GameElementBean toBean() {
+        List<Integer> idIslands = new ArrayList<>();
+        List<Integer> idAssistants = new ArrayList<>();
+        List<Integer> idPlayers = new ArrayList<>();
+        int currentPlayerId = parameters.getCurrentPlayer().getPlayerId().index;
+        int turn = parameters.getTurn();
+        String phase = parameters.getCurrentPhase().name;
+        for(IslandGroup islandGroup: islandGroups){
+            idIslands.add(islandGroup.getIdGroup());
+        }
+        for(Player player: players){
+            idAssistants.add(player.getAssistantPlayed().id);
+            idPlayers.add(player.getPlayerId().index);
+        }
+        GameBoardBean bean = new GameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,turn,phase);
+        return bean;
+    }
 }

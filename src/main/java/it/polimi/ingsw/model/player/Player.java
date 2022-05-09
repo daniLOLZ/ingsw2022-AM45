@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Player {
+public class Player extends DrawableObject {
     protected PlayerEnum playerId;
     protected String nickname;
     protected ParameterHandler parameters;
@@ -207,8 +207,11 @@ public class Player {
 
     /**
      *
-     * @return a bean of player
+     * @return a bean with all information about this player,
+     *      * his nickname, color team, student at tables and at entrance,
+     *      * his assistants cards, his professors
      */
+    @Override
     public GameElementBean toBean(){
         int numTowers =getNumTowers();                                      //Get remaining towers
         List<StudentEnum> studAtEntrance = board.getStudentsAtEntrance();   //Get students at entrance
