@@ -36,7 +36,7 @@ public class CLI extends View{
 
     public void show(){
         final int highestPriority = 1;
-        final int lowestPriority = 4;
+        final int lowestPriority = 10;
         final int timeToNewLine = 1;
 
         View = new StringBuilder();
@@ -85,7 +85,7 @@ public class CLI extends View{
     }
 
     private void draw(int position, String elementToDraw){
-        final int width = 6;
+        final int width = 4;
         final String tab = "    ";
         final String center = "\t\t\t\t\t\t\t\t";
 

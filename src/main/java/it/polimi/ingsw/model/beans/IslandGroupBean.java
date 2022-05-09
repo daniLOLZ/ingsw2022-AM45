@@ -17,7 +17,7 @@ public class IslandGroupBean extends GameElementBean {
                            List<StudentEnum> studentsOnIsland, boolean isPresentMN,
                            TeamEnum towersColor){
 
-        int mediumPriority = 2;
+        final int mediumPriority = 4;
         priority = mediumPriority;
         this.idIslandGroup = idIslandGroup;
         this.idIslands = idIslands;
@@ -95,20 +95,7 @@ public class IslandGroupBean extends GameElementBean {
 
     }
 
-    protected String setTab(String string){
-        Scanner scanner = new Scanner(string);
-        scanner.useDelimiter("\n");
-        StringBuilder builder = new StringBuilder();
-        String border = "    ____________________________________    \n";
-        while(scanner.hasNext()){
-            String x = scanner.next();
-            while(x.length() < border.length())
-                x = x + " ";
 
-            builder.append(x).append("\n");
-        }
-        return  builder.toString();
-    }
 
 
 }

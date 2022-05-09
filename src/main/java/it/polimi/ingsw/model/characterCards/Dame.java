@@ -8,11 +8,16 @@ import it.polimi.ingsw.model.player.Player;
 
 
 public class Dame extends InitialEffect{
+    private final static String  name = "DAME";
+    private final static String description = "Take 1 Student from this card\n" +
+                                          "\t|\tand place it in your Dining Room.\n" +
+                                          "\t|\tThen draw a new Student from the Bag\n" +
+                                          "\t|\tand place it on this card";
 
 
 
     public Dame(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
-        super(2,11, parameters, advancedParameters);
+        super(2,11, parameters, advancedParameters, name, description);
         requirements = new Requirements(0,0,0,1);
     }
 

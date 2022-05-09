@@ -9,13 +9,18 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Juggler extends InitialEffect{
+    private static final String name ="JUGGLER";
+    private static final String description = "You may take up to 3 Students\n" +
+                                          "\t|\tfrom this card and replace them\n" +
+                                          "\t|\twith the same number of Students\n" +
+                                          "\t|\tfrom your Entrance";
 
 
     private final int maxTradeableStudents = 3;
     private int numTrades;
 
     public Juggler(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
-        super(1,7, parameters, advancedParameters);
+        super(1,7, parameters, advancedParameters,name,description);
         requirements = new Requirements(0,maxTradeableStudents,0,maxTradeableStudents);
     }
 

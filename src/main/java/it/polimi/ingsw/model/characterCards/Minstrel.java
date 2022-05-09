@@ -11,12 +11,16 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Minstrel extends CharacterCard {
+    private static final String name ="MINSTREL";
+    private static final String description ="You may exchange up to 2 Students\n" +
+                                         "\t|\tbetween your Entrance and your\n" +
+                                         "\t|\tDining Room";
 
     private final int maxTradeableStudents = 2;
     private int trades;
 
     public Minstrel(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
-        super(1,10,parameters, advancedParameters);
+        super(1,10,parameters, advancedParameters,name,description);
         requirements = new Requirements(0,maxTradeableStudents,maxTradeableStudents,0);
     }
 

@@ -1,11 +1,14 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.model.Cloud;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
+import it.polimi.ingsw.model.beans.CloudBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
+import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.ParameterHandler;
@@ -63,6 +66,17 @@ public class CLITest {
         }
         game.startPhase(PlayerEnum.PLAYER1.index);
         GameElementBean beanG = game.toBean();
+        Cloud cloud = new Cloud(1,3);
+        List<StudentEnum> listStudent = new ArrayList<StudentEnum>();
+        listStudent.add(StudentEnum.RED);
+        listStudent.add(StudentEnum.BLUE);
+        cloud.fill(listStudent);
+        GameElementBean beanC = cloud.toBean();
+        CharacterCard card;
+        for(int i=0;i< 3;i++ ){
+            card = game.getCharacterCard(i);
+            cli.addBean(card.toBean());
+        }
 
 
         cli.addBean(bean1);
@@ -71,6 +85,8 @@ public class CLITest {
         cli.addBean(bean4);
         cli.addBean(beanP);
         cli.addBean(beanG);
+        cli.addBean(beanC);
+        cli.addBean(beanC);
         cli.show();
     }
 

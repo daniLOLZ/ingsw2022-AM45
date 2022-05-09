@@ -1,12 +1,17 @@
 package it.polimi.ingsw.model.characterCards;
 
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Centaur extends CharacterCard {
+    private static final String name = "CENTAUR";
+    private static final String description = "When resolving a Conquering\n" +
+                                          "\t|\ton an Island,Towers do not count\n" +
+                                          "\t|\ttowards influence." ;
 
     public Centaur(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
-        super(3,6, parameters, advancedParameters);
+        super(3,6, parameters, advancedParameters, name, description);
     }
 
     /**
@@ -18,5 +23,6 @@ public class Centaur extends CharacterCard {
         super.activateEffect();
         super.getAdvancedParameters().setCountTowers(false);
     }
+
 
 }

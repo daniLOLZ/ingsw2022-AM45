@@ -1,12 +1,17 @@
 package it.polimi.ingsw.model.characterCards;
 
+import it.polimi.ingsw.model.DrawableObject;
+import it.polimi.ingsw.model.beans.CharacterCardBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 
 import java.util.Objects;
 
-public abstract class CharacterCard {
+public abstract class CharacterCard implements DrawableObject {
+    protected final String name;
+    protected final String description;
     protected int cardCost;
     protected boolean hasBeenUsed;
     public final int id;
@@ -14,12 +19,15 @@ public abstract class CharacterCard {
     protected AdvancedParameterHandler advancedParameters;
     protected Requirements requirements;
 
-    public CharacterCard(int cardCost, int id, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+    public CharacterCard(int cardCost, int id, ParameterHandler parameters,
+                         AdvancedParameterHandler advancedParameters, String name, String description){
         this.cardCost = cardCost;
         hasBeenUsed = false;
         this.id = id;
         this.parameters = parameters;
         this.advancedParameters = advancedParameters;
+        this.name = name;
+        this.description = description;
 
     }
 
@@ -89,4 +97,9 @@ public abstract class CharacterCard {
         return advancedParameters;
     }
 
+
+    @Override
+    public GameElementBean toBean() {
+        return new CharacterCardBean(id, name,description,null,cardCost);
+    }
 }
