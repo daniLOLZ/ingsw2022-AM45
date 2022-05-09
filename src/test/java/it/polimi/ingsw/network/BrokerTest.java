@@ -50,7 +50,9 @@ public class BrokerTest {
             return;
         }
         broker.receive(inputStreamFile);
+        while (!broker.lock());
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
+        broker.unlock();
     }
 }

@@ -68,7 +68,7 @@ public class ClientMain {
         }
         System.out.println("Username " + client.nickname + " was accepted");
 
-        Thread thread = new Thread(client::ping);
+        new Thread(client::ping).start();
 
         String userInput;
         while(client.isConnected()){ // generic game loop
@@ -203,16 +203,19 @@ public class ClientMain {
 
         final Future<Void> handler = pingExecutor.submit(() -> {
 
-            while (!pingBroker.receive(inStream)); //operation to execute with timeout
+            while (!pingBroker.lock()); //operation to execute with timeout
 
             return null; //no need for a return value
         });
 
         do{
             //send ping message
+            while (!pingBroker.lock());
             pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
             pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
             pingBroker.send(outStream);
+            pingBroker.unlock();
+            pingBroker.receive(inStream);
 
             //receive pong message
             try {
@@ -221,11 +224,13 @@ public class ClientMain {
                 handler.cancel(true);
                 connected = false;
                 System.err.println("Connection timed out");
+                pingBroker.unlock();
                 break;
             } catch (InterruptedException | ExecutionException e) {
                 handler.cancel(true);
                 connected = false;
                 e.printStackTrace();
+                pingBroker.unlock();
                 break;
             }
             pingExecutor.shutdownNow();
@@ -246,7 +251,7 @@ public class ClientMain {
                 System.err.println("Wrong Request Id. Expected: " + progressiveIdPingRequest + ". Received: " + receivedIdPingRequest);
                 connected = false;
             }
-
+            pingBroker.unlock();
         } while (connected);
     }
 
