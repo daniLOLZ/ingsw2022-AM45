@@ -1,7 +1,8 @@
 package it.polimi.ingsw.model;
 
-import it.polimi.ingsw.model.StudentEnum;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class StudentEnumTest {
@@ -17,4 +18,13 @@ public class StudentEnumTest {
         }
         assert (y == 15);
     }
+
+    /**
+     * Tests the id to student color mapping
+     */
+    @Test
+    void idToStudentTest(){
+        assertEquals(StudentEnum.getColorById(1), StudentEnum.RED);
+    }
+
 }

@@ -37,6 +37,11 @@ public enum PlayerEnum {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the player with number id + 1
+     * @param id the player to return will have its number be the id + 1
+     * @return the chosen PlayerEnum
+     */
     public static PlayerEnum getPlayer(int id){
         switch(id){
             case 0: return PLAYER1;
