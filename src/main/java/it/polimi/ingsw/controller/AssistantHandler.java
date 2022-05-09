@@ -8,6 +8,12 @@ import it.polimi.ingsw.model.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ *ACTIONS:
+ *
+ *
+ */
+
 public class AssistantHandler {
     private final Controller controller;
     private List<Assistant> assistantsPlayed;
