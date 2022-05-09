@@ -16,12 +16,17 @@ public class BrokerTest {
 
     MessageBroker broker;
 
+    /**
+     * Creates an input stream from the JSON passed as a String
+     * @param message the json formatted message
+     * @return an input stream containing the message
+     */
     public InputStream createJSONFile(String message){
         File tempFile;
         InputStream inputStreamFile;
         OutputStream outputStreamFile;
         try {
-            tempFile = File.createTempFile("test","idfk");
+            tempFile = File.createTempFile("prefix","suffix");
             inputStreamFile = new FileInputStream(tempFile);
             outputStreamFile = new FileOutputStream(tempFile);
         } catch (IOException e) {
@@ -60,21 +65,29 @@ public class BrokerTest {
         broker.unlock();
     }
 
-    /*
     @Test
     public void twoMessagesQuickSuccession(){
         InputStream stream = createJSONFile("{\n" +
                 "    \"COMMAND\" : \"CONNECTION_REQUEST\",\n" +
                 "    \"NICKNAME\" : \"gigio\"\n" +
-                "}"+"\n" +
+                "}" +
                 "{\n" +
                 "    \"COMMAND\" : \"CONNECTION_REQUEST\",\n" +
                 "    \"NICKNAME\" : \"gigio2\"\n" +
                 "}");
-        assertTrue(broker.receive(stream));
-        assertTrue(broker.receive(stream));
-        assertFalse(broker.receive(stream));
+        broker.receive(stream);
+        broker.receive(stream);
+        if(!broker.lock()){
+            fail("No first message to read");
+        }
+        assertEquals("gigio", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
+        broker.unlock();
+        if(!broker.lock()){
+            fail("No second message to read");
+        }
+        assertEquals("gigio2", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
+        broker.unlock();
         //If the messages were correctly parsed, the broker should be able to read two different messages correctly
     }
-    */
+
 }
