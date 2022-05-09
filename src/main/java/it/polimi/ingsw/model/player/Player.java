@@ -26,12 +26,14 @@ public class Player implements DrawableObject {
     protected Wizard wizard;
 
     /**
+     * ! This method doesn't allow for the choice of the wizard !
      * Basic Player constructor
-     * @param playerId id given by SimpleGame at initialization
+     * @param playerId id given by SimpleGame on initialization
      * @param nickname string chosen by the user, should not be equal to other players
      * @param teamColor the team's color
      * @param leader true if the player is the leader of their team (has the towers on their board)
      */
+    @Deprecated
     public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters) {
         this.playerId = playerId;
         this.nickname = nickname;
@@ -47,21 +49,21 @@ public class Player implements DrawableObject {
 
     /**
      * Player constructor which features all choices made by the user: nickname, tower color and wizard
-     * @param playerId
-     * @param nickname
-     * @param teamColor
-     * @param leader
-     * @param parameters
-     * @param wizard
+     * @param playerId id given by SimpleGame on initialization
+     * @param nickname nickname chosen by the user
+     * @param teamColor this player's team's color
+     * @param leader true if the player is the leader of their team (has the towers on their board)
+     * @param parameters parameters of the game creating this player
+     * @param wizard the wizard chosen by the user
      */
-    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters, Wizard wizard){
+    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, Wizard wizard, boolean leader, ParameterHandler parameters){        this.playerId = playerId;
         this.playerId = playerId;
         this.nickname = nickname;
         this.teamColor = teamColor;
+        this.wizard = wizard;
         this.leader = leader;
         this.board = createBoard(teamColor, parameters);
         this.parameters = parameters;
-        this.wizard = wizard;
     }
 
 

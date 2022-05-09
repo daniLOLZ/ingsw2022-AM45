@@ -10,7 +10,8 @@ public class PlayerCreation {
     private final Controller controller;
     protected final List<TeamEnum> teamColor ;
     protected final List<String> nicknames;
-    protected final List<Integer> wizards;
+    private final List<Integer> wizards; // Wizard ids
+
 
     public PlayerCreation(Controller controller){
         this.controller = controller;

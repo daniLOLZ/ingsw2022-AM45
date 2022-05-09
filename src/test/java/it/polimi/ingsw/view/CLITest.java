@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.game.SimpleGame;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
+import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import org.junit.jupiter.api.Test;
@@ -114,8 +115,8 @@ public class CLITest {
         IslandGroupBean bean3 = new IslandGroupBean(3,islands,studOnIsland,false, TeamEnum.NOTEAM);
         IslandGroupBean bean4 = new IslandGroupBean(4,islands,studOnIsland,false, TeamEnum.NOTEAM);
 
-        Player player = new Player(PlayerEnum.PLAYER1,"Franco", TeamEnum.WHITE,
-                true,parameterHandler, FactoryWizard.getWizard(0));
+        Player player = FactoryPlayer.getPlayer("Franco", PlayerEnum.PLAYER1, TeamEnum.WHITE, FactoryWizard.getWizard(0),
+                true, parameterHandler, false);
         player.addEntrance(StudentEnum.RED);
         player.selectStudentAtEntrance(0);
         player.moveFromEntranceToHall();

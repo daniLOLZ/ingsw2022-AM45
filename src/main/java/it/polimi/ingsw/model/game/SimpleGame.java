@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.islands.IslandGroup;
@@ -33,12 +34,15 @@ public class SimpleGame implements DrawableObject {
 
     private boolean hasBeenInitialized;
 
+
     /**
+     * ! Old constructor without customization possible from the users !
      * Must be initialized after creation via the initializeGame() function
      * @param numPlayers the number of players in the game [2,4]
      * @throws IncorrectPlayersException the number of players isn't in the
      * allowed range
      */
+    @Deprecated
     public SimpleGame(int numPlayers) throws  IncorrectPlayersException{
 
         if(numPlayers > 4 || numPlayers < 2){
@@ -72,6 +76,46 @@ public class SimpleGame implements DrawableObject {
         parameters.setPlayersAllegiance(players);
     }
 
+    /**
+     * Creates a new SimpleGame with the parameters chosen by the players,
+     * must be initialized after creation via the initializeGame() function
+     * @param numPlayers number of players in the game [2,4]
+     * @param selectedWizards array containing users' selection for their wizards
+     * @param selectedColors array containing users' selection for their tower colors
+     * @param nicknames array containing users' nicknames
+     * @throws IncorrectPlayersException the number of players isn't in the
+     *                                  allowed range
+     */
+    public SimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) throws  IncorrectPlayersException{
+
+        if(numPlayers > 4 || numPlayers < 2){
+            throw new IncorrectPlayersException();
+        }
+
+        int numberOfClouds = numPlayers;
+        this.hasBeenInitialized = false;
+        this.amountOfIslands = 12;
+        this.numPlayers = numPlayers;
+        this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
+        createParameters();
+        this.isLastTurn = false;
+        this.currentIslandGroupId = 0;
+        this.players = new ArrayList<>();
+        this.clouds = new ArrayList<>();
+        for (int cloudNumber = 0; cloudNumber < numberOfClouds; cloudNumber++){
+            clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud()));
+        }
+        createIslandGroups();
+
+        // Mother Nature starts on the first island group, will get moved in the initialization of the game
+        this.MN = new MotherNature(islandGroups.get(0));
+        //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
+        this.sack = new Sack(2);
+        //createPlayers(numPlayers);
+        createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
+        parameters.setPlayersAllegiance(players);
+    }
+
     //TODO this could become a private method called from the constructor;
     // for testing purposes, it's kept separate
     /**
@@ -79,7 +123,7 @@ public class SimpleGame implements DrawableObject {
      */
     public void initializeGame(){
         //We must not initialize twice
-        if (hasBeenInitialized == true) return;
+        if (hasBeenInitialized) return;
 
         // Moves Mother nature to a random island
         int MNStartingPosition = abs(new Random().nextInt() % amountOfIslands);
@@ -129,12 +173,57 @@ public class SimpleGame implements DrawableObject {
     }
 
     /**
+     * !This method doesn't allow for customization from the users!
      * This method initializes the players held in the game
      * it can be overridden to account for the creation of AdvancedPlayers in advanced games
      * @param numPlayers the number of players to create
      */
+    @Deprecated
     protected void createPlayers(int numPlayers){
         this.players = FactoryPlayer.getNPlayers(numPlayers, parameters);
+    }
+
+    /**
+     * Creates players based on the parameters received by the users (wizard, tower color and usernames selected)
+     * @param numPlayers the number of players to create
+     * @param selectedWizards array containing the correspondence between player and selected wizard
+     * @param selectedColors array containing the correspondence between player and selected tower color
+     * @param nicknames array containing the users' nicknames
+     */
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames){
+        List<TeamEnum> alreadyAssignedLeaders = new ArrayList<>();
+
+        //TODO check validity of the assumptions about leaders and playerIds
+        // leaders -> is it always the first in order?
+        // playerIds -> is it always the same as the order of the players?
+
+        //TODO Lucario : Possibile necessità di unificare questo controllo di leader con quello in PlayerCreation.isLeader
+        boolean isLeader;
+        for(int player = 0; player < numPlayers; player++){
+            TeamEnum currentColor = selectedColors.get(player);
+
+            if (alreadyAssignedLeaders.contains(currentColor)){ // If a leader of that color has been
+                // assigned already, then the next player(s)
+                // won't be leaders
+                isLeader = false;
+            }
+            else {
+                isLeader = true;
+                alreadyAssignedLeaders.add(currentColor);
+            }
+
+            this.players.add(
+                    FactoryPlayer.getPlayer(
+                            nicknames.get(player),
+                            PlayerEnum.getPlayer(player),
+                            selectedColors.get(player),
+                            FactoryWizard.getWizard(selectedWizards.get(player)),
+                            isLeader,
+                            parameters,
+                            false
+                    ) // Check if playerId is actually the same as the order of these Arrays
+            );
+        }
     }
 
     /**

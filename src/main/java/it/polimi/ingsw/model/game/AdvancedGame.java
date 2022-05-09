@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.beans.AdvancedGameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
@@ -24,10 +25,8 @@ public class AdvancedGame extends SimpleGame {
                                                     // col controller? In ogni caso si può vedere se servono davvero
     private AdvancedParameterHandler advancedParameters;
 
-    /*
-    forse è meglio che il construttore di game abbia come parametro passato una lista di giocatori
-    invece che crearseli lui.
-     */
+
+    @Deprecated
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException {
         super(numPlayers);
         advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
@@ -45,9 +44,9 @@ public class AdvancedGame extends SimpleGame {
         }
 
         createPlayingSack();
-
     }
 
+    @Deprecated
     /**
      * AdvanceGame's constructor.
      * Get a players List of AdvancedPlayer (created in network state) and num of coins and num of character
@@ -72,8 +71,8 @@ public class AdvancedGame extends SimpleGame {
         }
 
         createPlayingSack();
-
     }
+
 
 
     /**
@@ -100,6 +99,7 @@ public class AdvancedGame extends SimpleGame {
      * @param numPlayers > 1 useful for version with override
      */
     @Override
+    @Deprecated
     protected void createPlayers(int numPlayers){
 
         players = FactoryPlayer.getNPlayers(numPlayers, getParameters());
@@ -115,6 +115,24 @@ public class AdvancedGame extends SimpleGame {
         }
 
         //TODO VERSION WITH OVERRIDE
+    }
+
+    @Override
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) {
+        super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
+        AdvancedPlayers = new ArrayList<>();
+        for(Player player: players){ // Unhappy cast that could be resolved by separating
+            // into two methods : getPlayer and getAdvancedPlayer
+            AdvancedPlayers.add(
+                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                            player.getNickname(),
+                            player.getPlayerId(),
+                            player.getTeamColor(),
+                            player.getWizard(),
+                            player.isLeader(),
+                            getParameters(),
+                            true));
+        }
     }
 
     public List<AdvancedPlayer> getAdvancedPlayers() {
