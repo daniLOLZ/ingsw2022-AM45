@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ActiveLobbies {
 
-    private static Object genericLock = new Object();
+    private static final Object genericLock = new Object();
 
     private static List<Lobby> lobbies = new ArrayList<>();
 
@@ -20,9 +20,7 @@ public class ActiveLobbies {
 
         Lobby lobby = searchGame(rules);
 
-        if (lobby == null){
-            lobby = createLobby(rules);
-        }
+        if (lobby == null) lobby = createLobby(rules);
 
         return lobby;
     }
@@ -35,9 +33,12 @@ public class ActiveLobbies {
      */
     private static Lobby searchGame(GameRuleEnum rules){
 
-        for (Lobby lobby:
-             lobbies) {
-            if (lobby.getGameType().equals(rules) && !lobby.isFull()) return lobby;
+
+        synchronized (genericLock) {
+            for (Lobby lobby:
+                 lobbies) {
+                if (lobby.getGameType().equals(rules) && !lobby.isFull()) return lobby;
+            }
         }
 
         return null;
@@ -46,7 +47,7 @@ public class ActiveLobbies {
     /**
      * Creates a Lobby with the specified game rules
      * @param rules The game rules of the lobby
-     * @return An empty lobby with the desired gamerules
+     * @return An empty lobby with the desired game rules
      */
     private static Lobby createLobby(GameRuleEnum rules){
 
@@ -62,7 +63,9 @@ public class ActiveLobbies {
      * @param lobby The lobby to be removed
      */
     public static void removeLobby(Lobby lobby){
-        lobbies.remove(lobby);
+        synchronized (genericLock) {
+            lobbies.remove(lobby);
+        }
     }
 
     /**
@@ -72,7 +75,10 @@ public class ActiveLobbies {
      */
     public static boolean startGame(Lobby lobby){
 
-        if (lobbies.contains(lobby)) return true; //TODO create everything
+        if (lobbies.contains(lobby)) {
+            ActiveGames.createGame(lobby);
+            return true; //TODO create everything
+        }
         //todo check if all players ready
         return false;
     }
