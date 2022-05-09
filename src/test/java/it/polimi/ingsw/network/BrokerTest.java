@@ -36,8 +36,7 @@ public class BrokerTest {
             inputStreamFile = new FileInputStream(tempFile);
             outputStreamFile = new FileOutputStream(tempFile);
         } catch (IOException e) {
-            System.err.println("can't create temp file or get streams");
-            assertTrue(false);
+            assertTrue(false, "Can't create temp file or get streams");
             return;
         }
         try {
