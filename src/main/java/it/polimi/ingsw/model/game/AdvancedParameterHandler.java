@@ -74,6 +74,7 @@ public class AdvancedParameterHandler {
 
     /**
      * @param coinsToRemove The number of coins to remove (must be > 0)
+     * @return the amount of coins actually removed
      */
     public int removeCoins(int coinsToRemove){
 

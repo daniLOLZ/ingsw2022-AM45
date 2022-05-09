@@ -11,6 +11,8 @@ import it.polimi.ingsw.model.player.PlayerEnum;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.abs;
+
 
 public class SimpleGame extends DrawableObject {
     private ErrorState errorState;
@@ -79,14 +81,17 @@ public class SimpleGame extends DrawableObject {
         if (hasBeenInitialized == true) return;
 
         // Moves Mother nature to a random island
-        int MNPosition = new Random().nextInt() % amountOfIslands;
-        MN.move(MNPosition);
+        int MNStartingPosition = abs(new Random().nextInt() % amountOfIslands);
+        MN.move(MNStartingPosition);
 
         //Puts one student from the initial sack on each* of the islands.
         StudentEnum drawnStudent;
-        for(int curPosition = MNPosition; curPosition < MNPosition-1; curPosition = (curPosition+1)% amountOfIslands){
+        int curPosition;
+
+        for(int currentStep = 0; currentStep < amountOfIslands; currentStep++){
+            curPosition = (MNStartingPosition + currentStep) % amountOfIslands;
             // If the current position is MotherNature's or its opposite, we don't put a student there
-            if(!(curPosition == MNPosition || curPosition == (MNPosition + amountOfIslands/2) % amountOfIslands)){
+            if(!(curPosition == MNStartingPosition || curPosition == (MNStartingPosition + amountOfIslands/2) % amountOfIslands)){
                 drawnStudent = sack.drawNStudents(1).get(0);
                 islandGroups.get(curPosition).addStudent(drawnStudent);
             }
@@ -281,7 +286,7 @@ public class SimpleGame extends DrawableObject {
     }
 
     /**
-     * Get students from a cloud aand put them at player's entrance
+     * Get students from a cloud and put them at player's entrance
      * @param player!=null
      * @param cloudId >=0 && < clouds.size()
      */

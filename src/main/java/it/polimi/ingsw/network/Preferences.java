@@ -2,13 +2,10 @@ package it.polimi.ingsw.network;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+
 import java.util.Map;
 
 
