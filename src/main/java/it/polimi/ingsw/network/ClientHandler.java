@@ -50,19 +50,24 @@ public class ClientHandler implements Runnable{
             quitGame(); // Maybe useless
             return;
         }
-        while(true){ // Message listener loop
 
-            if(!broker.receive(clientInput)){ // Received an invalid message
+        new Thread(()->{while (isConnected) broker.receive(clientInput);}).start();
+
+        while(isConnected){ // Message listener loop
+
+            if(!broker.lock()){ // Received an invalid message
                 continue;
             }
             CommandEnum command = CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND));
 
             if(!connectionState.isAllowed(command)){ // Trashes a command given at the wrong time
+                broker.unlock();
                 continue;
             }
             handleCommand(command); // runs the appropriate routine depending on the command received
             // Sends a reply to the client
             broker.send(clientOutput);
+            broker.unlock();
 
         }
         // This point should never be reached in normal circumstances

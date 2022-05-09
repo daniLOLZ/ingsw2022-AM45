@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BrokerTest {
 
@@ -48,14 +49,15 @@ public class BrokerTest {
 
     @Test
     public void deserializeTest(){
-
         InputStream stream = createJSONFile("{\n" +
                 "    \"COMMAND\" : \"CONNECTION_REQUEST\",\n" +
                 "    \"NICKNAME\" : \"gigio\"\n" +
                 "}");
         broker.receive(stream);
+        while (!broker.lock());
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
+        broker.unlock();
     }
 
     /*

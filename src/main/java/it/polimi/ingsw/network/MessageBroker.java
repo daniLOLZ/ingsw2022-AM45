@@ -57,11 +57,9 @@ public class MessageBroker {
 
     /**
      * Removes the oldest received message from the incoming messages buffer.
-     * Allows the broker to give access to next received message
      */
     private void flushFirstMessage(){
-        incomingMessages.remove(FIRST_RECEIVED);
-        readyForNext = true;
+        if (incomingMessages.size() > 0) incomingMessages.remove(FIRST_RECEIVED);
     }
 
     private void outFlush(){
@@ -95,26 +93,31 @@ public class MessageBroker {
     /**
      * Receives and stores the received message as an HashMap in the incoming message buffer
      * @param sourceInput the InputStream of the host to read the message from
-     * @return true if the message received is valid
      */
-    public boolean receive(InputStream sourceInput){
+    public void receive(InputStream sourceInput){
 
-        readyForNext = false;
         String receivedMessage;
         StringBuilder tempString = new StringBuilder();
         int rawReadInt;
         char rawChar;
         boolean endOfMessage = false;
+        boolean inString = false; //signals whether we are reading the content of a String
+        boolean escaped = false; //signals whether the next character is meant to be read as raw text
         int numberOfOpenCurlyBrackets = 0;
         try {
             while(!endOfMessage) {
                 rawReadInt = sourceInput.read();
                 rawChar = (char) rawReadInt;
 
-                //TODO this will break in case some user sends a curly bracket
+                if (!escaped) {
+                    if (rawChar == '\\') escaped = true;
+                    if (rawChar == '"') inString = !inString;
+                }
+                else escaped = false;
+
                 //Signals the end of the message based on the amount of curly bracket pairs
-                if (rawChar == '{') numberOfOpenCurlyBrackets++;
-                else if (rawChar == '}') numberOfOpenCurlyBrackets--;
+                if (!inString && rawChar == '{') numberOfOpenCurlyBrackets++;
+                else if (!inString && rawChar == '}') numberOfOpenCurlyBrackets--;
                 if (numberOfOpenCurlyBrackets == 0) {
                     endOfMessage = true;
                 }
@@ -125,29 +128,64 @@ public class MessageBroker {
             System.err.println(e.getMessage());
             //TODO handle user disconnection by passing it to ClientHandler somehow
             e.printStackTrace();
-            return false;
+            return;
         } catch (IOException e) {
             System.err.println("Error reading message from the network");
             e.printStackTrace();
-            return false;
+            return;
         }
         receivedMessage = tempString.toString();
 
         System.out.println("message received");
-        incomingMessages.add(deserialize(receivedMessage));
 
-        return checkFirstValidity();
+        Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
+
+        if (checkValidity(deserializedMessage)) {
+            incomingMessages.add(deserializedMessage);
+        }
     }
 
     /**
-     * Check if the first received message is in a valid format
+     * Asks to lock the incoming buffer to process the message
+     * @return false if broker is already locked or if there's no incoming message
+     */
+    public boolean lock(){//maybe this should just be synchronized
+        if (isReadyForNext()) {
+            if (incomingMessages.size() == 0) return false;
+            readyForNext = false;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * unlocks the incoming buffer and flushes the last executed message
+     */
+    public void unlock(){
+        if (!isReadyForNext()) {
+            readyForNext = true;
+            flushFirstMessage();
+        }
+    }
+
+    /**
+     * Checks if the first message in the buffer is in a valid format
      * @return true if the message is valid, false otherwise
      */
     public boolean checkFirstValidity(){
+        return checkValidity(incomingMessages.get(FIRST_RECEIVED));
+    }
+
+    /**
+     * Checks if the message is in a valid format
+     * @param message The message to check
+     * @return true if the message is valid, false otherwise
+     */
+    private boolean checkValidity(Map<NetworkFieldEnum, Object> message){
 
         Object object;
         // For each field, check whether it can be cast and return false if an exception is raised
-        List<NetworkFieldEnum> keyArray = new ArrayList<>(incomingMessages.get(FIRST_RECEIVED).keySet());
+        List<NetworkFieldEnum> keyArray = new ArrayList<>(message.keySet());
         for(NetworkFieldEnum field : keyArray){
             object = incomingMessages.get(FIRST_RECEIVED).get(field);
 
