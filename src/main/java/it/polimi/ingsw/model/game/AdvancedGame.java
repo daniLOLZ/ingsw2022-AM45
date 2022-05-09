@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.beans.AdvancedGameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.board.AdvancedBoard;
@@ -212,7 +213,12 @@ public class AdvancedGame extends SimpleGame {
             idIslands.add(islandGroup.getIdGroup());
         }
         for(Player player: players){
-            idAssistants.add(player.getAssistantPlayed().id);
+            Assistant assistant = player.getAssistantPlayed();
+            if(assistant != null)
+                idAssistants.add(assistant.id);
+            else
+                idAssistants.add(0);
+
             idPlayers.add(player.getPlayerId().index);
         }
         AdvancedGameBoardBean bean = new AdvancedGameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,

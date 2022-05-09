@@ -4,14 +4,16 @@ import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class CLI {
-    private List<GameElementBean> beans;
+public class CLI extends View{
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;
+    private final int startPosition = 0;
+    private final int centerPosition = 10;
 
 
     public CLI(){
@@ -21,10 +23,25 @@ public class CLI {
         LastElement = new StringBuilder();
     }
 
+    /**
+     *
+     * @return the string received as input by user
+     */
+    public String askCommand(){
+        System.out.println("ENTER COMMAND: ");
+        Scanner keyboard = new Scanner(System.in);
+        String command = keyboard.nextLine();
+        return command;
+    }
+
     public void show(){
+        final int highestPriority = 1;
         final int lowestPriority = 4;
         final int timeToNewLine = 1;
-        final int startPosition = 0;
+
+        View = new StringBuilder();
+        LastView = new StringBuilder();
+
         int precPriority = lowestPriority;
         int positionOnScreen = 0;
         GameElementBean curr = beans.get(0);
@@ -45,12 +62,17 @@ public class CLI {
                 }
             }
 
+            if(precPriority != curr.getPriority())
+                positionOnScreen = startPosition;
+
             if(precPriority == curr.getPriority())
                 positionOnScreen++;
 
             if(positionOnScreen > timeToNewLine)
                 positionOnScreen = startPosition;
 
+            if(curr.getPriority() == highestPriority )
+                positionOnScreen = centerPosition;
 
             draw(positionOnScreen, curr.drawCLI());
             precPriority = curr.getPriority();
@@ -63,13 +85,27 @@ public class CLI {
     }
 
     private void draw(int position, String elementToDraw){
-        int width = 7;
+        final int width = 6;
+        final String tab = "    ";
+        final String center = "\t\t\t\t\t\t\t\t";
 
 
-        if(position == 0){
+        if(position == startPosition){
             LastView = new StringBuilder(View.toString());
             View.append("\n\n");
             View.append(elementToDraw);
+            LastElement = new StringBuilder(elementToDraw);
+            return;
+        }
+
+        if(position == centerPosition){
+            LastView = new StringBuilder(View.toString());
+            View.append("\n\n");
+            Scanner scanner = new Scanner(elementToDraw);
+            scanner.useDelimiter("\n");
+            while (scanner.hasNext()){
+                View.append(center).append(scanner.next()).append("\n");
+            }
             LastElement = new StringBuilder(elementToDraw);
             return;
         }
@@ -85,7 +121,7 @@ public class CLI {
         //OFFSET
         StringBuilder offsetBuilder = new StringBuilder();
         for(int i = 0; i < width * position; i++){
-            offsetBuilder.append("\t");
+            offsetBuilder.append(tab);
         }
         String offset = offsetBuilder.toString();
         String last = LastView.toString();
@@ -104,14 +140,6 @@ public class CLI {
         LastElement = new StringBuilder(elementToDraw);
     }
 
-    public void addBean(GameElementBean bean){
-        beans.add(bean);
-    }
 
-    public void removeBean(int position){
-        beans.remove(position);
-    }
-    public void clearBeans(){
-        beans.clear();
-    }
+
 }
