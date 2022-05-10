@@ -110,8 +110,7 @@ public class Player implements DrawableObject {
             tempAssistant = wizard.playCard(assistantId);
         }
         catch (NoSuchAssistantException e){
-            e.printStackTrace();
-            //TODO handle exception better or propagate upwards
+            parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
         setAssistantPlayed(tempAssistant);
     }
@@ -120,11 +119,7 @@ public class Player implements DrawableObject {
         return nickname;
     }
 
-    //LUXRAY: con questo metodo possiamo creare il player e indipendentemente il Wizard.
-    //In questo modo possiamo dare la possibilità di scegliere il wizard che si vuole.
-    public void setWizard(Wizard wizard){
-        this.wizard = wizard;
-    }
+
 
     /**
      * Get from cloud the students to add at Entrance

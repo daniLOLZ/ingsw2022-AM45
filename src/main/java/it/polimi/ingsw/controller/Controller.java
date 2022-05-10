@@ -21,6 +21,7 @@ public class Controller {
     protected BoardHandler boardHandler;
     protected TurnHandler turnHandler;
     protected WinnerHandler winnerHandler;
+    protected IslandHandler islandHandler;
 
     public void createPlayerCreation(){
         playerCreation = new PlayerCreation(this);

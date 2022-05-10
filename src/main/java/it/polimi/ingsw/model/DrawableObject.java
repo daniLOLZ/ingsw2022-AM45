@@ -8,5 +8,5 @@ public interface DrawableObject {
      *
      * @return a JavaBean with all information about this class
      */
-    public GameElementBean toBean();
+    GameElementBean toBean();
 }

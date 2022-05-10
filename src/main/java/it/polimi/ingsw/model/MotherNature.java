@@ -23,6 +23,10 @@ public class MotherNature {
         return position;
     }
 
+    public void setPosition(IslandGroup position) {
+        this.position = position;
+    }
+
     public IslandGroup getPosition() {
         return position;
     }

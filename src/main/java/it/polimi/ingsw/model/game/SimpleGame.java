@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
@@ -17,6 +18,7 @@ import static java.lang.Math.abs;
 
 
 public class SimpleGame implements DrawableObject {
+    protected List<DrawableObject> drawables;
     private ErrorState errorState;
     private final int numPlayers;
     private final int maxStudentsByType;
@@ -114,6 +116,9 @@ public class SimpleGame implements DrawableObject {
         //createPlayers(numPlayers);
         createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
         parameters.setPlayersAllegiance(players);
+
+        drawables = new ArrayList<>();
+        setDrawables();
     }
 
     //TODO this could become a private method called from the constructor;
@@ -311,6 +316,9 @@ public class SimpleGame implements DrawableObject {
         isLastTurn = isLast;
     }
 
+    /**
+     * Fill clouds' student list with new student drawing from sack
+     */
     public void fillClouds(){
         for(Cloud cloud : clouds){
             cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
@@ -613,10 +621,60 @@ public class SimpleGame implements DrawableObject {
      * move Mother Nature across island groups.
      * Update the currentPositionMN in parameters.
      * @param steps >= 0
+     * @return id of islandGroup where MN has been placed
      */
-    public void moveMN(int steps){
+    public int  moveMN(int steps){
         IslandGroup positionMN = MN.move(steps);
         parameters.setIdIslandGroupMN(positionMN.getIdGroup());
+        return positionMN.getIdGroup();
+    }
+
+    /**
+     * Evaluate the influence on chosen island group.
+     * Get winnerTeam by  chosen island group's evaluate method, then
+     * call build method and if winnerTeam is different from No team
+     * it builds towers on chosen island group, then call mergeAdjacent
+     * and create a new islandGroup with island merged.
+     * Set Mother Nature on new island group and update parameters.
+     * If no merge is possible
+     * throws exception.
+     *
+     *
+     * @param idIsland != null
+     * @throws UnmergeableException when there are no island to merge
+     */
+    public void evaluateIsland(int idIsland) throws UnmergeableException {
+        final int  offsetNewIdIslandGroup = 100;
+        IslandGroup island = null;
+        IslandGroup newIsland = null;
+        TeamEnum winnerTeam;
+        for(IslandGroup isla : islandGroups )
+            if(isla.getIdGroup() == idIsland)
+                island = isla;
+
+
+        if(island != null){
+
+            winnerTeam = island.evaluateMostInfluential();
+            island.build(winnerTeam, players);
+            newIsland = island.mergeAdjacent(island.getIdGroup() + offsetNewIdIslandGroup, islandGroups);
+
+            //IF ISLAND GROUP WITH MN DOES NOT EXIST ANY MORE
+            //RESET MN POSITION
+            boolean setMN = !islandGroups.contains(MN.getPosition());
+            if(setMN){
+            MN.setPosition(newIsland);
+            parameters.setIdIslandGroupMN(newIsland.getIdGroup());
+            }
+        }
+
+        if(island == null){
+            parameters.setErrorState("INCORRECT ISLAND ID");
+        }
+
+        setDrawables();
+
+
     }
 
     /**
@@ -659,5 +717,46 @@ public class SimpleGame implements DrawableObject {
         }
         GameBoardBean bean = new GameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,turn,phase);
         return bean;
+    }
+
+    public void playAssistant(Player player, int id){
+        player.playAssistant(id);
+    }
+
+    /**
+     *
+     * @return the list with played assistants
+     */
+    public List<Assistant> playedAssistants(){
+        List<Assistant> playedAssistants = new ArrayList<>();
+        for(Player player: players)
+            playedAssistants.add(player.getAssistantPlayed());
+        return playedAssistants;
+    }
+
+    /**
+     *
+     * @return the list with all beans useful for View
+     */
+    public List<GameElementBean> getElementView(){
+        List<GameElementBean> beans = new ArrayList<>();
+        for(DrawableObject object: drawables){
+            beans.add(object.toBean());
+        }
+
+        return beans;
+    }
+
+    /**
+     * Set and update the list of drawable elements with correct model objects.
+     * Clear the previous list
+     */
+    public void setDrawables() {
+        drawables.clear();
+        drawables.add(this);
+        drawables.addAll(islandGroups);
+        drawables.addAll(players);
+        drawables.addAll(clouds);
+
     }
 }

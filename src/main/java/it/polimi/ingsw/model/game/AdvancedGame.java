@@ -11,9 +11,11 @@ import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
 import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,11 +210,96 @@ public class AdvancedGame extends SimpleGame {
     }
 
     /**
-     * a java Bean with all general information about this game,
-     * a list with island groups id, a list of played assistants,
-     * a list of players id, the current player id, current turn number,
-     * current phase, Game coins and Character Cards id of this game
-     * @return
+     * Update professor considering the presence of glutton's effect
+     * @param professor the professor who needs to checked for updates
+     */
+    @Override
+    public void updateProfessor(StudentEnum professor) {
+        if(!advancedParameters.isDrawIsWin())
+            super.updateProfessor(professor);
+        else{
+            Player currentPlayer = parameters.getCurrentPlayer();
+            int max = currentPlayer.getNumStudentAtTable(professor);
+            Player challenger = currentPlayer;
+            int curr;
+
+            for(Player player: players){
+                curr = player.getNumStudentAtTable(professor);
+                if( curr > max ){
+                    challenger = player;
+                }
+            }
+
+            parameters.addProfessor(challenger.getPlayerId(), professor);
+        }
+    }
+
+    /**
+     *
+     * @param player who want to use the card
+     * @param idCard of the character card
+     * @return true if id is valid and player has enough coins
+     */
+    public boolean canUseCharacterCard(AdvancedPlayer player, final int idCard){
+        CharacterCard card = null;
+        for(CharacterCard x : CharacterCards){
+            if(x.id == idCard)
+                card = x;
+        }
+
+        return card == null || card.getCardCost() > player.getNumCoins();
+
+    }
+
+
+    /**
+     *
+     * @param idIsland > 0
+     * @return true if chosen island have one or more block tiles
+     */
+    public boolean isBlocked(int idIsland){
+        IslandGroup island = null;
+        for(IslandGroup islandGroup: islandGroups){
+            if(islandGroup.getIdGroup() == idIsland)
+                island = islandGroup;
+        }
+
+        if(island == null){
+            parameters.setErrorState("WRONG ID ISLAND GROUP");
+            return false;
+        }
+
+        //In advanced game we have advanced islandGroup
+        AdvancedIslandGroup advancedIsland = (AdvancedIslandGroup) island;
+        return advancedIsland.getNumBlockTiles() > 0;
+    }
+
+    /**
+     * Remove a block tile from chosen island
+     * @param idIsland > 0
+     */
+    public void unblockIsland(int idIsland){
+        IslandGroup island = null;
+        for(IslandGroup islandGroup: islandGroups){
+            if(islandGroup.getIdGroup() == idIsland)
+                island = islandGroup;
+        }
+
+        if(island == null){
+            parameters.setErrorState("WRONG ID ISLAND GROUP");
+            return;
+        }
+
+        AdvancedIslandGroup advancedIsland = (AdvancedIslandGroup) island;
+        advancedIsland.unblock();
+    }
+
+    /**
+     *
+     * @return a java Bean with all general information about this game,
+     *       a list with island groups id, a list of played assistants,
+     *       a list of players id, the current player id, current turn number,
+     *       current phase, Game coins and Character Cards id of this game
      */
     @Override
     public GameElementBean toBean() {
@@ -242,6 +329,12 @@ public class AdvancedGame extends SimpleGame {
         AdvancedGameBoardBean bean = new AdvancedGameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,
                 turn,phase, numCoins, idCharacterCards);
         return bean;
+    }
+
+    @Override
+    public void setDrawables() {
+        super.setDrawables();
+        drawables.addAll(CharacterCards);
     }
 }
 
