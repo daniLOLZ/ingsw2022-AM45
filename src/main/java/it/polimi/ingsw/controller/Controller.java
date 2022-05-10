@@ -22,14 +22,38 @@ public class Controller {
     protected TurnHandler turnHandler;
     protected WinnerHandler winnerHandler;
     protected IslandHandler islandHandler;
+    protected final List<Integer> playerNumbers;
 
-    public void createPlayerCreation(){
-        playerCreation = new PlayerCreation(this);
+
+    /**
+     * Creates a new game controller
+     * @param playerNumbers the idUsers of the users playing:
+     *                      the user whose id is in position 0 will be PlayerEnum.PLAYER1, etc..
+     * @param gameRule the rules chosen for this game
+     */
+    public Controller(List<Integer> playerNumbers, GameRuleEnum gameRule){
+        createPlayerCreation();
+        this.playerNumbers = playerNumbers;
+        this.gameRule = gameRule;
+        //TODO
     }
 
     public Controller(){
 
-        //TODO
+    /**
+     * Creates a game with simple rules using the wizards, tower colors and nicknames stored in playerCreation
+     */
+    public boolean createSimpleGame(){
+        try{
+            simpleGame = new SimpleGame(GameRuleEnum.getNumPlayers(gameRule.id),
+                                        playerCreation.getWizards(),
+                                        playerCreation.getTeamColors(),
+                                        playerCreation.getNicknames());
+        } catch (IncorrectPlayersException e) {
+            System.err.println("Error creating the game!");
+            return false;
+        }
+        return true;
     }
 
     public void createSimpleGame(int numPlayers){

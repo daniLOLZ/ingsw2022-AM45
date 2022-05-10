@@ -75,11 +75,13 @@ public class ActiveLobbies {
      */
     public static boolean startGame(Lobby lobby){
 
-        if (lobbies.contains(lobby)) {
+        if (lobbies.contains(lobby) &&
+            lobby.everyoneReady()   ) {
+
             ActiveGames.createGame(lobby);
             return true; //TODO create everything
+            //todo destroy lobby after creating game?
         }
-        //todo check if all players ready
         return false;
     }
 }

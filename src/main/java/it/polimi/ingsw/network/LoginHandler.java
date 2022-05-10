@@ -40,4 +40,13 @@ public class LoginHandler {
             return progressiveId++;
         }
     }
+
+    /**
+     * Returns the nickname associated with this id at the time of login
+     * @param id the idUser of the user
+     * @return the nickname of the user with the specified id
+     */
+    public static String getNicknameFromId(Integer id){
+        return idUserToNickname.get(id);
+    }
 }

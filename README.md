@@ -9,10 +9,10 @@
 | Functionality  | State |
 |:---------------|:-----:|
 | Basic rules    |  🟢   |
-| Complete rules |  🟡   |
+| Complete rules |  🟢   |
 | Controller     |  🟡   |
 | Socket         |  🟡   |
-| CLI            |  🔴   |
+| CLI            |  🟡   |
 | GUI            |  🔴   |
 | Multiple games |  🟡   |
 

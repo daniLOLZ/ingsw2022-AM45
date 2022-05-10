@@ -14,22 +14,28 @@ public class ActiveGames {
     private static Map<Integer, Controller> userToGameAssociation = new HashMap<>();
 
     /**
-     * Creates a new game based on information from the lobby
+     * Creates a new game controller based on information from the lobby
+     * The lobby contains information on the number of players, the rules of the game and the ids of the players
      * @param lobby the lobby to get the information from
      */
     public static void createGame(Lobby lobby){
-        Controller controller = new Controller();
-        //todo
+        Controller controller = new Controller(lobby.getPlayers(), lobby.getGameType());
         GameRuleEnum rule = lobby.getGameType();
         int playerNumber = GameRuleEnum.getNumPlayers(rule.id);
 
+        //gets the nicknames of the players in the lobby from the LoginHandler
+        for(Integer idUser : lobby.getPlayers()){
+            controller.setNickname(LoginHandler.getNicknameFromId(idUser), idUser);
+        }
+/*
+        //Creation of the game can't happen yet, we need the wizards and teams first
         if(GameRuleEnum.isSimple(rule.id)){
             controller.createSimpleGame(playerNumber);
         }
         else if(GameRuleEnum.isAdvanced(rule.id)){
             controller.createAdvancedGame(playerNumber);
         }
-        // todo still
+*/
         // Adds the controller to the list
         gameControllers.add(controller);
 
