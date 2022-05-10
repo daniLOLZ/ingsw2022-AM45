@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
@@ -25,6 +26,22 @@ public class AdvancedGame extends SimpleGame {
                                                     // col controller? In ogni caso si può vedere se servono davvero
     private AdvancedParameterHandler advancedParameters;
 
+
+    public AdvancedGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames, int numCoins, int numCharacterCards) throws  IncorrectPlayersException{
+        super(numPlayers, selectedWizards, selectedColors, nicknames);
+        advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
+                                                    // time because we need to create parameters before
+                                                    // creating the islands, this happens in the createParameters()
+                                                    // method, which don't have the number of coins as input
+        CharacterCards = new ArrayList<>();
+        for(int card = 0; card < numCharacterCards; card++){
+            CharacterCards.add(FactoryCharacterCard.
+                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+        }
+        for(int card = 0; card < numCharacterCards; card++){
+            CharacterCards.get(card).initialise(this);
+        }
+    }
 
     @Deprecated
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException {

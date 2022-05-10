@@ -343,6 +343,9 @@ public class ClientHandler implements Runnable{
         else {
             notifyError("The chosen team isn't available, please change your selection");
         }
+        if (userController.startPlayingGame()){
+            setConnectionState(new WaitingForControl());
+        } // todo might need better handling
     }
 
     /**
@@ -357,14 +360,17 @@ public class ClientHandler implements Runnable{
         else {
             notifyError("The chosen wizard isn't available, please change your selection");
         }
+        if (userController.startPlayingGame()){
+            setConnectionState(new WaitingForControl());
+        } // todo might need better handling
     }
 
     /**
-     * The users requests to start the game
+     * The user requests to start the game
      * The request will be successful only if the host coincides with the user and all players are ready
      */
     private void startGame() {
-        if(this.idUser != userLobby.getHost()){
+        if(!userLobby.isHost(this.idUser)){
             notifyError("You're not the host! You can't start the game.");
         }
         else {

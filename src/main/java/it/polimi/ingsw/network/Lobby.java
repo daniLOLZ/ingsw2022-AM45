@@ -124,4 +124,24 @@ public class Lobby {
     public List<Integer> getPlayers(){
         return this.players;
     }
+
+    /**
+     * Checks whether the user is the host of this lobby
+     * @param idUser
+     * @return true if idUser is equal to this.host
+     */
+    public boolean isHost(int idUser){
+        return idUser == this.host;
+    }
+
+    /**
+     * Tests whether every player in the lobby is ready by comparing the players and playersReady lists
+     * @return true if every player in the lobby is ready
+     */
+    public boolean everyoneReady(){
+        if(this.players.containsAll(this.playersReady)){
+            return true;
+        }
+        else return false;
+    }
 }
