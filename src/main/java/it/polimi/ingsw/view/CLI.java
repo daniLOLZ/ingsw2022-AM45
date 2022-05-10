@@ -110,6 +110,29 @@ public class CLI extends View{
             return;
         }
 
+        Scanner moreRowsLastElement = new Scanner(LastElement.toString());
+        Scanner moreRowsThisElement = new Scanner(elementToDraw);
+        moreRowsLastElement.useDelimiter("\n");
+        moreRowsThisElement.useDelimiter("\n");
+        int lastElementRows = 0;
+        int thisElementRows = 0;
+        while(moreRowsLastElement.hasNext()){
+            moreRowsLastElement.next();
+            lastElementRows++;
+        }
+
+        while(moreRowsThisElement.hasNext()){
+            moreRowsThisElement.next();
+            thisElementRows++;
+        }
+
+        if(thisElementRows > lastElementRows){
+            String toggle = elementToDraw;
+            elementToDraw = LastElement.toString();
+            LastElement = new StringBuilder(toggle);
+        }
+
+
         //Old element to show in left position on screen
         Scanner scannerLastElement = new Scanner(LastElement.toString());
         scannerLastElement.useDelimiter("\n");
@@ -126,13 +149,21 @@ public class CLI extends View{
         String offset = offsetBuilder.toString();
         String last = LastView.toString();
 
+
+
+
+
+
         /*
         now for each old element's row I append the new element's row with an offset.
         I must start from the last view, before the old element was inserted, and append
         both two elements.
          */
-        while(scannerLastElement.hasNext() && scannerThisElement.hasNext()){
-            LastView.append(scannerLastElement.next()).append(offset).append(scannerThisElement.next()).append("\n");
+        while(scannerLastElement.hasNext() || scannerThisElement.hasNext()){
+            if(!scannerThisElement.hasNext())
+                LastView.append(scannerLastElement.next()).append("\n");
+            else
+                LastView.append(scannerLastElement.next()).append(offset).append(scannerThisElement.next()).append("\n");
         }
 
 
