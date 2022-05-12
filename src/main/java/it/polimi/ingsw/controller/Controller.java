@@ -9,7 +9,6 @@ import it.polimi.ingsw.model.game.SimpleGame;
 
 import java.util.List;
 
-//TODO
 public class Controller {
 
     protected PlayerCreation playerCreation;
@@ -21,6 +20,7 @@ public class Controller {
     protected BoardHandler boardHandler;
     protected TurnHandler turnHandler;
     protected WinnerHandler winnerHandler;
+    protected SelectionHandler selectionHandler;
     protected final List<Integer> playerNumbers;
     protected IslandHandler islandHandler;
 
@@ -113,9 +113,26 @@ public class Controller {
         playerCreation = new PlayerCreation(this);
     }
 
-    public void createBasicHandlers(){
-        characterCardHandler = new CharacterCardHandler(this);
-        boardHandler = new BoardHandler(this);
+    /**
+     * Creates the handlers for this controller, depending on whether the game is simple or advanced
+     * @param advanced true if the game needs to be its advanced variation
+     */
+    public void createBasicHandlers(boolean advanced){
+        selectionHandler = new SelectionHandler(this);
+        assistantHandler = new AssistantHandler(this);
+        turnHandler = new TurnHandler(this);
+        winnerHandler = new WinnerHandler(this);
+        if(advanced){
+            characterCardHandler = new CharacterCardHandler(this);
+            boardHandler = new AdvancedBoardHandler(this);
+            islandHandler = new AdvancedIslandHandler(this);
+        }
+        else {
+            boardHandler = new BoardHandler(this);
+            islandHandler = new IslandHandler(this);
+        }
+
+
     }
 
     private void createView(){
@@ -172,13 +189,27 @@ public class Controller {
         if(GameRuleEnum.isAdvanced(gameRule.id)){
             if(!createAdvancedGame()) return false;
         }
+        createBasicHandlers(GameRuleEnum.isAdvanced(gameRule.id));
 
-        createBasicHandlers();
+        simpleGame.initializeGame();
+
         return true;
     }
+
+    /**
+     * By calling the appropriate handler, checks whether all students have moved for this turn
+     * @return true if all students have moved for this action phase
+     */
+    public boolean allStudentsMoved(){
+        return boardHandler.allStudentsMoved();
+    }
+
+
     /*____________________________
         Network command handling
     ______________________________*/
+
+
     /**
      * By calling the appropriate handler, sets the nickname of the user with the given id in the PlayerCreation class
      * @param nickname a string representing the nickname of the user
@@ -249,19 +280,28 @@ public class Controller {
      * @return true if the user gained control
      */
     public boolean askForControl(Integer idUser, PhaseEnum gamePhase) {
-        //TODO
-        return false;
+        return turnHandler.askForControl(idUser, gamePhase);
     }
 
     /**
      * By calling the appropriate handler, the user plays an assistant card. idUser is not necessary
      * since only one player is the active player at this point of the game
+     * If the planning phase is over, starts the action phase
      * @param idAssistant the id of the assistant card to play
      * @return true if the action succeeded
      */
     public boolean playAssistant(Integer idAssistant) {
-        //TODO
-        return false;
+        if(!assistantHandler.playCard(idAssistant)){
+            return false;
+        }
+        turnHandler.endPlayerPhase();
+
+        //If everyone played their assistants, go to the next phase
+        if(turnHandler.isPhaseOver()) {
+            turnHandler.nextPhase();
+            simpleGame.sortPlayers(); // move to turn handler?
+        }
+        return true;
     }
 
     /**
@@ -270,8 +310,10 @@ public class Controller {
      * @return true if the selection was successful
      */
     public boolean selectStudent(Integer selectedStudent) {
-        // TODO
-        return false;
+        //needs to check that the player doesn't move more students than they're allowed
+        if(boardHandler.allStudentsMoved()) return false;
+        selectionHandler.selectStudentAtEntrance(selectedStudent);
+        return true;
     }
 
     /**
@@ -279,8 +321,8 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean putInHall() {
-        //TODO
-        return false;
+        if(!boardHandler.moveFromEntranceToHall()) return false;
+        return true;
     }
 
     /**
@@ -289,38 +331,47 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean putInIsland(Integer idIsland) {
-        //TODO
-        return false;
+        if(!boardHandler.moveFromEntranceToIsland(idIsland)) return false;
+        return true;
     }
 
     /**
      * By calling the appropriate handler, deselects the currently selected student
      * @return true if the action succeeded
      */
-    public boolean deselectStudent() {
-        //TODO
-        return false;
+    public boolean deselectStudent(Integer position) {
+        selectionHandler.deselectStudentAtEntrance(position);
+        return true;
     }
 
     /**
      * By calling the appropriate handler, moves mother nature by the given amount of steps
+     * Calls all the methods needed to check for changes in the board like tower building
      * @param steps the amount of steps MN will take
-     * @return true if the actions succeeded
+     * @return true if the action succeeded
      */
     public boolean moveMNToIsland(Integer steps) {
-        //TODO
-        return false;
+        if(!islandHandler.moveMN(steps)){
+            return false;
+        }
+        return true;
     }
 
     /**
      * By calling the appropriate handler, this method refills the player's entrance
      * with the students from the selected cloud
      * @param idCloud the id of the cloud to take students from
-     * @return true if the actions succeeded
+     * @return true if the action succeeded
      */
     public boolean chooseCloud(Integer idCloud) {
-        //TODO
-        return false;
+        if(!boardHandler.takeFromCloud(idCloud)){
+            return false;
+        }
+        turnHandler.endPlayerPhase();
+        if(turnHandler.isPhaseOver()){
+            turnHandler.nextPhase();
+        }
+        return true;
     }
 
     /**
@@ -338,7 +389,7 @@ public class Controller {
     /**
      * By calling the appropriate handler, this method selects the chosen color
      * @param color the student color the user selected
-     * @return true if the actions succeeded
+     * @return true if the action succeeded
      */
     public boolean selectStudentColor(List<StudentEnum> color) {
 
@@ -349,7 +400,7 @@ public class Controller {
     /**
      * By calling the appropriate handler, this method selects the students on the character card
      * @param students the positions of the students on the card
-     * @return true if the actions succeeded
+     * @return true if the action succeeded
      */
     public boolean selectStudentOnCard(List<Integer> students) {
         //TODO
@@ -359,7 +410,7 @@ public class Controller {
     /**
      * By calling the appropriate handler, this method selects the students at the entrance
      * @param students the positions of the students at the entrance
-     * @return true if the actions succeeded
+     * @return true if the action succeeded
      */
     public boolean selectEntranceStudents(List<Integer> students) {
         //TODO
@@ -369,9 +420,19 @@ public class Controller {
     /**
      * By calling the appropriate handler, this method selects the island groups
      * @param islandIds the ids of the island groups chosen
-     * @return true if the actions succeeded
+     * @return true if the action succeeded
      */
     public boolean selectIslandGroups(List<Integer> islandIds) {
+        //TODO
+        return false;
+    }
+
+    /**
+     * By calling the appropriate handler, this method plays the character card
+     * @param cardPosition the position of the card on the board
+     * @return true if the activation was successful
+     */
+    public boolean playCard(Integer cardPosition){
         //TODO
         return false;
     }

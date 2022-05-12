@@ -28,7 +28,8 @@ public class SimpleGame implements DrawableObject {
     private int currentIslandGroupId;
     protected List<IslandGroup> islandGroups; // These are not in order of navigation, the order
                                             // is given by the pointers
-    protected List<Player> players; // These will not be in order, they will get shifted around
+    protected List<Player> players; // These will not be in order, they will get shifted around depending
+                                    // on the turn order for that round
     private List<Cloud> clouds;
     private MotherNature MN;
     protected Sack sack;
@@ -129,6 +130,12 @@ public class SimpleGame implements DrawableObject {
     public void initializeGame(){
         //We must not initialize twice
         if (hasBeenInitialized) return;
+
+        //Assumption that the first player is number one, can be changed
+        Player firstPlayer = GameHelper.getPlayerById(players, PlayerEnum.PLAYER1);
+        parameters.setCurrentPlayer(firstPlayer);
+        parameters.setCurrentPhase(PhaseEnum.PLANNING);
+        parameters.setTurn(1);
 
         // Moves Mother nature to a random island
         int MNStartingPosition = abs(new Random().nextInt() % amountOfIslands);
@@ -483,19 +490,22 @@ public class SimpleGame implements DrawableObject {
     }
 
     /**
-     * player's turn starts and this player becomes the current player and the current phase
+     * player's planning phase starts and this player becomes the current player and the current phase
      * becomes PLANNING
-     * @param player != null
+     * @param player the index of the player (in the current ordering) that can now play
      */
-    public void startPhase(int player){
+    public void startPlanningPhase(int player){
         parameters.setCurrentPlayer(players.get(player));
         parameters.setCurrentPhase(PhaseEnum.PLANNING);
     }
 
     /**
-     * current phase becomes ACTION
+     * player's action phase starts and this player becomes the current player and the current phase
+     * becomes ACTION
+     * @param player the index of the player (in the current ordering) that can now play
      */
-    public void actionPhase(){
+    public void startActionPhase(int player){
+        parameters.setCurrentPlayer(players.get(player));
         parameters.setCurrentPhase(PhaseEnum.ACTION);
     }
 
@@ -504,11 +514,13 @@ public class SimpleGame implements DrawableObject {
      * move the student  from position parameter.selectedEntranceStudents
      * into the correct Hall's table.
      * Call updateProfessor
+     * Deselects the entrance student
      * @param player != null
      */
     public void moveFromEntranceToHall(Player player){
         StudentEnum studentColor = player.moveFromEntranceToHall();
         updateProfessor(studentColor);
+        deselectAllEntranceStudents();
     }
 
     /**
@@ -516,7 +528,9 @@ public class SimpleGame implements DrawableObject {
      * @param player != null
      * @param position >= 0
      */
+
     public void selectStudentAtEntrance(Player player, int position){
+        //todo remove legacy selection, now in parameters
         player.selectStudentAtEntrance(position);
         selectEntranceStudent(position);
     }
@@ -524,12 +538,14 @@ public class SimpleGame implements DrawableObject {
     /**
      * Move the student  from position parameter.selectedEntranceStudents
      * to islandGroup with chosen idIslandGroup
+     * Deselects the students positions
      * @param player != null
      * @param idIslandGroup > 0 && < islandGroups.size()
      */
     public void moveFromEntranceToIsland(Player player, int idIslandGroup){
         IslandGroup island = islandGroups.get(idIslandGroup);
         player.moveFromEntranceToIsland(island);
+        deselectAllEntranceStudents();
     };
 
 
@@ -544,8 +560,26 @@ public class SimpleGame implements DrawableObject {
         parameters.selectIsland(islandGroup);
     }
 
-    public void selectEntranceStudent(int position){
 
+    /**
+     * Deselects the student at the entrance at the position given
+     * @param position the position at the entrance of the student to deselect
+     */
+    public void deselectEntranceStudent(Integer position){
+        if(!parameters.getSelectedEntranceStudents().isPresent()) return;
+        else {
+            parameters.getSelectedEntranceStudents().get().remove((Integer)position);
+        }
+    }
+
+    /**
+     * Deselects all the students at the entrance by replacing it with an empty list
+     */
+    public void deselectAllEntranceStudents(){
+        parameters.setSelectedEntranceStudents(new ArrayList<>());
+    }
+
+    public void selectEntranceStudent(Integer position){
 
         if(parameters.getSelectedEntranceStudents().isEmpty()){
             List<Integer> positionList = new ArrayList<>();
@@ -582,6 +616,16 @@ public class SimpleGame implements DrawableObject {
      */
     public boolean checkValidIdIsland(final int idIslandGroup){
         return islandGroups.stream().anyMatch(island -> island.getIdGroup() == idIslandGroup);
+    }
+
+    /**
+     * Checks whether the cloud can be selected (has a valid id and hasn't been taken already)
+     * @param idCloud the cloud chosen
+     * @return true if the cloud exists and still has players to take
+     */
+    public boolean checkValidIdCloud(Integer idCloud) {
+        return (idCloud >= 0 && idCloud < numPlayers &&
+                !clouds.get(idCloud).isEmpty());
     }
 
     /**
@@ -759,4 +803,5 @@ public class SimpleGame implements DrawableObject {
         drawables.addAll(clouds);
 
     }
+
 }

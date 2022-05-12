@@ -19,12 +19,17 @@ public class AdvancedBoardHandler extends BoardHandler{
     /**
      * move a student from chosen position at currentPlayer's entrance
      * to hall and assign a coin to currentPlayer if he deserves it.
-     * @param position > 0
+     * Student was already chosen previously
      */
     @Override
-    public void moveFromEntranceToHall(int position) {
+    public boolean moveFromEntranceToHall() {
         getCurrentPlayer();
-        controller.advancedGame.selectStudentAtEntrance(currentPlayer, position);
+        if(!controller.advancedGame.getParameters().getSelectedEntranceStudents().isPresent()){
+            controller.advancedGame.getParameters().setErrorState("CANNOT ADD TO HALL, STUDENT NOT CHOSEN");
+            return false;
+        }
         controller.advancedGame.moveFromEntranceToHall(currentPlayer);
+        numberOfStudentsMoved++;
+        return true;
     }
 }

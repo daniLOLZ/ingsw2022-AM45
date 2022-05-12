@@ -132,8 +132,6 @@ public class AdvancedGame extends SimpleGame {
                     player.isLeader(),
                     getParameters()));
         }
-
-        //TODO VERSION WITH OVERRIDE
     }
 
     @Override
@@ -224,6 +222,7 @@ public class AdvancedGame extends SimpleGame {
             advancedPlayer.addCoin();
             advancedParameters.removeCoin();
         }
+        deselectAllEntranceStudents();
     }
 
     /**

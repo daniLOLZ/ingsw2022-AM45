@@ -22,10 +22,10 @@ public class IslandHandler {
      * Update Mother Nature position and update parameters.
      * @param steps > 0
      */
-    public void moveMN(int steps){
+    public boolean moveMN(int steps){
         if(!checkCorrectSteps(steps)){
             controller.simpleGame.getParameters().setErrorState("INCORRECT STEPS");
-            return;
+            return false;
         }
 
         int idIsland = controller.simpleGame.moveMN(steps);
@@ -35,7 +35,9 @@ public class IslandHandler {
         } catch (UnmergeableException e) {
             //Non so cosa dovrei fare
         }
-
+        finally {
+            return true;
+        }
     }
 
     /**

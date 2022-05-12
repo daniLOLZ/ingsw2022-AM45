@@ -29,6 +29,16 @@ public class SelectionHandler {
         }
     }
 
+    /**
+     * Deselects the student at the player's entrance at the position given
+     * @param position the position of the student to deselect
+     * @return true if the deselection didn't cause errors (so if it deselected student or did nothing)
+     */
+    public boolean deselectStudentAtEntrance(Integer position){
+        controller.simpleGame.deselectEntranceStudent(position);
+        return true;
+    }
+
     public void selectStudentAtEntrance(int position){
         controller.simpleGame.selectEntranceStudent(position);
     }
@@ -38,6 +48,7 @@ public class SelectionHandler {
             selectStudentAtEntrance(position);
         }
     }
+
 
     public void selectStudentType(StudentEnum type){
         controller.simpleGame.selectStudentType(type);

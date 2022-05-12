@@ -45,6 +45,7 @@ public class Board {
         return numberOfTowers <= 0;
     }
 
+    //todo remove legacy selection, now in parameters
     public void setSelectedEntranceStudentPos(int pos){
         selectedEntranceStudentPos = Optional.of(pos);
     }
@@ -59,6 +60,7 @@ public class Board {
      * Resets selectedEntranceStudentPos.
      * @return moved student's type
      */
+    //todo remove legacy selection, now in parameters
     public StudentEnum moveFromEntranceToHall(){
 
         //no selected student
@@ -84,6 +86,7 @@ public class Board {
      * Resets selectedEntranceStudentPos.
      * @param chosenIsland the IslandGroup selected by the current player
      */
+    //todo remove legacy selection, now in parameters
     public void moveFromEntranceToIsland(IslandGroup chosenIsland){
 
         //no selected student
@@ -102,6 +105,7 @@ public class Board {
      * call empty from chosenCloud and add the elements of the obtained collection to studentsAtEntrance collection
      * @param chosenCloud the Cloud chosen by the current player
      */
+    //todo remove legacy selection, now in parameters
     public void moveFromCloud(Cloud chosenCloud){
 
         //get students from chosenCloud

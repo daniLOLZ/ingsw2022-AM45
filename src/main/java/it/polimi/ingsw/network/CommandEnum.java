@@ -21,7 +21,7 @@ public enum CommandEnum {
     SELECT_STUDENT("Select Student",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     PUT_IN_HALL("Put in Hall",                          new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     PUT_IN_ISLAND("Put in Island",                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLAND}),
-    DESELECT_STUDENT("Deselect Student",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
+    DESELECT_STUDENT("Deselect Student",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     MOVE_MN_TO_ISLAND("Move MN to Island",              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, STEPS_MN}),
     CHOOSE_CLOUD("Choose Cloud",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_CLOUD}),
     SELECT_CHARACTER("Select Character",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION}),

@@ -65,7 +65,7 @@ public class CLITest {
         for(Player playerX: game.getPlayers()){
             playerX.playAssistant(0);
         }
-        game.startPhase(PlayerEnum.PLAYER1.index);
+        game.startPlanningPhase(PlayerEnum.PLAYER1.index);
         GameElementBean beanG = game.toBean();
         Cloud cloud = new Cloud(1,3);
         List<StudentEnum> listStudent = new ArrayList<StudentEnum>();
@@ -132,7 +132,7 @@ public class CLITest {
         for(Player playerX: game.getPlayers()){
             playerX.playAssistant(0);
         }
-        game.startPhase(PlayerEnum.PLAYER1.index);
+        game.startPlanningPhase(PlayerEnum.PLAYER1.index);
         GameElementBean beanG = game.toBean();
 
 

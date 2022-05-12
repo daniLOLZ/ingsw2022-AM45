@@ -32,20 +32,20 @@ public class AssistantHandler {
     /**
      * play an assistant card if the chosen card is valid.
      * Update the lists assistantPlayed and turnPlayer.
-     *
-     * @param id > 0
+     * @param id the id of the assistant to play ( > 0 )
+     * @return true if the assistant was played successfully
      */
-    public void playCard(int id){
+    public boolean playCard(int id){
         assistantsPlayed = controller.simpleGame.playedAssistants();
         Player currentPlayer = controller.simpleGame.getParameters().getCurrentPlayer();
         if(checkValidAssistant(id)){
-        controller.simpleGame.playAssistant(currentPlayer, id);
-
+            controller.simpleGame.playAssistant(currentPlayer, id);
         }
-
-        else
+        else{
             controller.simpleGame.getParameters().setErrorState("INVALID ASSISTANT");
-
+            return false;
+        }
+        return true;
     }
 
 

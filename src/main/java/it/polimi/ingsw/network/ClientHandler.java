@@ -19,6 +19,7 @@ public class ClientHandler implements Runnable{
     private int idUser;
     private MessageBroker broker;
     private ConnectionState connectionState;
+    private ConnectionState callbackConnectionState;
     private Lobby userLobby;
     private Controller userController;
 
@@ -121,10 +122,29 @@ public class ClientHandler implements Runnable{
             case SELECT_STUDENT_ON_CARD -> selectStudentOnCard();
             case SELECT_ENTRANCE_STUDENTS -> selectEntranceStudents();
             case SELECT_ISLAND_GROUP -> selectIslandGroup();
-
-            //TODO rest of commands
+            case PLAY_CHARACTER -> playCharacter();
         }
     }
+
+
+    /*
+     *  For all the methods below, the game connection state updates accordingly
+     */
+
+    /**
+     * The player plays the card for which they (optionally) selected the requirements
+     */
+    private void playCharacter() {
+        Integer cardPosition = (Integer)broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
+        if(userController.playCard(cardPosition)){
+            notifySuccessfulOperation();
+            setConnectionState(callbackConnectionState);
+        }
+        else {
+            notifyError("Couldn't play the character card");
+        }
+    }
+
 
     /**
      * Card requirements method.
@@ -203,6 +223,10 @@ public class ClientHandler implements Runnable{
      * The user selects a character card to play
      */
     private void selectCharacter() {
+        //Here we need to memorize what the previous state the user had to resume the turn
+        // after the character takes effect
+        callbackConnectionState = connectionState;
+
         Integer cardPosition = (Integer) broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
         if(!userController.selectCard(cardPosition)){
             notifyError("Couldn't play the card, not enough coins");
@@ -227,6 +251,7 @@ public class ClientHandler implements Runnable{
     private void chooseCloud() {
         Integer idCloud = (Integer) broker.readField(NetworkFieldEnum.ID_CLOUD);
         if(userController.chooseCloud(idCloud)){
+            setConnectionState(new WaitingForControl());
             notifySuccessfulOperation();
         }
         else {
@@ -241,6 +266,7 @@ public class ClientHandler implements Runnable{
         Integer steps = (Integer)broker.readField(NetworkFieldEnum.STEPS_MN);
         if(userController.moveMNToIsland(steps)){
             notifySuccessfulOperation();
+            setConnectionState(new CloudChoosing());
         }
         else {
             notifyError("Couldn't move mother nature");
@@ -251,8 +277,10 @@ public class ClientHandler implements Runnable{
      * The user deselects the student
      */
     private void deselectStudent() {
-        if(userController.deselectStudent()){
+        Integer studentPosition = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
+        if(userController.deselectStudent(studentPosition)){
             notifySuccessfulOperation();
+            setConnectionState(new StudentChoosing());
         }
         else {
             notifyError("Couldn't deselect the student");
@@ -266,6 +294,12 @@ public class ClientHandler implements Runnable{
         Integer idIsland = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ISLAND);
         if(userController.putInIsland(idIsland)){
             notifySuccessfulOperation();
+            if(userController.allStudentsMoved()){
+                setConnectionState(new MNMoving());
+            }
+            else {
+                setConnectionState(new StudentChoosing());
+            }
         }
         else {
             notifyError("Couldn't put the student on the island");
@@ -278,6 +312,12 @@ public class ClientHandler implements Runnable{
     private void putInHall() {
         if(userController.putInHall()){
             notifySuccessfulOperation();
+            if(userController.allStudentsMoved()){
+                setConnectionState(new MNMoving());
+            }
+            else {
+                setConnectionState(new StudentChoosing());
+            }
         }
         else {
             notifyError("Couldn't put the student in the hall");
@@ -291,9 +331,11 @@ public class ClientHandler implements Runnable{
         Integer selectedStudent = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
         if(userController.selectStudent(selectedStudent)){
             notifySuccessfulOperation();
+            setConnectionState(new StudentMoving());
         }
         else {
-            notifyError("Error selecting the student");
+            notifyError("Error selecting the student, you've chosen all students already");
+
         }
     }
 
@@ -322,7 +364,7 @@ public class ClientHandler implements Runnable{
                 setConnectionState(new PlanningPhaseTurn());
             }
             else if(gamePhase.equals(PhaseEnum.ACTION)){
-                setConnectionState(new ActionPhaseTurn());
+                setConnectionState(new StudentChoosing());
             }
             notifySuccessfulOperation();
         }
@@ -330,6 +372,8 @@ public class ClientHandler implements Runnable{
             notifyError("Not your turn to play");
         }
     }
+
+    // Above this point, the commands relate to the actual game
 
     /**
      * The user selects a team to be part of, this method calls the game controller to know whether the

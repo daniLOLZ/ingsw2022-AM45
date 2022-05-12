@@ -10,15 +10,16 @@ public class AdvancedIslandHandler extends IslandHandler{
     }
 
     @Override
-    public void moveMN(int steps) {
+    public boolean moveMN(int steps) {
         if(!checkCorrectSteps(steps)){
             controller.simpleGame.getParameters().setErrorState("INCORRECT STEPS");
-            return;
+            return false;
         }
 
         int idIsland = controller.advancedGame.moveMN(steps);               //Move MN
         if(controller.advancedGame.isBlocked(idIsland)){                    //is island blocked?
             controller.advancedGame.unblockIsland(idIsland);                //unblock it and return
+            return true;
         }
 
         else {
@@ -26,6 +27,9 @@ public class AdvancedIslandHandler extends IslandHandler{
                 controller.advancedGame.evaluateIsland(idIsland);             //island is not blocked so evaluate
             } catch (UnmergeableException e) {
                 //Non so cosa dovrei fare
+            }
+            finally {
+                return true;
             }
         }
     }

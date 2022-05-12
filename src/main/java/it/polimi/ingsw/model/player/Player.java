@@ -41,9 +41,6 @@ public class Player implements DrawableObject {
         this.leader = leader;
         this.parameters = parameters;
         this.board = new Board(teamColor, parameters);
-        //TODO make the player choose which wizard they want to pick
-
-
         this.wizard = FactoryWizard.getWizard(playerId.index*10);
     }
 
@@ -108,11 +105,11 @@ public class Player implements DrawableObject {
         Assistant tempAssistant = null;
         try {
             tempAssistant = wizard.playCard(assistantId);
+            setAssistantPlayed(tempAssistant);
         }
         catch (NoSuchAssistantException e){
             parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
-        setAssistantPlayed(tempAssistant);
     }
 
     public String getNickname() {
@@ -161,7 +158,7 @@ public class Player implements DrawableObject {
     }
 
     /**
-     * Move the student  from position parameter.selectedEntranceStudents
+     * Move the student from position parameter.selectedEntranceStudents
      * to Hall
      * @return the moved student's color
      */
