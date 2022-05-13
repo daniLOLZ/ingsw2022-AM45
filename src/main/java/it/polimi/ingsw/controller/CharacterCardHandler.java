@@ -131,7 +131,7 @@ public class CharacterCardHandler {
     /**
      * Check if User can use this card and update Model to make
      * visible the requirements of this card.
-     * When the View fulfill the requirements, can be called the method
+     * When the UserInterface fulfill the requirements, can be called the method
      * play card
      * @param idCard > 0 && cardList.contains(idCard)
      * @return true if the card could be selected

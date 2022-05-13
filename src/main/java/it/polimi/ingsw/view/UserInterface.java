@@ -5,10 +5,10 @@ import it.polimi.ingsw.model.beans.GameElementBean;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class View {
+public abstract class UserInterface {
     protected List<GameElementBean> beans;
 
-    public View(){
+    public UserInterface(){
         beans = new ArrayList<>();
     }
 

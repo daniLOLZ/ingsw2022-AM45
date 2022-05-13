@@ -1,14 +1,11 @@
 package it.polimi.ingsw.view;
 
-import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
-public class CLI extends View{
+public class CLI extends UserInterface {
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;

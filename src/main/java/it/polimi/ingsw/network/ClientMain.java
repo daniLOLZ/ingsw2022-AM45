@@ -1,11 +1,23 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.view.CLI;
+import it.polimi.ingsw.view.GUI;
+import it.polimi.ingsw.view.UserInterface;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.*;
+
+/**
+ * Entry point for the client application
+ * It evaluates the parameters passed on launch and instances
+ * an actual player
+ */
 
 public class ClientMain {
 
@@ -20,6 +32,9 @@ public class ClientMain {
     private MessageBroker mainBroker, pingBroker;
     private boolean connected;
     private int idUser;  // May be removed
+    private UserInterface userInterface;
+    public static final List<String> allowedParameters = Arrays.asList("--cli", "--gui", "--hostname", "--port");
+    public static final List<Boolean> parameterRequiresInput = Arrays.asList(false, false, true, true); //positional reference
 
     public ClientMain(String hostname, int portNumber, String nickname) {
         this.hostname = hostname;
@@ -54,8 +69,15 @@ public class ClientMain {
     }
 
     public static void main(String[] args){
+
         ClientMain client = new ClientMain("127.0.0.1", 54321, "username"); //TODO remove hardcoded network parameters
 
+        // Updates the default values of the newly generated instance with the preferences obtained from command line
+        client.readParameters(args);
+
+        // From here on, the view is responsible for what the player sees
+
+        //todo move username insertion in the view
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Insert your username");
@@ -68,13 +90,63 @@ public class ClientMain {
         }
         System.out.println("Username " + client.nickname + " was accepted");
 
+        //start the user's ping routine in a new thread
         new Thread(client::ping).start();
 
-        String userInput;
+        //TODO IMPLEMENT VIEW
         while(client.isConnected()){ // generic game loop
-            userInput = scanner.nextLine();
+
             //After askForControl(planning) is over, starts to continuously send askForControl(action)
         }
+    }
+
+    /**
+     * Reads the arguments from the command line
+     * @param arguments the arguments read
+     */
+    private void readParameters(String[] arguments) {
+
+        //Invalid parameters are ignored
+
+        int argLength = arguments.length;
+        String readArgument;
+        for(int argumentIndex = 0; argumentIndex < argLength; argumentIndex++){
+            if(!allowedParameters.contains(arguments[argumentIndex])){
+                continue;
+            }
+            if(parameterRequiresInput.get(argumentIndex) && argumentIndex+1 >= argLength) { // There is no actual value
+                // after a parameter that requires it
+                continue;
+            }
+
+            readArgument = arguments[argumentIndex];
+
+            //Starts actually parsing the parameters, akin to a switch
+            if(readArgument.equals(allowedParameters.get(0))){ // --cli
+                userInterface = new CLI();
+            }
+            else if (readArgument.equals(allowedParameters.get(1))) { // --gui
+                userInterface = new GUI();
+            }
+            else if (readArgument.equals(allowedParameters.get(2))) { // --hostname
+                String host = arguments[argumentIndex+1];
+                setHost(host);
+            }
+            else if (readArgument.equals(allowedParameters.get(3))) { // --port
+                Integer port = Integer.parseInt(arguments[argumentIndex+1]);
+                setPort(port);
+            }
+
+            //Other parameters here, if needed
+        }
+    }
+
+    private void setHost(String host) {
+        this.hostname = host;
+    }
+
+    private void setPort(Integer port) {
+        this.mainPortNumber = port;
     }
 
     /**

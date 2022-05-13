@@ -819,7 +819,7 @@ public class SimpleGame implements DrawableObject {
 
     /**
      *
-     * @return the list with all beans useful for View
+     * @return the list with all beans useful for UserInterface
      */
     public List<GameElementBean> getElementView(){
         List<GameElementBean> beans = new ArrayList<>();

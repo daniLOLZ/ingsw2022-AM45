@@ -18,7 +18,9 @@ public class ServerMain {
     private static ServerSocket serverSocket;
 
     //Todo move to another class?
-    private static final List<String> allowedParameters = Arrays.asList("--port");
+    public static final List<String> allowedParameters = Arrays.asList("--port");
+    public static final List<Boolean> parameterRequiresInput = Arrays.asList(true);
+
 
     public static void main(String[] args){
         //TODO network parameters should be read from parameters or from json as a default
@@ -34,29 +36,38 @@ public class ServerMain {
         //Other preferences here;
     }
 
+    /**
+     * Reads the arguments from the command line
+     * @param arguments the arguments read
+     */
     private static void readParameters(String[] arguments) {
+
+        //Invalid parameters are ignored
+
         int argLength = arguments.length;
-        for(int argumentIndex = 0; argumentIndex < argLength; argumentIndex+=2){
+        String readArgument;
+        for(int argumentIndex = 0; argumentIndex < argLength; argumentIndex++){
             if(!allowedParameters.contains(arguments[argumentIndex])){
-                return;
+                continue;
             }
-            if(argumentIndex+1 >= argLength) { // There is no actual value afterwards
-                return;
+            if(parameterRequiresInput.get(argumentIndex) && argumentIndex+1 >= argLength) { // There is no actual value
+                                                                                            // after a paramter that requires it
+                continue;
             }
 
+            readArgument = arguments[argumentIndex];
+
+            //todo find a way to factor this for both client and server
             //Starts actually parsing the parameters, akin to a switch
-            if(arguments[argumentIndex].equals(allowedParameters.get(0))){
+
+            if (readArgument.equals(allowedParameters.get(0))){ // --port
                 Integer port = Integer.parseInt(arguments[argumentIndex+1]);
                 setPort(port);
             }
-            //Other parameters here, if needed
-            /*
-            else if(){
 
-            };
-            */
         }
     }
+
 
     private static void setPort(Integer port) {
         portNumber = port;
@@ -90,4 +101,7 @@ public class ServerMain {
         }
         executor.shutdown();
     }
+
+
+
 }
