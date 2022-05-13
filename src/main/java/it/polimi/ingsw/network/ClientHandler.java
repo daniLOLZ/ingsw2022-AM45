@@ -6,18 +6,29 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.characterCards.Requirements;
 import it.polimi.ingsw.model.game.PhaseEnum;
+import it.polimi.ingsw.network.commandHandler.CommandHandler;
+import it.polimi.ingsw.network.commandHandler.PingHandler;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 import it.polimi.ingsw.network.connectionState.*;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class ClientHandler implements Runnable{
-    private Socket socket;
+
+    private static final Duration timeout = Duration.ofSeconds(5);
+
+    private Socket mainSocket;
+    private Socket pingSocket;
     private boolean isConnected;
     private int idUser;
-    private MessageBroker broker;
+    private MessageBroker mainBroker;
+    private MessageBroker pingBroker;
     private ConnectionState connectionState;
     private Lobby userLobby;
     private Controller userController;
@@ -25,14 +36,24 @@ public class ClientHandler implements Runnable{
 
     /**
      * Creates a new client handler with its own message broker and set to state Authentication
-     * @param socket the socket of the connection that's been created in the server
+     * @param mainSocket the main socket of the connection that's been created in the server
      */
-    public ClientHandler(Socket socket) {
-        this.socket = socket;
-        this.broker = new MessageBroker();
+    public ClientHandler(Socket mainSocket) {
+        this.mainSocket = mainSocket;
+        this.mainBroker = new MessageBroker();
+        this.pingBroker = new MessageBroker();
         this.connectionState = new Authentication();
         this.userLobby = null;
         this.userController = null;
+        this.isConnected = true;
+    }
+
+    /**
+     * Assigns the socket that will be used to perform the ping routine
+     * @param pingSocket The socket that will be used to perform the ping routine
+     */
+    public void assignPingSocket(Socket pingSocket){
+        this.pingSocket = pingSocket;
     }
 
     @Override
@@ -42,8 +63,8 @@ public class ClientHandler implements Runnable{
 
         idUser = LoginHandler.getNewUserId();
         try {
-            clientInput = socket.getInputStream();
-            clientOutput = socket.getOutputStream();
+            clientInput = mainSocket.getInputStream();
+            clientOutput = mainSocket.getOutputStream();
         } catch (IOException e) {
             System.err.println("Error obtaining streams");
             System.err.println(e.getMessage());
@@ -51,35 +72,37 @@ public class ClientHandler implements Runnable{
             return;
         }
 
-        new Thread(()->{while (isConnected) broker.receive(clientInput);}).start();
+        new Thread(()->{while (isConnected) mainBroker.receive(clientInput);}).start();
+
+        new Thread(this::pong).start();
 
         while(isConnected){ // Message listener loop
 
-            if(!broker.lock()){ // Received an invalid message
+            if(!mainBroker.lock()){ // Received an invalid message
                 continue;
             }
-            CommandEnum command = CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND));
+            CommandEnum command = CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND));
 
             if(!connectionState.isAllowed(command)){ // Trashes a command given at the wrong time
-                broker.unlock();
+                mainBroker.unlock();
                 continue;
             }
             handleCommand(command); // runs the appropriate routine depending on the command received
             // Sends a reply to the client
-            broker.send(clientOutput);
-            broker.unlock();
+            mainBroker.send(clientOutput);
+            mainBroker.unlock();
 
         }
-        // This point should never be reached in normal circumstances
+        // This point should never be reached in normal circumstances (unless the client disconnects)
     }
 
     /**
      * Adds the reply fields in the server message in case of a successful operation (Message and status)
      */
     private void notifySuccessfulOperation(){
-        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "OK");
-        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 0);
-        broker.addToMessage(NetworkFieldEnum.ID_REQUEST, broker.readField(NetworkFieldEnum.ID_REQUEST));
+        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "OK");
+        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 0);
+        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
     }
 
     /**
@@ -87,10 +110,10 @@ public class ClientHandler implements Runnable{
      * @param errorMessage A verbose message describing the error
      */
     private void notifyError(String errorMessage){ // parametrize reply status as well
-        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
-        broker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
-        broker.addToMessage(NetworkFieldEnum.ID_REQUEST, broker.readField(NetworkFieldEnum.ID_REQUEST));
-        broker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
+        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
+        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
+        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
+        mainBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
     }
 
     /**
@@ -126,12 +149,71 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    private void pong(){//TEMPORARY
+
+        InputStream clientInput;
+        OutputStream clientOutput;
+
+        try {
+            clientInput = pingSocket.getInputStream();
+            clientOutput = pingSocket.getOutputStream();
+        } catch (IOException e) {
+            System.err.println("Error obtaining streams");
+            System.err.println(e.getMessage());
+            quitGame(); // Maybe useless
+            return;
+        }
+
+        ExecutorService pingExecutor = Executors.newSingleThreadExecutor();
+
+        final Future<Void> handler = pingExecutor.submit(() -> {
+
+            while (!pingBroker.lock()); //operation to execute with timeout
+
+            return null; //no need for a return value
+        });
+
+        while (isConnected) {
+
+            pingBroker.receive(clientInput);
+            try {
+                handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                handler.cancel(true);
+                isConnected = false;
+                System.err.println("Connection timed out");
+                pingBroker.unlock();
+                break;
+            } catch (InterruptedException | ExecutionException e) {
+                handler.cancel(true);
+                isConnected = false;
+                e.printStackTrace();
+                pingBroker.unlock();
+                break;
+            }
+
+            if (pingBroker.readField(NetworkFieldEnum.COMMAND) != CommandEnum.PING){
+                System.err.println("ERROR: socket was not dedicated for ping routine");
+                isConnected = false;
+            }
+            else {
+                CommandHandler pingHandler = new PingHandler();
+                try {
+                    pingHandler.executeCommand(pingBroker, clientOutput);
+                } catch (UnexecutableCommandException e) { //should never happen, condition is already verified
+                    e.printStackTrace(); //this method has been overridden
+                }
+            }
+            pingBroker.unlock();
+        }
+    }
+
     /**
      * Card requirements method.
      * The user sends the selected islands
      */
     private void selectIslandGroup() {
-        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.CHOSEN_ISLANDS);
+        Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.CHOSEN_ISLANDS);
         List<Integer> islandIds = new ArrayList<>();
         for(Object o : objectArray){ //TODO could be wrong
             islandIds.add((Integer)o);
@@ -149,7 +231,7 @@ public class ClientHandler implements Runnable{
      * The user sends the selected students at their entrance
      */
     private void selectEntranceStudents() {
-        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
+        Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
         List<Integer> students = new ArrayList<>();
         for(Object o : objectArray){ //TODO could be wrong
             students.add((Integer)o);
@@ -167,7 +249,7 @@ public class ClientHandler implements Runnable{
      * The user sends the selected students on the card they previously selected
      */
     private void selectStudentOnCard() {
-        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.CHOSEN_CARD_POSITIONS);
+        Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.CHOSEN_CARD_POSITIONS);
         List<Integer> students = new ArrayList<>();
         for(Object o : objectArray){ //TODO could be wrong
             students.add((Integer)o);
@@ -185,7 +267,7 @@ public class ClientHandler implements Runnable{
      * The user sends the selected student color
      */
     private void selectStudentColor() {
-        Object[] objectArray = (Object[]) broker.readField(NetworkFieldEnum.COLORS_REQUIRED);
+        Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.COLORS_REQUIRED);
         List<StudentEnum> colors = new ArrayList<>();
         for(Object o : objectArray){ //TODO could be wrong
             colors.add(StudentEnum.fromObjectToEnum(o));
@@ -203,7 +285,7 @@ public class ClientHandler implements Runnable{
      * The user selects a character card to play
      */
     private void selectCharacter() {
-        Integer cardPosition = (Integer) broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
+        Integer cardPosition = (Integer) mainBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
         if(!userController.selectCard(cardPosition)){
             notifyError("Couldn't play the card, not enough coins");
         }
@@ -211,10 +293,10 @@ public class ClientHandler implements Runnable{
             notifySuccessfulOperation();
             Requirements requirements = userController.getAdvancedGame()
                                         .getAdvancedParameters().getRequirementsForThisAction();
-            broker.addToMessage(NetworkFieldEnum.ENTRANCE_REQUIRED, requirements.studentAtEntrance);
-            broker.addToMessage(NetworkFieldEnum.COLORS_REQUIRED, requirements.studentType);
-            broker.addToMessage(NetworkFieldEnum.ISLANDS_REQUIRED, requirements.islands);
-            broker.addToMessage(NetworkFieldEnum.ON_CARD_REQUIRED, requirements.studentOnCard);
+            mainBroker.addToMessage(NetworkFieldEnum.ENTRANCE_REQUIRED, requirements.studentAtEntrance);
+            mainBroker.addToMessage(NetworkFieldEnum.COLORS_REQUIRED, requirements.studentType);
+            mainBroker.addToMessage(NetworkFieldEnum.ISLANDS_REQUIRED, requirements.islands);
+            mainBroker.addToMessage(NetworkFieldEnum.ON_CARD_REQUIRED, requirements.studentOnCard);
             //TODO maybe incapsulate somewhere else?
 
             setConnectionState(new CharacterCardActivation());
@@ -225,7 +307,7 @@ public class ClientHandler implements Runnable{
      * The user chooses a cloud to refill their entrance with
      */
     private void chooseCloud() {
-        Integer idCloud = (Integer) broker.readField(NetworkFieldEnum.ID_CLOUD);
+        Integer idCloud = (Integer) mainBroker.readField(NetworkFieldEnum.ID_CLOUD);
         if(userController.chooseCloud(idCloud)){
             notifySuccessfulOperation();
         }
@@ -238,7 +320,7 @@ public class ClientHandler implements Runnable{
      * The user moves mother nature
      */
     private void moveMNToIsland() {
-        Integer steps = (Integer)broker.readField(NetworkFieldEnum.STEPS_MN);
+        Integer steps = (Integer)mainBroker.readField(NetworkFieldEnum.STEPS_MN);
         if(userController.moveMNToIsland(steps)){
             notifySuccessfulOperation();
         }
@@ -263,7 +345,7 @@ public class ClientHandler implements Runnable{
      * The user chooses to put the student on the selected island
      */
     private void putInIsland() {
-        Integer idIsland = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ISLAND);
+        Integer idIsland = (Integer)mainBroker.readField(NetworkFieldEnum.CHOSEN_ISLAND);
         if(userController.putInIsland(idIsland)){
             notifySuccessfulOperation();
         }
@@ -288,7 +370,7 @@ public class ClientHandler implements Runnable{
      * The user asks to select a student from their entrance
      */
     private void selectEntranceStudent() {
-        Integer selectedStudent = (Integer)broker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
+        Integer selectedStudent = (Integer)mainBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
         if(userController.selectStudent(selectedStudent)){
             notifySuccessfulOperation();
         }
@@ -302,7 +384,7 @@ public class ClientHandler implements Runnable{
      * if the assistant can't be played
      */
     private void chooseAssistant() {
-        Integer idAssistant = (Integer)broker.readField(NetworkFieldEnum.ID_ASSISTANT);
+        Integer idAssistant = (Integer)mainBroker.readField(NetworkFieldEnum.ID_ASSISTANT);
         if(userController.playAssistant(idAssistant)){
             notifySuccessfulOperation();
             setConnectionState(new WaitingForControl());
@@ -316,7 +398,7 @@ public class ClientHandler implements Runnable{
      * While waiting for their turn, the user periodically sends this message to ask for their turn to start
      */
     private void askForControl() {
-        PhaseEnum gamePhase = PhaseEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_PHASE));
+        PhaseEnum gamePhase = PhaseEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.GAME_PHASE));
         if(userController.askForControl(this.idUser, gamePhase)){
             if(gamePhase.equals(PhaseEnum.PLANNING)){
                 setConnectionState(new PlanningPhaseTurn());
@@ -336,7 +418,7 @@ public class ClientHandler implements Runnable{
      * team chosen is available, and notifies it to the user
      */
     private void selectTowerColor() {
-        TeamEnum teamColor = TeamEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
+        TeamEnum teamColor = TeamEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
         if(userController.setTeamColor(teamColor, this.idUser)){
             notifySuccessfulOperation();
         }
@@ -350,7 +432,7 @@ public class ClientHandler implements Runnable{
      * wizard chosen is available, and notifies it to the user
      */
     private void selectWizard() {
-        Integer idWizard = (Integer)broker.readField(NetworkFieldEnum.ID_WIZARD);
+        Integer idWizard = (Integer)mainBroker.readField(NetworkFieldEnum.ID_WIZARD);
         if(userController.setWizard(idWizard, this.idUser)){
             notifySuccessfulOperation();
         }
@@ -384,7 +466,7 @@ public class ClientHandler implements Runnable{
      */
     private void playGame() {
 
-        GameRuleEnum rules = GameRuleEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
+        GameRuleEnum rules = GameRuleEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.GAME_RULE));
 
         userLobby = ActiveLobbies.assignLobby(rules);
         userLobby.addPlayer(this.idUser);
@@ -431,7 +513,7 @@ public class ClientHandler implements Runnable{
      */
     public void connectionRequest(){
         boolean loginSuccessful;
-        loginSuccessful= LoginHandler.login((String)broker.readField(NetworkFieldEnum.NICKNAME), idUser);
+        loginSuccessful= LoginHandler.login((String)mainBroker.readField(NetworkFieldEnum.NICKNAME), idUser);
         if(!loginSuccessful){
             notifyError("Nickname already taken");
             quitGame();
@@ -442,6 +524,10 @@ public class ClientHandler implements Runnable{
 
     public void setConnectionState(ConnectionState connectionState) {
         this.connectionState = connectionState;
+    }
+
+    public Socket getMainSocket(){
+        return mainSocket;
     }
 
 }
