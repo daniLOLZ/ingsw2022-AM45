@@ -7,8 +7,8 @@ import java.util.List;
 public class ActiveLobbies {
 
     private static final Object genericLock = new Object();
-
     private static List<Lobby> lobbies = new ArrayList<>();
+
 
     /**
      * If there's already an available Lobby with the same game rules and at least an empty seat it returns the said lobby.

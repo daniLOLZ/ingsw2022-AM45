@@ -29,15 +29,16 @@ public class CharacterCardHandler {
      * Check if requirements are fulfilled.
      * Spend Player coins.
      * Activate card effect.
+     * @return true if the action succeeded
      */
-    public void playCard(){
+    public boolean playCard(){
         Requirements requirements =   controller.
                                                 advancedGame.
                                                 getAdvancedParameters().
                                                 getRequirementsForThisAction();
         if(!requirements.isSatisfied()){
             controller.simpleGame.getParameters().setErrorState("REQUIREMENTS FOR CARD NOT SATISFIED");
-            return;
+            return false;
         }
 
         spendCoin();
@@ -63,7 +64,7 @@ public class CharacterCardHandler {
             case 3 -> {
                 if(controller.simpleGame.getParameters().getSelectedIslands().isEmpty()){
                     controller.simpleGame.getParameters().setErrorState("MISSING ISLAND");
-                    return;
+                    return false;
                 }
 
                 int idIsland = controller.simpleGame.getParameters().getSelectedIslands().get().get(0).getIdGroup();
@@ -124,6 +125,7 @@ public class CharacterCardHandler {
 
         usingCard = null;
 
+        return true;
     }
 
     /**
@@ -132,13 +134,16 @@ public class CharacterCardHandler {
      * When the View fulfill the requirements, can be called the method
      * play card
      * @param idCard > 0 && cardList.contains(idCard)
+     * @return true if the card could be selected
      */
-    public void selectCard(int idCard){
+    public boolean selectCard(int idCard){
         if(!canUseCard(idCard)){
             controller.simpleGame.getParameters().setErrorState("NOT ENOUGH COIN TO PLAY THIS CARD");
+            return false;
         }
         else{
             usingCard.select();
+            return true;
         }
     }
 
@@ -184,5 +189,14 @@ public class CharacterCardHandler {
 
         game.spendCoin(player, usingCard.getCardCost());
 
+    }
+
+    /**
+     * Gets the id of the character card at the position given
+     * @param cardPosition the position on the board
+     * @return the id of the card in that position
+     */
+    public int getIdFromPosition(Integer cardPosition) {
+        return controller.advancedGame.getCharacterCard(cardPosition).id;
     }
 }

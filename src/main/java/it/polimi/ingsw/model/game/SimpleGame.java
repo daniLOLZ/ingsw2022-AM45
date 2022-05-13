@@ -546,8 +546,26 @@ public class SimpleGame implements DrawableObject {
         IslandGroup island = islandGroups.get(idIslandGroup);
         player.moveFromEntranceToIsland(island);
         deselectAllEntranceStudents();
-    };
+    }
 
+    /**
+     * Deselects the island chosen
+     * @param idIslandGroup the island to deselect
+     */
+    public void deselectIslandGroup(int idIslandGroup){
+        //todo move deselection logic to parameters
+        if(parameters.getSelectedIslands().isEmpty()) return;
+        else {
+            parameters.getSelectedIslands().get().remove((Integer) idIslandGroup);
+        }
+    }
+
+    /**
+     * Deselects all island groups by replacing them with an empty list
+     */
+    public void deselectAllIslandGroup(){
+        parameters.setSelectedIslands(new ArrayList<>());
+    }
 
     public void selectIslandGroup(int idIslandGroup){
         IslandGroup islandGroup = islandGroups.get(idIslandGroup);
@@ -566,9 +584,10 @@ public class SimpleGame implements DrawableObject {
      * @param position the position at the entrance of the student to deselect
      */
     public void deselectEntranceStudent(Integer position){
-        if(!parameters.getSelectedEntranceStudents().isPresent()) return;
+        //todo move deselection logic to parameters
+        if(parameters.getSelectedEntranceStudents().isEmpty()) return;
         else {
-            parameters.getSelectedEntranceStudents().get().remove((Integer)position);
+            parameters.getSelectedEntranceStudents().get().remove(position);
         }
     }
 
@@ -588,6 +607,26 @@ public class SimpleGame implements DrawableObject {
         }
         else
         parameters.selectEntranceStudent(position);
+    }
+
+
+    /**
+     * Deselects the given student type
+     * @param type the type to deselect
+     */
+    public void deselectStudentType(StudentEnum type) {
+        //todo move deselection logic to parameters
+        if(parameters.getSelectedStudentTypes().isEmpty()) return;
+        else {
+            parameters.getSelectedStudentTypes().get().remove(type);
+        }
+    }
+
+    /**
+     * Deselects all student types by replacing it with an empty list
+     */
+    public void deselectAllStudentTypes(){
+        parameters.setSelectedStudentTypes(new ArrayList<>());
     }
 
     public void selectStudentType(StudentEnum type){

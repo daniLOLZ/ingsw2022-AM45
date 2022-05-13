@@ -118,16 +118,17 @@ public class Controller {
      * @param advanced true if the game needs to be its advanced variation
      */
     public void createBasicHandlers(boolean advanced){
-        selectionHandler = new SelectionHandler(this);
         assistantHandler = new AssistantHandler(this);
         turnHandler = new TurnHandler(this);
         winnerHandler = new WinnerHandler(this);
         if(advanced){
+            selectionHandler = new AdvancedSelectionHandler(this);
             characterCardHandler = new CharacterCardHandler(this);
             boardHandler = new AdvancedBoardHandler(this);
             islandHandler = new AdvancedIslandHandler(this);
         }
         else {
+            selectionHandler = new SelectionHandler(this);
             boardHandler = new BoardHandler(this);
             islandHandler = new IslandHandler(this);
         }
@@ -382,19 +383,24 @@ public class Controller {
     public boolean selectCard(Integer cardPosition) {
         // will need to convert the position into the actual id of the character card before calling
         // the CharacterCardHandler method
-        //TODO
-        return false;
+
+        int cardId = characterCardHandler.getIdFromPosition(cardPosition);
+
+        if(characterCardHandler.selectCard(cardId)) {
+            return true;
+        }
+        else return false;
     }
 
     /**
      * By calling the appropriate handler, this method selects the chosen color
-     * @param color the student color the user selected
+     * @param colors the student colors the user selected
      * @return true if the action succeeded
      */
-    public boolean selectStudentColor(List<StudentEnum> color) {
+    public boolean selectStudentColor(List<StudentEnum> colors) {
 
-        //TODO
-        return false;
+        return selectionHandler.selectStudentType(colors);
+
     }
 
     /**
@@ -403,8 +409,9 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean selectStudentOnCard(List<Integer> students) {
-        //TODO
-        return false;
+
+        return selectionHandler.selectStudentAtEntrance(students);
+
     }
 
     /**
@@ -413,8 +420,8 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean selectEntranceStudents(List<Integer> students) {
-        //TODO
-        return false;
+
+        return selectionHandler.selectStudentAtEntrance(students);
     }
 
     /**
@@ -423,17 +430,16 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean selectIslandGroups(List<Integer> islandIds) {
-        //TODO
-        return false;
+        return selectionHandler.selectIsland(islandIds);
     }
 
     /**
      * By calling the appropriate handler, this method plays the character card
-     * @param cardPosition the position of the card on the board
      * @return true if the activation was successful
      */
-    public boolean playCard(Integer cardPosition){
-        //TODO
-        return false;
+    public boolean playCard(){
+
+        return characterCardHandler.playCard();
+
     }
 }

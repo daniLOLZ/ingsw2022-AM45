@@ -40,6 +40,7 @@ public class ClientHandler implements Runnable{
     public void run(){
         InputStream clientInput;
         OutputStream clientOutput;
+        isConnected = true; // todo remove after implementing ping
 
         idUser = LoginHandler.getNewUserId();
         try {
@@ -95,6 +96,13 @@ public class ClientHandler implements Runnable{
     }
 
     /**
+     * Closes the current connection
+     */
+    private void closeConnection() {
+        //todo
+    }
+
+    /**
      * Finds the command that's been given and runs the appropriate methods
      * @param command the command that was received by the client
      */
@@ -135,8 +143,8 @@ public class ClientHandler implements Runnable{
      * The player plays the card for which they (optionally) selected the requirements
      */
     private void playCharacter() {
-        Integer cardPosition = (Integer)broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
-        if(userController.playCard(cardPosition)){
+//        Integer cardPosition = (Integer)broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
+        if(userController.playCard()){
             notifySuccessfulOperation();
             setConnectionState(callbackConnectionState);
         }
@@ -473,7 +481,19 @@ public class ClientHandler implements Runnable{
      */
     public void quitGame(){
         //TODO later, when all cases have been accounted for
+        if(!userController.equals(null)){
+            // The user decides to quit the game while still in the lobby, so the other users
+            // shouldn't be kicked out automatically
+            userLobby.removePlayer(this.idUser);
+        }
+        else {
+            // The game is already starting or already started, so the game shall end for
+            // every player
+            ActiveGames.endGame(this.idUser);
+            closeConnection();
+        }
     }
+
 
     /**
      * Handles the connections of a new user, checking whether their nickname

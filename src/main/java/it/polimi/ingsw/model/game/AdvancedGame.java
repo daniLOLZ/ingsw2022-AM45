@@ -196,6 +196,24 @@ public class AdvancedGame extends SimpleGame {
         return true;
     }
 
+    /**
+     * Deselects the students on this card by assigning a new empty list
+     */
+    public void deselectAllCardStudents() {
+        advancedParameters.setSelectedStudentsOnCard(new ArrayList<>());
+    }
+
+    /**
+     * Deselects the student on the card selected at the position given
+     * @param position the position of the student to deselect
+     */
+    public void deselectStudentOnCard(int position){
+        //todo move deselection logic to parameters
+        if(advancedParameters.getSelectedStudentsOnCard().isEmpty()) return;
+        else {
+            advancedParameters.getSelectedStudentsOnCard().get().remove((Integer) position);
+        }
+    }
     public void selectStudentOnCard(int position){
         if(advancedParameters.getSelectedStudentsOnCard().isEmpty()){
             List<Integer> positionList = new ArrayList<>();
@@ -263,7 +281,7 @@ public class AdvancedGame extends SimpleGame {
                 card = x;
         }
 
-        return card == null || card.getCardCost() > player.getNumCoins();
+        return !(card == null || card.getCardCost() > player.getNumCoins());
 
     }
 
@@ -352,5 +370,6 @@ public class AdvancedGame extends SimpleGame {
         super.setDrawables();
         drawables.addAll(CharacterCards);
     }
+
 }
 

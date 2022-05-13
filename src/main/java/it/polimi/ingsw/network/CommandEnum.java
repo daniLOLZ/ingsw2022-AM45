@@ -30,7 +30,7 @@ public enum CommandEnum {
     // For now this and SELECT_STUDENT are kept separate to better separate these two different scenarios
     SELECT_ISLAND_GROUP("Select Island Group",          new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLANDS}),
     SELECT_STUDENT_ON_CARD("Select Student on Card",    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_CARD_POSITIONS}),
-    PLAY_CHARACTER("Play Character",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION});
+    PLAY_CHARACTER("Play Character",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST});
     //TODO add commands to exchange game information (beans)
 
     public final String command;
