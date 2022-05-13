@@ -5,18 +5,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import java.util.Arrays;
 import java.util.List;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class ServerMain {
     private static int portNumber; // java doesn't support unsigned int
     private static ServerSocket serverSocket;
+    private static List<ClientHandler> pinglessClients;
 
+    public ServerMain(int port){
+        this.portNumber = port;
+        pinglessClients = new ArrayList<>();
+    }
     //Todo move to another class?
     public static final List<String> allowedParameters = Arrays.asList("--port");
     public static final List<Boolean> parameterRequiresInput = Arrays.asList(true);
@@ -89,11 +96,32 @@ public class ServerMain {
             return;
         }
         System.out.println("Server started");
+
+        ClientHandler waitingClient = null;
+
         while(true){
             try{
                 Socket socket = serverSocket.accept();
-                System.out.println("New connection from " + socket.getInetAddress());
-                executor.submit(new ClientHandler(socket));
+
+                for (ClientHandler clientHandler:
+                     pinglessClients) {
+                    if (clientHandler.getMainSocket().getInetAddress().equals(socket.getInetAddress())) {
+                        waitingClient = clientHandler;
+                    }
+                }
+
+                if (waitingClient != null){
+                    waitingClient.assignPingSocket(socket);
+                    pinglessClients.remove(waitingClient);
+                    System.out.println("Starting Handler of" + waitingClient.getMainSocket().getInetAddress());
+                    executor.submit(waitingClient);
+                }
+                else {
+                    System.out.println("New connection from " + socket.getInetAddress());
+                    pinglessClients.add(new ClientHandler(socket));
+                }
+
+
             } catch (IOException e){
                 System.out.println(e.getMessage());
                 break;
