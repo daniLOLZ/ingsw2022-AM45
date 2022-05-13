@@ -8,9 +8,10 @@ import java.util.List;
 
 public class PlayerCreation {
     private final Controller controller;
-    protected final List<TeamEnum> teamColor ;
+    protected final List<TeamEnum> teamColor;
     protected final List<String> nicknames;
-    protected final List<Integer> wizards;
+    private final List<Integer> wizards; // Wizard ids
+
 
     public PlayerCreation(Controller controller){
         this.controller = controller;
@@ -27,27 +28,33 @@ public class PlayerCreation {
         }
     }
 
-
     /**
      * nick was checked in network level
      * @param nick != null
-     * @param user > 0
+     * @param user the player's enumeration in this game
      * @return true if nick is correctly set
      */
     public synchronized boolean setNickname(String nick, int user){
             nicknames.add(user,nick);
             return true;
-
     }
 
 
+    /**
+     * Check whether a given color has already been assigned
+     * @param color the color to check
+     * @return true if the color is already assigned to a player
+     */
+    public synchronized boolean isColorTaken(TeamEnum color){
+        return teamColor.contains(color);
+    }
 
     /**
      * Set player's team color in teamColor list in position user
      * Each game has one color per player except the 2 player teams games that have 2 players per color.
      * Color grey is present only in 3 players game.
      * @param team != NoTeam
-     * @param user > 0
+     * @param user the player's enumeration in this game
      * @return true if team is correctly set.
      */
     public synchronized boolean setTeamColor(final TeamEnum team, int user){
@@ -92,12 +99,19 @@ public class PlayerCreation {
         teamColor.add(user, null);
     }
 
-
+    /**
+     * Check whether a given wizard id has already been assigned
+     * @param idWizard the wizard to check
+     * @return true if the wizard is already assigned to a player
+     */
+    public synchronized boolean isWizardTaken(int idWizard){
+        return wizards.contains(idWizard);
+    }
     /**
      * set, in user position, a new wizard id in wizards list only if there not are
      * others equal to it
      * @param idWizard == 0 , 10, 20 ,30
-     * @param user > 0
+     * @param user the player's enumeration in this game
      * @return true if wizard is set correctly
      */
     public synchronized boolean setWizard(final int idWizard, int user){
@@ -141,5 +155,17 @@ public class PlayerCreation {
         }
 
         return true;
+    }
+
+    public List<TeamEnum> getTeamColors() {
+        return teamColor;
+    }
+
+    public List<String> getNicknames() {
+        return nicknames;
+    }
+
+    public List<Integer> getWizards() {
+        return wizards;
     }
 }

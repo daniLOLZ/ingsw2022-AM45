@@ -10,7 +10,7 @@ import it.polimi.ingsw.model.player.PlayerEnum;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IslandGroup {
+public class IslandGroup implements DrawableObject {
     protected ParameterHandler parameters;
     protected final int idGroup;
     protected final List<Island> islands;
@@ -310,6 +310,7 @@ public class IslandGroup {
      * its id, islands' ids, students on this island group, if MN is present,
      * tower color
      */
+    @Override
     public GameElementBean toBean(){
         int idIslandGroup = idGroup;
         List<Integer> idIsland = new ArrayList<>();

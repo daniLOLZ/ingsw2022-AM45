@@ -17,76 +17,38 @@ import java.util.List;
 public class AssistantHandler {
     private final Controller controller;
     private List<Assistant> assistantsPlayed;
-    private final List<Player> players;
-    private List<Player> turnPlayer;
+
 
     public AssistantHandler(Controller controller){
         this.controller = controller;
         assistantsPlayed = new ArrayList<>();
-        players = controller.simpleGame.getPlayers();
-        turnPlayer = new ArrayList<>();
+
     }
 
-    public void setAssistantsPlayed(List<Assistant> assistantsPlayed) {
-        this.assistantsPlayed = assistantsPlayed;
-    }
-
-    public void setTurnPlayer(List<Player> turnPlayer) {
-        this.turnPlayer = turnPlayer;
+    public void setAssistantsPlayed(Assistant assistant) {
+        this.assistantsPlayed.add(assistant);
     }
 
     /**
      * play an assistant card if the chosen card is valid.
      * Update the lists assistantPlayed and turnPlayer.
-     *
-     * @param id > 0
+     * @param id the id of the assistant to play ( > 0 )
+     * @return true if the assistant was played successfully
      */
-    public void playCard(int id){
-
-        //CHECK IF CARD IS VALID
-        if(!checkValidAssistant(id)){
-            controller.simpleGame.getParameters().setErrorState("Assistant not valid");
-        }
-
-        //GET ASSISTANT CARD TO USE FOR SORT PLAYERS
+    public boolean playCard(int id){
+        assistantsPlayed = controller.simpleGame.playedAssistants();
         Player currentPlayer = controller.simpleGame.getParameters().getCurrentPlayer();
-        Wizard wizard = currentPlayer.getWizard();
-        Assistant assistantPlayed;
-        try {
-            assistantPlayed = wizard.getAssistantByID(id);
-            assistantsPlayed.add(assistantPlayed);
-        } catch (NoSuchAssistantException e) {
-            controller.simpleGame.getParameters().setErrorState("Assistant not in Wizard");
-            return;
+        if(checkValidAssistant(id)){
+            controller.simpleGame.playAssistant(currentPlayer, id);
         }
-
-        //PLAY CARD IN MODEL
-        currentPlayer.playAssistant(id);
-
-
-        //SORT PLAYERS
-        if(turnPlayer.size() == 0){
-            turnPlayer.add(currentPlayer);
-            return;
+        else{
+            controller.simpleGame.getParameters().setErrorState("INVALID ASSISTANT");
+            return false;
         }
-
-        int turnOthers;
-
-        for(int position=0; position < turnPlayer.size(); position++){
-            turnOthers = turnPlayer.get(position).getAssistantPlayed().getTurnOrder();
-            if(assistantPlayed.getTurnOrder() < turnOthers)
-                turnPlayer.add(position,currentPlayer);
-        }
+        return true;
     }
 
 
-    public void resetAssistantsPlayed(){
-        assistantsPlayed.clear();
-    }
-
-    public void resetTurnPlayers(){
-        turnPlayer.clear();
-    }
 
 
     /**
@@ -141,6 +103,9 @@ public class AssistantHandler {
      * @return true if and only if played card is equal to at least one card of already played cards
      */
     private boolean isPlayed(final Assistant assistant){
+        if(assistantsPlayed.isEmpty())
+            return  false;
+
         return assistantsPlayed.stream().anyMatch(card -> card.equals(assistant));
     }
 

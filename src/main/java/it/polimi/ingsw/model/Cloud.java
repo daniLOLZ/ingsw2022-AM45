@@ -1,9 +1,12 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.beans.CloudBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cloud {
+public class Cloud implements DrawableObject{
     private List<StudentEnum> students;
     private final int id;
     private final int studentsPerCloud;
@@ -36,5 +39,11 @@ public class Cloud {
 
     public boolean isEmpty(){
         return students.isEmpty();
+    }
+
+    @Override
+    public GameElementBean toBean() {
+        CloudBean bean = new CloudBean(id, students);
+        return bean;
     }
 }

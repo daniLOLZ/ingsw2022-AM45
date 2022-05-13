@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.player;
 
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.assistantCards.Wizard;
 import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.board.AdvancedBoard;
@@ -14,8 +15,16 @@ import java.util.List;
 public class AdvancedPlayer extends Player {
     private int numCoins;
 
+    /**
+     * Basic constructor, doesn't allow for the choice of a wizard
+     */
     public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters){
         super(playerId, nickname, teamColor, leader, parameters);
+        this.numCoins = 1;
+    }
+
+    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor, Wizard wizard, boolean leader, ParameterHandler parameters){
+        super(playerId, nickname,teamColor, wizard, leader, parameters);
         this.numCoins = 1;
     }
 

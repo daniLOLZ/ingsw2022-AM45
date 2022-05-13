@@ -136,7 +136,7 @@ public class MessageBroker {
         }
         receivedMessage = tempString.toString();
 
-        System.out.println("message received");
+        //System.out.println("message received");
 
         Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
 
@@ -187,8 +187,8 @@ public class MessageBroker {
         // For each field, check whether it can be cast and return false if an exception is raised
         List<NetworkFieldEnum> keyArray = new ArrayList<>(message.keySet());
         for(NetworkFieldEnum field : keyArray){
-            object = incomingMessages.get(FIRST_RECEIVED).get(field);
-
+//          object = incomingMessages.get(FIRST_RECEIVED).get(field);
+            object = message.get(field);
             switch (field){
                 case ID_USER : {
                     try{

@@ -7,17 +7,17 @@ import java.util.List;
 import java.util.Scanner;
 
 public class IslandGroupBean extends GameElementBean {
-    private int idIslandGroup;
-    private List<Integer> idIslands;
-    private List<StudentEnum> studentsOnIsland;
-    private boolean isPresentMN;
-    private TeamEnum towersColor;
+    protected int idIslandGroup;
+    protected List<Integer> idIslands;
+    protected List<StudentEnum> studentsOnIsland;
+    protected boolean isPresentMN;
+    protected TeamEnum towersColor;
 
     public IslandGroupBean(int idIslandGroup, List<Integer> idIslands,
                            List<StudentEnum> studentsOnIsland, boolean isPresentMN,
                            TeamEnum towersColor){
 
-        int mediumPriority = 2;
+        final int mediumPriority = 4;
         priority = mediumPriority;
         this.idIslandGroup = idIslandGroup;
         this.idIslands = idIslands;
@@ -95,20 +95,7 @@ public class IslandGroupBean extends GameElementBean {
 
     }
 
-    private String setTab(String string){
-        Scanner scanner = new Scanner(string);
-        scanner.useDelimiter("\n");
-        StringBuilder builder = new StringBuilder();
-        String border = "\t____________________________________\t.\n";
-        while(scanner.hasNext()){
-            String x = scanner.next();
-            while(x.length() < border.length())
-                x = x + " ";
 
-            builder.append(x).append("\n");
-        }
-        return  builder.toString();
-    }
 
 
 }

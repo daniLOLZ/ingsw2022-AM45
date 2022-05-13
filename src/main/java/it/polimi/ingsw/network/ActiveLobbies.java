@@ -7,8 +7,8 @@ import java.util.List;
 public class ActiveLobbies {
 
     private static final Object genericLock = new Object();
-
     private static List<Lobby> lobbies = new ArrayList<>();
+
 
     /**
      * If there's already an available Lobby with the same game rules and at least an empty seat it returns the said lobby.
@@ -75,11 +75,13 @@ public class ActiveLobbies {
      */
     public static boolean startGame(Lobby lobby){
 
-        if (lobbies.contains(lobby)) {
+        if (lobbies.contains(lobby) &&
+            lobby.everyoneReady()   ) {
+
             ActiveGames.createGame(lobby);
             return true; //TODO create everything
+            //todo destroy lobby after creating game?
         }
-        //todo check if all players ready
         return false;
     }
 }

@@ -4,14 +4,16 @@ import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class CLI {
-    private List<GameElementBean> beans;
+public class CLI extends View{
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;
+    private final int startPosition = 0;
+    private final int centerPosition = 10;
 
 
     public CLI(){
@@ -21,10 +23,25 @@ public class CLI {
         LastElement = new StringBuilder();
     }
 
+    /**
+     *
+     * @return the string received as input by user
+     */
+    public String askCommand(){
+        System.out.println("ENTER COMMAND: ");
+        Scanner keyboard = new Scanner(System.in);
+        String command = keyboard.nextLine();
+        return command;
+    }
+
     public void show(){
-        final int lowestPriority = 4;
+        final int highestPriority = 1;
+        final int lowestPriority = 10;
         final int timeToNewLine = 1;
-        final int startPosition = 0;
+
+        View = new StringBuilder();
+        LastView = new StringBuilder();
+
         int precPriority = lowestPriority;
         int positionOnScreen = 0;
         GameElementBean curr = beans.get(0);
@@ -45,12 +62,17 @@ public class CLI {
                 }
             }
 
+            if(precPriority != curr.getPriority())
+                positionOnScreen = startPosition;
+
             if(precPriority == curr.getPriority())
                 positionOnScreen++;
 
             if(positionOnScreen > timeToNewLine)
                 positionOnScreen = startPosition;
 
+            if(curr.getPriority() == highestPriority )
+                positionOnScreen = centerPosition;
 
             draw(positionOnScreen, curr.drawCLI());
             precPriority = curr.getPriority();
@@ -63,16 +85,53 @@ public class CLI {
     }
 
     private void draw(int position, String elementToDraw){
-        int width = 7;
+        final int width = 4;
+        final String tab = "    ";
+        final String center = "\t\t\t\t\t\t\t\t";
 
 
-        if(position == 0){
+        if(position == startPosition){
             LastView = new StringBuilder(View.toString());
             View.append("\n\n");
             View.append(elementToDraw);
             LastElement = new StringBuilder(elementToDraw);
             return;
         }
+
+        if(position == centerPosition){
+            LastView = new StringBuilder(View.toString());
+            View.append("\n\n");
+            Scanner scanner = new Scanner(elementToDraw);
+            scanner.useDelimiter("\n");
+            while (scanner.hasNext()){
+                View.append(center).append(scanner.next()).append("\n");
+            }
+            LastElement = new StringBuilder(elementToDraw);
+            return;
+        }
+
+        Scanner moreRowsLastElement = new Scanner(LastElement.toString());
+        Scanner moreRowsThisElement = new Scanner(elementToDraw);
+        moreRowsLastElement.useDelimiter("\n");
+        moreRowsThisElement.useDelimiter("\n");
+        int lastElementRows = 0;
+        int thisElementRows = 0;
+        while(moreRowsLastElement.hasNext()){
+            moreRowsLastElement.next();
+            lastElementRows++;
+        }
+
+        while(moreRowsThisElement.hasNext()){
+            moreRowsThisElement.next();
+            thisElementRows++;
+        }
+
+        if(thisElementRows > lastElementRows){
+            String toggle = elementToDraw;
+            elementToDraw = LastElement.toString();
+            LastElement = new StringBuilder(toggle);
+        }
+
 
         //Old element to show in left position on screen
         Scanner scannerLastElement = new Scanner(LastElement.toString());
@@ -85,18 +144,26 @@ public class CLI {
         //OFFSET
         StringBuilder offsetBuilder = new StringBuilder();
         for(int i = 0; i < width * position; i++){
-            offsetBuilder.append("\t");
+            offsetBuilder.append(tab);
         }
         String offset = offsetBuilder.toString();
         String last = LastView.toString();
+
+
+
+
+
 
         /*
         now for each old element's row I append the new element's row with an offset.
         I must start from the last view, before the old element was inserted, and append
         both two elements.
          */
-        while(scannerLastElement.hasNext() && scannerThisElement.hasNext()){
-            LastView.append(scannerLastElement.next()).append(offset).append(scannerThisElement.next()).append("\n");
+        while(scannerLastElement.hasNext() || scannerThisElement.hasNext()){
+            if(!scannerThisElement.hasNext())
+                LastView.append(scannerLastElement.next()).append("\n");
+            else
+                LastView.append(scannerLastElement.next()).append(offset).append(scannerThisElement.next()).append("\n");
         }
 
 
@@ -104,14 +171,6 @@ public class CLI {
         LastElement = new StringBuilder(elementToDraw);
     }
 
-    public void addBean(GameElementBean bean){
-        beans.add(bean);
-    }
 
-    public void removeBean(int position){
-        beans.remove(position);
-    }
-    public void clearBeans(){
-        beans.clear();
-    }
+
 }

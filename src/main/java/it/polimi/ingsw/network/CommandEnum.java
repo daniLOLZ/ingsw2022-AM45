@@ -21,7 +21,7 @@ public enum CommandEnum {
     SELECT_STUDENT("Select Student",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     PUT_IN_HALL("Put in Hall",                          new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     PUT_IN_ISLAND("Put in Island",                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLAND}),
-    DESELECT_STUDENT("Deselect Student",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
+    DESELECT_STUDENT("Deselect Student",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     MOVE_MN_TO_ISLAND("Move MN to Island",              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, STEPS_MN}),
     CHOOSE_CLOUD("Choose Cloud",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_CLOUD}),
     SELECT_CHARACTER("Select Character",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION}),
@@ -30,7 +30,7 @@ public enum CommandEnum {
     // For now this and SELECT_STUDENT are kept separate to better separate these two different scenarios
     SELECT_ISLAND_GROUP("Select Island Group",          new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLANDS}),
     SELECT_STUDENT_ON_CARD("Select Student on Card",    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_CARD_POSITIONS}),
-    PLAY_CHARACTER("Play Character",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION});
+    PLAY_CHARACTER("Play Character",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST});
     //TODO add commands to exchange game information (beans)
 
     public final String command;

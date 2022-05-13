@@ -9,13 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Herbalist extends CharacterCard {
+    private static final String name = "HERBALIST";
+    private static final String description = "Place a No Entry tile on an Island\n" +
+                                          "\t|\tof your choice. The first time Mother\n" +
+                                          "\t|\tNature ends her movement there,\n" +
+                                          "\t|\tput the No Entry tile back onto this\n" +
+                                          "\t|\tcard, DO NOT calculate influence on that Island,\n" +
+                                          "\t|\tor place any Towers";
 
 
     private int numBlockTiles;
     private final List<BlockTile> blockTiles;
 
     public Herbalist(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
-        super(2,5, parameters, advancedParameters);
+        super(2,5, parameters, advancedParameters, name, description);
         final int maxBlockTiles = 4;
         numBlockTiles = maxBlockTiles;
         blockTiles = new ArrayList<>();

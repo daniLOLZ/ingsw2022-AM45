@@ -73,6 +73,7 @@ public class ClientMain {
         String userInput;
         while(client.isConnected()){ // generic game loop
             userInput = scanner.nextLine();
+            //After askForControl(planning) is over, starts to continuously send askForControl(action)
         }
     }
 

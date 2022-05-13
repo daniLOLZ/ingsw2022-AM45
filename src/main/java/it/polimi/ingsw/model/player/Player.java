@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Player extends DrawableObject {
+public class Player implements DrawableObject {
     protected PlayerEnum playerId;
     protected String nickname;
     protected ParameterHandler parameters;
@@ -26,12 +26,14 @@ public class Player extends DrawableObject {
     protected Wizard wizard;
 
     /**
+     * ! This method doesn't allow for the choice of the wizard !
      * Basic Player constructor
-     * @param playerId id given by SimpleGame at initialization
+     * @param playerId id given by SimpleGame on initialization
      * @param nickname string chosen by the user, should not be equal to other players
      * @param teamColor the team's color
      * @param leader true if the player is the leader of their team (has the towers on their board)
      */
+    @Deprecated
     public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters) {
         this.playerId = playerId;
         this.nickname = nickname;
@@ -39,28 +41,26 @@ public class Player extends DrawableObject {
         this.leader = leader;
         this.parameters = parameters;
         this.board = new Board(teamColor, parameters);
-        //TODO make the player choose which wizard they want to pick
-
-
         this.wizard = FactoryWizard.getWizard(playerId.index*10);
     }
 
     /**
      * Player constructor which features all choices made by the user: nickname, tower color and wizard
-     * @param playerId
-     * @param nickname
-     * @param teamColor
-     * @param leader
-     * @param parameters
-     * @param wizard
+     * @param playerId id given by SimpleGame on initialization
+     * @param nickname nickname chosen by the user
+     * @param teamColor this player's team's color
+     * @param leader true if the player is the leader of their team (has the towers on their board)
+     * @param parameters parameters of the game creating this player
+     * @param wizard the wizard chosen by the user
      */
-    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters, Wizard wizard){
+    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor, Wizard wizard, boolean leader, ParameterHandler parameters){        this.playerId = playerId;
         this.playerId = playerId;
         this.nickname = nickname;
         this.teamColor = teamColor;
+        this.wizard = wizard;
         this.leader = leader;
         this.board = createBoard(teamColor, parameters);
-        this.wizard = wizard;
+        this.parameters = parameters;
     }
 
 
@@ -105,23 +105,18 @@ public class Player extends DrawableObject {
         Assistant tempAssistant = null;
         try {
             tempAssistant = wizard.playCard(assistantId);
+            setAssistantPlayed(tempAssistant);
         }
         catch (NoSuchAssistantException e){
-            e.printStackTrace();
-            //TODO handle exception better or propagate upwards
+            parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
-        setAssistantPlayed(tempAssistant);
     }
 
     public String getNickname() {
         return nickname;
     }
 
-    //LUXRAY: con questo metodo possiamo creare il player e indipendentemente il Wizard.
-    //In questo modo possiamo dare la possibilità di scegliere il wizard che si vuole.
-    public void setWizard(Wizard wizard){
-        this.wizard = wizard;
-    }
+
 
     /**
      * Get from cloud the students to add at Entrance
@@ -163,7 +158,7 @@ public class Player extends DrawableObject {
     }
 
     /**
-     * Move the student  from position parameter.selectedEntranceStudents
+     * Move the student from position parameter.selectedEntranceStudents
      * to Hall
      * @return the moved student's color
      */
@@ -230,6 +225,10 @@ public class Player extends DrawableObject {
         PlayerBean bean = new PlayerBean(nickname, playerId, leader, teamColor, numTowers,
                 studAtEntrance,studPerTable,professors, idAssistants);
         return bean;
+    }
+
+    public void addEntrance(StudentEnum student){
+        board.addToEntrance(student);
     }
 
 

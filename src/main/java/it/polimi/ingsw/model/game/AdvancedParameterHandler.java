@@ -11,6 +11,7 @@ public class AdvancedParameterHandler {
 
     //STATIC PARAMETERS
     public static final int numCharacterCardPerGame = 3;
+    // todo remove/modify this fixed number, since the constructor of advancedGame has a parameter for this
 
     //DYNAMIC PARAMETERS
     private int numCoins;

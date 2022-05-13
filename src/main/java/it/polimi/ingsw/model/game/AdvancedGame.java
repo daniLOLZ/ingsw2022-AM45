@@ -1,7 +1,10 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.beans.AdvancedGameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.board.AdvancedBoard;
@@ -9,9 +12,11 @@ import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
 import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.model.player.PlayerEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +28,24 @@ public class AdvancedGame extends SimpleGame {
                                                     // col controller? In ogni caso si può vedere se servono davvero
     private AdvancedParameterHandler advancedParameters;
 
-    /*
-    forse è meglio che il construttore di game abbia come parametro passato una lista di giocatori
-    invece che crearseli lui.
-     */
+
+    public AdvancedGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames, int numCoins, int numCharacterCards) throws  IncorrectPlayersException{
+        super(numPlayers, selectedWizards, selectedColors, nicknames);
+        advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
+                                                    // time because we need to create parameters before
+                                                    // creating the islands, this happens in the createParameters()
+                                                    // method, which don't have the number of coins as input
+        CharacterCards = new ArrayList<>();
+        for(int card = 0; card < numCharacterCards; card++){
+            CharacterCards.add(FactoryCharacterCard.
+                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+        }
+        for(int card = 0; card < numCharacterCards; card++){
+            CharacterCards.get(card).initialise(this);
+        }
+    }
+
+    @Deprecated
     public AdvancedGame(int numPlayers, int numCoins, int numCharacterCards) throws IncorrectPlayersException {
         super(numPlayers);
         advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
@@ -44,9 +63,9 @@ public class AdvancedGame extends SimpleGame {
         }
 
         createPlayingSack();
-
     }
 
+    @Deprecated
     /**
      * AdvanceGame's constructor.
      * Get a players List of AdvancedPlayer (created in network state) and num of coins and num of character
@@ -71,8 +90,8 @@ public class AdvancedGame extends SimpleGame {
         }
 
         createPlayingSack();
-
     }
+
 
 
     /**
@@ -99,6 +118,7 @@ public class AdvancedGame extends SimpleGame {
      * @param numPlayers > 1 useful for version with override
      */
     @Override
+    @Deprecated
     protected void createPlayers(int numPlayers){
 
         players = FactoryPlayer.getNPlayers(numPlayers, getParameters());
@@ -112,8 +132,24 @@ public class AdvancedGame extends SimpleGame {
                     player.isLeader(),
                     getParameters()));
         }
+    }
 
-        //TODO VERSION WITH OVERRIDE
+    @Override
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) {
+        super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
+        AdvancedPlayers = new ArrayList<>();
+        for(Player player: players){ // Unhappy cast that could be resolved by separating
+            // into two methods : getPlayer and getAdvancedPlayer
+            AdvancedPlayers.add(
+                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                            player.getNickname(),
+                            player.getPlayerId(),
+                            player.getTeamColor(),
+                            player.getWizard(),
+                            player.isLeader(),
+                            getParameters(),
+                            true));
+        }
     }
 
     public List<AdvancedPlayer> getAdvancedPlayers() {
@@ -160,6 +196,24 @@ public class AdvancedGame extends SimpleGame {
         return true;
     }
 
+    /**
+     * Deselects the students on this card by assigning a new empty list
+     */
+    public void deselectAllCardStudents() {
+        advancedParameters.setSelectedStudentsOnCard(new ArrayList<>());
+    }
+
+    /**
+     * Deselects the student on the card selected at the position given
+     * @param position the position of the student to deselect
+     */
+    public void deselectStudentOnCard(int position){
+        //todo move deselection logic to parameters
+        if(advancedParameters.getSelectedStudentsOnCard().isEmpty()) return;
+        else {
+            advancedParameters.getSelectedStudentsOnCard().get().remove((Integer) position);
+        }
+    }
     public void selectStudentOnCard(int position){
         if(advancedParameters.getSelectedStudentsOnCard().isEmpty()){
             List<Integer> positionList = new ArrayList<>();
@@ -186,14 +240,100 @@ public class AdvancedGame extends SimpleGame {
             advancedPlayer.addCoin();
             advancedParameters.removeCoin();
         }
+        deselectAllEntranceStudents();
     }
 
     /**
-     * a java Bean with all general information about this game,
-     * a list with island groups id, a list of played assistants,
-     * a list of players id, the current player id, current turn number,
-     * current phase, Game coins and Character Cards id of this game
-     * @return
+     * Update professor considering the presence of glutton's effect
+     * @param professor the professor who needs to checked for updates
+     */
+    @Override
+    public void updateProfessor(StudentEnum professor) {
+        if(!advancedParameters.isDrawIsWin())
+            super.updateProfessor(professor);
+        else{
+            Player currentPlayer = parameters.getCurrentPlayer();
+            int max = currentPlayer.getNumStudentAtTable(professor);
+            Player challenger = currentPlayer;
+            int curr;
+
+            for(Player player: players){
+                curr = player.getNumStudentAtTable(professor);
+                if( curr > max ){
+                    challenger = player;
+                }
+            }
+
+            parameters.addProfessor(challenger.getPlayerId(), professor);
+        }
+    }
+
+    /**
+     *
+     * @param player who want to use the card
+     * @param idCard of the character card
+     * @return true if id is valid and player has enough coins
+     */
+    public boolean canUseCharacterCard(AdvancedPlayer player, final int idCard){
+        CharacterCard card = null;
+        for(CharacterCard x : CharacterCards){
+            if(x.id == idCard)
+                card = x;
+        }
+
+        return !(card == null || card.getCardCost() > player.getNumCoins());
+
+    }
+
+
+    /**
+     *
+     * @param idIsland > 0
+     * @return true if chosen island have one or more block tiles
+     */
+    public boolean isBlocked(int idIsland){
+        IslandGroup island = null;
+        for(IslandGroup islandGroup: islandGroups){
+            if(islandGroup.getIdGroup() == idIsland)
+                island = islandGroup;
+        }
+
+        if(island == null){
+            parameters.setErrorState("WRONG ID ISLAND GROUP");
+            return false;
+        }
+
+        //In advanced game we have advanced islandGroup
+        AdvancedIslandGroup advancedIsland = (AdvancedIslandGroup) island;
+        return advancedIsland.getNumBlockTiles() > 0;
+    }
+
+    /**
+     * Remove a block tile from chosen island
+     * @param idIsland > 0
+     */
+    public void unblockIsland(int idIsland){
+        IslandGroup island = null;
+        for(IslandGroup islandGroup: islandGroups){
+            if(islandGroup.getIdGroup() == idIsland)
+                island = islandGroup;
+        }
+
+        if(island == null){
+            parameters.setErrorState("WRONG ID ISLAND GROUP");
+            return;
+        }
+
+        AdvancedIslandGroup advancedIsland = (AdvancedIslandGroup) island;
+        advancedIsland.unblock();
+    }
+
+    /**
+     *
+     * @return a java Bean with all general information about this game,
+     *       a list with island groups id, a list of played assistants,
+     *       a list of players id, the current player id, current turn number,
+     *       current phase, Game coins and Character Cards id of this game
      */
     @Override
     public GameElementBean toBean() {
@@ -212,12 +352,24 @@ public class AdvancedGame extends SimpleGame {
             idIslands.add(islandGroup.getIdGroup());
         }
         for(Player player: players){
-            idAssistants.add(player.getAssistantPlayed().id);
+            Assistant assistant = player.getAssistantPlayed();
+            if(assistant != null)
+                idAssistants.add(assistant.id);
+            else
+                idAssistants.add(0);
+
             idPlayers.add(player.getPlayerId().index);
         }
         AdvancedGameBoardBean bean = new AdvancedGameBoardBean(idIslands,idAssistants,idPlayers,currentPlayerId,
                 turn,phase, numCoins, idCharacterCards);
         return bean;
     }
+
+    @Override
+    public void setDrawables() {
+        super.setDrawables();
+        drawables.addAll(CharacterCards);
+    }
+
 }
 
