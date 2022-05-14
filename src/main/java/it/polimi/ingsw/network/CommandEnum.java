@@ -1,5 +1,8 @@
 package it.polimi.ingsw.network;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static it.polimi.ingsw.network.NetworkFieldEnum.*;
 
 //TODO change ALL occurrences of command (variables, classes, ...) to messageType
@@ -39,6 +42,15 @@ public enum CommandEnum {
     CommandEnum(String command, NetworkFieldEnum[] allowedFields) {
         this.command = command;
         this.allowedFields = allowedFields;
+    }
+
+    /**
+     * Gets and returns the fields required for this command
+     * @param command the command chosen
+     * @return a list of fields required to correctly form the message
+     */
+    public static List<NetworkFieldEnum> getFieldsNeeded(CommandEnum command){
+        return Arrays.stream(command.allowedFields).toList();
     }
 
     public static CommandEnum fromObjectToEnum (Object command){

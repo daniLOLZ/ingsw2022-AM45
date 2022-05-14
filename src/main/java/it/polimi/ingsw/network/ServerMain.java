@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ServerMain {
     private static int portNumber; // java doesn't support unsigned int
     private static ServerSocket serverSocket;
-    private static List<ClientHandler> pinglessClients;
+    private static List<ClientHandler> pinglessClients = new ArrayList<>();
 
     public ServerMain(int port){
         this.portNumber = port;

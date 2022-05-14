@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -76,28 +77,107 @@ public class ClientMain {
         client.readParameters(args);
 
         // From here on, the view is responsible for what the player sees
+        client.mockViewLogin();
 
+        //TODO IMPLEMENT VIEW
+        try {
+            client.mockViewGameLoop();
+        } catch (IOException e) {
+            System.err.println("Generic network error, closing the game.");
+            client.quitGame();
+        }
+
+
+    }
+
+    /**
+     * Handles quitting the game on the client side
+     */
+    private void quitGame() {
+        //todo
+    }
+
+    /**
+     * This logic will be moved in the UI and is just a mock class
+     * The starting phase when the user logs in to the server
+     */
+    private void mockViewLogin(){
         //todo move username insertion in the view
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Insert your username");
         String inputNickname = scanner.nextLine();
-        client.setNickname(inputNickname);
+        setNickname(inputNickname);
 
-        if(!client.login(client.getHostname(), client.getPortNumber(), client.getNickname())){
+        if(!login(getHostname(), getPortNumber(), getNickname())){
             System.err.println("Error logging in");
             return;
         }
-        System.out.println("Username " + client.nickname + " was accepted");
+        System.out.println("Username " + nickname + " was accepted");
 
         //start the user's ping routine in a new thread
-        new Thread(client::ping).start();
+        new Thread(this::ping).start();
 
-        //TODO IMPLEMENT VIEW
-        while(client.isConnected()){ // generic game loop
+    }
+
+    /**
+     * This logic will be moved in the UI and is just a mock class
+     * The part of the game where the user can send commands after the login phase.
+     * Here it's just a loop of sending and receiving messages
+     */
+    private void mockViewGameLoop() throws IOException {
+
+        while(isConnected()) {
+
+            sendUserInput();
+            receiveServerReply();
 
             //After askForControl(planning) is over, starts to continuously send askForControl(action)
         }
+    }
+
+    /**
+     * Receives the reply from the server and outputs the response message
+     * @throws IOException
+     */
+    private void receiveServerReply() throws IOException {
+        mainBroker.receive(mainSocket.getInputStream());
+        //View visualization of the received data somehow
+        for(NetworkFieldEnum field : NetworkFieldEnum.values()){
+            if(mainBroker.readField(field) != null){
+                System.out.println(mainBroker.readField(field));
+            }
+        }
+
+    }
+
+    /**
+     * Asks the user to input a command and the relative fields
+     * @throws IOException
+     */
+    private void sendUserInput() throws IOException {
+        List<NetworkFieldEnum> fieldsNeeded;
+        List<String> fieldsUserInput;
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Insert the command");
+        String inputCommand = scanner.nextLine();
+        CommandEnum commandRead = CommandEnum.valueOf(inputCommand);
+
+        fieldsNeeded = CommandEnum.getFieldsNeeded(commandRead);
+        fieldsUserInput = new ArrayList<>();
+        for(NetworkFieldEnum field : fieldsNeeded){
+            System.out.println("Insert the value for the field: "+ field.toString());
+            fieldsUserInput.add(scanner.nextLine());
+        }
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, commandRead);
+        for(int field = 0; field < fieldsNeeded.size(); field++){
+            mainBroker.addToMessage(fieldsNeeded.get(field), fieldsUserInput.get(field));
+        }
+        mainBroker.send(mainSocket.getOutputStream());
+
+        //After askForControl(planning) is over, starts to continuously send askForControl(action)
     }
 
     /**
