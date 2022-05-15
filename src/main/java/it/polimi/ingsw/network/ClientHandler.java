@@ -1,21 +1,12 @@
 package it.polimi.ingsw.network;
 
-import it.polimi.ingsw.controller.Controller;
-import it.polimi.ingsw.controller.GameRuleEnum;
-import it.polimi.ingsw.model.StudentEnum;
-import it.polimi.ingsw.model.TeamEnum;
-import it.polimi.ingsw.model.characterCards.Requirements;
-import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.commandHandler.CommandHandler;
-import it.polimi.ingsw.network.commandHandler.PingHandler;
+import it.polimi.ingsw.network.commandHandler.FactoryCommandHandler;
 import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
-import it.polimi.ingsw.network.connectionState.*;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -23,17 +14,16 @@ public class ClientHandler implements Runnable{
 
     private static final Duration timeout = Duration.ofSeconds(5);
 
+    private static List<CommandHandler> commandHandlers = FactoryCommandHandler.getAllCommandHandlers();
+
     private Socket mainSocket;
     private Socket pingSocket;
     private MessageBroker mainBroker;
     private MessageBroker pingBroker;
     private boolean isConnected;
 
-    private int idUser;
-    private ConnectionState connectionState;
-    private ConnectionState callbackConnectionState;
-    private Lobby userLobby;
-    private Controller userController;
+
+    private ClientHandlerParameters parameters;
 
 
     /**
@@ -44,9 +34,7 @@ public class ClientHandler implements Runnable{
         this.mainSocket = mainSocket;
         this.mainBroker = new MessageBroker();
         this.pingBroker = new MessageBroker();
-        this.connectionState = new Authentication();
-        this.userLobby = null;
-        this.userController = null;
+        this.parameters = new ClientHandlerParameters();
         this.isConnected = true;
     }
 
@@ -64,14 +52,14 @@ public class ClientHandler implements Runnable{
         OutputStream clientOutput;
         isConnected = true; // todo remove after implementing ping
 
-        idUser = LoginHandler.getNewUserId();
+        parameters.setIdUser(LoginHandler.getNewUserId());
         try {
             clientInput = mainSocket.getInputStream();
             clientOutput = mainSocket.getOutputStream();
         } catch (IOException e) {
             System.err.println("Error obtaining streams");
             System.err.println(e.getMessage());
-            quitGame(); // Maybe useless
+            //quitGame(); // Maybe useless
             return;
         }
 
@@ -86,11 +74,11 @@ public class ClientHandler implements Runnable{
             }
             CommandEnum command = CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND));
 
-            if(!connectionState.isAllowed(command)){ // Trashes a command given at the wrong time
+            if(!parameters.getConnectionState().isAllowed(command)){ // Trashes a command given at the wrong time
                 mainBroker.unlock();
                 continue;
             }
-            handleCommand(command); // runs the appropriate routine depending on the command received
+            handleCommand(mainBroker); // runs the appropriate routine depending on the command received
             // Sends a reply to the client
             mainBroker.send(clientOutput);
             mainBroker.unlock();
@@ -99,25 +87,27 @@ public class ClientHandler implements Runnable{
         // This point should never be reached in normal circumstances (unless the client disconnects)
     }
 
-    /**
+    //below methods moved to CommandHandler
+
+    /*
      * Adds the reply fields in the server message in case of a successful operation (Message and status)
      */
-    private void notifySuccessfulOperation(){
+    /*private void notifySuccessfulOperation(){
         mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "OK");
         mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 0);
         mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
-    }
+    }*/
 
-    /**
+    /*
      * Adds the reply fields in the server message in case of a failed operation (Message and status)
      * @param errorMessage A verbose message describing the error
      */
-    private void notifyError(String errorMessage){ // parametrize reply status as well
+    /*private void notifyError(String errorMessage){ // parametrize reply status as well
         mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
         mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
         mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
         mainBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
-    }
+    }*/
 
     /**
      * Closes the current connection
@@ -128,54 +118,44 @@ public class ClientHandler implements Runnable{
 
     /**
      * Finds the command that's been given and runs the appropriate methods
-     * @param command the command that was received by the client
+     * @param messageBroker The broker containing the message with the command to handle
      */
-    public void handleCommand(CommandEnum command){
-        switch(command){
-            case QUIT -> quitGame();
-            case CONNECTION_REQUEST -> connectionRequest();
-            case PLAY_GAME -> playGame();
-            case READY_TO_START -> sendReady();
-            case NOT_READY -> sendNotReady();
-            case LEAVE_LOBBY -> requestLeaveLobby();
-            case START_GAME -> startGame();
-            case SELECT_WIZARD -> selectWizard();
-            case SELECT_TOWER_COLOR -> selectTowerColor();
-            case ASK_FOR_CONTROL -> askForControl();
-            case CHOOSE_ASSISTANT -> chooseAssistant();
-            case SELECT_STUDENT -> selectEntranceStudent();
-            case PUT_IN_HALL -> putInHall();
-            case PUT_IN_ISLAND -> putInIsland();
-            case DESELECT_STUDENT -> deselectStudent();
-            case MOVE_MN_TO_ISLAND -> moveMNToIsland();
-            case CHOOSE_CLOUD -> chooseCloud();
-            case SELECT_CHARACTER -> selectCharacter();
-            case SELECT_STUDENT_COLOR -> selectStudentColor();
-            case SELECT_STUDENT_ON_CARD -> selectStudentOnCard();
-            case SELECT_ENTRANCE_STUDENTS -> selectEntranceStudents();
-            case SELECT_ISLAND_GROUP -> selectIslandGroup();
-            case PLAY_CHARACTER -> playCharacter();
+    public void handleCommand(MessageBroker messageBroker){
+
+        boolean successfulOperation = false;
+
+        for (CommandHandler commandHandler:
+             commandHandlers) {
+            try {
+                successfulOperation = commandHandler.executeCommand(messageBroker, parameters);
+            }
+            catch (UnexecutableCommandException e){
+                continue;
+            }
+
+            break;
         }
+
+        if (!successfulOperation); //TODO close connection?
     }
 
 
-    /*
-     *  For all the methods below, the game connection state updates accordingly
-     */
+    //  For all the methods below, the game connection state updates accordingly
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The player plays the card for which they (optionally) selected the requirements
      */
-    private void playCharacter() {
+    /*private void playCharacter() {
 //        Integer cardPosition = (Integer)broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
-        if(userController.playCard()){
+        if(parameters.getUserController().playCard()){
             notifySuccessfulOperation();
-            setConnectionState(callbackConnectionState);
+            parameters.setConnectionState(parameters.getCallbackConnectionState());
         }
         else {
             notifyError("Couldn't play the character card");
         }
-    }
+    }*/
 
 
     private void pong(){//TEMPORARY
@@ -189,7 +169,7 @@ public class ClientHandler implements Runnable{
         } catch (IOException e) {
             System.err.println("Error obtaining streams");
             System.err.println(e.getMessage());
-            quitGame(); // Maybe useless
+            //quitGame(); //TODO handle this case better
             return;
         }
 
@@ -226,376 +206,391 @@ public class ClientHandler implements Runnable{
                 isConnected = false;
             }
             else {
-                CommandHandler pingHandler = new PingHandler();
-                try {
-                    pingHandler.executeCommand(pingBroker, clientOutput);
-                } catch (UnexecutableCommandException e) { //should never happen, condition is already verified
-                    e.printStackTrace(); //this method has been overridden
-                }
+                pingBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PONG);
+                pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST));
+                pingBroker.send(clientOutput);
             }
             pingBroker.unlock();
         }
     }
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Card requirements method.
      * The user sends the selected islands
      */
-    private void selectIslandGroup() {
+    /*private void selectIslandGroup() {
         Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.CHOSEN_ISLANDS);
         List<Integer> islandIds = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
+        for(Object o : objectArray){
             islandIds.add((Integer)o);
         }
-        if(userController.selectIslandGroups(islandIds)){
+        if(parameters.getUserController().selectIslandGroups(islandIds)){
             notifySuccessfulOperation();
         }
         else {
             notifyError("Couldn't select the islands");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Card requirements method.
      * The user sends the selected students at their entrance
      */
-    private void selectEntranceStudents() {
+    /*private void selectEntranceStudents() {
         Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
         List<Integer> students = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
+        for(Object o : objectArray){
             students.add((Integer)o);
         }
-        if(userController.selectEntranceStudents(students)){
+        if(parameters.getUserController().selectEntranceStudents(students)){
             notifySuccessfulOperation();
         }
         else {
             notifyError("Couldn't select the students at the entrance");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Card requirements method.
      * The user sends the selected students on the card they previously selected
      */
-    private void selectStudentOnCard() {
+    /*private void selectStudentOnCard() {
         Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.CHOSEN_CARD_POSITIONS);
         List<Integer> students = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
+        for(Object o : objectArray){
             students.add((Integer)o);
         }
-        if(userController.selectStudentOnCard(students)){
+        if(parameters.getUserController().selectStudentOnCard(students)){
             notifySuccessfulOperation();
         }
         else {
             notifyError("Couldn't select the students on the card");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Card requirements method.
      * The user sends the selected student color
      */
-    private void selectStudentColor() {
+    /*private void selectStudentColor() {
         Object[] objectArray = (Object[]) mainBroker.readField(NetworkFieldEnum.COLORS_REQUIRED);
         List<StudentEnum> colors = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
+        for(Object o : objectArray){
             colors.add(StudentEnum.fromObjectToEnum(o));
         }
 
-        if(userController.selectStudentColor(colors)){
+        if(parameters.getUserController().selectStudentColor(colors)){
             notifySuccessfulOperation();
         }
         else {
             notifyError("Couldn't select student color");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user selects a character card to play
      */
-    private void selectCharacter() {
+    /*private void selectCharacter() {
         //Here we need to memorize what the previous state the user had to resume the turn
         // after the character takes effect
-        callbackConnectionState = connectionState;
+        parameters.setCallbackConnectionState(parameters.getConnectionState());
 
         Integer cardPosition = (Integer) mainBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
-        if(!userController.selectCard(cardPosition)){
+        if(!parameters.getUserController().selectCard(cardPosition)){
             notifyError("Couldn't play the card, not enough coins");
         }
         else {
             notifySuccessfulOperation();
-            Requirements requirements = userController.getAdvancedGame()
+            Requirements requirements = parameters.getUserController().getAdvancedGame()
                                         .getAdvancedParameters().getRequirementsForThisAction();
             mainBroker.addToMessage(NetworkFieldEnum.ENTRANCE_REQUIRED, requirements.studentAtEntrance);
             mainBroker.addToMessage(NetworkFieldEnum.COLORS_REQUIRED, requirements.studentType);
             mainBroker.addToMessage(NetworkFieldEnum.ISLANDS_REQUIRED, requirements.islands);
             mainBroker.addToMessage(NetworkFieldEnum.ON_CARD_REQUIRED, requirements.studentOnCard);
-            //TODO maybe incapsulate somewhere else?
 
-            setConnectionState(new CharacterCardActivation());
+            parameters.setConnectionState(new CharacterCardActivation());
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user chooses a cloud to refill their entrance with
      */
-    private void chooseCloud() {
+    /*private void chooseCloud() {
         Integer idCloud = (Integer) mainBroker.readField(NetworkFieldEnum.ID_CLOUD);
-        if(userController.chooseCloud(idCloud)){
-            setConnectionState(new WaitingForControl());
+        if(parameters.getUserController().chooseCloud(idCloud)){
+            parameters.setConnectionState(new WaitingForControl());
             notifySuccessfulOperation();
         }
         else {
             notifyError("Couldn't select the cloud");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user moves mother nature
      */
-    private void moveMNToIsland() {
+    /*private void moveMNToIsland() {
         Integer steps = (Integer)mainBroker.readField(NetworkFieldEnum.STEPS_MN);
-        if(userController.moveMNToIsland(steps)){
+        if(parameters.getUserController().moveMNToIsland(steps)){
             notifySuccessfulOperation();
-            setConnectionState(new CloudChoosing());
+            parameters.setConnectionState(new CloudChoosing());
         }
         else {
             notifyError("Couldn't move mother nature");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user deselects the student
      */
-    private void deselectStudent() {
+    /*private void deselectStudent() {
         Integer studentPosition = (Integer)mainBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
-        if(userController.deselectStudent(studentPosition)){
+        if(parameters.getUserController().deselectStudent(studentPosition)){
             notifySuccessfulOperation();
-            setConnectionState(new StudentChoosing());
+            parameters.setConnectionState(new StudentChoosing());
         }
         else {
             notifyError("Couldn't deselect the student");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user chooses to put the student on the selected island
      */
-    private void putInIsland() {
+    /*private void putInIsland() {
         Integer idIsland = (Integer)mainBroker.readField(NetworkFieldEnum.CHOSEN_ISLAND);
-        if(userController.putInIsland(idIsland)){
+        if(parameters.getUserController().putInIsland(idIsland)){
             notifySuccessfulOperation();
-            if(userController.allStudentsMoved()){
-                setConnectionState(new MNMoving());
+            if(parameters.getUserController().allStudentsMoved()){
+                parameters.setConnectionState(new MNMoving());
             }
             else {
-                setConnectionState(new StudentChoosing());
+                parameters.setConnectionState(new StudentChoosing());
             }
         }
         else {
             notifyError("Couldn't put the student on the island");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user chooses to put their student in their hall
      */
-    private void putInHall() {
-        if(userController.putInHall()){
+    /*private void putInHall() {
+        if(parameters.getUserController().putInHall()){
             notifySuccessfulOperation();
-            if(userController.allStudentsMoved()){
-                setConnectionState(new MNMoving());
+            if(parameters.getUserController().allStudentsMoved()){
+                parameters.setConnectionState(new MNMoving());
             }
             else {
-                setConnectionState(new StudentChoosing());
+                parameters.setConnectionState(new StudentChoosing());
             }
         }
         else {
             notifyError("Couldn't put the student in the hall");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user asks to select a student from their entrance
      */
-    private void selectEntranceStudent() {
+    /*private void selectEntranceStudent() {
         Integer selectedStudent = (Integer)mainBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
-        if(userController.selectStudent(selectedStudent)){
+        if(parameters.getUserController().selectStudent(selectedStudent)){
             notifySuccessfulOperation();
-            setConnectionState(new StudentMoving());
+            parameters.setConnectionState(new StudentMoving());
         }
         else {
             notifyError("Error selecting the student, you've chosen all students already");
 
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user selects which assistant they want to play, the server replies with an error
      * if the assistant can't be played
      */
-    private void chooseAssistant() {
+    /*private void chooseAssistant() {
         Integer idAssistant = (Integer)mainBroker.readField(NetworkFieldEnum.ID_ASSISTANT);
-        if(userController.playAssistant(idAssistant)){
+        if(parameters.getUserController().playAssistant(idAssistant)){
             notifySuccessfulOperation();
-            setConnectionState(new WaitingForControl());
+            parameters.setConnectionState(new WaitingForControl());
         }
         else {
             notifyError("The assistant couldn't be played");
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * While waiting for their turn, the user periodically sends this message to ask for their turn to start
      */
-    private void askForControl() {
+    /*private void askForControl() {
         PhaseEnum gamePhase = PhaseEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.GAME_PHASE));
-        if(userController.askForControl(this.idUser, gamePhase)){
+        if(parameters.getUserController().askForControl(parameters.getIdUser(), gamePhase)){
             if(gamePhase.equals(PhaseEnum.PLANNING)){
-                setConnectionState(new PlanningPhaseTurn());
+                parameters.setConnectionState(new PlanningPhaseTurn());
             }
             else if(gamePhase.equals(PhaseEnum.ACTION)){
-                setConnectionState(new StudentChoosing());
+                parameters.setConnectionState(new StudentChoosing());
             }
             notifySuccessfulOperation();
         }
         else{
             notifyError("Not your turn to play");
         }
-    }
+    }*/
 
     // Above this point, the commands relate to the actual game
 
-    /**
+
+    // HANDLED ELSEWHERE
+    /*
      * The user selects a team to be part of, this method calls the game controller to know whether the
      * team chosen is available, and notifies it to the user
      */
-    private void selectTowerColor() {
+    /*private void selectTowerColor() {
         TeamEnum teamColor = TeamEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
-        if(userController.setTeamColor(teamColor, this.idUser)){
+        if(parameters.getUserController().setTeamColor(teamColor, parameters.getIdUser())){
             notifySuccessfulOperation();
         }
         else {
             notifyError("The chosen team isn't available, please change your selection");
         }
-        if (userController.startPlayingGame()){
-            setConnectionState(new WaitingForControl());
-        } // todo might need better handling
-    }
+        if (parameters.getUserController().startPlayingGame()){
+            parameters.setConnectionState(new WaitingForControl());
+        }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user selects a wizard from the four available, this method calls the game controller to know whether the
      * wizard chosen is available, and notifies it to the user
      */
-    private void selectWizard() {
+    /*private void selectWizard() {
         Integer idWizard = (Integer)mainBroker.readField(NetworkFieldEnum.ID_WIZARD);
-        if(userController.setWizard(idWizard, this.idUser)){
+        if(parameters.getUserController().setWizard(idWizard, parameters.getIdUser())){
             notifySuccessfulOperation();
         }
         else {
             notifyError("The chosen wizard isn't available, please change your selection");
         }
-        if (userController.startPlayingGame()){
-            setConnectionState(new WaitingForControl());
-        } // todo might need better handling
-    }
+        if (parameters.getUserController().startPlayingGame()){
+            parameters.setConnectionState(new WaitingForControl());
+        }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user requests to start the game
      * The request will be successful only if the host coincides with the user and all players are ready
      */
-    private void startGame() {
-        if(!userLobby.isHost(this.idUser)){
+    /*private void startGame() {
+        if(!parameters.getUserLobby().isHost(parameters.getIdUser())){
             notifyError("You're not the host! You can't start the game.");
         }
         else {
-            if(ActiveLobbies.startGame(userLobby)){
-                setConnectionState(new StartingGame());
-                this.userController = ActiveGames.getGameFromUserId(this.idUser);
+            if(ActiveLobbies.startGame(parameters.getUserLobby())){
+                parameters.setConnectionState(new StartingGame());
+                parameters.setUserController(ActiveGames.getGameFromUserId(parameters.getIdUser()));
                 notifySuccessfulOperation();
             }
             else {
                 notifyError("The game couldn't start, returning to lobby");
             }
         }
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user requests to play a game with the given rules
      */
-    private void playGame() {
+    /*private void playGame() {
 
         GameRuleEnum rules = GameRuleEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.GAME_RULE));
 
-        userLobby = ActiveLobbies.assignLobby(rules);
-        userLobby.addPlayer(this.idUser);
-        setConnectionState(new InLobby());
+        parameters.setUserLobby(ActiveLobbies.assignLobby(rules));
+        parameters.getUserLobby().addPlayer(parameters.getIdUser());
+        parameters.setConnectionState(new InLobby());
         notifySuccessfulOperation();
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * The user requests to leave the current lobby
      */
-    private void requestLeaveLobby() {
-        userLobby.removePlayer(this.idUser);
-        userLobby = null;
-        setConnectionState(new LookingForLobby());
+    /*private void requestLeaveLobby() {
+        parameters.getUserLobby().removePlayer(parameters.getIdUser());
+        parameters.setUserLobby(null);
+        parameters.setConnectionState(new LookingForLobby());
         notifySuccessfulOperation();
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Sends a message to the server letting it know the user is not ready to start the game
      */
-    private void sendNotReady() {
-        userLobby.removeReady(this.idUser);
+    /*private void sendNotReady() {
+        parameters.getUserLobby().removeReady(parameters.getIdUser());
         notifySuccessfulOperation(); // other checks to do?
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Sends a message to the server letting it know the user is ready to start the game
      */
-    private void sendReady() {
-        userLobby.addReady(this.idUser);
+    /*private void sendReady() {
+        parameters.getUserLobby().addReady(parameters.getIdUser());
         notifySuccessfulOperation(); // other checks to do?
-    }
+    }*/
 
-    /**
+    // HANDLED ELSEWHERE but should it?
+    /*
      * Closes the connection for this user
      */
-    public void quitGame(){
-        //TODO later, when all cases have been accounted for
-        if(!userController.equals(null)){
+    /*public void quitGame(){
+        if(parameters.getUserController() != null){
             // The user decides to quit the game while still in the lobby, so the other users
             // shouldn't be kicked out automatically
-            userLobby.removePlayer(this.idUser);
+            parameters.getUserLobby().removePlayer(parameters.getIdUser());
         }
         else {
             // The game is already starting or already started, so the game shall end for
             // every player
-            ActiveGames.endGame(this.idUser);
+            ActiveGames.endGame(parameters.getIdUser());
             closeConnection();
         }
-    }
+    }*/
 
 
-    /**
+    // HANDLED ELSEWHERE
+    /*
      * Handles the connections of a new user, checking whether their nickname
      * satisfies the requirement of uniqueness
      */
-    public void connectionRequest(){
+    /*public void connectionRequest(){
         boolean loginSuccessful;
-        loginSuccessful= LoginHandler.login((String)mainBroker.readField(NetworkFieldEnum.NICKNAME), idUser);
+        loginSuccessful= LoginHandler.login((String)mainBroker.readField(NetworkFieldEnum.NICKNAME), parameters.getIdUser());
         if(!loginSuccessful){
             notifyError("Nickname already taken");
             quitGame();
         }
         else notifySuccessfulOperation();
-        setConnectionState(new LookingForLobby());
-    }
+        parameters.setConnectionState(new LookingForLobby());
+    }*/
 
-    public void setConnectionState(ConnectionState connectionState) {
-        this.connectionState = connectionState;
-    }
 
     public Socket getMainSocket(){
         return mainSocket;

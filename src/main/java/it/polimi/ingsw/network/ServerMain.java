@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ServerMain {
     private static int portNumber; // java doesn't support unsigned int
     private static ServerSocket serverSocket;
-    private static List<ClientHandler> pinglessClients = new ArrayList<>();
+    private static List<ClientHandler> pinglessClients = new ArrayList<>(); //contains all clients not having a ping socket
 
     public ServerMain(int port){
         this.portNumber = port;
@@ -106,11 +106,12 @@ public class ServerMain {
                 for (ClientHandler clientHandler:
                      pinglessClients) {
                     if (clientHandler.getMainSocket().getInetAddress().equals(socket.getInetAddress())) {
-                        waitingClient = clientHandler;
+                        waitingClient = clientHandler; //if the client connecting is in the list, we assume he's
+                                                       //asking to open a ping socket
                     }
                 }
 
-                if (waitingClient != null){
+                if (waitingClient != null){ //client is connecting again to open the ping socket
                     waitingClient.assignPingSocket(socket);
                     pinglessClients.remove(waitingClient);
                     System.out.println("Starting Handler of" + waitingClient.getMainSocket().getInetAddress());
@@ -120,7 +121,9 @@ public class ServerMain {
                 }
                 else {
                     System.out.println("New connection from " + socket.getInetAddress());
-                    pinglessClients.add(new ClientHandler(socket));
+                    pinglessClients.add(new ClientHandler(socket)); //the clientHandler is kept in the pinglessClients list
+                                                                    //waiting for the Client to establish another connection
+                                                                    //for the ping routine
                 }
 
 
