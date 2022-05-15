@@ -25,10 +25,11 @@ public class ClientHandler implements Runnable{
 
     private Socket mainSocket;
     private Socket pingSocket;
-    private boolean isConnected;
-    private int idUser;
     private MessageBroker mainBroker;
     private MessageBroker pingBroker;
+    private boolean isConnected;
+
+    private int idUser;
     private ConnectionState connectionState;
     private ConnectionState callbackConnectionState;
     private Lobby userLobby;

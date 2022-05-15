@@ -115,6 +115,8 @@ public class ServerMain {
                     pinglessClients.remove(waitingClient);
                     System.out.println("Starting Handler of" + waitingClient.getMainSocket().getInetAddress());
                     executor.submit(waitingClient);
+                    // Resets the waiting client
+                    waitingClient = null;
                 }
                 else {
                     System.out.println("New connection from " + socket.getInetAddress());

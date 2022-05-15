@@ -11,10 +11,13 @@ public class Cloud implements DrawableObject{
     private final int id;
     private final int studentsPerCloud;
 
-    public Cloud(int id, int studentsPerCloud){
+    public Cloud(int id, int studentsPerCloud){ //, VirtualView virtualView
         this.id = id;
         this.studentsPerCloud = studentsPerCloud;
         students = new ArrayList<>();
+        // CloudObserver obsCreated = new Observer();
+        // this.addObserver(ciao);
+        // virtualView.addNewObserver(obsCreated);
     }
 
     public void fill(List<StudentEnum> numStudents){

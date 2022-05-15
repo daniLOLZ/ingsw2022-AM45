@@ -203,6 +203,13 @@ public class MessageBroker {
                         return false;
                     }
                 }
+                case ID_REQUEST : {
+                    try{
+                        int primitiveInt = (int) object;
+                    } catch(ClassCastException e) {
+                        return false;
+                    }
+                }
                 case NICKNAME : {
                     try{
                         String string = (String) object;

@@ -23,6 +23,7 @@ public class Controller {
     protected SelectionHandler selectionHandler;
     protected final List<Integer> playerNumbers;
     protected IslandHandler islandHandler;
+//  protected VirtualView virtualView
 
 
     /**
@@ -47,15 +48,18 @@ public class Controller {
      * Creates a game with simple rules using the wizards, tower colors and nicknames stored in playerCreation
      */
     public boolean createSimpleGame(){
+        // createVirtualView();
         try{
             simpleGame = new SimpleGame(GameRuleEnum.getNumPlayers(gameRule.id),
                     playerCreation.getWizards(),
                     playerCreation.getTeamColors(),
                     playerCreation.getNicknames());
+            // , virtualView
         } catch (IncorrectPlayersException e) {
             System.err.println("Error creating the game!");
             return false;
         }
+
         return true;
     }
 

@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 
 public class ClientMain {
 
-    private static final int DEFAULT_PING_PORT_NUMBER = 54322;
+    private static final int DEFAULT_PORT_NUMBER = 54321;
     private final Duration timeout = Duration.ofSeconds(5);
 
     private int progressiveIdRequest, progressiveIdPingRequest;
@@ -40,7 +40,7 @@ public class ClientMain {
     public ClientMain(String hostname, int portNumber, String nickname) {
         this.hostname = hostname;
         this.mainPortNumber = portNumber;
-        this.pingPortNumber = DEFAULT_PING_PORT_NUMBER;
+        this.pingPortNumber = DEFAULT_PORT_NUMBER;
         this.nickname = nickname;
         this.mainBroker = new MessageBroker();
         this.pingBroker = new MessageBroker();
@@ -71,7 +71,7 @@ public class ClientMain {
 
     public static void main(String[] args){
 
-        ClientMain client = new ClientMain("127.0.0.1", 54321, "username"); //TODO remove hardcoded network parameters
+        ClientMain client = new ClientMain("127.0.0.1", DEFAULT_PORT_NUMBER, "username"); //TODO remove hardcoded network parameters
 
         // Updates the default values of the newly generated instance with the preferences obtained from command line
         client.readParameters(args);
@@ -115,8 +115,7 @@ public class ClientMain {
         }
         System.out.println("Username " + nickname + " was accepted");
 
-        //start the user's ping routine in a new thread
-        new Thread(this::ping).start();
+
 
     }
 
@@ -243,6 +242,9 @@ public class ClientMain {
             e.printErrorMessage();
             return false;
         }
+
+        //start the user's ping routine in a new thread
+        new Thread(this::ping).start();
 
         if(!sendNickname(nickname)) {
             System.err.println("Nickname rejected");
