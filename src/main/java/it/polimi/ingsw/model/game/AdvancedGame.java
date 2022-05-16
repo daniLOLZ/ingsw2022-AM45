@@ -17,6 +17,8 @@ import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.AdvancedGameWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,38 @@ public class AdvancedGame extends SimpleGame {
             CharacterCards.add(FactoryCharacterCard.
                     getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
         }
+
+    }
+
+
+    /**
+     * Version with observer pattern
+     * @param numPlayers
+     * @param selectedWizards
+     * @param selectedColors
+     * @param nicknames
+     * @param numCoins
+     * @param numCharacterCards
+     * @param virtualView
+     * @throws IncorrectPlayersException
+     */
+    public AdvancedGame(int numPlayers, List<Integer> selectedWizards,
+                        List<TeamEnum> selectedColors, List<String> nicknames,
+                        int numCoins, int numCharacterCards, VirtualView virtualView) throws  IncorrectPlayersException{
+        super(numPlayers, selectedWizards, selectedColors, nicknames);
+        advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
+        // time because we need to create parameters before
+        // creating the islands, this happens in the createParameters()
+        // method, which don't have the number of coins as input
+        CharacterCards = new ArrayList<>();
+        for(int card = 0; card < numCharacterCards; card++){
+            CharacterCards.add(FactoryCharacterCard.
+                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+        }
+
+        watcherList = new ArrayList<>();
+        AdvancedGameWatcher watcher = new AdvancedGameWatcher(this, virtualView);
+        watcherList.add(watcher);
 
     }
 
@@ -128,6 +162,8 @@ public class AdvancedGame extends SimpleGame {
             advancedParameters.addCoins(1);
         }
 
+        //alert();
+
         return true;
     }
 
@@ -201,6 +237,7 @@ public class AdvancedGame extends SimpleGame {
 
             parameters.addProfessor(challenger.getPlayerId(), professor);
         }
+        //alert();
     }
 
     /**
@@ -306,5 +343,11 @@ public class AdvancedGame extends SimpleGame {
         drawables.addAll(CharacterCards);
     }
 
+    @Override
+    public void initialiseSelection() {
+        super.initialiseSelection();
+        List<Integer> emptyStudentsOnCard = new ArrayList<>();
+        advancedParameters.setSelectedStudentsOnCard(emptyStudentsOnCard);
+    }
 }
 

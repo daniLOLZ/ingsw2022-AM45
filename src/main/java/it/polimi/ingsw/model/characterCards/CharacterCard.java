@@ -6,10 +6,16 @@ import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.CharacterWatcher;
+import it.polimi.ingsw.view.observer.Watcher;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public abstract class CharacterCard implements DrawableObject {
+public abstract class CharacterCard extends DrawableObject {
+    private List<Watcher> watcherList;
     protected final String name;
     protected final String description;
     protected int cardCost;
@@ -31,12 +37,41 @@ public abstract class CharacterCard implements DrawableObject {
 
     }
 
+
+    /**
+     * Version with observer pattern
+     * @param cardCost
+     * @param id
+     * @param parameters
+     * @param advancedParameters
+     * @param name
+     * @param description
+     * @param virtualView
+     */
+    public CharacterCard(int cardCost, int id, ParameterHandler parameters,
+                         AdvancedParameterHandler advancedParameters, String name, String description,
+                         VirtualView virtualView){
+        this.cardCost = cardCost;
+        hasBeenUsed = false;
+        this.id = id;
+        this.parameters = parameters;
+        this.advancedParameters = advancedParameters;
+        this.name = name;
+        this.description = description;
+        watcherList = new ArrayList<>();
+        CharacterWatcher watcher = new CharacterWatcher(this, virtualView);
+        watcherList.add(watcher);
+
+
+
+    }
+
     /**
      * Initialise CharacterChard fields where this operation is useful
      * @param game != null
      */
     public void initialise(AdvancedGame game){
-
+        //alert();
     }
 
     @Override
@@ -61,6 +96,7 @@ public abstract class CharacterCard implements DrawableObject {
         if(!HasBeenUsed()){
             hasBeenUsed = true;
             cardCost += 1;
+            //alert();
         }
 
         //PARAMETER NOT SET

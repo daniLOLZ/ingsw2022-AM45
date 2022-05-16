@@ -8,6 +8,9 @@ import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.AdvancedPlayerWatcher;
+import it.polimi.ingsw.view.observer.PlayerWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,17 @@ public class AdvancedPlayer extends Player {
         this.numCoins = 1;
     }
 
+    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor,
+                          Wizard wizard, boolean leader,
+                          ParameterHandler parameters, VirtualView virtualView){
+        super(playerId, nickname,teamColor, wizard, leader, parameters);
+        this.numCoins = 1;
+
+        watcherList = new ArrayList<>();
+        AdvancedPlayerWatcher watcher = new AdvancedPlayerWatcher(this, virtualView);
+        watcherList.add(watcher);
+    }
+
     @Override
     protected Board createBoard(TeamEnum teamColor, ParameterHandler parameters) {
         return new AdvancedBoard(teamColor, parameters);
@@ -35,14 +49,16 @@ public class AdvancedPlayer extends Player {
 
     @Override
     public StudentEnum moveFromEntranceToHall() {
-        return board.moveFromEntranceToHall();
+        StudentEnum color= board.moveFromEntranceToHall();
+        //alert();
+        return color;
     }
 
     public void addCoin(){
-        numCoins++;
+        numCoins++;//alert();
     }
     public void useCoin(){
-        numCoins--;
+        numCoins--;//alert();
     }
 
     public int getNumCoins() {

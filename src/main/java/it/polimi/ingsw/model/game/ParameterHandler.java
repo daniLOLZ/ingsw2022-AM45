@@ -1,14 +1,21 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.DrawableObject;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.beans.ErrorBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.ErrorWatcher;
+import it.polimi.ingsw.view.observer.SimpleGameWatcher;
+import it.polimi.ingsw.view.observer.Watcher;
 
 import java.util.*;
 
-public class ParameterHandler {
+public class ParameterHandler extends DrawableObject {
 
     //STATIC PARAMETER FOR DIFFERENT GAME TYPE
     private static final int studentsPerCloud2or4Players = 3;
@@ -22,6 +29,7 @@ public class ParameterHandler {
     private final int studentsPerCloud;
     private final int maxStudentsAtEntrance;
     private final int numTowers;
+    private  List<Watcher> watcherList;
     private Map<PlayerEnum, TeamEnum> playersAllegiance;
 
     //DYNAMIC PARAMETERS
@@ -58,6 +66,37 @@ public class ParameterHandler {
         }
 
         undoSelection();
+
+    }
+
+    /**
+     * Version with observer pattern
+     * @param numPlayers
+     * @param virtualView
+     */
+    public ParameterHandler(int numPlayers, VirtualView virtualView){
+
+        if (numPlayers == 3) {
+            studentsPerCloud      = studentsPerCloud3Players;
+            maxStudentsAtEntrance = maxStudentsAtEntrance3Players;
+            numTowers             = numTowers3Players;
+        } else {
+            studentsPerCloud      = studentsPerCloud2or4Players;
+            maxStudentsAtEntrance = maxStudentsAtEntrance2or4Players;
+            numTowers             = numTowers2or4Players;
+        }
+
+        playersAllegiance = new HashMap<>();
+        professors = new ArrayList<>();
+        for (StudentEnum studEnum : StudentEnum.values()){
+            professors.add(PlayerEnum.NOPLAYER);
+        }
+
+        undoSelection();
+
+        watcherList = new ArrayList<>();
+        ErrorWatcher watcher = new ErrorWatcher(this, virtualView);
+        watcherList.add(watcher);
     }
 
     public int getStudentsPerCloud() {
@@ -138,6 +177,7 @@ public class ParameterHandler {
 
     public void setErrorState(String error){
         errorMessage = error;
+        //alert();
     }
 
     public void setCurrentPlayer(Player currentPlayer) {
@@ -209,5 +249,10 @@ public class ParameterHandler {
 
     public void setTurn(int turn) {
         this.turn = turn;
+    }
+
+    @Override
+    public GameElementBean toBean() {
+        return new ErrorBean(errorMessage);
     }
 }

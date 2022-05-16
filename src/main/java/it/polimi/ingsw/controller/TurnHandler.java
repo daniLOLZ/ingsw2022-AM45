@@ -34,7 +34,8 @@ public class TurnHandler {
      * Reinitializes the board and all the users' selections for the next turn
      */
     public void initializeNewTurn(){
-       //todo
+       controller.simpleGame.initialiseSelection();
+       controller.boardHandler.refillClouds();
     }
 
     /**

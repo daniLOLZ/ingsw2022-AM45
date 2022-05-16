@@ -8,6 +8,9 @@ import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.AdvancedIslandGroupWatcher;
+import it.polimi.ingsw.view.observer.IslandGroupWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +45,33 @@ public class AdvancedIslandGroup extends IslandGroup {
         super(idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor, parameters);
         this.blockTiles = new ArrayList<>(blockTiles);
         this.advancedParameters = advancedParameters;
+    }
+
+    /**
+     * Version with observer pattern
+     * @param idGroup
+     * @param islands
+     * @param nextIslandGroup
+     * @param prevIslandGroup
+     * @param students
+     * @param towerColor
+     * @param blockTiles
+     * @param parameters
+     * @param advancedParameters
+     * @param virtualView
+     */
+    public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup,
+                               IslandGroup prevIslandGroup, List<StudentEnum> students,
+                               TeamEnum towerColor, List<BlockTile> blockTiles, ParameterHandler parameters,
+                               AdvancedParameterHandler advancedParameters, VirtualView virtualView){
+
+        super(idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor, parameters);
+        this.blockTiles = new ArrayList<>(blockTiles);
+        this.advancedParameters = advancedParameters;
+
+        watcherList = new ArrayList<>();
+        AdvancedIslandGroupWatcher watcher = new AdvancedIslandGroupWatcher(this, virtualView);
+        watcherList.add(watcher);
     }
 
     /**
@@ -114,6 +144,7 @@ public class AdvancedIslandGroup extends IslandGroup {
             mergedBlocks.addAll(groupTemp.blockTiles);
             // Once we know the island must be merged, we remove it from the group
             islandGroups.remove(getNextIslandGroup());
+            //getNextIslandGroup().killAll();
         }
         if(getPrevIslandGroup().getTowerColor().equals(getTowerColor())){
             predecessor = getPrevIslandGroup();
@@ -123,9 +154,11 @@ public class AdvancedIslandGroup extends IslandGroup {
             mergedBlocks.addAll(groupTemp.blockTiles);
             // Same as before
             islandGroups.remove(getPrevIslandGroup());
+            //getPrevIslandGroup().killAll();
         }
         // Finally, remove this island
         islandGroups.remove(this);
+        //killAll();
 
         // prepare pointers
         IslandGroup nextPointer = successor.getNextIslandGroup();
@@ -136,6 +169,7 @@ public class AdvancedIslandGroup extends IslandGroup {
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
 
+        //alert();
         return mergedGroup;
     }
 
@@ -211,6 +245,7 @@ public class AdvancedIslandGroup extends IslandGroup {
      */
     public void block(BlockTile tile){
         blockTiles.add(tile);
+        //alert();
     }
 
     /**
@@ -222,6 +257,7 @@ public class AdvancedIslandGroup extends IslandGroup {
             BlockTile tileToRemove = blockTiles.remove(0);
             tileToRemove.setAssigned(false);
         }
+        //alert();
     }
 
     public AdvancedParameterHandler getAdvancedParameters() {

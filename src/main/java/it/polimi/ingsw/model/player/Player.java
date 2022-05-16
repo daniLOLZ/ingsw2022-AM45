@@ -10,12 +10,15 @@ import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.PlayerWatcher;
+import it.polimi.ingsw.view.observer.Watcher;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-public class Player implements DrawableObject {
+public class Player extends DrawableObject {
+    protected   List<Watcher> watcherList;
     protected PlayerEnum playerId;
     protected String nickname;
     protected ParameterHandler parameters;
@@ -61,6 +64,32 @@ public class Player implements DrawableObject {
         this.leader = leader;
         this.board = createBoard(teamColor, parameters);
         this.parameters = parameters;
+    }
+
+    /**
+     * version with observer pattern
+     * @param playerId
+     * @param nickname
+     * @param teamColor
+     * @param wizard
+     * @param leader
+     * @param parameters
+     * @param virtualView
+     */
+    public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor,
+                  Wizard wizard, boolean leader,
+                  ParameterHandler parameters, VirtualView virtualView){        this.playerId = playerId;
+        this.playerId = playerId;
+        this.nickname = nickname;
+        this.teamColor = teamColor;
+        this.wizard = wizard;
+        this.leader = leader;
+        this.board = createBoard(teamColor, parameters);
+        this.parameters = parameters;
+
+        watcherList = new ArrayList<>();
+        PlayerWatcher watcher = new PlayerWatcher(this, virtualView);
+        watcherList.add(watcher);
     }
 
 
@@ -110,6 +139,7 @@ public class Player implements DrawableObject {
         catch (NoSuchAssistantException e){
             parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
+        //alert();
     }
 
     public String getNickname() {
@@ -127,6 +157,7 @@ public class Player implements DrawableObject {
         for(StudentEnum stud: students){
             board.addToEntrance(stud);
         }
+        //alert();
     }
 
     /**
@@ -163,7 +194,9 @@ public class Player implements DrawableObject {
      * @return the moved student's color
      */
     public StudentEnum moveFromEntranceToHall(){
-        return board.moveFromEntranceToHall();
+        StudentEnum color= board.moveFromEntranceToHall();
+        //alert();
+        return  color;
     }
 
     /**
@@ -172,6 +205,7 @@ public class Player implements DrawableObject {
      */
     public void moveFromEntranceToIsland(IslandGroup island){
         board.moveFromEntranceToIsland(island);
+        //alert();
     }
 
     /**
@@ -229,6 +263,7 @@ public class Player implements DrawableObject {
 
     public void addEntrance(StudentEnum student){
         board.addToEntrance(student);
+        //alert();
     }
 
 

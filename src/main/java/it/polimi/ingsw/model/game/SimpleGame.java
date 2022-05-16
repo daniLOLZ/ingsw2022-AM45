@@ -11,6 +11,9 @@ import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.SimpleGameWatcher;
+import it.polimi.ingsw.view.observer.Watcher;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,8 +21,9 @@ import java.util.stream.Collectors;
 import static java.lang.Math.abs;
 
 
-public class SimpleGame implements DrawableObject {
+public class SimpleGame extends DrawableObject {
     protected List<DrawableObject> drawables;
+    protected List<Watcher> watcherList;
     private ErrorState errorState;
     private final int numPlayers;
     private final int maxStudentsByType;
@@ -81,6 +85,54 @@ public class SimpleGame implements DrawableObject {
         parameters.setPlayersAllegiance(players);
 
         drawables = new ArrayList<>();
+
+    }
+
+
+    /**
+     * observer pattern version
+     * @param numPlayers
+     * @param selectedWizards
+     * @param selectedColors
+     * @param nicknames
+     * @param virtualView
+     * @throws IncorrectPlayersException
+     */
+    public SimpleGame(int numPlayers, List<Integer> selectedWizards,
+                      List<TeamEnum> selectedColors,
+                      List<String> nicknames, VirtualView virtualView) throws  IncorrectPlayersException{
+
+        if(numPlayers > 4 || numPlayers < 2){
+            throw new IncorrectPlayersException();
+        }
+
+        int numberOfClouds = numPlayers;
+        this.hasBeenInitialized = false;
+        this.amountOfIslands = 12;
+        this.numPlayers = numPlayers;
+        this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
+        createParameters();
+        this.isLastTurn = false;
+        this.currentIslandGroupId = 0;
+        this.players = new ArrayList<>();
+        this.clouds = new ArrayList<>();
+        for (int cloudNumber = 0; cloudNumber < numberOfClouds; cloudNumber++){
+            clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud()));
+        }
+        createIslandGroups();
+
+        // Mother Nature starts on the first island group, will get moved in the initialization of the game
+        this.MN = new MotherNature(islandGroups.get(0));
+        //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
+        this.sack = new Sack(2);
+        //createPlayers(numPlayers);
+        createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
+        parameters.setPlayersAllegiance(players);
+
+        drawables = new ArrayList<>();
+        watcherList = new ArrayList<>();
+        SimpleGameWatcher watcher = new SimpleGameWatcher(this, virtualView);
+        watcherList.add(watcher);
     }
 
     //TODO this could become a private method called from the constructor;
@@ -119,6 +171,7 @@ public class SimpleGame implements DrawableObject {
         createPlayingSack();
 
         hasBeenInitialized = true;
+        //alert();
     }
 
     /**
@@ -224,6 +277,8 @@ public class SimpleGame implements DrawableObject {
         if(!currentWinner.equals(PlayerEnum.NOPLAYER)) {
             assignProfessor(professor, currentWinner);
         }
+
+        //alert();
     }
 
     /**
@@ -284,6 +339,7 @@ public class SimpleGame implements DrawableObject {
 
     public void setLastTurn(boolean isLast) {
         isLastTurn = isLast;
+        //alert();
     }
 
     /**
@@ -460,6 +516,7 @@ public class SimpleGame implements DrawableObject {
     public void startPlanningPhase(int player){
         parameters.setCurrentPlayer(players.get(player));
         parameters.setCurrentPhase(PhaseEnum.PLANNING);
+        //alert();
     }
 
     /**
@@ -470,6 +527,7 @@ public class SimpleGame implements DrawableObject {
     public void startActionPhase(int player){
         parameters.setCurrentPlayer(players.get(player));
         parameters.setCurrentPhase(PhaseEnum.ACTION);
+        //alert();
     }
 
     /**
@@ -484,6 +542,7 @@ public class SimpleGame implements DrawableObject {
         StudentEnum studentColor = player.moveFromEntranceToHall();
         updateProfessor(studentColor);
         deselectAllEntranceStudents();
+
     }
 
     /**
@@ -767,6 +826,7 @@ public class SimpleGame implements DrawableObject {
 
     public void playAssistant(Player player, int id){
         player.playAssistant(id);
+        //alert();
     }
 
     /**
@@ -804,6 +864,15 @@ public class SimpleGame implements DrawableObject {
         drawables.addAll(players);
         drawables.addAll(clouds);
 
+    }
+
+    public void initialiseSelection(){
+        List<Integer> emptyEntranceStudents = new ArrayList<>();
+        List<IslandGroup> emptyIslands = new ArrayList<>();
+        List<StudentEnum> emptyColors = new ArrayList<>();
+        parameters.setSelectedEntranceStudents(emptyEntranceStudents);
+        parameters.setSelectedIslands(emptyIslands);
+        parameters.setSelectedStudentTypes(emptyColors);
     }
 
 }

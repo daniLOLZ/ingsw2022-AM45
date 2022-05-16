@@ -6,11 +6,16 @@ import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import it.polimi.ingsw.view.observer.IslandGroupWatcher;
+import it.polimi.ingsw.view.observer.SimpleGameWatcher;
+import it.polimi.ingsw.view.observer.Watcher;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IslandGroup implements DrawableObject {
+public class IslandGroup extends DrawableObject {
+    protected List<Watcher> watcherList;
     protected ParameterHandler parameters;
     protected final int idGroup;
     protected final List<Island> islands;
@@ -42,6 +47,33 @@ public class IslandGroup implements DrawableObject {
         this.students = students;
         this.towerColor = towerColor;
         this.parameters = parameters;
+    }
+
+    /**
+     * version with pattern observer
+     * @param idGroup
+     * @param islands
+     * @param nextIslandGroup
+     * @param prevIslandGroup
+     * @param students
+     * @param towerColor
+     * @param parameters
+     */
+    public IslandGroup(int idGroup, List<Island> islands,
+                       IslandGroup nextIslandGroup, IslandGroup prevIslandGroup,
+                       List<StudentEnum> students, TeamEnum towerColor,
+                       ParameterHandler parameters, VirtualView virtualView) {
+        this.idGroup = idGroup;
+        this.islands = islands;
+        this.nextIslandGroup = nextIslandGroup;
+        this.prevIslandGroup = prevIslandGroup;
+        this.students = students;
+        this.towerColor = towerColor;
+        this.parameters = parameters;
+
+        watcherList = new ArrayList<>();
+        IslandGroupWatcher watcher = new IslandGroupWatcher(this, virtualView);
+        watcherList.add(watcher);
     }
 
     /**
@@ -216,6 +248,7 @@ public class IslandGroup implements DrawableObject {
             }
         }
         towerColor = team;
+        //alert();
 
     }
 
@@ -255,6 +288,7 @@ public class IslandGroup implements DrawableObject {
             mergedStudents.addAll(nextIslandGroup.students);
             // Once we know the island must be merged, we remove it from the group
             islandGroups.remove(nextIslandGroup);
+            //nextIslandGroup.killAll();
         }
         if(prevIslandGroup.towerColor.equals(towerColor)){
             predecessor = prevIslandGroup;
@@ -262,9 +296,11 @@ public class IslandGroup implements DrawableObject {
             mergedStudents.addAll(prevIslandGroup.students);
             // Same as before
             islandGroups.remove(prevIslandGroup);
+            //prevIslandGroup.killAll();
         }
         // Finally, remove this island
         islandGroups.remove(this);
+        //killAll();
 
         // prepare pointers
         IslandGroup nextPointer = successor.nextIslandGroup;
@@ -284,6 +320,7 @@ public class IslandGroup implements DrawableObject {
      */
     public void addStudent(StudentEnum student){
         students.add(student);
+        //alert();
     }
 
     /**
