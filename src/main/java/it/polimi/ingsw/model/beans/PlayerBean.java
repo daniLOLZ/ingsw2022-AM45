@@ -111,7 +111,7 @@ public class PlayerBean extends GameElementBean{
     public String drawCLI() {
         StringBuilder toReturn = new StringBuilder();
 
-        toReturn.append("\t________________________________________________\t\n");
+        toReturn.append("\t________________________________________________________\t\n");
         toReturn.append("\t|Nickname : ").append(nickname).append("\n");
         toReturn.append("\t|\tPlayer id: ").append(playerId).append("\n");
         toReturn.append("\t|\tTower color: ").append(towerColor).append("\n");
@@ -138,9 +138,10 @@ public class PlayerBean extends GameElementBean{
                 append(studentsPerTable.get(StudentEnum.PINK.index)).append("\n");
         toReturn.append("\t|\tProfessors: ").append(professors).append("\n");
         toReturn.append("\t|\tAssistants: ").append(idAssistants).append("\n");
-        toReturn.append("\t________________________________________________\t\n");
+        toReturn.append("\t________________________________________________________\t\n");
+        String border = 	"AAAAAAAA___________________________________________________\t\n";
 
-        return toReturn.toString();
+        return setTab(toReturn.toString(), border.length() );
     }
 
 }

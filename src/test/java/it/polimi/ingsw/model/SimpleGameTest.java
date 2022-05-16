@@ -9,6 +9,9 @@ import it.polimi.ingsw.model.player.PlayerEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,8 +23,20 @@ public class SimpleGameTest {
 
     @BeforeEach
     public void createNewGame(){
+        final List<Integer> selectedWizards = new ArrayList<>();
+        selectedWizards.add(0);
+        selectedWizards.add(10);
+        selectedWizards.add(20);
+        final List<TeamEnum> teamColors = new ArrayList<>();
+        teamColors.add(TeamEnum.WHITE);
+        teamColors.add(TeamEnum.BLACK);
+        teamColors.add(TeamEnum.GREY);
+        final List<String> nicknames = new ArrayList<>();
+        nicknames.add("Franco");
+        nicknames.add("Mario");
+        nicknames.add("Alice");
         try {
-            game = new SimpleGame(3);
+            game = new SimpleGame(3,selectedWizards,teamColors,nicknames);
         }
         catch (IncorrectPlayersException e){
             e.printStackTrace();
@@ -33,9 +48,9 @@ public class SimpleGameTest {
     @Test
     public void wrongNumberOfPlayers(){
         SimpleGame game2;
-        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(5));
-        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(-1));
-        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(0));
+        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(5,null,null,null));
+        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(-1,null,null,null));
+        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(0,null,null,null));
     }
 
     @Test

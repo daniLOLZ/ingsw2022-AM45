@@ -13,7 +13,7 @@ public class Sack {
         List<StudentEnum> studentsList = new ArrayList<>();
 
         for(StudentEnum type: StudentEnum.values())
-            for(int istances= 0; istances < numStudentsByType; istances++ ){
+            for(int instances= 0; instances < numStudentsByType; instances++ ){
                 if(type != StudentEnum.NOSTUDENT)
                 studentsList.add(type);
             }

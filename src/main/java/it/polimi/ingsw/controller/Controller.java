@@ -84,34 +84,9 @@ public class Controller {
         }
         return true;
     }
-    @Deprecated
-    public void createSimpleGame(int numPlayers){
-        try {
-            simpleGame = new SimpleGame(numPlayers);
-            gameRule = GameRuleEnum.getBasicRule(numPlayers);
-        } catch (IncorrectPlayersException e) {
-            e.printStackTrace();
-        }
 
-        //TODO
-    }
 
-    @Deprecated
-    public void createAdvancedGame(int numPlayers){
-        final int numCoins = 20;
-        final int numCharacterCards = 3;
 
-        try {
-            advancedGame = new AdvancedGame(numPlayers, numCoins, numCharacterCards);
-            gameRule = GameRuleEnum.getAdvancedRule(numPlayers);
-        } catch (IncorrectPlayersException e) {
-            e.printStackTrace();
-        }
-
-        simpleGame = advancedGame;
-
-        //TODO
-    }
 
     public void createPlayerCreation(){
         playerCreation = new PlayerCreation(this);
@@ -445,5 +420,13 @@ public class Controller {
 
         return characterCardHandler.playCard();
 
+    }
+
+    public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
+        try {
+            simpleGame = new SimpleGame(numPlayers,selectedWizards,teamColors,nicknames);
+        } catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }
     }
 }

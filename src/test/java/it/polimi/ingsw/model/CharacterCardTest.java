@@ -99,8 +99,21 @@ public class CharacterCardTest {
     public void InitialEffectCards(){
         List<CharacterCard> cards = new ArrayList<>();
         AdvancedGame game = null;
+        final List<Integer> selectedWizards = new ArrayList<>();
+        selectedWizards.add(0);
+        selectedWizards.add(10);
+        selectedWizards.add(20);
+        final List<TeamEnum> teamColors = new ArrayList<>();
+        teamColors.add(TeamEnum.WHITE);
+        teamColors.add(TeamEnum.BLACK);
+        teamColors.add(TeamEnum.GREY);
+        final List<String> nicknames = new ArrayList<>();
+        nicknames.add("Franco");
+        nicknames.add("Mario");
+        nicknames.add("Alice");
         try {
-            game = new AdvancedGame(2, 20,3);
+            game = new AdvancedGame(3, selectedWizards,teamColors,nicknames, 20,3);
+            game.initializeGame();
         }
         catch (IncorrectPlayersException e) {
             e.printStackTrace();

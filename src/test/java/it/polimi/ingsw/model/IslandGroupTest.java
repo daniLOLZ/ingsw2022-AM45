@@ -31,8 +31,20 @@ public class IslandGroupTest {
     @BeforeEach
     public void initializeIslandGroup(){
 
+        final List<Integer> selectedWizards = new ArrayList<>();
+        selectedWizards.add(0);
+        selectedWizards.add(10);
+        selectedWizards.add(20);
+        final List<TeamEnum> teamColors = new ArrayList<>();
+        teamColors.add(TeamEnum.WHITE);
+        teamColors.add(TeamEnum.BLACK);
+        teamColors.add(TeamEnum.GREY);
+        final List<String> nicknames = new ArrayList<>();
+        nicknames.add("Franco");
+        nicknames.add("Mario");
+        nicknames.add("Alice");
         try{
-            game = new SimpleGame(2);
+            game = new SimpleGame(2,selectedWizards,teamColors,nicknames);
         }
         catch (IncorrectPlayersException e){
             e.printStackTrace();

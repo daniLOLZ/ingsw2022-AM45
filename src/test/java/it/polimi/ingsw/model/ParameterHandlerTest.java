@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.player.PlayerEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,8 +22,21 @@ public class ParameterHandlerTest {
 
     @BeforeEach
     void createGame(){
+        final List<Integer> selectedWizards = new ArrayList<>();
+        selectedWizards.add(0);
+        selectedWizards.add(10);
+        selectedWizards.add(20);
+        final List<TeamEnum> teamColors = new ArrayList<>();
+        teamColors.add(TeamEnum.WHITE);
+        teamColors.add(TeamEnum.BLACK);
+        teamColors.add(TeamEnum.GREY);
+        final List<String> nicknames = new ArrayList<>();
+        nicknames.add("Franco");
+        nicknames.add("Mario");
+        nicknames.add("Alice");
         try {
-            game = new SimpleGame(4);
+            game = new SimpleGame(3,selectedWizards,teamColors,nicknames);
+            game.initializeGame();
         } catch (IncorrectPlayersException e) {
             fail();
         }

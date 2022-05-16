@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.model.*;
 import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.assistantCards.FactoryWizard;
+import it.polimi.ingsw.model.beans.ErrorBean;
 import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.islands.IslandGroup;
@@ -38,46 +39,7 @@ public class SimpleGame implements DrawableObject {
     private boolean hasBeenInitialized;
 
 
-    /**
-     * ! Old constructor without customization possible from the users !
-     * Must be initialized after creation via the initializeGame() function
-     * @param numPlayers the number of players in the game [2,4]
-     * @throws IncorrectPlayersException the number of players isn't in the
-     * allowed range
-     */
-    @Deprecated
-    public SimpleGame(int numPlayers) throws  IncorrectPlayersException{
 
-        if(numPlayers > 4 || numPlayers < 2){
-            throw new IncorrectPlayersException();
-        }
-
-        // (Maybe unnecessary) change this constructor into a JSON reader to remove magic numbers
-        int numberOfClouds = numPlayers;
-        this.hasBeenInitialized = false;
-        this.amountOfIslands = 12;
-        this.numPlayers = numPlayers;
-        this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
-        createParameters();
-        //this.parameters = new ParameterHandler(numPlayers);
-        this.isLastTurn = false;
-        this.currentIslandGroupId = 0;
-        this.players = new ArrayList<>();
-        this.clouds = new ArrayList<>();
-        for (int cloudNumber = 0; cloudNumber < numberOfClouds; cloudNumber++){
-            clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud()));
-        }
-        createIslandGroups();
-
-        // Mother Nature starts on the first island group, will get moved in the initialization of the game
-        this.MN = new MotherNature(islandGroups.get(0));
-        //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
-        this.sack = new Sack(2);
-
-        // TODO creation of players may be handled by someone else
-        createPlayers(numPlayers);
-        parameters.setPlayersAllegiance(players);
-    }
 
     /**
      * Creates a new SimpleGame with the parameters chosen by the players,
@@ -119,7 +81,6 @@ public class SimpleGame implements DrawableObject {
         parameters.setPlayersAllegiance(players);
 
         drawables = new ArrayList<>();
-        setDrawables();
     }
 
     //TODO this could become a private method called from the constructor;
@@ -140,6 +101,7 @@ public class SimpleGame implements DrawableObject {
         // Moves Mother nature to a random island
         int MNStartingPosition = abs(new Random().nextInt() % amountOfIslands);
         MN.move(MNStartingPosition);
+        parameters.setIdIslandGroupMN(MN.getPosition().getIdGroup());
 
         //Puts one student from the initial sack on each* of the islands.
         StudentEnum drawnStudent;
@@ -148,7 +110,8 @@ public class SimpleGame implements DrawableObject {
         for(int currentStep = 0; currentStep < amountOfIslands; currentStep++){
             curPosition = (MNStartingPosition + currentStep) % amountOfIslands;
             // If the current position is MotherNature's or its opposite, we don't put a student there
-            if(!(curPosition == MNStartingPosition || curPosition == (MNStartingPosition + amountOfIslands/2) % amountOfIslands)){
+            if(!(curPosition == MNStartingPosition ||
+                    curPosition == (MNStartingPosition + amountOfIslands/2) % amountOfIslands)){
                 drawnStudent = sack.drawNStudents(1).get(0);
                 islandGroups.get(curPosition).addStudent(drawnStudent);
             }

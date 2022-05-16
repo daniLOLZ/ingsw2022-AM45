@@ -1,6 +1,8 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.network.NetworkFieldEnum;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -77,6 +79,8 @@ public class CLI extends UserInterface {
 
 
         }
+
+        drawOption();
 
         System.out.println(View.toString());
     }
@@ -166,6 +170,29 @@ public class CLI extends UserInterface {
 
         View = new StringBuilder(LastView.toString());
         LastElement = new StringBuilder(elementToDraw);
+    }
+
+    /**
+     * Append to View (String builder) the available command string
+     * in order to show in the CLI
+     */
+    public void drawOption(){
+        View.append("\n\t\t\t\t::CHOICES::\n");
+        for(int index=0;index<availableCommands.size();index++){
+            CommandEnum command = availableCommands.get(index);
+            View.append(" ________________________________________\n");
+            View.append("|" + command +"\n");
+            View.append("|REQUIRES: ");
+            for(NetworkFieldEnum field: command.allowedFields){
+                if(field != NetworkFieldEnum.ID_USER &&
+                        field != NetworkFieldEnum.ID_REQUEST &&
+                        field!= NetworkFieldEnum.ID_PING_REQUEST)
+                View.append("-"+field+"- ");
+            }
+            View.append("\n| PRESS " + index + " to choose this action\n");
+            View.append("|________________________________________\n");
+        }
+
     }
 
 

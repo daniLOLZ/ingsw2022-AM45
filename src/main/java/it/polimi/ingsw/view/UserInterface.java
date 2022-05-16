@@ -1,15 +1,18 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.CommandEnum;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class UserInterface {
     protected List<GameElementBean> beans;
+    protected List<CommandEnum> availableCommands;
 
     public UserInterface(){
         beans = new ArrayList<>();
+        availableCommands = new ArrayList<>();
     }
 
     public void addBean(GameElementBean bean){
@@ -22,6 +25,18 @@ public abstract class UserInterface {
 
     public void clearBeans(){
         beans.clear();
+    }
+
+    public void addCommand(CommandEnum command){
+        availableCommands.add(command);
+    }
+
+    public CommandEnum removeCommand(int index){
+        return removeCommand(index);
+    }
+
+    public void clearCommand(){
+        availableCommands.clear();
     }
 
 }
