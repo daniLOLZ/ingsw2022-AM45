@@ -9,6 +9,10 @@ import it.polimi.ingsw.network.connectionState.WaitingForControl;
 
 public class SelectTowerColorHandler extends CommandHandler{
 
+    public SelectTowerColorHandler(){
+        commandAccepted = CommandEnum.SELECT_TOWER_COLOR;
+    }
+
     /**
      * The user selects a team to be part of, this method calls the game controller to know whether the
      * team chosen is available, and notifies it to the user
@@ -16,7 +20,8 @@ public class SelectTowerColorHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.SELECT_TOWER_COLOR)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         TeamEnum teamColor = TeamEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
         if(parameters.getUserController().setTeamColor(teamColor, parameters.getIdUser())){

@@ -8,13 +8,18 @@ import it.polimi.ingsw.network.connectionState.StudentMoving;
 
 public class SelectEntranceStudentHandler extends CommandHandler{
 
+    public SelectEntranceStudentHandler(){
+        commandAccepted = CommandEnum.SELECT_STUDENT;
+    }
+
     /**
      * The user asks to select a student from their entrance
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.SELECT_STUDENT)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Integer selectedStudent = (Integer)messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
         if(parameters.getUserController().selectStudent(selectedStudent)){

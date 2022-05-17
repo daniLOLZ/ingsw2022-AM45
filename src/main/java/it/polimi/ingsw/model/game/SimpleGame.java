@@ -46,6 +46,7 @@ public class SimpleGame extends DrawableObject {
 
 
     /**
+     * view-less constructor
      * Creates a new SimpleGame with the parameters chosen by the players,
      * must be initialized after creation via the initializeGame() function
      * @param numPlayers number of players in the game [2,4]
@@ -55,6 +56,7 @@ public class SimpleGame extends DrawableObject {
      * @throws IncorrectPlayersException the number of players isn't in the
      *                                  allowed range
      */
+    @Deprecated
     public SimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) throws  IncorrectPlayersException{
 
         if(numPlayers > 4 || numPlayers < 2){
@@ -90,13 +92,16 @@ public class SimpleGame extends DrawableObject {
 
 
     /**
-     * observer pattern version
-     * @param numPlayers
-     * @param selectedWizards
-     * @param selectedColors
-     * @param nicknames
-     * @param virtualView
-     * @throws IncorrectPlayersException
+     * Observer pattern version
+     * Creates a new SimpleGame with the parameters chosen by the players,
+     * must be initialized after creation via the initializeGame() function
+     * @param numPlayers number of players in the game [2,4]
+     * @param selectedWizards array containing users' selection for their wizards
+     * @param selectedColors array containing users' selection for their tower colors
+     * @param nicknames array containing users' nicknames
+     * @param virtualView the view that will hold the watchers for the model classes
+     * @throws IncorrectPlayersException the number of players isn't in the
+     *                                  allowed range
      */
     public SimpleGame(int numPlayers, List<Integer> selectedWizards,
                       List<TeamEnum> selectedColors,
@@ -111,6 +116,7 @@ public class SimpleGame extends DrawableObject {
         this.amountOfIslands = 12;
         this.numPlayers = numPlayers;
         this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
+        //TODO add watchers to every model entity that requires watching
         createParameters();
         this.isLastTurn = false;
         this.currentIslandGroupId = 0;

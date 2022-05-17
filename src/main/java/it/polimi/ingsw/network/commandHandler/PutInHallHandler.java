@@ -9,13 +9,18 @@ import it.polimi.ingsw.network.connectionState.StudentChoosing;
 
 public class PutInHallHandler extends CommandHandler{
 
+    public PutInHallHandler(){
+        commandAccepted = CommandEnum.PUT_IN_HALL;
+    }
+
     /**
      * The user chooses to put their student in their hall
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.PUT_IN_HALL)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         if(parameters.getUserController().putInHall()){
             notifySuccessfulOperation(messageBroker);

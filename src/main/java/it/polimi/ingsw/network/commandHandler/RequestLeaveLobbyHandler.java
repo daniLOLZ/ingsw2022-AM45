@@ -8,13 +8,18 @@ import it.polimi.ingsw.network.connectionState.LookingForLobby;
 
 public class RequestLeaveLobbyHandler extends CommandHandler{
 
+    public RequestLeaveLobbyHandler(){
+        commandAccepted = CommandEnum.LEAVE_LOBBY;
+    }
+
     /**
      * The user requests to leave the current lobby
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.LEAVE_LOBBY)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         parameters.getUserLobby().removePlayer(parameters.getIdUser());
         parameters.setUserLobby(null);

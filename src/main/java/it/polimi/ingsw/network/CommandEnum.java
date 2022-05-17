@@ -35,6 +35,7 @@ public enum CommandEnum {
     SELECT_STUDENT_ON_CARD("Select Student on Card",    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_CARD_POSITIONS}),
     PLAY_CHARACTER("Play Character",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST});
     //TODO add commands to exchange game information (beans)
+    // i.e. GET_UPDATES
 
     public final String command;
     public final NetworkFieldEnum[] allowedFields;

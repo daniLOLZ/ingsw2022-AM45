@@ -6,13 +6,18 @@ import it.polimi.ingsw.network.connectionState.InLobby;
 
 public class PlayGameHandler extends CommandHandler{
 
+    public PlayGameHandler(){
+        commandAccepted = CommandEnum.PLAY_GAME;
+    }
+
     /**
      * The user requests to play a game with the given rules
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.PLAY_GAME)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         GameRuleEnum rules = GameRuleEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.GAME_RULE));
 

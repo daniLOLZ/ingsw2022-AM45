@@ -4,13 +4,18 @@ import it.polimi.ingsw.network.*;
 
 public class QuitGameHandler extends CommandHandler{
 
+    public QuitGameHandler(){
+        commandAccepted = CommandEnum.QUIT;
+    }
+
     /**
      * Closes the connection for this user
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.QUIT)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         //TODO later, when all cases have been accounted for
         if(parameters.getUserController() != null){

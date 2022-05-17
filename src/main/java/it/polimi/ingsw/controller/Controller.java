@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.game.SimpleGame;
+import it.polimi.ingsw.view.VirtualView;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class Controller {
     protected SelectionHandler selectionHandler;
     protected final List<Integer> playerNumbers;
     protected IslandHandler islandHandler;
-//  protected VirtualView virtualView
+    protected VirtualView virtualView;
 
 
     /**
@@ -36,10 +37,13 @@ public class Controller {
         createPlayerCreation();
         this.playerNumbers = playerNumbers;
         this.gameRule = gameRule;
-        //TODO
+
+        // Should we create it here or when the game starts?
+        createView();
     }
 
     /** Used for tests only */
+    @Deprecated
     public Controller(){
         playerNumbers = null;
     }
@@ -48,13 +52,12 @@ public class Controller {
      * Creates a game with simple rules using the wizards, tower colors and nicknames stored in playerCreation
      */
     public boolean createSimpleGame(){
-        // createVirtualView();
         try{
             simpleGame = new SimpleGame(GameRuleEnum.getNumPlayers(gameRule.id),
                     playerCreation.getWizards(),
                     playerCreation.getTeamColors(),
-                    playerCreation.getNicknames());
-            // , virtualView
+                    playerCreation.getNicknames(),
+                    virtualView);
         } catch (IncorrectPlayersException e) {
             System.err.println("Error creating the game!");
             return false;
@@ -94,6 +97,7 @@ public class Controller {
 
     /**
      * Creates the handlers for this controller, depending on whether the game is simple or advanced
+     * It doesn't create the handlers that were necessary prior to the start of the actual game
      * @param advanced true if the game needs to be its advanced variation
      */
     public void createBasicHandlers(boolean advanced){
@@ -116,7 +120,7 @@ public class Controller {
     }
 
     private void createView(){
-        //TODO
+        virtualView = new VirtualView();
     }
 
     /** Only for testing purposes */
@@ -422,6 +426,7 @@ public class Controller {
 
     }
 
+    //What is this for?
     public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
         try {
             simpleGame = new SimpleGame(numPlayers,selectedWizards,teamColors,nicknames);

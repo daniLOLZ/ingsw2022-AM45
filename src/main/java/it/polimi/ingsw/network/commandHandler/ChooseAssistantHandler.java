@@ -8,6 +8,10 @@ import it.polimi.ingsw.network.connectionState.WaitingForControl;
 
 public class ChooseAssistantHandler extends CommandHandler{
 
+    public ChooseAssistantHandler(){
+        commandAccepted = CommandEnum.CHOOSE_ASSISTANT;
+    }
+
     /**
      * The user selects which assistant they want to play, the server replies with an error
      * if the assistant can't be played
@@ -15,7 +19,8 @@ public class ChooseAssistantHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.CHOOSE_ASSISTANT)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Integer idAssistant = (Integer)messageBroker.readField(NetworkFieldEnum.ID_ASSISTANT);
         if(parameters.getUserController().playAssistant(idAssistant)){

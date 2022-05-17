@@ -9,13 +9,18 @@ import it.polimi.ingsw.network.connectionState.CharacterCardActivation;
 
 public class SelectCharacterHandler extends CommandHandler{
 
+    public SelectCharacterHandler(){
+        commandAccepted = CommandEnum.SELECT_CHARACTER;
+    }
+
     /**
      * The user selects a character card to play
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.SELECT_CHARACTER)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         //Here we need to memorize what the previous state the user had to resume the turn
         // after the character takes effect

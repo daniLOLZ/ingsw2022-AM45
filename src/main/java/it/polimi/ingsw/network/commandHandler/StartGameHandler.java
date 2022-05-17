@@ -5,6 +5,10 @@ import it.polimi.ingsw.network.connectionState.StartingGame;
 
 public class StartGameHandler extends CommandHandler{
 
+    public StartGameHandler(){
+        commandAccepted = CommandEnum.START_GAME;
+    }
+
     /**
      * The user requests to start the game
      * The request will be successful only if the host coincides with the user and all players are ready
@@ -12,7 +16,8 @@ public class StartGameHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.START_GAME)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         if(!parameters.getUserLobby().isHost(parameters.getIdUser())){
             notifyError(messageBroker,"You're not the host! You can't start the game.");

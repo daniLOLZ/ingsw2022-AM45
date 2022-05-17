@@ -10,6 +10,10 @@ import java.util.List;
 
 public class SelectIslandGroupHandler extends CommandHandler{
 
+    public SelectIslandGroupHandler(){
+        commandAccepted = CommandEnum.SELECT_ISLAND_GROUP;
+    }
+
     /**
      * Card requirements method.
      * The user sends the selected islands
@@ -17,7 +21,8 @@ public class SelectIslandGroupHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.SELECT_ISLAND_GROUP)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Object[] objectArray = (Object[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_ISLANDS);
         List<Integer> islandIds = new ArrayList<>();

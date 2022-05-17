@@ -9,13 +9,18 @@ import it.polimi.ingsw.network.connectionState.StudentChoosing;
 
 public class PutInIslandHandler extends CommandHandler{
 
+    public PutInIslandHandler(){
+        commandAccepted = CommandEnum.PUT_IN_ISLAND;
+    }
+
     /**
      * The user chooses to put the student on the selected island
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.PUT_IN_ISLAND)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Integer idIsland = (Integer)messageBroker.readField(NetworkFieldEnum.CHOSEN_ISLAND);
         if(parameters.getUserController().putInIsland(idIsland)){
