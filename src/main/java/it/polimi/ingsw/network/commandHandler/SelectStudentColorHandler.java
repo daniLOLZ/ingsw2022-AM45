@@ -11,6 +11,10 @@ import java.util.List;
 
 public class SelectStudentColorHandler extends CommandHandler{
 
+    public SelectStudentColorHandler(){
+        commandAccepted = CommandEnum.SELECT_STUDENT_COLOR;
+    }
+
     /**
      * Card requirements method.
      * The user sends the selected student color
@@ -18,7 +22,8 @@ public class SelectStudentColorHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.SELECT_STUDENT_COLOR)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Object[] objectArray = (Object[]) messageBroker.readField(NetworkFieldEnum.COLORS_REQUIRED);
         List<StudentEnum> colors = new ArrayList<>();

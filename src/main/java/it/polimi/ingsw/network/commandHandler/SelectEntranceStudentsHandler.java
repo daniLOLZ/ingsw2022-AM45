@@ -10,6 +10,10 @@ import java.util.List;
 
 public class SelectEntranceStudentsHandler extends CommandHandler{
 
+    public SelectEntranceStudentsHandler(){
+        commandAccepted = CommandEnum.SELECT_ENTRANCE_STUDENTS;
+    }
+
     /**
      * Card requirements method.
      * The user sends the selected students at their entrance
@@ -17,7 +21,8 @@ public class SelectEntranceStudentsHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.SELECT_ENTRANCE_STUDENTS)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Object[] objectArray = (Object[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
         List<Integer> students = new ArrayList<>();

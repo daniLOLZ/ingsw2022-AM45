@@ -8,13 +8,18 @@ import it.polimi.ingsw.network.connectionState.WaitingForControl;
 
 public class ChooseCloudHandler extends CommandHandler{
 
+    public ChooseCloudHandler(){
+        commandAccepted = CommandEnum.CHOOSE_CLOUD;
+    }
+
     /**
      * The user chooses a cloud to refill their entrance with
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.CHOOSE_CLOUD)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         Integer idCloud = (Integer) messageBroker.readField(NetworkFieldEnum.ID_CLOUD);
         if(parameters.getUserController().chooseCloud(idCloud)){

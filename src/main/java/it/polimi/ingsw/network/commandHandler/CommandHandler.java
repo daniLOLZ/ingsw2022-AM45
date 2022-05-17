@@ -1,10 +1,13 @@
 package it.polimi.ingsw.network.commandHandler;
 
 import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
 public abstract class CommandHandler {
+
+    CommandEnum commandAccepted;
 
     /**
      * Processes the command stored inside the given messageBroker if it's responsibility of the specific class
@@ -16,6 +19,16 @@ public abstract class CommandHandler {
      * @throws UnexecutableCommandException If the command is not this class' responsibility
      */
     public abstract boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException;
+
+    /**
+     * Returns the command enum value of the given object, if it's a variable
+     * @param command the object to cast
+     * @return the CommandEnum equivalent of the object input
+     */
+    public CommandEnum parseCommand(Object command){
+        return CommandEnum.fromObjectToEnum(command);
+        //Add a default error if not a command
+    }
 
     /**
      * Adds the reply fields in the server message in case of a successful operation (Message and status)
@@ -37,5 +50,15 @@ public abstract class CommandHandler {
         messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
         messageBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, messageBroker.readField(NetworkFieldEnum.ID_REQUEST));
         messageBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
+    }
+
+    /**
+     * Checks whether the command can be handled by the handler calling the function
+     * @param read the command read
+     * @param required the command that the handler can handle
+     * @return true if the command can be handled correctly
+     */
+    public boolean checkHandleable(CommandEnum read, CommandEnum required){
+        return read.equals(required);
     }
 }

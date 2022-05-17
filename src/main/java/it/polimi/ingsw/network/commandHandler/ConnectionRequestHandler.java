@@ -5,6 +5,10 @@ import it.polimi.ingsw.network.connectionState.LookingForLobby;
 
 public class ConnectionRequestHandler extends CommandHandler{
 
+    public ConnectionRequestHandler(){
+        commandAccepted = CommandEnum.CONNECTION_REQUEST;
+    }
+
     /**
      * Handles the connections of a new user, checking whether their nickname
      * satisfies the requirement of uniqueness
@@ -12,10 +16,12 @@ public class ConnectionRequestHandler extends CommandHandler{
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
 
-        if( !(messageBroker.readField(NetworkFieldEnum.COMMAND) == CommandEnum.CONNECTION_REQUEST)) throw new UnexecutableCommandException();
+        CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
+        if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         boolean loginSuccessful;
-        loginSuccessful= LoginHandler.login((String)messageBroker.readField(NetworkFieldEnum.NICKNAME), parameters.getIdUser());
+        loginSuccessful= LoginHandler.login((String)messageBroker.readField(NetworkFieldEnum.NICKNAME),
+                                            parameters.getIdUser());
         if(!loginSuccessful){
             notifyError(messageBroker,"Nickname already taken");
             //quitGame(); //TODO tell the server to shutdown the connection

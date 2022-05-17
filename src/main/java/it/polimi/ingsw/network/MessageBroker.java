@@ -2,6 +2,9 @@ package it.polimi.ingsw.network;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.game.PhaseEnum;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -190,11 +193,13 @@ public class MessageBroker {
     private boolean checkValidity(Map<NetworkFieldEnum, Object> message){
 
         Object object;
+        Class objClass;
+        Class neededClass;
         // For each field, check whether it can be cast and return false if an exception is raised
         List<NetworkFieldEnum> keyArray = new ArrayList<>(message.keySet());
         for(NetworkFieldEnum field : keyArray){
-//          object = incomingMessages.get(FIRST_RECEIVED).get(field);
             object = message.get(field);
+           /*
             switch (field){
                 case ID_USER : {
                     try{
@@ -219,6 +224,52 @@ public class MessageBroker {
                 }
                 // TODO add other fields
                 // TODO check for cleaner implementation
+            }
+        */
+            objClass = object.getClass();
+
+            switch (field){
+                case ID_USER:
+                case ID_REQUEST:
+                case ID_PING_REQUEST:
+                case ID_TOWER_COLOR:
+                case ID_WIZARD:
+                case ID_ASSISTANT:
+                case ID_CHARACTER:
+                case ID_CLOUD:
+                case CHOSEN_ENTRANCE_STUDENT:
+                case CHOSEN_ISLAND:
+                case STEPS_MN:
+                case CHARACTER_CARD_POSITION:
+                    // The json reads these parameters as doubles, where they should be ints,
+                    // in case they actually are doubles, "cast" to integer
+                    if(objClass.equals(Double.class)) objClass = Integer.class;
+                    neededClass = Integer.class;
+                    break;
+                case COMMAND:
+                case NICKNAME:
+                    neededClass = String.class;
+                    break;
+                case GAME_RULE:
+                    neededClass = GameRuleEnum.class;
+                    break;
+                case CHOSEN_ENTRANCE_POSITIONS:
+                case CHOSEN_ISLANDS:
+                case CHOSEN_CARD_POSITIONS:
+                    neededClass = Double[].class;
+                    break;
+                case CHOSEN_STUDENT_COLORS:
+                    neededClass = StudentEnum.class;
+                    break;
+                case GAME_PHASE:
+                    neededClass = PhaseEnum.class;
+                    break;
+                default:
+                    neededClass = objClass;
+                    break;
+            }
+            if (!objClass.equals(neededClass)){
+                return false;
             }
         }
         return true;

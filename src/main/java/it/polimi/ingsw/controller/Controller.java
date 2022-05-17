@@ -422,6 +422,7 @@ public class Controller {
 
     }
 
+    //What is this for?
     public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
         try {
             simpleGame = new SimpleGame(numPlayers,selectedWizards,teamColors,nicknames);
