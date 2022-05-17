@@ -32,11 +32,18 @@ public abstract class UserInterface {
     }
 
     public CommandEnum removeCommand(int index){
+        //todo remove infinite recursion
         return removeCommand(index);
     }
 
     public void clearCommand(){
         availableCommands.clear();
     }
+
+    public abstract void showLoginScreen();
+
+    public abstract void showTowerAndWizardSelection();
+
+    public abstract void showGameInterface();
 
 }
