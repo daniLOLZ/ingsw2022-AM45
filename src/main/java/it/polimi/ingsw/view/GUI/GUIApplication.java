@@ -1,16 +1,26 @@
 package it.polimi.ingsw.view.GUI;
 
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class GUIApplication extends Application {
 
-    private static final double WINDOW_WIDTH = 1500, WINDOW_HEIGHT = 720, REAL_SIZE = 1;
+    private static final double WINDOW_WIDTH = 1500, WINDOW_HEIGHT = 720, REAL_SIZE = 1, MAX_REPORTABLE_WRONG_LOGINS = 6;
 
     private static final double left    = 0,
                                 right   = WINDOW_WIDTH,
@@ -29,25 +39,42 @@ public class GUIApplication extends Application {
                                downRightCorner = new Coord(right,down),
                                downCenter      = new Coord(centerX,down);
 
+    private Stage stage;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage primaryStage) throws Exception {
 
-        Group root = new Group();
-        Scene scene = new Scene(root);
+        this.stage = primaryStage;
+
+        VBox root = new VBox(25);
+        root.setAlignment(Pos.TOP_CENTER);
+
+        //First scene - Opening the game
+        Scene startingScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         Image icon = new Image("assets/icon.png");
         stage.getIcons().add(icon);
         stage.setTitle("Eriantys");
 
-        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        //Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        //GraphicsContext gc = canvas.getGraphicsContext2D();
         Image image = new Image("assets/icon.png");
-        drawImage(gc, image, center);
+        ImageView imageView = new ImageView(image);
+        imageView.fitHeightProperty().setValue(image.getHeight()/1.2);
+        imageView.fitWidthProperty().setValue(image.getWidth()/1.2);
+        //drawImage(gc, image, center);
 
-        root.getChildren().add(canvas);
+        Label welcomeMessage = new Label("WELCOME TO ERIANTYS");
+        welcomeMessage.setFont(Font.font("Verdana", 42));
 
-        stage.setScene(scene);
+        Button playButton = new Button("Play");
+        playButton.setTextFill(Color.DARKRED);
+        playButton.setOnAction(event -> showLoginScreen());
+
+        root.getChildren().addAll(imageView, welcomeMessage, playButton);
+
+
+        stage.setScene(startingScene);
         stage.show();
     }
     
@@ -55,9 +82,65 @@ public class GUIApplication extends Application {
         launch();
     }
 
+    //@Override
+    public void showLoginScreen() {
+
+        VBox login = new VBox(20);
+        login.setAlignment(Pos.CENTER);
+
+        Scene loginScene = new Scene(login, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        Button loginButton = new Button("Login");
+
+        Label loginLabel = new Label("Nickname");
+        TextField textField = new TextField("Testa : di cazzo");
+        textField.setMaxWidth(WINDOW_WIDTH/4);
+        textField.setOnAction(event -> loginButton.fire());
+
+        AtomicInteger wrongAttempts = new AtomicInteger();
+
+        loginButton.setOnAction(event -> {
+            if(ConnectionWithServerHandler.login(textField.getText())) showSearchGameScreen();
+            else {
+
+                if (wrongAttempts.incrementAndGet() < MAX_REPORTABLE_WRONG_LOGINS) {
+                    Label errorMessage = new Label("Invalid nickname! Please try again");
+                    errorMessage.setTextFill(Color.RED);
+                    login.getChildren().add(errorMessage);
+                }
+                if (wrongAttempts.get() == MAX_REPORTABLE_WRONG_LOGINS){
+                    Label errorMessage = new Label("You sure are persistent...");
+                    errorMessage.setTextFill(Color.RED);
+                    errorMessage.setStyle("-fx-font-style: italic");
+                    login.getChildren().add(errorMessage);
+                }
+            }
+        });
+
+        HBox inputNickname = new HBox(10);
+        inputNickname.getChildren().addAll(loginLabel, textField);
+        inputNickname.setAlignment(Pos.CENTER);
+
+        login.getChildren().addAll(inputNickname, loginButton);
+        stage.setScene(loginScene);
+    }
+
+    public void showSearchGameScreen(){
+
+        VBox lookingForLobby = new VBox(25);
+        lookingForLobby.setAlignment(Pos.CENTER);
+
+        Scene searchGame = new Scene(lookingForLobby, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        Button button = new Button("Search Game");
+
+        lookingForLobby.getChildren().addAll(button);
+        stage.setScene(searchGame);
+    }
+
     /**
      * Draws an image scaled by the given scaling factor.
-     * If alignment coordinates are inside the window, the drawn image is always totally in the window (unless it's too big)
+     * If alignment coordinates are inside the scene, the drawn image is always totally inside the scene (unless it's too big)
      * @param graphicsContext The graphics context required to draw the image
      * @param image The image to draw
      * @param alignment The point the image should be placed

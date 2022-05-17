@@ -5,7 +5,18 @@ import javafx.application.Application;
 
 public class GUIMain extends UserInterface {
 
-    private static final GUIApplication application = new GUIApplication();
+    @Override
+    public void showLoginScreen() {
 
+    }
 
+    @Override
+    public void showTowerAndWizardSelection() {
+
+    }
+
+    @Override
+    public void showGameInterface() {
+
+    }
 }
