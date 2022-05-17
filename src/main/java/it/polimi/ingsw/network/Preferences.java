@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Preferences {
 
-    private static final String filename = "/NetworkParameters.json";
+        private static final String filename = "/jsonFiles/NetworkParameters.json";
     private static final int standardPort = 54321;
     private static final Gson gson = new Gson();
 
