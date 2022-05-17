@@ -93,7 +93,7 @@ public class GUIApplication extends Application {
         Button loginButton = new Button("Login");
 
         Label loginLabel = new Label("Nickname");
-        TextField textField = new TextField("Testa : di cazzo");
+        TextField textField = new TextField("Wizard of the Skies");
         textField.setMaxWidth(WINDOW_WIDTH/4);
         textField.setOnAction(event -> loginButton.fire());
 
