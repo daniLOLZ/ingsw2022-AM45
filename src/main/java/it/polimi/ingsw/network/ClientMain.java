@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.view.CLI;
-import it.polimi.ingsw.view.GUI;
+import it.polimi.ingsw.view.GUI.GUIMain;
 import it.polimi.ingsw.view.UserInterface;
 
 import java.io.*;
@@ -205,7 +205,7 @@ public class ClientMain {
                 userInterface = new CLI();
             }
             else if (readArgument.equals(allowedParameters.get(1))) { // --gui
-                userInterface = new GUI();
+                userInterface = new GUIMain();
             }
             else if (readArgument.equals(allowedParameters.get(2))) { // --hostname
                 String host = arguments[argumentIndex+1];
