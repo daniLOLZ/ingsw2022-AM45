@@ -196,5 +196,18 @@ public class CLI extends UserInterface {
     }
 
 
+    @Override
+    public void showLoginScreen() {
+        //todo
+    }
 
+    @Override
+    public void showTowerAndWizardSelection() {
+        //todo
+    }
+
+    @Override
+    public void showGameInterface() {
+        //todo
+    }
 }
