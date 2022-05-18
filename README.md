@@ -13,7 +13,7 @@
 | Controller     |  🟡   |
 | Socket         |  🟡   |
 | CLI            |  🟡   |
-| GUI            |  🔴   |
+| GUI            |  🟡   |
 | Multiple games |  🟡   |
 
 

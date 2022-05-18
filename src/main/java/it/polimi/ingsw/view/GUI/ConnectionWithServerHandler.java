@@ -9,4 +9,15 @@ public class ConnectionWithServerHandler {
         if (nickname.equals("ingconti")) return false;
         return true;
     }
+
+    public static void quit(){
+
+    }
+
+    public static void searchGame(String rules, int numPlayers){
+    }
+
+    public static boolean isInLobby(){
+        return true;
+    }
 }
