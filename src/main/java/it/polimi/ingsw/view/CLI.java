@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -15,7 +16,21 @@ public class CLI extends UserInterface {
     private final int centerPosition = 10;
 
 
+    /**
+     * Network-less constructor, used for testing
+     */
     public CLI(){
+        beans = new ArrayList<>();
+        View = new StringBuilder("");
+        LastView = new StringBuilder("");
+        LastElement = new StringBuilder();
+    }
+
+    /**
+     * Creates a new CLI and calls the method to create a new NetworkManager
+     */
+    public CLI(String hostname, int port){
+        super(hostname, port);
         beans = new ArrayList<>();
         View = new StringBuilder("");
         LastView = new StringBuilder("");
@@ -197,8 +212,85 @@ public class CLI extends UserInterface {
 
 
     @Override
+    public void showWelcomeScreen() {
+        System.out.println("``````CIAO AAAAAAAAA ERIANTYS~~~~~~~~~~~");
+    }
+
+    @Override
     public void showLoginScreen() {
-        //todo
+        Scanner scanner = new Scanner(System.in);
+        String inputNickname;
+        boolean errorLogin = false;
+
+        do{
+            System.out.println("Insert your username: ");
+            inputNickname = scanner.nextLine();
+            if(!networkManager.login(networkManager.getHostname(), networkManager.getPortNumber(), inputNickname)){
+                errorLogin = true;
+                System.out.println("Username was rejecetd cus it sucks, choose another one");
+            }
+            else errorLogin = false;
+
+        } while(errorLogin);
+
+        nickname = inputNickname;
+        System.out.println("Username " + inputNickname + " was accepted");
+    }
+
+    @Override
+    public void showGameruleSelection() {
+        Scanner scanner = new Scanner(System.in);
+        int gameMode;
+        int numPlayers;
+        boolean errorChoice, serverError;
+        do {
+            errorChoice = false;
+            serverError = false;
+
+            System.out.println("""
+                    Which type of game would you like to play? (Type in the corresponding number)
+                    1 - Simple game: No character cards
+                    2 - Advanced game: Character cards allowed""");
+            do {
+                gameMode = scanner.nextInt();
+                if (!(gameMode == 1 ||
+                        gameMode == 2)) {
+                    errorChoice = true;
+                    System.out.println("Wrong choice! Please select a correct game mode");
+                } else errorChoice = false;
+
+            } while (errorChoice);
+
+            System.out.println("""
+                    How many players do you want the game to have? (Type in the corresponding number)
+                    2 - 2 Players
+                    3 - 3 Players
+                    4 - 4 Players
+                    """);
+            do {
+                numPlayers = scanner.nextInt();
+                if (!(numPlayers == 2 ||
+                        numPlayers == 3 ||
+                        numPlayers == 4)) {
+                    errorChoice = true;
+                    System.out.println("Wrong choice! Please select a correct amount of players");
+                } else errorChoice = false;
+
+            } while (errorChoice);
+
+            if (!networkManager.sendGameModePreference(gameMode, numPlayers)) {
+                serverError = true;
+                System.out.println("There was a problem sending the gamemode preferences, please try again");
+            }
+        } while(serverError);
+    }
+
+    @Override
+    public void showLobby() {
+        System.out.println("You are waiting for players to join a game with you...");
+        //See if this could be an "interactive" wait, where you can see the players joining, or even
+        // just a simple counter
+        // networkManager.waitForStart();
     }
 
     @Override
@@ -209,5 +301,13 @@ public class CLI extends UserInterface {
     @Override
     public void showGameInterface() {
         //todo
+    }
+
+    @Override
+    public void startInterface() {
+        showWelcomeScreen();
+        showLoginScreen();
+        showGameruleSelection();
+        showLobby();
     }
 }

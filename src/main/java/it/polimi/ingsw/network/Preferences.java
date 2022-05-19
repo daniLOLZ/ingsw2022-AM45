@@ -11,8 +11,9 @@ import java.util.Map;
 
 public class Preferences {
 
-        private static final String filename = "/jsonFiles/NetworkParameters.json";
+    private static final String filename = "/jsonFiles/NetworkParameters.json";
     private static final int standardPort = 54321;
+    private static final String standardHostname = "127.0.0.1";
     private static final Gson gson = new Gson();
 
     public static int readPortFromJson(){
@@ -36,5 +37,27 @@ public class Preferences {
         Double parsedValue = (Double)map.get("defaultPort");
         returnPort = parsedValue.intValue();
         return returnPort;
+    }
+
+    public static String readHostnameFromJson(){
+
+        Type mapType = new TypeToken<Map<String, Object>>() {}.getType();    //Map<NetworkFieldEnum, Object> is a generic Type. It needs to be specified
+        Map<String, Object> map;
+        Reader reader;
+        String returnString;
+        InputStream stream;
+
+        try {
+            stream = Preferences.class.getResourceAsStream(filename);
+            reader = new InputStreamReader(stream);
+        } catch (NullPointerException e) {
+            System.err.println("Preferences file hasn't been found, using standard hostname");
+            e.printStackTrace();
+            return standardHostname;
+        }
+
+        map = gson.fromJson(reader, mapType);
+        returnString = (String)map.get("defaultHostname");
+        return returnString;
     }
 }
