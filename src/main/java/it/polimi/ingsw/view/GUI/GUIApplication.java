@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.GUI;
 
 import javafx.application.Application;
+import javafx.css.Style;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -12,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -60,8 +62,44 @@ public class GUIApplication extends Application {
         stage.setX(0);
         stage.setY(0);
 
+        VBox root = new VBox(70);
+        root.setAlignment(Pos.CENTER);
+
+        Button playButton = new Button("Start your journey");
+        playButton.setOnAction(event -> showLoginScreen());
+
+        //<editor-fold desc="Decorations">
+
+        showMenuBackground(root);
+
+        Label welcomeMessage = new Label("""
+                Once upon a time, a boy lifted his eyes,
+                And glanced at islands full of magic filling up the skies.
+                They enjoy learning, practicing and playing during their leisure,
+                They're the Wizards, their assistants, and the gorgeous Mother Nature.
+                You can visit the entrance, the dining hall, or the alleys.
+                Either way, you're welcome to the world of Eriantys.""");
+
+        welcomeMessage.setFont(Font.font("Pristina",47));
+        welcomeMessage.setTextAlignment(TextAlignment.CENTER);
+        root.getChildren().add(welcomeMessage);
+
+        playButton.setMaxWidth(700);
+        playButton.setMinHeight(120);
+        playButton.setBackground(Background.EMPTY);
+        playButton.setTextFill(Color.DARKRED);
+        playButton.setOnMouseEntered(event -> playButton.setFont(Font.font("Lucida Handwriting", 50)));
+        playButton.setOnMouseExited(event -> playButton.setFont(Font.font("Lucida Handwriting", 40)));
+        playButton.setFont(Font.font("Lucida Handwriting", 40));
+
+        //</editor-fold>
+
+        root.getChildren().add(playButton);
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
         stage.show();
-        showLoginScreen();
+
     }
     
     public static void main(String[] args){
@@ -299,18 +337,19 @@ public class GUIApplication extends Application {
         Label notification = new Label();
 
         userActions.getChildren().add(ready);
+        userActions.getChildren().add(startGame);
         userActions.getChildren().add(leaveLobby);
 
         if (errorOccured) {
             notification.setText("Couldn't start game! Some players are not ready");
             ready.setSelected(true);
-            userActions.getChildren().add(startGame);
+            startGame.setVisible(true);
         }
+        else startGame.setVisible(false);
 
         ready.setOnAction(event -> {
             readyHandle(ready.isSelected());
-            if (ready.isSelected() && ConnectionWithServerHandler.isHost()) userActions.getChildren().add(startGame);
-            else userActions.getChildren().remove(startGame);
+            startGame.setVisible(ready.isSelected() && ConnectionWithServerHandler.isHost());
         });
 
         startGame.setOnAction(event -> {
