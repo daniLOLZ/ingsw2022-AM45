@@ -7,12 +7,8 @@ import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -25,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GUIApplication extends Application {
 
-    private static final double WINDOW_WIDTH = 1500, WINDOW_HEIGHT = 720, REAL_SIZE = 1, MAX_REPORTABLE_WRONG_ATTEMPTS = 6;
+    private static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780, REAL_SIZE = 1, MAX_REPORTABLE_WRONG_ATTEMPTS = 6;
 
     private static final double left    = 0,
                                 right   = WINDOW_WIDTH,
@@ -47,6 +43,9 @@ public class GUIApplication extends Application {
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
 
+    private String preselectedGameRule = availableGameRules.get(0);
+    private Integer preselectedNumPlayers = availablePlayerNumber.get(0);
+
     private Stage stage;
     private String chosenNickname;
 
@@ -55,35 +54,14 @@ public class GUIApplication extends Application {
 
         this.stage = primaryStage;
 
-        VBox root = new VBox(25);
-        root.setAlignment(Pos.TOP_CENTER);
-
-        //First scene - Opening the game
-        Scene startingScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-
         Image icon = new Image("assets/icon.png");
         stage.getIcons().add(icon);
         stage.setTitle("Eriantys");
+        stage.setX(0);
+        stage.setY(0);
 
-
-        Image image = new Image("assets/icon.png");
-        ImageView imageView = new ImageView(image);
-        imageView.fitHeightProperty().setValue(image.getHeight()/1.2);
-        imageView.fitWidthProperty().setValue(image.getWidth()/1.2);
-
-        Label welcomeMessage = new Label("WELCOME TO ERIANTYS");
-        welcomeMessage.setFont(Font.font("Verdana", 42));
-
-        //button that brings to login screen
-        Button playButton = new Button("Play");
-        playButton.setTextFill(Color.DARKRED);
-        playButton.setOnAction(event -> showLoginScreen());
-
-        root.getChildren().addAll(imageView, welcomeMessage, playButton);
-
-
-        stage.setScene(startingScene);
         stage.show();
+        showLoginScreen();
     }
     
     public static void main(String[] args){
@@ -100,39 +78,21 @@ public class GUIApplication extends Application {
 
         StackPane root = new StackPane();
 
-        VBox login = new VBox(20);
-        login.setAlignment(Pos.CENTER);
-
         //<editor-fold desc="Decorations">
 
-        Image background = new Image("assets/decorations/login_screen/background.jpg");
-        BackgroundImage backgroundImage = new BackgroundImage(background,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                new BackgroundPosition(Side.LEFT,0.5,true,Side.TOP,0.5,true),
-                new BackgroundSize(WINDOW_WIDTH, WINDOW_WIDTH, false, false, false, false));
+        showMenuBackground(root);
 
-        root.setBackground(new Background(backgroundImage));
+        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        Image profsLogo = new Image("assets/decorations/login_screen/professors.png");
-        Image textLogo = new Image("assets/decorations/login_screen/eriantys_text_logo.png");
+        drawLogo(graphicsContext);
+
         Image king = new Image("assets/decorations/login_screen/king_no_bg.png");
         Image pixie = new Image("assets/decorations/login_screen/pixie_no_bg.png");
         Image sorcerer = new Image("assets/decorations/login_screen/sorcerer_no_bg.png");
         Image wizard = new Image("assets/decorations/login_screen/wizard_no_bg.png");
-        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-        drawImage(graphicsContext,
-                profsLogo,
-                new Coord(centerX, centerY * 0.1),
-                0.6);
-        drawImage(graphicsContext,
-                textLogo,
-                new Coord(centerX, centerY * 0.35),
-                0.15);
 
         double rescalingFactor = pixie.getHeight()/king.getHeight();
-
 
         drawImage(graphicsContext,
                 king,
@@ -155,6 +115,9 @@ public class GUIApplication extends Application {
 
         //</editor-fold>
 
+        VBox login = new VBox(20);
+        login.setAlignment(Pos.CENTER);
+
         root.getChildren().add(login);
 
         Scene loginScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -170,7 +133,7 @@ public class GUIApplication extends Application {
         AtomicInteger wrongAttempts = new AtomicInteger(0);
 
         loginButton.setOnAction(event -> { //calls external class to check input validity
-            if(ConnectionWithServerHandler.login(textField.getText())) showSearchGameScreen();
+            if(ConnectionWithServerHandler.login(textField.getText())) showSearchGameScreen(false);
             else {
 
                 if (wrongAttempts.incrementAndGet() == 1) {
@@ -196,13 +159,29 @@ public class GUIApplication extends Application {
         stage.setScene(loginScene);
     }
 
-    public void showSearchGameScreen(){
+    public void showSearchGameScreen(boolean errorOccurred){
 
         //user is logged in. If he quits, the server is notified
         stage.setOnCloseRequest(event -> ConnectionWithServerHandler.quit());
 
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        showMenuBackground(root);
+
+        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+
+        drawLogo(graphicsContext);
+
+        root.getChildren().add(canvas);
+
+        //</editor-fold>
+
         VBox lookingForLobby = new VBox(30);
         lookingForLobby.setAlignment(Pos.CENTER);
+        lookingForLobby.setPadding(new Insets(100, 0, 0, 0));
 
         GridPane preferences = new GridPane();
         preferences.setAlignment(Pos.CENTER);
@@ -216,7 +195,7 @@ public class GUIApplication extends Application {
 
         ChoiceBox<String> gameRuleSelection = new ChoiceBox<>();
         gameRuleSelection.getItems().addAll(availableGameRules);
-        gameRuleSelection.setValue(availableGameRules.get(0));
+        gameRuleSelection.setValue(preselectedGameRule);
         GridPane.setConstraints(gameRuleSelection, 1, 0);
 
         //select number of player
@@ -225,23 +204,47 @@ public class GUIApplication extends Application {
 
         ChoiceBox<Integer> numPlayersSelection = new ChoiceBox<>();
         numPlayersSelection.getItems().addAll(availablePlayerNumber);
-        numPlayersSelection.setValue(availablePlayerNumber.get(0));
+        numPlayersSelection.setValue(preselectedNumPlayers);
         GridPane.setConstraints(numPlayersSelection, 1, 1);
 
         preferences.getChildren().addAll(gameRuleLabel, gameRuleSelection, numPlayersLabel, numPlayersSelection);
 
         HBox bottomBar = new HBox(13);
         bottomBar.setAlignment(Pos.CENTER);
-        Label searching = new Label("");
+        Label searching = new Label();
+        if (errorOccurred) searching.setText("Error! Couldn't find your game");
+        else searching.setText("Click here to search a game");
         Button searchGameButton = new Button("Search Game");
-        searchGameButton.setOnAction(event -> sendSearchGameRequest(gameRuleSelection.getValue(), numPlayersSelection.getValue(), searching));
+        searchGameButton.setOnAction(event -> {
+            //game must be searched once
+            searchGameButton.setOnAction(null);
 
+            //saving selections in case operation fails
+            preselectedGameRule = gameRuleSelection.getValue();
+            preselectedNumPlayers = numPlayersSelection.getValue();
+            sendSearchGameRequest(gameRuleSelection.getValue(), numPlayersSelection.getValue(), searching);
+        });
 
 
         bottomBar.getChildren().addAll(searchGameButton, searching);
         lookingForLobby.getChildren().addAll(preferences, bottomBar);
 
-        Scene searchGame = new Scene(lookingForLobby, WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.getChildren().add(lookingForLobby);
+        Scene searchGame = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+
+        //<editor-fold desc="Debug">
+
+        Label debugLabel = new Label("Debugging options");
+        Button success = new Button("Simulate game lobby");
+        Button failure = new Button("Simulate failure");
+        success.setOnAction(event -> notifyEnteredLobby());
+        failure.setOnAction(event -> notifyErrorInSearchGame());
+
+        bottomBar.getChildren().addAll(debugLabel, success, failure);
+
+        //</editor-fold>
+
 
         stage.setScene(searchGame);
     }
@@ -253,8 +256,95 @@ public class GUIApplication extends Application {
 
     }
 
-    //probably will be called from above
-    private void showLobbyScreen(){
+    //will be called from above
+    public void notifyEnteredLobby(){
+        showLobbyScreen(false);
+    }
+
+    //will be called from above
+    public void notifyErrorInSearchGame(){
+        showSearchGameScreen(true);
+    }
+
+    private void showLobbyScreen(boolean errorOccured){
+
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        showMenuBackground(root);
+
+        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+
+        drawLogo(graphicsContext);
+
+        root.getChildren().add(canvas);
+
+        //</editor-fold>
+
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+        layout.setPadding(new Insets(100,0,0,0));
+
+        Label gameDetails = new Label("Game rules: " + preselectedGameRule + "\nPlayers: " + preselectedNumPlayers);
+        gameDetails.setFont(Font.font("Verdana", 25));
+
+        HBox userActions = new HBox(35);
+        userActions.setAlignment(Pos.CENTER);
+
+        CheckBox ready = new CheckBox("Ready");
+        Button startGame = new Button("Start game");
+        Button leaveLobby = new Button("Leave lobby");
+        Label notification = new Label();
+
+        userActions.getChildren().add(ready);
+        userActions.getChildren().add(leaveLobby);
+
+        if (errorOccured) {
+            notification.setText("Couldn't start game! Some players are not ready");
+            ready.setSelected(true);
+            userActions.getChildren().add(startGame);
+        }
+
+        ready.setOnAction(event -> {
+            readyHandle(ready.isSelected());
+            if (ready.isSelected() && ConnectionWithServerHandler.isHost()) userActions.getChildren().add(startGame);
+            else userActions.getChildren().remove(startGame);
+        });
+
+        startGame.setOnAction(event -> {
+            ready.setDisable(true);
+            leaveLobby.setOnAction(null);
+            ConnectionWithServerHandler.startGame();
+        });
+
+        leaveLobby.setOnAction(event -> {
+            ConnectionWithServerHandler.leaveLobby();
+            showSearchGameScreen(false);
+        });
+
+        layout.getChildren().addAll(gameDetails, userActions, notification);
+        root.getChildren().add(layout);
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
+    }
+
+    private void readyHandle(boolean selected){
+        if (selected) ConnectionWithServerHandler.ready();
+        else ConnectionWithServerHandler.notReady();
+    }
+
+    public void notifyStartingGame(){
+        startGame();
+    }
+
+    public void notifyPlayersNotReady(){
+        showLobbyScreen(true);
+    }
+
+    private void startGame(){
 
     }
 
@@ -297,5 +387,29 @@ public class GUIApplication extends Application {
 
     private void drawFromCenterImage (GraphicsContext graphicsContext, Image image, Coord pos){
         drawFromCenterImage(graphicsContext, image, pos, REAL_SIZE);
+    }
+
+    private void showMenuBackground(Region region){
+        Image background = new Image("assets/background.jpg");
+        BackgroundImage backgroundImage = new BackgroundImage(background,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                new BackgroundPosition(Side.LEFT,0.5,true,Side.TOP,0.5,true),
+                new BackgroundSize(WINDOW_WIDTH, WINDOW_WIDTH, false, false, false, false));
+
+        region.setBackground(new Background(backgroundImage));
+    }
+
+    private void drawLogo(GraphicsContext graphicsContext){
+        Image profsLogo = new Image("assets/decorations/login_screen/professors.png");
+        Image textLogo = new Image("assets/decorations/login_screen/eriantys_text_logo.png");
+        drawImage(graphicsContext,
+                profsLogo,
+                new Coord(centerX, centerY * 0.1),
+                0.6);
+        drawImage(graphicsContext,
+                textLogo,
+                new Coord(centerX, centerY * 0.35),
+                0.15);
     }
 }
