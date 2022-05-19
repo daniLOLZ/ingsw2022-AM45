@@ -23,6 +23,7 @@ import java.util.List;
 public class CLITest {
 
 
+    //todo update with new virtualView
     @Test
     public void simple(){
         List<Integer> selectedWizards = new ArrayList<>();
@@ -56,6 +57,7 @@ public class CLITest {
 
     }
 
+    //todo update with new virtualView
     @Test
     public void advanced(){
         List<Integer> selectedWizards = new ArrayList<>();

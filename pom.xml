@@ -87,7 +87,7 @@
             <archive>
               <manifest>
                 <!-- give full qualified name of your main class-->
-                <mainClass>it.polimi.ingsw.network.ServerMain</mainClass>
+                <mainClass>it.polimi.ingsw.network.Server</mainClass>
               </manifest>
             </archive>
           </configuration>
@@ -123,7 +123,7 @@
               <archive>
                 <manifest>
                   <!-- //TODO change to ingsw.Eriantys (the class that lets you choose between client [CLI or GUI] and server) -->
-                  <mainClass>it.polimi.ingsw.network.ServerMain</mainClass>
+                  <mainClass>it.polimi.ingsw.Eriantys</mainClass>
                 </manifest>
               </archive>
               <descriptorRefs>

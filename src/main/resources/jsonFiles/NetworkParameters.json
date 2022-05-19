@@ -1,3 +1,4 @@
 {
-  "defaultPort" : 54321
+  "defaultPort" : 54321,
+  "defaultHostname" : "127.0.0.1"
 }
