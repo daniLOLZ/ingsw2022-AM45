@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.view.observer.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,6 +25,16 @@ public class VirtualView {
     private List<ErrorWatcher> errorWatchers;
     private SimpleGameWatcher simpleGameWatcher;
     private AdvancedGameWatcher advancedGameWatcher;
+
+    public VirtualView(){
+        cloudWatchers = new ArrayList<>();
+        characterWatchers = new ArrayList<>();
+        islandGroupWatchers = new ArrayList<>();
+        advancedIslandGroupWatchers = new ArrayList<>();
+        playerWatchers = new ArrayList<>();
+        advancedPlayerWatchers = new ArrayList<>();
+        errorWatchers = new ArrayList<>();
+    }
 
     public void setAdvancedGameWatcher(AdvancedGameWatcher advancedGameWatcher) {
         this.advancedGameWatcher = advancedGameWatcher;
@@ -59,7 +71,66 @@ public class VirtualView {
     public void addCharacterWatcher(CharacterWatcher watcher){
         characterWatchers.add(watcher);
     }
+
+    public List<CloudBean> getCloudBean(){
+        List<CloudBean> beans = new ArrayList<>();
+        for(CloudWatcher watcher: cloudWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public List<CharacterCardBean> getCharacterBean(){
+        List<CharacterCardBean> beans = new ArrayList<>();
+        for(CharacterWatcher watcher: characterWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public List<IslandGroupBean> getIslandBean(){
+        List<IslandGroupBean> beans = new ArrayList<>();
+        for(IslandGroupWatcher watcher: islandGroupWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public List<AdvancedIslandGroupBean> getAdvancedIslandBean(){
+        List<AdvancedIslandGroupBean> beans = new ArrayList<>();
+        for(AdvancedIslandGroupWatcher watcher: advancedIslandGroupWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public List<PlayerBean> getPlayerBean(){
+        List<PlayerBean> beans = new ArrayList<>();
+        for(PlayerWatcher watcher: playerWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public List<AdvancedPlayerBean> getAdvancedPlayerBean(){
+        List<AdvancedPlayerBean> beans = new ArrayList<>();
+        for(AdvancedPlayerWatcher watcher: advancedPlayerWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public List<ErrorBean> getErrorBean(){
+        List<ErrorBean> beans = new ArrayList<>();
+        for(ErrorWatcher watcher: errorWatchers)
+            beans.add(watcher.getBean());
+        return  beans;
+    }
+
+    public AdvancedGameBoardBean getAdvancedGameBean() {
+        return advancedGameWatcher.getBean();
+    }
+
+    public GameBoardBean getSimpleGameBean() {
+        return simpleGameWatcher.getBean();
+    }
 }
+
+
 
 // public CloudObserver{
 //  CloudBean bean;

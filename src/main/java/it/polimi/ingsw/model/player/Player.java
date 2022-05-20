@@ -194,6 +194,7 @@ public class Player extends DrawableObject {
      * @return the moved student's color
      */
     public StudentEnum moveFromEntranceToHall(){
+        selectStudentAtEntrance(parameters.getSelectedEntranceStudents().get().get(0));
         StudentEnum color= board.moveFromEntranceToHall();
         //alert();
         return  color;
@@ -204,6 +205,7 @@ public class Player extends DrawableObject {
      * @param island != null
      */
     public void moveFromEntranceToIsland(IslandGroup island){
+        selectStudentAtEntrance(parameters.getSelectedEntranceStudents().get().get(0));
         board.moveFromEntranceToIsland(island);
         //alert();
     }

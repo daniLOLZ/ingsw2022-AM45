@@ -17,4 +17,8 @@ public class PlayerWatcher extends Watcher{
     public void update() {
         bean = (PlayerBean) source.toBean();
     }
+
+    public PlayerBean getBean() {
+        return bean;
+    }
 }

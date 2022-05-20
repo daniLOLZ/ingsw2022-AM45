@@ -349,12 +349,30 @@ public class SimpleGame extends DrawableObject {
     }
 
     /**
-     * Fill clouds' student list with new student drawing from sack
+     * Fill clouds' student list with new student drawing from sack if cloud is empty
      */
     public void fillClouds(){
         for(Cloud cloud : clouds){
-            cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
+            if(cloud.isEmpty())
+                cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
         }
+    }
+
+    /**
+     *
+     * @param idCloud >= 0
+     * @return true if chosen cloud is empty, false otherwise
+     */
+    public boolean cloudIsEmpty(int idCloud){
+        return clouds.get(idCloud).isEmpty();
+    }
+
+    /**
+     *
+     * @return number of clouds
+     */
+    public int cloudsNumber(){
+        return clouds.size();
     }
 
 
@@ -495,14 +513,16 @@ public class SimpleGame extends DrawableObject {
     public Map<TeamEnum, Integer> professorsPerTeam(){
         Map<TeamEnum, Integer> numProfessorsPerTeam = new HashMap<>();
         List<PlayerEnum> professors = parameters.getProfessors();
-        TeamEnum team;
-        int previous;
+        TeamEnum team = TeamEnum.NOTEAM;
+        int previous = 0;
 
         //INITIALISE NUM OF OWNED PROFESSORS
         for(Player player: players){
             team = parameters.getPlayerTeamById(player.getPlayerId());
             numProfessorsPerTeam.put(team,0);
         }
+
+        numProfessorsPerTeam.put(TeamEnum.NOTEAM,0);
 
         for (PlayerEnum playerWithProfessor : professors) {
             team = parameters.getPlayerTeamById(playerWithProfessor);
@@ -706,7 +726,8 @@ public class SimpleGame extends DrawableObject {
     /**
      *
      * @param studentColor != NO_STUDENT && != null
-     * @return the player's PlayerEnum with more students with chosen studentColor
+     * @return the player's PlayerEnum with more students at table with chosen studentColor.
+     * If nobody has more students  than other players return NoPlayer
      */
     public PlayerEnum playerWithMoreStudent(StudentEnum studentColor){
         int max = 0;
@@ -720,7 +741,7 @@ public class SimpleGame extends DrawableObject {
                 maxPlayer = player.getPlayerId();
             }
 
-            if(curr == max){
+            else if(curr == max){
                 maxPlayer = PlayerEnum.NOPLAYER;
             }
 
@@ -830,6 +851,11 @@ public class SimpleGame extends DrawableObject {
         return bean;
     }
 
+    /**
+     * Play assistant card updating model with right playedAssistant
+     * @param player != null
+     * @param id > 0
+     */
     public void playAssistant(Player player, int id){
         player.playAssistant(id);
         //alert();

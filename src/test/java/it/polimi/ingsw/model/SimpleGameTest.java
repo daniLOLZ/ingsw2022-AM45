@@ -1,20 +1,24 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.*;
-import it.polimi.ingsw.model.game.GameHelper;
-import it.polimi.ingsw.model.game.IncorrectPlayersException;
-import it.polimi.ingsw.model.game.ParameterHandler;
-import it.polimi.ingsw.model.game.SimpleGame;
+import it.polimi.ingsw.model.beans.GameBoardBean;
+import it.polimi.ingsw.model.game.*;
+import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.islands.UnmergeableException;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SimpleGameTest {
 
@@ -35,8 +39,11 @@ public class SimpleGameTest {
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
+        VirtualView virtualView = new VirtualView();
         try {
-            game = new SimpleGame(3,selectedWizards,teamColors,nicknames);
+            game = new SimpleGame(3,selectedWizards,teamColors,nicknames,virtualView);
+            game.initializeGame();
+            game.initialiseSelection();
         }
         catch (IncorrectPlayersException e){
             e.printStackTrace();
@@ -48,14 +55,14 @@ public class SimpleGameTest {
     @Test
     public void wrongNumberOfPlayers(){
         SimpleGame game2;
-        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(5,null,null,null));
-        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(-1,null,null,null));
-        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(0,null,null,null));
+        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(5,null,null,null,null));
+        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(-1,null,null,null,null));
+        assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(0,null,null,null,null));
     }
 
     @Test
     public void checkInitialized(){
-        assertFalse(game.isHasBeenInitialized());
+        //assertFalse(game.isHasBeenInitialized());
         game.initializeGame();
         assertTrue(game.isHasBeenInitialized());
     }
@@ -124,6 +131,331 @@ public class SimpleGameTest {
                 && game.getPlayers().get(1).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3))
                 && game.getPlayers().get(2).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1)));
         }
+    }
+
+    /**
+     * Test if after filling clouds, these are not empty
+     */
+    @Test
+    public void fillCloudsTest(){
+        game.fillClouds();
+        for(int i=0; i< game.cloudsNumber(); i++)
+            Assertions.assertFalse(game.cloudIsEmpty(i));
+    }
+
+    /**
+     * Test if getFromCloud add correctly the student at the player entrance and
+     * remove them from cloud
+     */
+    @Test
+    public void getFromCloudTest(){
+        game.fillClouds();
+        Player player = game.getPlayers().get(0);
+        while(player.getBoard().entranceSize() != 0)
+            player.getBoard().removeFromEntrance(0);
+
+        game.getFromCloud(player,0);
+
+        assertTrue(player.getBoard().entranceSize() > 0);
+        assertTrue(game.cloudIsEmpty(0));
+    }
+
+    @Test
+    public void noMoreAssistantTest(){
+        boolean noMoreAssistant = game.noMoreAssistant();
+        Player player = game.getPlayers().get(0);
+
+        assertFalse(noMoreAssistant);
+
+        game.playAssistant(player,1);
+        game.playAssistant(player,2);
+        game.playAssistant(player,3);
+        game.playAssistant(player,4);
+        game.playAssistant(player,5);
+        game.playAssistant(player,6);
+        game.playAssistant(player,7);
+        game.playAssistant(player,8);
+        game.playAssistant(player,9);
+        game.playAssistant(player,10);
+
+        noMoreAssistant = game.noMoreAssistant();
+        assertTrue(noMoreAssistant);
+
+
+
+    }
+
+    /**
+     * Test if noMoreTowers return the team with no tower
+     */
+    @Test
+    public void noMoreTowersTest(){
+        TeamEnum noMoreTowers = game.noMoreTowers();
+        assertEquals(TeamEnum.NOTEAM, noMoreTowers);
+
+        Player player = game.getPlayers().get(0);
+        int numTowers = player.getNumTowers();
+        player.getBoard().updateTowers(-numTowers);
+        noMoreTowers = game.noMoreTowers();
+        assertEquals(player.getTeamColor(), noMoreTowers);
+
+        //RESET
+        player.getBoard().updateTowers(numTowers);
+
+    }
+
+    /**
+     * Test if islandShortage return true if there are 3 island groups or less
+     */
+    @Test
+    public void islandShortageTest(){
+        boolean shortage = game.islandShortage();
+        assertFalse(shortage);
+
+        List<IslandGroup> mem = new ArrayList<>();
+        while(game.getIslandGroups().size() > 3){
+            mem.add(game.getIslandGroups().remove(0));
+        }
+
+        shortage = game.islandShortage();
+        assertTrue(shortage);
+
+        //RESET
+        game.getIslandGroups().addAll(mem);
+    }
+
+
+    /**
+     * Test if number of professors per team is correct
+     */
+    @Test
+    public void professorPerTeamTest(){
+        Map map = game.professorsPerTeam();
+
+        assertEquals(0, map.get(TeamEnum.WHITE));
+        assertEquals(0, map.get(TeamEnum.BLACK));
+        assertEquals(0, map.get(TeamEnum.GREY));
+
+        Player player = game.getPlayers().get(1);               //BLACK TEAM
+        game.getParameters().setCurrentPlayer(player);
+        player.getBoard().addToEntrance(StudentEnum.RED);
+        game.selectStudentAtEntrance(player,0);
+        game.moveFromEntranceToHall(player);                    //BLACK TEAM GAIN 1 PROF
+
+        map = game.professorsPerTeam();
+
+        assertEquals(0, map.get(TeamEnum.WHITE));
+        assertEquals(1, map.get(TeamEnum.BLACK));
+        assertEquals(0, map.get(TeamEnum.GREY));
+    }
+
+    /**
+     * Test behavior of startPlanning phase
+     */
+    @Test
+    public void startPlanningPhaseTest(){
+        game.startPlanningPhase(0);
+        assertEquals(PhaseEnum.PLANNING, game.getParameters().getCurrentPhase());
+        assertEquals(game.getPlayers().get(0), game.getParameters().getCurrentPlayer());
+    }
+
+    /**
+     * Test behavior of startAction phase
+     */
+    @Test
+    public void startActionPhaseTest(){
+        game.startActionPhase(0);
+        assertEquals(PhaseEnum.ACTION, game.getParameters().getCurrentPhase());
+        assertEquals(game.getPlayers().get(0), game.getParameters().getCurrentPlayer());
+    }
+
+    /**
+     *Test for correct behavior of moveFromEntrancceToHall.
+     * Professor update and students moved
+     */
+    @Test
+    public void moveFromEntranceToHallTest(){
+        Player player = game.getPlayers().get(0);
+        int previousSize = player.getBoard().entranceSize();
+        int previousTableStudents = player.getNumStudentAtTable(StudentEnum.GREEN);
+        player.getBoard().addToEntrance(StudentEnum.GREEN);
+        game.selectStudentAtEntrance(player, 0);
+        game.moveFromEntranceToHall(player);
+
+        assertEquals(previousTableStudents + 1, player.getNumStudentAtTable(StudentEnum.GREEN));
+        assertEquals(previousSize, player.getBoard().entranceSize());
+        assertEquals(player.getPlayerId(), game.getParameters().getProfessors().get(StudentEnum.GREEN.index));
+    }
+
+    /**
+     * Test for correct behavior of moveFromEntranceToIsland.
+     * Students moved
+     */
+    @Test
+    public void moveFromEntranceToIsland(){
+        Player player = game.getPlayers().get(0);
+        IslandGroup island = game.getIslandGroups().get(0);
+        int entranceSize = player.getBoard().entranceSize();
+        player.getBoard().addToEntrance(StudentEnum.BLUE);
+        game.selectEntranceStudent(0);
+        game.moveFromEntranceToIsland(player,island.getIdGroup());
+        assertTrue(island.getStudents().contains(StudentEnum.BLUE));
+        assertEquals(entranceSize, player.getBoard().entranceSize());
+    }
+
+    /**
+     * Test for check validity of id received as input
+     */
+    @Test
+    public void checkValidID(){
+
+        assertFalse(game.checkValidIdIsland(5000));
+        assertFalse(game.checkValidIdIsland(-1));
+        assertFalse(game.checkValidIdCloud(5000));
+        assertFalse(game.checkValidIdCloud(-1));
+        assertTrue(game.checkValidIdIsland(game.getIslandGroups().get(0).getIdGroup()));
+        boolean emptyCloud = game.cloudIsEmpty(0);
+        assertTrue(game.checkValidIdCloud(0) || emptyCloud);
+    }
+
+    /**
+     * Test if playerWithMoreStudent return the player with more students of chosen color
+     */
+    @Test
+    public void moreStudentAtTable(){
+
+        //ALL PLAYERS WITH 0 YELLOW STUDENTS
+        PlayerEnum playerId = game.playerWithMoreStudent(StudentEnum.YELLOW);
+        assertEquals(PlayerEnum.NOPLAYER, playerId);
+
+        Player player1 = game.getPlayers().get(0);
+        Player player2 = game.getPlayers().get(1);
+
+        //PLAYER1 GET 1 YELLOW STUDENT AND NOW HE IS THE PLAYER WITH MORE YELLOW STUDENTS
+        player1.getBoard().addToHall(StudentEnum.YELLOW);
+        playerId = game.playerWithMoreStudent(StudentEnum.YELLOW);
+
+        assertEquals(player1.getPlayerId(), playerId);
+
+        //PLAYER2 GET 2 YELLOW STUDENT AND NOW HE IS THE PLAYER WITH MORE YELLOW STUDENTS
+
+        player2.getBoard().addToHall(StudentEnum.YELLOW);
+        player2.getBoard().addToHall(StudentEnum.YELLOW);
+
+        playerId = game.playerWithMoreStudent(StudentEnum.YELLOW);
+
+        assertEquals(player2.getPlayerId(), playerId);
+    }
+
+    /**
+     * Test behavior of moveMN
+     */
+    @Test
+    public void MoveMNTest(){
+        int idIsland = game.moveMN(2);
+        for(IslandGroup island: game.getIslandGroups())
+            if(idIsland == island.getIdGroup())
+                assertEquals(island.getIdGroup(), game.getIdIslandMN());
+    }
+
+    /**
+     * Test behavior of evaluate.
+     * Merge, Mn position and built tower
+     */
+    @Test
+    public void evaluateTest()  {
+        IslandGroup island = game.getIslandGroups().get(2);
+        int previousNumberIsland = game.getIslandGroups().size();
+
+        //PUT MN ON ISLAND
+        while(game.getIdIslandMN() != island.getIdGroup())
+            game.moveMN(1);
+
+        Player player = game.getPlayers().get(2);               //GREY
+        player.getBoard().addToEntrance(StudentEnum.PINK);
+        game.selectEntranceStudent(0);
+        game.moveFromEntranceToHall(player);
+        island.addStudent(StudentEnum.PINK);
+
+        //NO MERGE
+        try {
+            game.evaluateIsland(island.getIdGroup());
+        } catch (UnmergeableException e) {
+            //Non una vera eccezione
+        }
+
+        assertEquals(TeamEnum.GREY, island.getTowerColor());
+
+        //MERGE 2 ISLANDS
+        IslandGroup island2 = island.getNextIslandGroup();
+        player.getBoard().addToEntrance(StudentEnum.PINK);
+        game.selectEntranceStudent(0);
+        game.moveFromEntranceToHall(player);
+        island2.addStudent(StudentEnum.PINK);
+
+
+        try {
+            game.evaluateIsland(island2.getIdGroup());
+        } catch (UnmergeableException e) {
+            //Non una vera eccezione
+        }
+
+        assertFalse(game.getIslandGroups().contains(island));
+        assertFalse(game.getIslandGroups().contains(island2));
+        assertEquals(previousNumberIsland - 1, game.getIslandGroups().size());
+        assertFalse(game.getIdIslandMN() == island.getIdGroup());
+
+
+        int newIslandId = game.getIdIslandMN();
+        IslandGroup newIsland = null;
+        for(IslandGroup isla: game.getIslandGroups())
+            if(isla.getIdGroup() == newIslandId)
+                newIsland = isla;
+
+        assertEquals(2, newIsland.getIslands().size());
+        assertEquals(island.getStudents().size() + island2.getStudents().size(),
+                newIsland.getStudents().size());
+
+        assertEquals(island.getTowerColor(), newIsland.getTowerColor());
+
+
+    }
+
+    /**
+     * Bean test
+     */
+    @Test
+    public void toBeanTest(){
+        GameBoardBean bean = (GameBoardBean) game.toBean();
+
+
+        assertNotNull(bean);
+
+
+        List<Integer> cardsAssistant = bean.getIdAssistantsPlayed();
+        List<Integer> idPlayer = bean.getIdPlayers();
+        for(Player player: game.getPlayers()){
+            if(player.getAssistantPlayed() != null)
+                assertTrue(cardsAssistant.contains(player.getAssistantPlayed().id));
+            assertTrue(idPlayer.contains(player.getPlayerId().index));
+        }
+
+        List<Integer> islands = bean.getIdIslandGroups();
+        for(IslandGroup island: game.getIslandGroups())
+            assertTrue(islands.contains(island.getIdGroup()));
+
+        assertEquals(game.getParameters().getCurrentPlayer().getPlayerId().index,bean.getCurrentPlayerId());
+        assertEquals(game.getParameters().getTurn(),bean.getTurn());
+        assertEquals(game.getParameters().getCurrentPhase().name, bean.getPhase());
+    }
+
+    @Test
+    public void PlayAssistant(){
+        Player player3 = game.getPlayers().get(2);
+        int size = player3.getWizard().size();
+        game.playAssistant(player3, 21);
+        assertEquals(21,player3.getAssistantPlayed().id);
+        assertEquals(size - 1,player3.getWizard().size());
     }
 
 
