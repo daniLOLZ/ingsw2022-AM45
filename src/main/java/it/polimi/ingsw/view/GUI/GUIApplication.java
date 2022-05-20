@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.model.beans.CloudBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.IslandGroupBean;
 import javafx.application.Application;
-import javafx.css.Style;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -23,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GUIApplication extends Application {
 
-    private static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780, REAL_SIZE = 1, MAX_REPORTABLE_WRONG_ATTEMPTS = 6;
+    private static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780, REAL_SIZE = 1;
 
     private static final double left    = 0,
                                 right   = WINDOW_WIDTH,
@@ -47,9 +49,10 @@ public class GUIApplication extends Application {
 
     private String preselectedGameRule = availableGameRules.get(0);
     private Integer preselectedNumPlayers = availablePlayerNumber.get(0);
+    private List<CloudBean> clouds;
+    private List<IslandGroupBean> islands;
 
     private Stage stage;
-    private String chosenNickname;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -66,7 +69,7 @@ public class GUIApplication extends Application {
         root.setAlignment(Pos.CENTER);
 
         Button playButton = new Button("Start your journey");
-        playButton.setOnAction(event -> showLoginScreen());
+        playButton.setOnAction(event -> showLoginScreen(false));
 
         //<editor-fold desc="Decorations">
 
@@ -107,7 +110,7 @@ public class GUIApplication extends Application {
     }
 
     //@Override
-    public void showLoginScreen() {
+    public void showLoginScreen(boolean errorOccurred) {
 
         //in case of logout I want to reset the action on close request
         //to not try and send a quit message
@@ -167,37 +170,44 @@ public class GUIApplication extends Application {
         textField.setPromptText("Insert your nickname");
         textField.setMaxWidth(WINDOW_WIDTH/4);
         textField.setOnAction(event -> loginButton.fire());
+        Label errorMessage = new Label("Invalid nickname! Please try again");
+        errorMessage.setTextFill(Color.RED);
 
-        AtomicInteger wrongAttempts = new AtomicInteger(0);
+        errorMessage.setVisible(errorOccurred);
 
-        loginButton.setOnAction(event -> { //calls external class to check input validity
-            if(ConnectionWithServerHandler.login(textField.getText())) showSearchGameScreen(false);
-            else {
-
-                if (wrongAttempts.incrementAndGet() == 1) {
-                    Label errorMessage = new Label("Invalid nickname! Please try again");
-                    errorMessage.setTextFill(Color.RED);
-                    login.getChildren().add(errorMessage);
-                }
-                if (wrongAttempts.get() == MAX_REPORTABLE_WRONG_ATTEMPTS){
-                    Label errorMessage = new Label("You sure are persistent...");
-                    errorMessage.setTextFill(Color.RED);
-                    errorMessage.setStyle("-fx-font-style: italic");
-                    login.getChildren().add(errorMessage);
-                }
-            }
-        });
+        //calls external class to check input validity
+        loginButton.setOnAction(event -> ConnectionWithServerHandler.login(textField.getText()));
 
         HBox inputNickname = new HBox(10);
         inputNickname.getChildren().addAll(loginLabel, textField);
         inputNickname.setAlignment(Pos.CENTER);
 
+        login.getChildren().addAll(inputNickname, loginButton, errorMessage);
 
-        login.getChildren().addAll(inputNickname, loginButton);
+        //<editor-fold desc="Debug">
+
+        Button success = new Button("Simulate success");
+        Button failure = new Button("Simulate failure");
+
+        success.setOnAction(event -> notifySuccessfulLogin());
+        failure.setOnAction(event -> notifyLoginFailure());
+
+        login.getChildren().addAll(success, failure);
+
+        //</editor-fold>
+
         stage.setScene(loginScene);
     }
 
-    public void showSearchGameScreen(boolean errorOccurred){
+    public void notifySuccessfulLogin(){
+        showSearchGameScreen(false);
+    }
+
+    public void notifyLoginFailure(){
+        showLoginScreen(true);
+    }
+
+    private void showSearchGameScreen(boolean errorOccurred){
 
         //user is logged in. If he quits, the server is notified
         stage.setOnCloseRequest(event -> ConnectionWithServerHandler.quit());
@@ -212,6 +222,7 @@ public class GUIApplication extends Application {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
         drawLogo(graphicsContext);
+        showDecorativeIslands(graphicsContext);
 
         root.getChildren().add(canvas);
 
@@ -279,7 +290,11 @@ public class GUIApplication extends Application {
         success.setOnAction(event -> notifyEnteredLobby());
         failure.setOnAction(event -> notifyErrorInSearchGame());
 
-        bottomBar.getChildren().addAll(debugLabel, success, failure);
+        HBox debug = new HBox(20);
+        debug.setAlignment(Pos.CENTER);
+        debug.getChildren().addAll(success, failure);
+
+        lookingForLobby.getChildren().addAll(debugLabel, debug);
 
         //</editor-fold>
 
@@ -316,6 +331,7 @@ public class GUIApplication extends Application {
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
         drawLogo(graphicsContext);
+        showDecorativeIslands(graphicsContext);
 
         root.getChildren().add(canvas);
 
@@ -450,5 +466,32 @@ public class GUIApplication extends Application {
                 textLogo,
                 new Coord(centerX, centerY * 0.35),
                 0.15);
+    }
+
+    private void showDecorativeIslands(GraphicsContext graphicsContext){
+
+        Image island1 = new Image("assets/tiles/island1.png");
+        Image island2 = new Image("assets/tiles/island2.png");
+        Image island3 = new Image("assets/tiles/island3.png");
+
+        Image cloud = new Image("assets/tiles/cloud_card.png");
+
+        double scale = 0.2;
+
+
+        drawImage(graphicsContext, cloud, upLeftCorner, scale);
+        drawImage(graphicsContext, island1, upLeftCorner, scale);
+        drawImage(graphicsContext, cloud, upRightCorner, scale);
+        drawImage(graphicsContext, island1, upRightCorner, scale);
+
+        drawImage(graphicsContext, cloud, centerLeft, scale);
+        drawImage(graphicsContext, island2, centerLeft, scale);
+        drawImage(graphicsContext, cloud, centerRight, scale);
+        drawImage(graphicsContext, island2, centerRight, scale);
+
+        drawImage(graphicsContext, cloud, downLeftCorner, scale);
+        drawImage(graphicsContext, island3, downLeftCorner, scale);
+        drawImage(graphicsContext, cloud, downRightCorner, scale);
+        drawImage(graphicsContext, island3, downRightCorner, scale);
     }
 }
