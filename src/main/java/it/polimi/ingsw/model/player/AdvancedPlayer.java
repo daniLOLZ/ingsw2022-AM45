@@ -57,6 +57,10 @@ public class AdvancedPlayer extends Player {
     public void addCoin(){
         numCoins++;//alert();
     }
+
+    /**
+     * numCoins --
+     */
     public void useCoin(){
         numCoins--;//alert();
     }

@@ -17,4 +17,8 @@ public class AdvancedGameWatcher extends Watcher{
     public void update() {
         bean = (AdvancedGameBoardBean) source.toBean();
     }
+
+    public AdvancedGameBoardBean getBean() {
+        return bean;
+    }
 }

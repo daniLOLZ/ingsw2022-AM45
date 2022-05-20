@@ -17,4 +17,8 @@ public class ErrorWatcher extends Watcher{
     public void update() {
         bean = (ErrorBean) source.toBean();
     }
+
+    public ErrorBean getBean() {
+        return bean;
+    }
 }

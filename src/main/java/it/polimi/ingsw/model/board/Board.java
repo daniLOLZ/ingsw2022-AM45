@@ -66,6 +66,7 @@ public class Board {
         //no selected student
         if (studentsAtEntrance.isEmpty()) return StudentEnum.NOSTUDENT;
 
+
         StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos.get());
 
         //table is full
@@ -88,6 +89,8 @@ public class Board {
      */
     //todo remove legacy selection, now in parameters
     public void moveFromEntranceToIsland(IslandGroup chosenIsland){
+
+
 
         //no selected student
         if(selectedEntranceStudentPos.isEmpty()) return;

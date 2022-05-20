@@ -38,40 +38,25 @@ public abstract class CharacterCard extends DrawableObject {
     }
 
 
-    /**
-     * Version with observer pattern
-     * @param cardCost
-     * @param id
-     * @param parameters
-     * @param advancedParameters
-     * @param name
-     * @param description
-     * @param virtualView
-     */
-    public CharacterCard(int cardCost, int id, ParameterHandler parameters,
-                         AdvancedParameterHandler advancedParameters, String name, String description,
-                         VirtualView virtualView){
-        this.cardCost = cardCost;
-        hasBeenUsed = false;
-        this.id = id;
-        this.parameters = parameters;
-        this.advancedParameters = advancedParameters;
-        this.name = name;
-        this.description = description;
-        watcherList = new ArrayList<>();
-        CharacterWatcher watcher = new CharacterWatcher(this, virtualView);
-        watcherList.add(watcher);
 
-
-
-    }
 
     /**
      * Initialise CharacterChard fields where this operation is useful
      * @param game != null
      */
     public void initialise(AdvancedGame game){
+
         //alert();
+    }
+
+    /**
+     * Create a Watcher to observe this card and add the Watcher to VirtualView list
+     * @param virtualView != null
+     */
+    public void addWatcher(VirtualView virtualView){
+        watcherList = new ArrayList<>();
+        CharacterWatcher watcher = new CharacterWatcher(this, virtualView);
+        watcherList.add(watcher);
     }
 
     @Override
@@ -133,6 +118,9 @@ public abstract class CharacterCard extends DrawableObject {
         return advancedParameters;
     }
 
+    public Requirements getRequirements() {
+        return requirements;
+    }
 
     @Override
     public GameElementBean toBean() {

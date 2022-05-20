@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.view.VirtualView;
 
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ public class Juggler extends InitialEffect{
 
     @Override
     public void initialise(AdvancedGame game) {
+        super.initialise(game);
         final int startingStudents = 6;
         addAllStudents(game.getSack().drawNStudents(startingStudents));
     }

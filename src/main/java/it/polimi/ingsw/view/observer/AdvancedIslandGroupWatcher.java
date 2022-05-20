@@ -17,4 +17,8 @@ public class AdvancedIslandGroupWatcher extends Watcher{
     public void update() {
         bean = (AdvancedIslandGroupBean) source.toBean();
     }
+
+    public AdvancedIslandGroupBean getBean() {
+        return bean;
+    }
 }

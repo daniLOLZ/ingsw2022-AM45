@@ -16,4 +16,8 @@ public class AdvancedPlayerWatcher extends Watcher{
     public void update() {
         bean = (AdvancedPlayerBean) source.toBean();
     }
+
+    public AdvancedPlayerBean getBean() {
+        return bean;
+    }
 }
