@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.beans.GameBoardBean;
 import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.islands.IslandGroup;
@@ -449,6 +450,9 @@ public class SimpleGameTest {
         assertEquals(game.getParameters().getCurrentPhase().name, bean.getPhase());
     }
 
+    /**
+     * Test if assistant card is played correctly
+     */
     @Test
     public void PlayAssistant(){
         Player player3 = game.getPlayers().get(2);
@@ -456,6 +460,83 @@ public class SimpleGameTest {
         game.playAssistant(player3, 21);
         assertEquals(21,player3.getAssistantPlayed().id);
         assertEquals(size - 1,player3.getWizard().size());
+    }
+
+    @Test
+    public void playedAssistantsTest(){
+        Player player1 = game.getPlayers().get(0);
+        Player player2 = game.getPlayers().get(1);
+        Player player3 = game.getPlayers().get(2);
+
+        //FIRST TIME OF PLANNING PHASE WHERE ASSISTANTS ARE PLAYED
+        game.playAssistant(player1,1);
+        game.playAssistant(player2,11);
+        game.playAssistant(player3,21);
+
+        List<Assistant> assistantsPlayed = game.playedAssistants();
+        List<Integer> assistantPlayedId = assistantsPlayed.stream().
+                mapToInt(x -> x.id).
+                collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        assertEquals(3, assistantPlayedId.size());
+        assertTrue(assistantPlayedId.contains(1));
+        assertTrue(assistantPlayedId.contains(11));
+        assertTrue(assistantPlayedId.contains(21));
+        assertFalse(assistantPlayedId.contains(22));
+
+
+        //SECOND TIME OF PLANNING PHASE WHERE ASSISTANTS ARE PLAYED
+        game.playAssistant(player1,2);
+        game.playAssistant(player2,12);
+        game.playAssistant(player3,22);
+
+        assistantsPlayed = game.playedAssistants();
+        assistantPlayedId = assistantsPlayed.stream().
+                                     mapToInt(x -> x.id).
+                                        collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+        assertEquals(3, assistantPlayedId.size());
+        assertTrue(assistantPlayedId.contains(2));
+        assertTrue(assistantPlayedId.contains(12));
+        assertTrue(assistantPlayedId.contains(22));
+        assertFalse(assistantPlayedId.contains(1));
+    }
+
+    @Test
+    public void emptySackTest(){
+        assertFalse(game.emptySack());
+
+        while(!game.getSack().isEmpty()){
+            game.getSack().drawNStudents(1);
+        }
+
+        assertTrue(game.emptySack());
+    }
+
+    /**
+     * Test if select and deselect correctly
+     */
+    @Test
+    public void selectionTest(){
+        IslandGroup island = game.getIslandGroups().get(0);
+        Player player = game.getPlayers().get(0);
+        player.getBoard().addToEntrance(StudentEnum.RED);
+        game.selectIslandGroup(island.getIdGroup());
+        game.selectStudentAtEntrance(player,0);
+        game.selectStudentType(StudentEnum.PINK);
+
+        assertEquals(island, game.getParameters().getSelectedIslands().get().get(0));
+        assertEquals(0,game.getParameters().getSelectedEntranceStudents().get().get(0));
+        assertEquals(StudentEnum.PINK,game.getParameters().getSelectedStudentTypes().get().get(0));
+
+        game.deselectAllEntranceStudents();
+        game.deselectAllIslandGroup();
+        game.deselectAllStudentTypes();
+
+        assertTrue(game.getParameters().getSelectedIslands().get().isEmpty());
+        assertTrue(game.getParameters().getSelectedEntranceStudents().get().isEmpty());
+        assertTrue(game.getParameters().getSelectedStudentTypes().get().isEmpty());
+
     }
 
 

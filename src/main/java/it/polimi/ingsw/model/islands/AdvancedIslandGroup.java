@@ -36,12 +36,36 @@ public class AdvancedIslandGroup extends IslandGroup {
      * @param blockTiles an array of block tiles for this new object
      * @param advancedParameters advanced parameters
      */
-    public AdvancedIslandGroup(IslandGroup island, List<BlockTile> blockTiles, AdvancedParameterHandler advancedParameters){
+    public AdvancedIslandGroup(IslandGroup island, List<BlockTile> blockTiles,
+                               AdvancedParameterHandler advancedParameters){
         super(island);
         this.blockTiles = new ArrayList<>(blockTiles);
         this.advancedParameters = advancedParameters;
     }
-    public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, List<BlockTile> blockTiles, ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
+
+
+    /**
+     * Constructor of an advancedIslandGroup starting from a base IslandGroup
+     * @param island the islandGroup to base this object off of
+     * @param blockTiles an array of block tiles for this new object
+     * @param advancedParameters advanced parameters
+     */
+    public AdvancedIslandGroup(IslandGroup island, List<BlockTile> blockTiles,
+                               AdvancedParameterHandler advancedParameters, VirtualView virtualView){
+        super(island);
+        this.blockTiles = new ArrayList<>(blockTiles);
+        this.advancedParameters = advancedParameters;
+
+        watcherList = new ArrayList<>();
+        AdvancedIslandGroupWatcher watcher = new AdvancedIslandGroupWatcher(this, virtualView);
+        watcherList.add(watcher);
+        watchers = watcherList;
+        alert();
+    }
+    public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup,
+                               IslandGroup prevIslandGroup, List<StudentEnum> students,
+                               TeamEnum towerColor, List<BlockTile> blockTiles, ParameterHandler parameters,
+                               AdvancedParameterHandler advancedParameters){
         super(idGroup, islands, nextIslandGroup, prevIslandGroup, students, towerColor, parameters);
         this.blockTiles = new ArrayList<>(blockTiles);
         this.advancedParameters = advancedParameters;
@@ -72,6 +96,9 @@ public class AdvancedIslandGroup extends IslandGroup {
         watcherList = new ArrayList<>();
         AdvancedIslandGroupWatcher watcher = new AdvancedIslandGroupWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+        alert();
+
     }
 
     /**
@@ -88,6 +115,42 @@ public class AdvancedIslandGroup extends IslandGroup {
         AdvancedIslandGroup decoratedIsland;
         for(IslandGroup s_group : simpleIslands){
             decoratedIsland = new AdvancedIslandGroup(s_group, new ArrayList<BlockTile>(), advancedParameters);
+            advancedIslands.add(decoratedIsland);
+        }
+        // We fix the islands' pointers to point to the islands in the newly created collection
+        // Possibly duplicate code
+        IslandGroup first = advancedIslands.get(0);
+        IslandGroup last = advancedIslands.get(amount-1);
+
+        first.setPrevIslandGroup(last);
+        last.setNextIslandGroup(first);
+
+        for(int index = 1; index < advancedIslands.size(); index++){
+            advancedIslands.get(index).setPrevIslandGroup(advancedIslands.get(index-1));
+            advancedIslands.get(index-1).setNextIslandGroup(advancedIslands.get(index));
+        }
+        return advancedIslands;
+    }
+
+
+    /**
+     * Creates and returns a List of AdvancedIslands
+     * @param startingId Starting id for the IslandGroups
+     * @param amount Amount of IslandGroups to have in the collection.
+     *               if the amount is 1, the next and previous pointers will refer to
+     *               the single island group in the collection
+     * @return a collection of AdvancedIslandGroup
+     */
+    public static List<IslandGroup> getCollectionAdvancedIslandGroup(AdvancedParameterHandler advancedParameters,
+                                                                     ParameterHandler parameters,
+                                                                     int startingId, int amount,
+                                                                     VirtualView virtualView){
+        List<IslandGroup> simpleIslands = getCollectionOfIslandGroup(parameters ,startingId, amount);
+        List<IslandGroup> advancedIslands = new ArrayList<>();
+        AdvancedIslandGroup decoratedIsland;
+        for(IslandGroup s_group : simpleIslands){
+            decoratedIsland = new AdvancedIslandGroup(s_group, new ArrayList<BlockTile>(),
+                    advancedParameters, virtualView);
             advancedIslands.add(decoratedIsland);
         }
         // We fix the islands' pointers to point to the islands in the newly created collection
@@ -144,7 +207,7 @@ public class AdvancedIslandGroup extends IslandGroup {
             mergedBlocks.addAll(groupTemp.blockTiles);
             // Once we know the island must be merged, we remove it from the group
             islandGroups.remove(getNextIslandGroup());
-            //getNextIslandGroup().killAll();
+            getNextIslandGroup().killAll();
         }
         if(getPrevIslandGroup().getTowerColor().equals(getTowerColor())){
             predecessor = getPrevIslandGroup();
@@ -154,22 +217,23 @@ public class AdvancedIslandGroup extends IslandGroup {
             mergedBlocks.addAll(groupTemp.blockTiles);
             // Same as before
             islandGroups.remove(getPrevIslandGroup());
-            //getPrevIslandGroup().killAll();
+            getPrevIslandGroup().killAll();
         }
         // Finally, remove this island
         islandGroups.remove(this);
-        //killAll();
+        killAll();
 
         // prepare pointers
         IslandGroup nextPointer = successor.getNextIslandGroup();
         IslandGroup previousPointer = predecessor.getPrevIslandGroup();
 
 
-        AdvancedIslandGroup mergedGroup = new AdvancedIslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, getTowerColor(), mergedBlocks, getParameters(), advancedParameters);
+        AdvancedIslandGroup mergedGroup = new AdvancedIslandGroup(newId, mergedIslands, nextPointer, previousPointer,
+                mergedStudents, getTowerColor(), mergedBlocks, getParameters(),
+                advancedParameters, parameters.getVirtualView());
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
 
-        //alert();
         return mergedGroup;
     }
 
@@ -245,7 +309,7 @@ public class AdvancedIslandGroup extends IslandGroup {
      */
     public void block(BlockTile tile){
         blockTiles.add(tile);
-        //alert();
+        alert();
     }
 
     /**
@@ -257,7 +321,7 @@ public class AdvancedIslandGroup extends IslandGroup {
             BlockTile tileToRemove = blockTiles.remove(0);
             tileToRemove.setAssigned(false);
         }
-        //alert();
+        alert();
     }
 
     public AdvancedParameterHandler getAdvancedParameters() {

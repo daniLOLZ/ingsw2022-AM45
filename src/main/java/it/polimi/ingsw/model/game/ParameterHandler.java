@@ -31,6 +31,7 @@ public class ParameterHandler extends DrawableObject {
     private final int numTowers;
     private  List<Watcher> watcherList;
     private Map<PlayerEnum, TeamEnum> playersAllegiance;
+    private VirtualView virtualView;
 
     //DYNAMIC PARAMETERS
     private Player currentPlayer;
@@ -97,6 +98,14 @@ public class ParameterHandler extends DrawableObject {
         watcherList = new ArrayList<>();
         ErrorWatcher watcher = new ErrorWatcher(this, virtualView);
         watcherList.add(watcher);
+    }
+
+    public void setVirtualView(VirtualView virtualView) {
+        this.virtualView = virtualView;
+    }
+
+    public VirtualView getVirtualView() {
+        return virtualView;
     }
 
     public int getStudentsPerCloud() {

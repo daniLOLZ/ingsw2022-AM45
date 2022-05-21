@@ -22,7 +22,7 @@ import java.util.List;
 public class AdvancedGameTest {
 
     AdvancedGame game;
-    int players = 2;
+    int players = 3;
     int CharacterCards = 3;
     int coins = 20;
 
@@ -43,7 +43,8 @@ public class AdvancedGameTest {
 
         VirtualView virtualView = new VirtualView();
         try {
-            game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,coins,CharacterCards, virtualView);
+            game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,
+                    coins,CharacterCards, virtualView);
             game.initializeGame();
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();

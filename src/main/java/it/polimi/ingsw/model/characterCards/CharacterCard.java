@@ -46,7 +46,7 @@ public abstract class CharacterCard extends DrawableObject {
      */
     public void initialise(AdvancedGame game){
 
-        //alert();
+        alert();
     }
 
     /**
@@ -57,6 +57,8 @@ public abstract class CharacterCard extends DrawableObject {
         watcherList = new ArrayList<>();
         CharacterWatcher watcher = new CharacterWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+
     }
 
     @Override
@@ -81,7 +83,7 @@ public abstract class CharacterCard extends DrawableObject {
         if(!HasBeenUsed()){
             hasBeenUsed = true;
             cardCost += 1;
-            //alert();
+            alert();
         }
 
         //PARAMETER NOT SET

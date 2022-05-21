@@ -39,7 +39,8 @@ public class AssistantHandlerTests {
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
-        controller.createSimpleGame(2,selectedWizards,teamColors,nicknames);
+        controller.createSimpleGame(3,selectedWizards,teamColors,nicknames);
+        controller.getSimpleGame().initializeGame();
         player1 = controller.getSimpleGame().getPlayers().get(0);
         player2 = controller.getSimpleGame().getPlayers().get(1);
         controller.getSimpleGame().getParameters().setCurrentPlayer(player2);

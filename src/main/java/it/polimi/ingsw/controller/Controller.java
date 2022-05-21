@@ -45,6 +45,7 @@ public class Controller {
     /** Used for tests only */
     @Deprecated
     public Controller(){
+        virtualView = new VirtualView();
         playerNumbers = null;
     }
 
@@ -429,7 +430,8 @@ public class Controller {
     //What is this for?
     public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
         try {
-            simpleGame = new SimpleGame(numPlayers,selectedWizards,teamColors,nicknames);
+
+            simpleGame = new SimpleGame(numPlayers,selectedWizards,teamColors,nicknames, virtualView);
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }

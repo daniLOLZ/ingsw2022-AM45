@@ -74,6 +74,8 @@ public class IslandGroup extends DrawableObject {
         watcherList = new ArrayList<>();
         IslandGroupWatcher watcher = new IslandGroupWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+        alert();
     }
 
     /**
@@ -105,13 +107,40 @@ public class IslandGroup extends DrawableObject {
      *               the single island group in the collection
      * @return A collection of island groups, ordered cyclically
      */
-    public static List<IslandGroup> getCollectionOfIslandGroup(ParameterHandler parameters, int startingId, int amount){
+    public static List<IslandGroup> getCollectionOfIslandGroup(ParameterHandler parameters,
+                                                               int startingId, int amount){
 
         List<IslandGroup> returnList = new ArrayList<>();
         for (int islandGroupId = startingId; islandGroupId < startingId+amount; islandGroupId++){
             List<Island> islList = new ArrayList<>();
             islList.add(new Island(islandGroupId));
             returnList.add(new IslandGroup(islandGroupId, islList, null, null, new ArrayList<>(), TeamEnum.NOTEAM, parameters));
+        }
+
+        IslandGroup first = returnList.get(0);
+        IslandGroup last = returnList.get(amount-1);
+
+        first.setPrevIslandGroup(last);
+        last.setNextIslandGroup(first);
+
+        for(int index = 1; index < amount; index++){
+            returnList.get(index).setPrevIslandGroup(returnList.get(index-1));
+            returnList.get(index-1).setNextIslandGroup(returnList.get(index));
+        }
+
+        return returnList;
+
+    }
+
+    public static List<IslandGroup> getCollectionOfIslandGroup(ParameterHandler parameters,
+                                                               int startingId, int amount, VirtualView virtualView){
+
+        List<IslandGroup> returnList = new ArrayList<>();
+        for (int islandGroupId = startingId; islandGroupId < startingId+amount; islandGroupId++){
+            List<Island> islList = new ArrayList<>();
+            islList.add(new Island(islandGroupId));
+            returnList.add(new IslandGroup(islandGroupId, islList,
+                    null, null, new ArrayList<>(), TeamEnum.NOTEAM, parameters,virtualView));
         }
 
         IslandGroup first = returnList.get(0);
@@ -248,7 +277,7 @@ public class IslandGroup extends DrawableObject {
             }
         }
         towerColor = team;
-        //alert();
+        alert();
 
     }
 
@@ -288,7 +317,7 @@ public class IslandGroup extends DrawableObject {
             mergedStudents.addAll(nextIslandGroup.students);
             // Once we know the island must be merged, we remove it from the group
             islandGroups.remove(nextIslandGroup);
-            //nextIslandGroup.killAll();
+            nextIslandGroup.killAll();
         }
         if(prevIslandGroup.towerColor.equals(towerColor)){
             predecessor = prevIslandGroup;
@@ -296,20 +325,22 @@ public class IslandGroup extends DrawableObject {
             mergedStudents.addAll(prevIslandGroup.students);
             // Same as before
             islandGroups.remove(prevIslandGroup);
-            //prevIslandGroup.killAll();
+            prevIslandGroup.killAll();
         }
         // Finally, remove this island
         islandGroups.remove(this);
-        //killAll();
+        killAll();
 
         // prepare pointers
         IslandGroup nextPointer = successor.nextIslandGroup;
         IslandGroup previousPointer = predecessor.prevIslandGroup;
 
 
-        IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands, nextPointer, previousPointer, mergedStudents, towerColor, parameters);
+        IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands,
+                nextPointer, previousPointer, mergedStudents, towerColor, parameters, parameters.getVirtualView());
 
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
+
 
         return mergedGroup;
     }
@@ -320,7 +351,7 @@ public class IslandGroup extends DrawableObject {
      */
     public void addStudent(StudentEnum student){
         students.add(student);
-        //alert();
+        alert();
     }
 
     /**

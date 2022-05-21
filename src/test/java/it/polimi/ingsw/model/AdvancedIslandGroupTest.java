@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.islands.BlockTile;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.Player;
+import it.polimi.ingsw.view.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,8 +54,10 @@ public class AdvancedIslandGroupTest {
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
+        VirtualView virtualView = new VirtualView();
         try{
-            game = new AdvancedGame(2,selectedWizards,teamColors,nicknames, numCoins, numCharacters);
+            game = new AdvancedGame(3,selectedWizards,teamColors,nicknames, numCoins, numCharacters, virtualView);
+            game.initializeGame();
         }
         catch (IncorrectPlayersException e){
             e.printStackTrace();
