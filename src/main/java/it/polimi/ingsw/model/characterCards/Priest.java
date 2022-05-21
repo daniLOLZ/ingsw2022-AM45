@@ -20,6 +20,7 @@ public class Priest extends InitialEffect{
 
     @Override
     public void initialise(AdvancedGame game) {
+        super.initialise(game);
         final int startingStudents = 4;
         addAllStudents(game.getSack().drawNStudents(startingStudents));
     }

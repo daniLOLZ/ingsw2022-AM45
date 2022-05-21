@@ -56,7 +56,8 @@ public class AdvancedIslandGroupTest {
         nicknames.add("Alice");
         VirtualView virtualView = new VirtualView();
         try{
-            game = new AdvancedGame(3,selectedWizards,teamColors,nicknames, numCoins, numCharacters, virtualView);
+            game = new AdvancedGame(3,selectedWizards,teamColors,nicknames, numCoins,
+                    numCharacters, virtualView);
             game.initializeGame();
         }
         catch (IncorrectPlayersException e){
@@ -158,6 +159,10 @@ public class AdvancedIslandGroupTest {
         Player player1 = game.getPlayers().get(1);
 
         IslandGroup island = group.get(0);
+
+        while(! island.getStudents().isEmpty())
+            island.getStudents().remove(0);
+
         island.build(player0.getTeamColor(), game.getPlayers());
         island.addStudent(StudentEnum.RED);
         island.addStudent(StudentEnum.GREEN);
@@ -183,6 +188,10 @@ public class AdvancedIslandGroupTest {
         Player player1 = game.getPlayers().get(1);
 
         IslandGroup island = group.get(0);
+
+        while(! island.getStudents().isEmpty())
+            island.getStudents().remove(0);
+
         island.build(player0.getTeamColor(), game.getPlayers());
         island.addStudent(StudentEnum.RED);
         island.addStudent(StudentEnum.GREEN);
@@ -197,7 +206,7 @@ public class AdvancedIslandGroupTest {
 
         assertEquals(island.evaluateMostInfluential(), player1.getTeamColor());
 
-        knight.activateEffect(); // Now player0 has 3 ingluence, including the 2 bonus points from the character
+        knight.activateEffect(); // Now player0 has 3 influence, including the 2 bonus points from the character
 
         assertEquals(island.evaluateMostInfluential(), player0.getTeamColor());
     }
@@ -211,6 +220,9 @@ public class AdvancedIslandGroupTest {
         parameters.setCurrentPlayer(player0);
 
         IslandGroup island = group.get(0);
+
+        while(! island.getStudents().isEmpty())
+            island.getStudents().remove(0);
 
         island.addStudent(StudentEnum.RED);
         island.addStudent(StudentEnum.RED);

@@ -404,6 +404,7 @@ public class SimpleGame extends DrawableObject {
             }
         }
         this.players = newPlayerOrder;
+        alert();
     }
 
     public void setLastTurn(boolean isLast) {
@@ -631,6 +632,7 @@ public class SimpleGame extends DrawableObject {
         StudentEnum studentColor = player.moveFromEntranceToHall();
         updateProfessor(studentColor);
         deselectAllEntranceStudents();
+        player.alert();
 
     }
 
@@ -932,7 +934,7 @@ public class SimpleGame extends DrawableObject {
      */
     public void playAssistant(Player player, int id){
         player.playAssistant(id);
-        //alert();
+        alert();
     }
 
     /**

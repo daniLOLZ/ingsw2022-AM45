@@ -275,6 +275,8 @@ public class IslandGroup extends DrawableObject {
                 oldTowers = p.getBoard().getNumberOfTowers();
                 p.getBoard().updateTowers(numOfIslandsInGroup());
             }
+
+            p.alert();
         }
         towerColor = team;
         alert();

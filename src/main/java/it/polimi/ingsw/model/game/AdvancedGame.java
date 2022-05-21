@@ -268,6 +268,7 @@ public class AdvancedGame extends SimpleGame {
         }
         updateProfessor(studentColor);
         deselectAllEntranceStudents();
+        player.alert();
     }
 
     /**
