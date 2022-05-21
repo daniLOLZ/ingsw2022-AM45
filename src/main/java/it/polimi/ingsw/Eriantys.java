@@ -33,14 +33,17 @@ public class Eriantys {
         if(serverMode){
             Server server = new Server(portNumber);
             server.startServer();
+            return;
         }
         if(GUIMode){
             UserInterface gui = new GUIMain(hostname, portNumber);
             gui.startInterface();
+            return;
         }
         if(CLIMode){
             UserInterface cli = new CLI(hostname, portNumber);
             cli.startInterface();
+            return;
         }
     }
 

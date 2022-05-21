@@ -1,19 +1,25 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-public class CLI extends UserInterface {
+public class CLI implements UserInterface {
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;
     private final int startPosition = 0;
     private final int centerPosition = 10;
+    private List<GameElementBean> beans;
+    private List<CommandEnum> availableCommands;
+    private ClientNetworkManager networkManager;
+    private String chosenNickname;
 
 
     /**
@@ -21,6 +27,7 @@ public class CLI extends UserInterface {
      */
     public CLI(){
         beans = new ArrayList<>();
+        availableCommands = new ArrayList<>();
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
@@ -28,10 +35,13 @@ public class CLI extends UserInterface {
 
     /**
      * Creates a new CLI and calls the method to create a new NetworkManager
+     * @param hostname the name of the host
+     * @param port the port to connect to
      */
     public CLI(String hostname, int port){
-        super(hostname, port);
         beans = new ArrayList<>();
+        availableCommands = new ArrayList<>();
+        networkManager = new ClientNetworkManager(hostname, port);
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
@@ -233,7 +243,7 @@ public class CLI extends UserInterface {
 
         } while(errorLogin);
 
-        nickname = inputNickname;
+        chosenNickname = inputNickname;
         System.out.println("Username " + inputNickname + " was accepted");
     }
 
@@ -287,7 +297,20 @@ public class CLI extends UserInterface {
 
     @Override
     public void showLobby() {
-        System.out.println("You are waiting for players to join a game with you...");
+        Scanner scanner = new Scanner(System.in);
+        boolean ready = false;
+        System.out.println("""
+                You are waiting for players to join a game with you...
+                1 - Set yourself as ready
+                2 - Set yourself as not ready
+                """);
+        //Todo
+        while(!scanner.hasNext()){
+            // Possible wait() to avoid sending too many requests
+            networkManager.sendReadyStatus(ready);
+        }
+
+
         //See if this could be an "interactive" wait, where you can see the players joining, or even
         // just a simple counter
         // networkManager.waitForStart();
@@ -309,5 +332,35 @@ public class CLI extends UserInterface {
         showLoginScreen();
         showGameruleSelection();
         showLobby();
+    }
+
+    @Override
+    public void addBean(GameElementBean bean) {
+        beans.add(bean);
+    }
+
+    @Override
+    public GameElementBean removeBean(int index) {
+        return beans.remove(index);
+    }
+
+    @Override
+    public void clearBeans() {
+        beans.clear();
+    }
+
+    @Override
+    public void addCommand(CommandEnum command) {
+        availableCommands.add(command);
+    }
+
+    @Override
+    public CommandEnum removeCommand(int index) {
+        return availableCommands.remove(index);
+    }
+
+    @Override
+    public void clearCommands() {
+        availableCommands.clear();
     }
 }

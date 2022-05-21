@@ -26,9 +26,9 @@ public enum GameRuleEnum {
 
     public static GameRuleEnum getAdvancedRule(int numPlayers){
         switch (numPlayers){
-            case 20: return ADVANCED_2;
-            case 30: return ADVANCED_3;
-            case 40: return ADVANCED_4;
+            case 2: return ADVANCED_2;
+            case 3: return ADVANCED_3;
+            case 4: return ADVANCED_4;
         }
         return  NO_RULE;
     }
