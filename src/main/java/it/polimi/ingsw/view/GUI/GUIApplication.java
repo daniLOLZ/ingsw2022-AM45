@@ -163,26 +163,35 @@ public class GUIApplication extends Application {
 
         Scene loginScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        Button loginButton = new Button("Login");
+
+        Label hostNameLabel = new Label("Hostname");
+        TextField inputHostName = new TextField("127.0.0.1");
+        inputHostName.setPromptText("Insert hostname");
 
         Label loginLabel = new Label("Nickname");
-        TextField textField = new TextField();
-        textField.setPromptText("Insert your nickname");
-        textField.setMaxWidth(WINDOW_WIDTH/4);
-        textField.setOnAction(event -> loginButton.fire());
+        TextField inputNickname = new TextField();
+        Button loginButton = new Button("Login");
+
+        HBox hostNameSelection = new HBox(10);
+        hostNameSelection.getChildren().addAll(hostNameLabel, inputHostName);
+        hostNameSelection.setAlignment(Pos.CENTER);
+
+        inputNickname.setPromptText("Insert your nickname");
+        inputNickname.setMaxWidth(WINDOW_WIDTH/4);
+        inputNickname.setOnAction(event -> loginButton.fire());
         Label errorMessage = new Label("Invalid nickname! Please try again");
         errorMessage.setTextFill(Color.RED);
 
         errorMessage.setVisible(errorOccurred);
 
         //calls external class to check input validity
-        loginButton.setOnAction(event -> ConnectionWithServerHandler.login(textField.getText()));
+        loginButton.setOnAction(event -> ConnectionWithServerHandler.login(inputHostName.getText(), inputNickname.getText()));
 
-        HBox inputNickname = new HBox(10);
-        inputNickname.getChildren().addAll(loginLabel, textField);
-        inputNickname.setAlignment(Pos.CENTER);
+        HBox nicknameSelection = new HBox(10);
+        nicknameSelection.getChildren().addAll(loginLabel, inputNickname);
+        nicknameSelection.setAlignment(Pos.CENTER);
 
-        login.getChildren().addAll(inputNickname, loginButton, errorMessage);
+        login.getChildren().addAll(hostNameSelection, nicknameSelection, loginButton, errorMessage);
 
         //<editor-fold desc="Debug">
 

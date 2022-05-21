@@ -5,7 +5,7 @@ import javafx.application.Platform;
 //this is a stub class
 public class ConnectionWithServerHandler {
 
-    public static void login(String nickname){
+    public static void login(String hostName, String nickname){
 
     }
 
