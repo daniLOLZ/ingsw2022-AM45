@@ -16,4 +16,8 @@ public class CharacterWatcher extends Watcher{
     public void update() {
         bean = (CharacterCardBean) source.toBean();
     }
+
+    public CharacterCardBean getBean() {
+        return bean;
+    }
 }

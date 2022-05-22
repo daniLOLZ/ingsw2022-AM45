@@ -57,7 +57,8 @@ public class SimpleGame extends DrawableObject {
      *                                  allowed range
      */
     @Deprecated
-    public SimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) throws  IncorrectPlayersException{
+    public SimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors,
+                      List<String> nicknames) throws  IncorrectPlayersException{
 
         if(numPlayers > 4 || numPlayers < 2){
             throw new IncorrectPlayersException();
@@ -118,27 +119,29 @@ public class SimpleGame extends DrawableObject {
         this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
         //TODO add watchers to every model entity that requires watching
         createParameters();
+        parameters.setVirtualView(virtualView);
         this.isLastTurn = false;
         this.currentIslandGroupId = 0;
         this.players = new ArrayList<>();
         this.clouds = new ArrayList<>();
         for (int cloudNumber = 0; cloudNumber < numberOfClouds; cloudNumber++){
-            clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud()));
+            clouds.add(new Cloud(cloudNumber, parameters.getStudentsPerCloud(), virtualView));
         }
-        createIslandGroups();
+        createIslandGroups(virtualView);
 
         // Mother Nature starts on the first island group, will get moved in the initialization of the game
         this.MN = new MotherNature(islandGroups.get(0));
         //Creates the sack for the initialization phase, it will get used up and replaced in the initializeGame method
         this.sack = new Sack(2);
         //createPlayers(numPlayers);
-        createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
+        createPlayers(numPlayers, selectedWizards, selectedColors, nicknames, virtualView);
         parameters.setPlayersAllegiance(players);
 
-        drawables = new ArrayList<>();
         watcherList = new ArrayList<>();
         SimpleGameWatcher watcher = new SimpleGameWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+
     }
 
     //TODO this could become a private method called from the constructor;
@@ -177,7 +180,7 @@ public class SimpleGame extends DrawableObject {
         createPlayingSack();
 
         hasBeenInitialized = true;
-        //alert();
+        alert();
     }
 
     /**
@@ -193,7 +196,18 @@ public class SimpleGame extends DrawableObject {
      * this.islandGroups. Can be overridden
      */
     protected void createIslandGroups(){
-        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters, currentIslandGroupId, amountOfIslands);
+        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters,
+                currentIslandGroupId, amountOfIslands);
+        currentIslandGroupId += amountOfIslands;
+    }
+
+    /**
+     * Creates the island groups of this game and assigns them to
+     * this.islandGroups. Can be overridden
+     */
+    protected void createIslandGroups(VirtualView virtualView){
+        this.islandGroups = IslandGroup.getCollectionOfIslandGroup(parameters,
+                currentIslandGroupId, amountOfIslands, virtualView);
         currentIslandGroupId += amountOfIslands;
     }
 
@@ -224,7 +238,8 @@ public class SimpleGame extends DrawableObject {
      * @param selectedColors array containing the correspondence between player and selected tower color
      * @param nicknames array containing the users' nicknames
      */
-    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames){
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
+                                 List<TeamEnum> selectedColors, List<String> nicknames){
         List<TeamEnum> alreadyAssignedLeaders = new ArrayList<>();
 
         //TODO check validity of the assumptions about leaders and playerIds
@@ -260,6 +275,54 @@ public class SimpleGame extends DrawableObject {
         }
     }
 
+
+
+    /**
+     * Creates players based on the parameters received by the users (wizard, tower color and usernames selected)
+     * @param numPlayers the number of players to create
+     * @param selectedWizards array containing the correspondence between player and selected wizard
+     * @param selectedColors array containing the correspondence between player and selected tower color
+     * @param nicknames array containing the users' nicknames
+     */
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
+                                 List<TeamEnum> selectedColors, List<String> nicknames,
+                                 VirtualView virtualView){
+        List<TeamEnum> alreadyAssignedLeaders = new ArrayList<>();
+
+        //TODO check validity of the assumptions about leaders and playerIds
+        // leaders -> is it always the first in order?
+        // playerIds -> is it always the same as the order of the players?
+
+        //TODO Lucario : Possibile necessità di unificare questo controllo di leader con quello in PlayerCreation.isLeader
+        boolean isLeader;
+        for(int player = 0; player < numPlayers; player++){
+            TeamEnum currentColor = selectedColors.get(player);
+
+            if (alreadyAssignedLeaders.contains(currentColor)){ // If a leader of that color has been
+                // assigned already, then the next player(s)
+                // won't be leaders
+                isLeader = false;
+            }
+            else {
+                isLeader = true;
+                alreadyAssignedLeaders.add(currentColor);
+            }
+
+            this.players.add(
+                    FactoryPlayer.getPlayer(
+                            nicknames.get(player),
+                            PlayerEnum.getPlayer(player),
+                            selectedColors.get(player),
+                            FactoryWizard.getWizard(selectedWizards.get(player)),
+                            isLeader,
+                            parameters,
+                            false,
+                            virtualView
+                    ) // Check if playerId is actually the same as the order of these Arrays
+            );
+        }
+    }
+
     /**
      * Checks whether a professor needs to change hands by comparing the respective tables
      * in the players' boards
@@ -284,7 +347,7 @@ public class SimpleGame extends DrawableObject {
             assignProfessor(professor, currentWinner);
         }
 
-        //alert();
+        alert();
     }
 
     /**
@@ -341,20 +404,39 @@ public class SimpleGame extends DrawableObject {
             }
         }
         this.players = newPlayerOrder;
+        alert();
     }
 
     public void setLastTurn(boolean isLast) {
         isLastTurn = isLast;
-        //alert();
+        alert();
     }
 
     /**
-     * Fill clouds' student list with new student drawing from sack
+     * Fill clouds' student list with new student drawing from sack if cloud is empty
      */
     public void fillClouds(){
         for(Cloud cloud : clouds){
-            cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
+            if(cloud.isEmpty())
+                cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
         }
+    }
+
+    /**
+     *
+     * @param idCloud >= 0
+     * @return true if chosen cloud is empty, false otherwise
+     */
+    public boolean cloudIsEmpty(int idCloud){
+        return clouds.get(idCloud).isEmpty();
+    }
+
+    /**
+     *
+     * @return number of clouds
+     */
+    public int cloudsNumber(){
+        return clouds.size();
     }
 
 
@@ -495,14 +577,16 @@ public class SimpleGame extends DrawableObject {
     public Map<TeamEnum, Integer> professorsPerTeam(){
         Map<TeamEnum, Integer> numProfessorsPerTeam = new HashMap<>();
         List<PlayerEnum> professors = parameters.getProfessors();
-        TeamEnum team;
-        int previous;
+        TeamEnum team = TeamEnum.NOTEAM;
+        int previous = 0;
 
         //INITIALISE NUM OF OWNED PROFESSORS
         for(Player player: players){
             team = parameters.getPlayerTeamById(player.getPlayerId());
             numProfessorsPerTeam.put(team,0);
         }
+
+        numProfessorsPerTeam.put(TeamEnum.NOTEAM,0);
 
         for (PlayerEnum playerWithProfessor : professors) {
             team = parameters.getPlayerTeamById(playerWithProfessor);
@@ -522,7 +606,7 @@ public class SimpleGame extends DrawableObject {
     public void startPlanningPhase(int player){
         parameters.setCurrentPlayer(players.get(player));
         parameters.setCurrentPhase(PhaseEnum.PLANNING);
-        //alert();
+        alert();
     }
 
     /**
@@ -533,7 +617,7 @@ public class SimpleGame extends DrawableObject {
     public void startActionPhase(int player){
         parameters.setCurrentPlayer(players.get(player));
         parameters.setCurrentPhase(PhaseEnum.ACTION);
-        //alert();
+        alert();
     }
 
     /**
@@ -548,6 +632,7 @@ public class SimpleGame extends DrawableObject {
         StudentEnum studentColor = player.moveFromEntranceToHall();
         updateProfessor(studentColor);
         deselectAllEntranceStudents();
+        player.alert();
 
     }
 
@@ -706,7 +791,8 @@ public class SimpleGame extends DrawableObject {
     /**
      *
      * @param studentColor != NO_STUDENT && != null
-     * @return the player's PlayerEnum with more students with chosen studentColor
+     * @return the player's PlayerEnum with more students at table with chosen studentColor.
+     * If nobody has more students  than other players return NoPlayer
      */
     public PlayerEnum playerWithMoreStudent(StudentEnum studentColor){
         int max = 0;
@@ -720,7 +806,7 @@ public class SimpleGame extends DrawableObject {
                 maxPlayer = player.getPlayerId();
             }
 
-            if(curr == max){
+            else if(curr == max){
                 maxPlayer = PlayerEnum.NOPLAYER;
             }
 
@@ -737,6 +823,8 @@ public class SimpleGame extends DrawableObject {
     public int  moveMN(int steps){
         IslandGroup positionMN = MN.move(steps);
         parameters.setIdIslandGroupMN(positionMN.getIdGroup());
+        alert();
+        positionMN.alert();
         return positionMN.getIdGroup();
     }
 
@@ -749,8 +837,6 @@ public class SimpleGame extends DrawableObject {
      * Set Mother Nature on new island group and update parameters.
      * If no merge is possible
      * throws exception.
-     *
-     *
      * @param idIsland != null
      * @throws UnmergeableException when there are no island to merge
      */
@@ -766,16 +852,25 @@ public class SimpleGame extends DrawableObject {
 
         if(island != null){
 
-            winnerTeam = island.evaluateMostInfluential();
-            island.build(winnerTeam, players);
-            newIsland = island.mergeAdjacent(island.getIdGroup() + offsetNewIdIslandGroup, islandGroups);
+            try{
+                winnerTeam = island.evaluateMostInfluential();
+                island.build(winnerTeam, players);
+                newIsland = island.mergeAdjacent(island.getIdGroup() + offsetNewIdIslandGroup,
+                        islandGroups);
 
-            //IF ISLAND GROUP WITH MN DOES NOT EXIST ANY MORE
-            //RESET MN POSITION
-            boolean setMN = !islandGroups.contains(MN.getPosition());
-            if(setMN){
-            MN.setPosition(newIsland);
-            parameters.setIdIslandGroupMN(newIsland.getIdGroup());
+                //IF ISLAND GROUP WITH MN DOES NOT EXIST ANY MORE
+                //RESET MN POSITION
+                boolean setMN = !islandGroups.contains(MN.getPosition());
+                if(setMN){
+                MN.setPosition(newIsland);
+                parameters.setIdIslandGroupMN(newIsland.getIdGroup());
+                }
+
+            }catch(UnmergeableException e){
+                throw e;
+            }
+            finally {
+                alert();
             }
         }
 
@@ -783,7 +878,9 @@ public class SimpleGame extends DrawableObject {
             parameters.setErrorState("INCORRECT ISLAND ID");
         }
 
-        setDrawables();
+
+
+        alert();
 
 
     }
@@ -830,9 +927,14 @@ public class SimpleGame extends DrawableObject {
         return bean;
     }
 
+    /**
+     * Play assistant card updating model with right playedAssistant
+     * @param player != null
+     * @param id > 0
+     */
     public void playAssistant(Player player, int id){
         player.playAssistant(id);
-        //alert();
+        alert();
     }
 
     /**

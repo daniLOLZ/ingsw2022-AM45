@@ -21,12 +21,14 @@ public class AdvancedPlayer extends Player {
     /**
      * Basic constructor, doesn't allow for the choice of a wizard
      */
-    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor, boolean leader, ParameterHandler parameters){
+    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor,
+                          boolean leader, ParameterHandler parameters){
         super(playerId, nickname, teamColor, leader, parameters);
         this.numCoins = 1;
     }
 
-    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor, Wizard wizard, boolean leader, ParameterHandler parameters){
+    public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor,
+                          Wizard wizard, boolean leader, ParameterHandler parameters){
         super(playerId, nickname,teamColor, wizard, leader, parameters);
         this.numCoins = 1;
     }
@@ -40,6 +42,8 @@ public class AdvancedPlayer extends Player {
         watcherList = new ArrayList<>();
         AdvancedPlayerWatcher watcher = new AdvancedPlayerWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+        alert();
     }
 
     @Override
@@ -50,15 +54,21 @@ public class AdvancedPlayer extends Player {
     @Override
     public StudentEnum moveFromEntranceToHall() {
         StudentEnum color= board.moveFromEntranceToHall();
-        //alert();
+        alert();
         return color;
     }
 
     public void addCoin(){
-        numCoins++;//alert();
+        numCoins++;
+        alert();
     }
+
+    /**
+     * numCoins --
+     */
     public void useCoin(){
-        numCoins--;//alert();
+        numCoins--;
+        alert();
     }
 
     public int getNumCoins() {

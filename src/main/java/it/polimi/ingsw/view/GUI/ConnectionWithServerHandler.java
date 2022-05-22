@@ -5,11 +5,8 @@ import javafx.application.Platform;
 //this is a stub class
 public class ConnectionWithServerHandler {
 
-    public static boolean login(String nickname){
+    public static void login(String nickname){
 
-        //don't take this personally, I needed a way to test login failure
-        if (nickname.equals("ingconti")) return false;
-        return true;
     }
 
     public static void quit(){

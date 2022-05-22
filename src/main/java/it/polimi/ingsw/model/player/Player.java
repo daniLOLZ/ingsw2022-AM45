@@ -78,7 +78,7 @@ public class Player extends DrawableObject {
      */
     public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor,
                   Wizard wizard, boolean leader,
-                  ParameterHandler parameters, VirtualView virtualView){        this.playerId = playerId;
+                  ParameterHandler parameters, VirtualView virtualView){
         this.playerId = playerId;
         this.nickname = nickname;
         this.teamColor = teamColor;
@@ -90,6 +90,9 @@ public class Player extends DrawableObject {
         watcherList = new ArrayList<>();
         PlayerWatcher watcher = new PlayerWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+        alert();
+
     }
 
 
@@ -139,7 +142,7 @@ public class Player extends DrawableObject {
         catch (NoSuchAssistantException e){
             parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
-        //alert();
+        alert();
     }
 
     public String getNickname() {
@@ -157,7 +160,7 @@ public class Player extends DrawableObject {
         for(StudentEnum stud: students){
             board.addToEntrance(stud);
         }
-        //alert();
+        alert();
     }
 
     /**
@@ -194,8 +197,9 @@ public class Player extends DrawableObject {
      * @return the moved student's color
      */
     public StudentEnum moveFromEntranceToHall(){
+        selectStudentAtEntrance(parameters.getSelectedEntranceStudents().get().get(0));
         StudentEnum color= board.moveFromEntranceToHall();
-        //alert();
+        alert();
         return  color;
     }
 
@@ -204,8 +208,9 @@ public class Player extends DrawableObject {
      * @param island != null
      */
     public void moveFromEntranceToIsland(IslandGroup island){
+        selectStudentAtEntrance(parameters.getSelectedEntranceStudents().get().get(0));
         board.moveFromEntranceToIsland(island);
-        //alert();
+        alert();
     }
 
     /**
@@ -263,7 +268,7 @@ public class Player extends DrawableObject {
 
     public void addEntrance(StudentEnum student){
         board.addToEntrance(student);
-        //alert();
+        alert();
     }
 
 

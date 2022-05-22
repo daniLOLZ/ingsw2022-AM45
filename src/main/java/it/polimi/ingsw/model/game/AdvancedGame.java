@@ -57,7 +57,7 @@ public class AdvancedGame extends SimpleGame {
     public AdvancedGame(int numPlayers, List<Integer> selectedWizards,
                         List<TeamEnum> selectedColors, List<String> nicknames,
                         int numCoins, int numCharacterCards, VirtualView virtualView) throws  IncorrectPlayersException{
-        super(numPlayers, selectedWizards, selectedColors, nicknames);
+        super(numPlayers, selectedWizards, selectedColors, nicknames, virtualView);
         advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later
         // time because we need to create parameters before
         // creating the islands, this happens in the createParameters()
@@ -68,9 +68,16 @@ public class AdvancedGame extends SimpleGame {
                     getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
         }
 
+        for(int card = 0; card < numCharacterCards; card++){
+            CharacterCards.get(card).addWatcher(virtualView);
+        }
+
         watcherList = new ArrayList<>();
         AdvancedGameWatcher watcher = new AdvancedGameWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+
+
 
     }
 
@@ -81,6 +88,7 @@ public class AdvancedGame extends SimpleGame {
         for(int card = 0; card < numCharacterCards; card++){
             CharacterCards.get(card).initialise(this);
         }
+        alert();
     }
 
     /**
@@ -104,7 +112,8 @@ public class AdvancedGame extends SimpleGame {
 
 
     @Override
-    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) {
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
+                                 List<TeamEnum> selectedColors, List<String> nicknames) {
         super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
         List<Player> advancedPlayers = new ArrayList<>();
         for(Player player: players){ // Unhappy cast that could be resolved by separating
@@ -118,6 +127,29 @@ public class AdvancedGame extends SimpleGame {
                             player.isLeader(),
                             getParameters(),
                             true));
+        }
+
+        players = advancedPlayers;
+    }
+
+
+    @Override
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
+                                 List<TeamEnum> selectedColors, List<String> nicknames,
+                                 VirtualView virtualView) {
+        super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames, virtualView );
+        List<Player> advancedPlayers = new ArrayList<>();
+        for(Player player: players){ // Unhappy cast that could be resolved by separating
+            // into two methods : getPlayer and getAdvancedPlayer
+            advancedPlayers.add(
+                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                            player.getNickname(),
+                            player.getPlayerId(),
+                            player.getTeamColor(),
+                            player.getWizard(),
+                            player.isLeader(),
+                            getParameters(),
+                            true, virtualView));
         }
 
         players = advancedPlayers;
@@ -144,12 +176,34 @@ public class AdvancedGame extends SimpleGame {
         setCurrentIslandGroupId(getCurrentIslandGroupId() + getAmountOfIslands());
     }
 
+    /**
+     * Creates the island groups of this game in their advanced form.
+     */
+    @Override
+    protected void createIslandGroups(VirtualView virtualView){
+        this.islandGroups = AdvancedIslandGroup.
+                getCollectionAdvancedIslandGroup(
+                        getAdvancedParameters(),
+                        getParameters(),
+                        getCurrentIslandGroupId(),
+                        getAmountOfIslands(), virtualView);
+        setCurrentIslandGroupId(getCurrentIslandGroupId() + getAmountOfIslands());
+    }
+
     @Override
     protected void createParameters() {
         super.createParameters();
         advancedParameters = new AdvancedParameterHandler(-1);
     }
 
+    /**
+     * Player spends a number of coins equals to coin argument.
+     * If player does not have enough coins return false and do not
+     * subtract player coins
+     * @param player != null
+     * @param coin > 0
+     * @return false if player can not spend that number of coins
+     */
     public boolean spendCoin(AdvancedPlayer player, int coin){
         int playerCoin = player.getNumCoins();
 
@@ -162,7 +216,7 @@ public class AdvancedGame extends SimpleGame {
             advancedParameters.addCoins(1);
         }
 
-        //alert();
+        alert();
 
         return true;
     }
@@ -198,7 +252,8 @@ public class AdvancedGame extends SimpleGame {
     /**
      * Move a student in selected position at Entrance in Hall table.
      * If the player deserves a coin the game add 1 coin to player and
-     * remove 1 coin from advanced parameters
+     * remove 1 coin from advanced parameters.
+     * Update professors.
      * @param player != null
      */
     @Override
@@ -211,7 +266,9 @@ public class AdvancedGame extends SimpleGame {
             advancedPlayer.addCoin();
             advancedParameters.removeCoin();
         }
+        updateProfessor(studentColor);
         deselectAllEntranceStudents();
+        player.alert();
     }
 
     /**
@@ -237,7 +294,7 @@ public class AdvancedGame extends SimpleGame {
 
             parameters.addProfessor(challenger.getPlayerId(), professor);
         }
-        //alert();
+        alert();
     }
 
     /**
@@ -337,11 +394,7 @@ public class AdvancedGame extends SimpleGame {
         return bean;
     }
 
-    @Override
-    public void setDrawables() {
-        super.setDrawables();
-        drawables.addAll(CharacterCards);
-    }
+
 
     @Override
     public void initialiseSelection() {

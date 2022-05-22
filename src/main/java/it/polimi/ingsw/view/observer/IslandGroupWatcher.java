@@ -17,4 +17,7 @@ public class IslandGroupWatcher extends Watcher{
         bean = (IslandGroupBean) source.toBean();
     }
 
+    public IslandGroupBean getBean() {
+        return bean;
+    }
 }

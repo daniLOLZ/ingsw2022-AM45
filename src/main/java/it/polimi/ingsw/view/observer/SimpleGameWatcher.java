@@ -16,4 +16,8 @@ public class SimpleGameWatcher extends Watcher{
     public void update() {
         bean = (GameBoardBean) source.toBean();
     }
+
+    public GameBoardBean getBean() {
+        return bean;
+    }
 }

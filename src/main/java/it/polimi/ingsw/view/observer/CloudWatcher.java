@@ -18,4 +18,8 @@ public class CloudWatcher extends Watcher {
     public void update() {
         bean = (CloudBean) source.toBean();
     }
+
+    public CloudBean getBean() {
+        return bean;
+    }
 }
