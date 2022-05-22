@@ -75,6 +75,9 @@ public class AdvancedGame extends SimpleGame {
         watcherList = new ArrayList<>();
         AdvancedGameWatcher watcher = new AdvancedGameWatcher(this, virtualView);
         watcherList.add(watcher);
+        watchers = watcherList;
+
+
 
     }
 
@@ -85,6 +88,7 @@ public class AdvancedGame extends SimpleGame {
         for(int card = 0; card < numCharacterCards; card++){
             CharacterCards.get(card).initialise(this);
         }
+        alert();
     }
 
     /**
@@ -108,7 +112,8 @@ public class AdvancedGame extends SimpleGame {
 
 
     @Override
-    protected void createPlayers(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames) {
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
+                                 List<TeamEnum> selectedColors, List<String> nicknames) {
         super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames);
         List<Player> advancedPlayers = new ArrayList<>();
         for(Player player: players){ // Unhappy cast that could be resolved by separating
@@ -122,6 +127,29 @@ public class AdvancedGame extends SimpleGame {
                             player.isLeader(),
                             getParameters(),
                             true));
+        }
+
+        players = advancedPlayers;
+    }
+
+
+    @Override
+    protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
+                                 List<TeamEnum> selectedColors, List<String> nicknames,
+                                 VirtualView virtualView) {
+        super.createPlayers(numPlayers, selectedWizards, selectedColors, nicknames, virtualView );
+        List<Player> advancedPlayers = new ArrayList<>();
+        for(Player player: players){ // Unhappy cast that could be resolved by separating
+            // into two methods : getPlayer and getAdvancedPlayer
+            advancedPlayers.add(
+                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                            player.getNickname(),
+                            player.getPlayerId(),
+                            player.getTeamColor(),
+                            player.getWizard(),
+                            player.isLeader(),
+                            getParameters(),
+                            true, virtualView));
         }
 
         players = advancedPlayers;
@@ -145,6 +173,20 @@ public class AdvancedGame extends SimpleGame {
                         getParameters(),
                         getCurrentIslandGroupId(),
                         getAmountOfIslands());
+        setCurrentIslandGroupId(getCurrentIslandGroupId() + getAmountOfIslands());
+    }
+
+    /**
+     * Creates the island groups of this game in their advanced form.
+     */
+    @Override
+    protected void createIslandGroups(VirtualView virtualView){
+        this.islandGroups = AdvancedIslandGroup.
+                getCollectionAdvancedIslandGroup(
+                        getAdvancedParameters(),
+                        getParameters(),
+                        getCurrentIslandGroupId(),
+                        getAmountOfIslands(), virtualView);
         setCurrentIslandGroupId(getCurrentIslandGroupId() + getAmountOfIslands());
     }
 
@@ -174,7 +216,7 @@ public class AdvancedGame extends SimpleGame {
             advancedParameters.addCoins(1);
         }
 
-        //alert();
+        alert();
 
         return true;
     }
@@ -226,6 +268,7 @@ public class AdvancedGame extends SimpleGame {
         }
         updateProfessor(studentColor);
         deselectAllEntranceStudents();
+        player.alert();
     }
 
     /**
@@ -251,7 +294,7 @@ public class AdvancedGame extends SimpleGame {
 
             parameters.addProfessor(challenger.getPlayerId(), professor);
         }
-        //alert();
+        alert();
     }
 
     /**

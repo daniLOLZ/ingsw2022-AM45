@@ -69,45 +69,33 @@ public class ClientHandler implements Runnable{
 
         while(isConnected){ // Message listener loop
 
+            /*
             if(!mainBroker.lock()){ // Received an invalid message
                 continue;
             }
+             */
+            while(!mainBroker.messagePresent());
+            System.out.println("---Starting to parse a message");
             CommandEnum command = CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND));
 
+            System.out.println("---Message parsed : "+command.toString());
             if(!parameters.getConnectionState().isAllowed(command)){ // Trashes a command given at the wrong time
-                mainBroker.unlock();
+                //mainBroker.unlock();
+                mainBroker.flushFirstMessage();
                 continue;
             }
             handleCommand(mainBroker); // runs the appropriate routine depending on the command received
+            System.out.println("---Command handled");
             // Sends a reply to the client
             mainBroker.send(clientOutput);
-            mainBroker.unlock();
+            //mainBroker.unlock();
+            mainBroker.flushFirstMessage();
 
         }
         // This point should never be reached in normal circumstances (unless the client disconnects)
     }
 
     //below methods moved to CommandHandler
-
-    /*
-     * Adds the reply fields in the server message in case of a successful operation (Message and status)
-     */
-    /*private void notifySuccessfulOperation(){
-        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "OK");
-        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 0);
-        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
-    }*/
-
-    /*
-     * Adds the reply fields in the server message in case of a failed operation (Message and status)
-     * @param errorMessage A verbose message describing the error
-     */
-    /*private void notifyError(String errorMessage){ // parametrize reply status as well
-        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
-        mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
-        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
-        mainBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, errorMessage);
-    }*/
 
     /**
      * Closes the current connection
@@ -120,7 +108,8 @@ public class ClientHandler implements Runnable{
      * Finds the command that's been given and runs the appropriate methods
      * @param messageBroker The broker containing the message with the command to handle
      */
-    public void handleCommand(MessageBroker messageBroker){
+    // Synchronized because one command must be fully handled at one time
+    public synchronized void handleCommand(MessageBroker messageBroker){
 
         boolean successfulOperation = false;
 
@@ -177,7 +166,8 @@ public class ClientHandler implements Runnable{
 
         final Future<Void> handler = pingExecutor.submit(() -> {
 
-            while (!pingBroker.lock()); //operation to execute with timeout
+            //todo might have broken it
+            while (!pingBroker.messagePresent()); //operation to execute with timeout
 
             return null; //no need for a return value
         });
@@ -191,13 +181,15 @@ public class ClientHandler implements Runnable{
                 handler.cancel(true);
                 isConnected = false;
                 System.err.println("Connection timed out");
-                pingBroker.unlock();
+                //pingBroker.unlock();
+                mainBroker.flushFirstMessage();
                 break;
             } catch (InterruptedException | ExecutionException e) {
                 handler.cancel(true);
                 isConnected = false;
                 e.printStackTrace();
-                pingBroker.unlock();
+                //pingBroker.unlock();
+                mainBroker.flushFirstMessage();
                 break;
             }
 
@@ -210,7 +202,8 @@ public class ClientHandler implements Runnable{
                 pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST));
                 pingBroker.send(clientOutput);
             }
-            pingBroker.unlock();
+            //pingBroker.unlock();
+            mainBroker.flushFirstMessage();
         }
     }
 

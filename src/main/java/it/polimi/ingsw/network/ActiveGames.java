@@ -44,6 +44,7 @@ public class ActiveGames {
         for(Integer user : lobby.getPlayers()){
             userToGameAssociation.put(user, newController);
         }
+        lobby.setStartGame();
     }
 
     /**

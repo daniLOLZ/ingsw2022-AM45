@@ -11,15 +11,9 @@ import java.util.List;
  * This class is an interface to what the client will see, it contains a NetworkManager which
  * takes requests from the View and sends them to the server
  */
-public abstract class UserInterface {
-    protected List<GameElementBean> beans;
-    protected List<CommandEnum> availableCommands;
-    protected ClientNetworkManager networkManager;
-    protected String nickname; // Should we keep this here?
+public interface UserInterface {
 
-    /**
-     * Network-less constructor, used for testing
-     */
+    /*
     public UserInterface(){
         beans = new ArrayList<>();
         availableCommands = new ArrayList<>();
@@ -29,46 +23,60 @@ public abstract class UserInterface {
         availableCommands = new ArrayList<>();
         networkManager = new ClientNetworkManager(hostname, port);
     }
+     */
 
-    public void addBean(GameElementBean bean){
-        beans.add(bean);
-    }
+    public void addBean(GameElementBean bean);
 
-    public GameElementBean removeBean(int index){
-        return beans.remove(index);
-    }
+    public GameElementBean removeBean(int index);
 
-    public void clearBeans(){
-        beans.clear();
-    }
+    public void clearBeans();
 
-    public void addCommand(CommandEnum command){
-        availableCommands.add(command);
-    }
+    public void addCommand(CommandEnum command);
 
-    public CommandEnum removeCommand(int index){
-        //todo remove infinite recursion
-        return removeCommand(index);
-    }
+    public CommandEnum removeCommand(int index);
 
-    public void clearCommand(){
-        availableCommands.clear();
-    }
+    public void clearCommands();
 
+    /**
+     * Shows a welcome screen for the game
+     */
     public abstract void showWelcomeScreen();
 
+    /**
+     * Shows the login screen;
+     * This screen should allow the player to enter their desired
+     * username and receive confirmation from the server
+     */
     public abstract void showLoginScreen();
 
+    /**
+     * Shows the selection of the game rules
+     * Here the user can select whether the game is simple or advanced
+     * and the number of players to play with
+     */
     public abstract void showGameruleSelection();
 
+    /**
+     * Once a lobby with the given rules is found,
+     * this screen will let the user decide if they're ready,
+     * start the game if they're the host and see how many players are ready
+     * in the lobby
+     */
     public abstract void showLobby();
 
+    /**
+     * This screen lets the user choose the wizard and tower color
+     * for the game
+     */
     public abstract void showTowerAndWizardSelection();
 
+    /**
+     * The main game interface
+     */
     public abstract void showGameInterface();
 
     /**
-     * Initializes and starts the game interface
+     * Initializes and starts the application interface
      */
     public abstract void startInterface();
 

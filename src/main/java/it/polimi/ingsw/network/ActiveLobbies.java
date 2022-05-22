@@ -71,7 +71,7 @@ public class ActiveLobbies {
     /**
      * Creates and starts a new game with the users in the lobby and the rules specified at the creation of the lobby
      * @param lobby The lobby in which all players all ready and want to start playing
-     * @return true if the game started correctly. false instead
+     * @return true if the game started correctly. false otherwise
      */
     public static boolean startGame(Lobby lobby){
 

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.view.LobbyBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +13,14 @@ public class Lobby {
     private List<Integer> players;
     private int emptySeats;
     private Integer host;
+    private boolean gameStarted;
 
     public Lobby(GameRuleEnum gameType){
 
         this.gameType = gameType;
         players = new ArrayList<>();
         host = null;
+        gameStarted = false;
         playersReady = new ArrayList<>();
         switch (this.gameType){
             case SIMPLE_2, ADVANCED_2 ->  emptySeats = 2;
@@ -31,11 +34,13 @@ public class Lobby {
     }
 
     /**
-     * Adds a player to the ready players' list
+     * Adds a player to the ready players' list, if not already present
      * @param idUser The idUser of the player to add (must be in the lobby)
      */
     public void addReady(int idUser){
-        if (players.contains(idUser)) playersReady.add(idUser);
+        //We don't add them twice if already present
+        if (players.contains(idUser) &&
+            !playersReady.contains(idUser)) playersReady.add(idUser);
         else ;//maybe handle case of idUser not present
     }
 
@@ -143,5 +148,30 @@ public class Lobby {
             return true;
         }
         else return false;
+    }
+
+    /**
+     * Sets the flag "gameStarted" to true
+     */
+    public void setStartGame(){
+        gameStarted = true;
+    }
+
+    public boolean isGameStarted(){
+        return gameStarted;
+    }
+
+    public synchronized LobbyBean getBean() {
+        List<String> beanNickList = new ArrayList<>();
+        List<Boolean> beanReadyList = new ArrayList<>();
+        for(int index = 0; index < players.size(); index++){
+            beanNickList.add(
+                    LoginHandler.getNicknameFromId(players.get(index))
+            );
+            beanReadyList.add(
+                playersReady.contains(players.get(index))
+            );
+        }
+        return new LobbyBean(beanNickList, beanReadyList, this.gameStarted);
     }
 }

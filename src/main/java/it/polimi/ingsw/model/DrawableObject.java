@@ -16,17 +16,19 @@ public abstract class DrawableObject {
     public abstract GameElementBean toBean();
 
     public void alert(){
-        for(Watcher watcher: watchers){
-            watcher.update();
-        }
+        if(watchers!= null)
+            for(Watcher watcher: watchers){
+                watcher.update();
+            }
     }
 
     /**
      * Kill all observers because this obj does not exist anymore
      */
     public void killAll(){
-        for(Watcher watcher: watchers){
-            watcher.kill();
-        }
+        if(watchers!= null)
+            for(Watcher watcher: watchers){
+                watcher.kill();
+            }
     }
 }

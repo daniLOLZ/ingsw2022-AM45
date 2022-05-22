@@ -25,6 +25,7 @@ public class StartGameHandler extends CommandHandler{
         }
         else {
             if(ActiveLobbies.startGame(parameters.getUserLobby())){
+                // the way this will be signaled to every "handler" will be through the lobby with the flag "gameStarted"
                 parameters.setConnectionState(new StartingGame());
                 parameters.setUserController(ActiveGames.getGameFromUserId(parameters.getIdUser()));
                 notifySuccessfulOperation(messageBroker);

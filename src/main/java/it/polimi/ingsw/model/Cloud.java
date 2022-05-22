@@ -13,7 +13,7 @@ public class Cloud extends DrawableObject{
     private List<StudentEnum> students;
     private final int id;
     private final int studentsPerCloud;
-    private List<Watcher> watchers;
+    private List<Watcher> watcherList;
 
     public Cloud(int id, int studentsPerCloud){ //, VirtualView virtualView
         this.id = id;
@@ -36,16 +36,18 @@ public class Cloud extends DrawableObject{
         this.id = id;
         this.studentsPerCloud = studentsPerCloud;
         students = new ArrayList<>();
-        watchers = new ArrayList<>();                                        //list of observers
+        watcherList = new ArrayList<>();                                        //list of observers
         Watcher cloudWatcher = new CloudWatcher(this,virtualView);    //New observer and the observer look this object
-        watchers.add(cloudWatcher);                                         //This object has the observer
+        watcherList.add(cloudWatcher);                                         //This object has the observer
+        watchers = watcherList;
+        alert();
 
     }
 
     public void fill(List<StudentEnum> numStudents){
         for(StudentEnum student: numStudents)
             students.add(student);
-        //alert();
+        alert();
     }
 
     public StudentEnum remove(int index){
@@ -53,7 +55,7 @@ public class Cloud extends DrawableObject{
             return null;
 
         StudentEnum toReturn = students.remove(index);
-        //alert();
+        alert();
         return  toReturn;
     }
 
@@ -62,7 +64,7 @@ public class Cloud extends DrawableObject{
         while(!students.isEmpty())
             studentsToReturn.add(students.remove(0));
 
-        //alert();
+        alert();
         return studentsToReturn;
     }
 

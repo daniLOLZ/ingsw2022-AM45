@@ -1,19 +1,27 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CLI extends UserInterface {
+public class CLI implements UserInterface {
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;
     private final int startPosition = 0;
     private final int centerPosition = 10;
+    private List<GameElementBean> beans;
+    private List<CommandEnum> availableCommands;
+    private ClientNetworkManager networkManager;
+    private String chosenNickname;
 
 
     /**
@@ -21,6 +29,7 @@ public class CLI extends UserInterface {
      */
     public CLI(){
         beans = new ArrayList<>();
+        availableCommands = new ArrayList<>();
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
@@ -28,10 +37,13 @@ public class CLI extends UserInterface {
 
     /**
      * Creates a new CLI and calls the method to create a new NetworkManager
+     * @param hostname the name of the host
+     * @param port the port to connect to
      */
     public CLI(String hostname, int port){
-        super(hostname, port);
         beans = new ArrayList<>();
+        availableCommands = new ArrayList<>();
+        networkManager = new ClientNetworkManager(hostname, port);
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
@@ -233,7 +245,7 @@ public class CLI extends UserInterface {
 
         } while(errorLogin);
 
-        nickname = inputNickname;
+        chosenNickname = inputNickname;
         System.out.println("Username " + inputNickname + " was accepted");
     }
 
@@ -287,14 +299,82 @@ public class CLI extends UserInterface {
 
     @Override
     public void showLobby() {
-        System.out.println("You are waiting for players to join a game with you...");
-        //See if this could be an "interactive" wait, where you can see the players joining, or even
+        Scanner scanner = new Scanner(System.in);
+        AtomicBoolean ready = new AtomicBoolean(false);
+        AtomicBoolean gameStarting = new AtomicBoolean(false);
+        int selection;
+        System.out.println("""
+                You are waiting for players to join a game with you...
+                1 - Set yourself as ready
+                2 - Set yourself as not ready
+                """);
+
+        //todo: See if this could be an "interactive" wait, where you can see the players joining, or even
         // just a simple counter
-        // networkManager.waitForStart();
+        // make a thread for the updating of the lobby and for checking whether or not the game is starting here
+
+        new Thread(()-> {
+
+            LobbyBean oldLobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
+            LobbyBean lobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
+            while(true){
+                if(networkManager.sendReadyStatus(ready.get())){
+                    //signal we're starting the game
+                    gameStarting.set(true);
+                    return;
+                }
+                lobbyBean = networkManager.getLobbyUpdates();
+                if(!lobbyBean.equals(oldLobbyBean)){
+                    printLobby(lobbyBean);
+                    oldLobbyBean = lobbyBean;
+                }
+            }
+        }).start();
+
+        /* Something like:
+        * while(true){
+        *    if(ready) sendReady();
+        *    getLobbyUpdates();
+        * }
+        * */
+
+        while(true) {
+            selection = scanner.nextInt();
+
+            // If the game started, any input is actually ignored
+            if(gameStarting.get()){
+                //TODO: This is probably an ugly way of exchanging information across threads
+                // The player won't be notified the game is starting until they actually
+                // make a selection, even though it will get discarded
+                break;
+            }
+
+            if (selection == 1) {
+                ready.set(true);
+                System.out.println("You set yourself as ready");
+            }
+            else if (selection == 2){
+                ready.set(false);
+                System.out.println("You set yourself as not ready");
+            } else continue;
+        }
+
+    }
+
+    private void printLobby(LobbyBean lobbyBean) {
+        for(int index = 0; index < lobbyBean.getNicknames().size(); index++){
+            String optionalNot = "";
+            if(!lobbyBean.getReadyPlayers().get(index)) optionalNot = " not";
+
+            System.out.println(String.format("User %s is%s ready.",
+                    lobbyBean.getNicknames().get(index),
+                    optionalNot));
+        }
     }
 
     @Override
     public void showTowerAndWizardSelection() {
+        System.out.println("Congrats, at least you got the game to start");
         //todo
     }
 
@@ -309,5 +389,36 @@ public class CLI extends UserInterface {
         showLoginScreen();
         showGameruleSelection();
         showLobby();
+        showTowerAndWizardSelection();
+    }
+
+    @Override
+    public void addBean(GameElementBean bean) {
+        beans.add(bean);
+    }
+
+    @Override
+    public GameElementBean removeBean(int index) {
+        return beans.remove(index);
+    }
+
+    @Override
+    public void clearBeans() {
+        beans.clear();
+    }
+
+    @Override
+    public void addCommand(CommandEnum command) {
+        availableCommands.add(command);
+    }
+
+    @Override
+    public CommandEnum removeCommand(int index) {
+        return availableCommands.remove(index);
+    }
+
+    @Override
+    public void clearCommands() {
+        availableCommands.clear();
     }
 }
