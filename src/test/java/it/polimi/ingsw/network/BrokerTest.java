@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,40 +55,59 @@ public class BrokerTest {
 
     @Test
     public void deserializeTest(){
-        InputStream stream = createJSONFile("{\n" +
-                "    \"COMMAND\" : \"CONNECTION_REQUEST\",\n" +
-                "    \"NICKNAME\" : \"gigio\"\n" +
-                "}");
+        InputStream stream = createJSONFile("""
+                {
+                    "COMMAND" : "CONNECTION_REQUEST",
+                    "NICKNAME" : "gigio"
+                }""");
         broker.receive(stream);
-        while (!broker.lock());
+        //while (!broker.lock());
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
-        broker.unlock();
+        //broker.unlock();
+        broker.flushFirstMessage();
     }
 
     @Test
     public void twoMessagesQuickSuccession(){
-        InputStream stream = createJSONFile("{\n" +
-                "    \"COMMAND\" : \"CONNECTION_REQUEST\",\n" +
-                "    \"NICKNAME\" : \"gigio\"\n" +
-                "}" +
-                "{\n" +
-                "    \"COMMAND\" : \"CONNECTION_REQUEST\",\n" +
-                "    \"NICKNAME\" : \"gigio2\"\n" +
-                "}");
+        InputStream stream = createJSONFile("""
+                {
+                    "COMMAND" : "CONNECTION_REQUEST",
+                    "NICKNAME" : "gigio"
+                }{
+                    "COMMAND" : "CONNECTION_REQUEST",
+                    "NICKNAME" : "gigio2"
+                }""");
         broker.receive(stream);
         broker.receive(stream);
-        if(!broker.lock()){
+        if(!broker.messagePresent()){
             fail("No first message to read");
         }
         assertEquals("gigio", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
-        broker.unlock();
-        if(!broker.lock()){
+        broker.flushFirstMessage();
+        if(!broker.messagePresent()){
             fail("No second message to read");
         }
         assertEquals("gigio2", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
-        broker.unlock();
+        broker.flushFirstMessage();
         //If the messages were correctly parsed, the broker should be able to read two different messages correctly
     }
+
+    /**
+     * Tests whether the outgoingMessage is reset after sending
+     */
+    @Test
+    public void emptyOutgoingAfterSending(){
+        InputStream in = this.createJSONFile("""
+                {
+                    "COMMAND" : "CONNECTION_REQUEST",
+                     "NICKNAME" : "gigio"
+                }
+                """);
+        OutputStream out = System.out;
+        broker.send(out);
+        assertEquals(broker.getOutgoingMessage(), new HashMap<>());
+    }
+
 
 }

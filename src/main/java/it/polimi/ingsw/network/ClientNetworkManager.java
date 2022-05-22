@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
-import it.polimi.ingsw.view.UserInterface;
+import it.polimi.ingsw.view.LobbyBean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,9 +9,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.*;
 
 /**
@@ -42,41 +39,11 @@ public class ClientNetworkManager {
         this.connected = true; //the ping routine will start before this field has been checked
     }
 
-    /**
-     * Increases idRequest and returns it
-     * @return The increased idRequest
+    /*
+
+            METHODS THAT REFLECT THE INTERFACE
+
      */
-    private int increaseAndGetRequestId(){
-
-        progressiveIdRequest++;
-        return progressiveIdRequest;
-    }
-
-    /**
-     * Increases idPingRequest and returns it
-     * @return The increased idPingRequest
-     */
-    private int increaseAndGetPingRequestId(){
-
-        progressiveIdPingRequest++;
-        return progressiveIdPingRequest;
-    }
-
-
-    /**
-     * Handles quitting the game on the client side
-     */
-    private void quitGame() {
-        //todo
-    }
-
-    private void setHost(String host) {
-        this.hostname = host;
-    }
-
-    private void setPort(Integer port) {
-        this.mainPortNumber = port;
-    }
 
     /**
      * Connects to a Server and sends the user nickname via private methods
@@ -111,6 +78,7 @@ public class ClientNetworkManager {
         return true;
     }
 
+
     /**
      * Sends the gamerule preferences to the server
      * @param gamemode the gamemode chosen, "1" for Simple, "2" for Advanced
@@ -118,6 +86,8 @@ public class ClientNetworkManager {
      * @return true if the call to the server succeeded and a successful reply was received
      */
     public boolean sendGameModePreference(int gamemode, int numPlayers){
+
+        boolean successfulReply = false;
 
         GameRuleEnum rule;
         //Converts the input to a gamerule
@@ -131,9 +101,107 @@ public class ClientNetworkManager {
 
         if(!sendToServer()) return false;
 
-        return checkSuccessfulReply();
+        // Read other params if necessary
+        successfulReply = checkSuccessfulReply();
 
+        mainBroker.flushFirstMessage();
+
+        return successfulReply;
     }
+
+    /**
+     * Handles quitting the game on the client side
+     */
+    public void quitGame() {
+        //todo
+    }
+
+    //todo handle this true/false better?
+    /**
+     * Updates the server on the readiness of the user
+     * @return true if the game is about to start;
+     * false if the game is still not able to start or if there has been an error
+     */
+    public boolean sendReadyStatus(boolean ready){
+
+        boolean successfulReply;
+
+        if(ready){
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.READY_TO_START);
+        }
+        else {
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.NOT_READY);
+        }
+        if(!sendToServer()) return false;
+
+        //The server will reply with either a "GameIsStarting" or a "GameNotStarting"
+
+        //while(!mainBroker.lock()); // Possible halt
+        successfulReply = checkSuccessfulReply();
+        /*
+        if(!successfulReply &&
+                mainBroker.readField(NetworkFieldEnum.ERROR_STATE).equals("GameNotStarting")) { // hardcoding
+            //The game isn't starting because not all players are ready
+        }
+         */
+
+        //mainBroker.unlock();
+        mainBroker.flushFirstMessage();
+        return successfulReply;
+    }
+
+
+    public LobbyBean getLobbyUpdates() {
+        LobbyBean returnBean = null;
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.GET_LOBBY_STATUS);
+        if(!sendToServer()) return null;
+
+        if(!checkSuccessfulReply()) return null;
+
+        //Of course, this can't actually be casted, we need to find another way
+        // returnBean = (LobbyBean) mainBroker.readField(NetworkFieldEnum.LOBBY_BEAN);
+        mainBroker.flushFirstMessage();
+        return returnBean;
+    }
+
+
+    /*
+
+            UTILITY METHODS
+
+     */
+
+    /**
+     * Increases idRequest and returns it
+     * @return The increased idRequest
+     */
+    private int increaseAndGetRequestId(){
+
+        progressiveIdRequest++;
+        return progressiveIdRequest;
+    }
+
+    /**
+     * Increases idPingRequest and returns it
+     * @return The increased idPingRequest
+     */
+    private int increaseAndGetPingRequestId(){
+
+        progressiveIdPingRequest++;
+        return progressiveIdPingRequest;
+    }
+
+
+
+    private void setHost(String host) {
+        this.hostname = host;
+    }
+
+    private void setPort(Integer port) {
+        this.mainPortNumber = port;
+    }
+
+
 
     /**
      * Establishes a connection to a Server
@@ -163,11 +231,13 @@ public class ClientNetworkManager {
      * and tries to send the message that was previously constructed in the appropriate
      * methods
      * It then receives the reply from the server
+     * @return true if the message was received successfully
      * @throws IOException
      */
     //This method could potentially block the client interface if the reply doesn't arrive
     private boolean sendToServer() {
-        addIdRequest();
+
+        int requestId = addIdRequest();
         OutputStream outStream;
         InputStream inStream;
         try {
@@ -180,14 +250,24 @@ public class ClientNetworkManager {
         }
 
         mainBroker.send(outStream);
-        System.out.println("Sent message to the server");
+        //System.out.println("Sent message to the server");
+
         mainBroker.receive(inStream);
-        System.out.println("Received reply from the server");
+        //System.out.println("Received reply from the server");
+
+        //Checking whether the reply is the correct one
+        //todo bad, we might trash messages meant for someone else
+        Double gottenId = (Double) mainBroker.readField(NetworkFieldEnum.ID_REQUEST);
+        if(requestId != gottenId.intValue() ) {
+            System.out.println("Wrong id request");
+            return false;
+        }
+
         return true;
     }
 
     /**
-     *
+     * Simply checks whether the server replied affirmatively
      * @return true if the message received from the server replied successfully
      * to the previously made request
      */
@@ -203,21 +283,32 @@ public class ClientNetworkManager {
      */
     private boolean sendNickname(String nickname){
 
+        boolean successfulReply;
+
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CONNECTION_REQUEST);
         mainBroker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
 
         if (!sendToServer()) return false;
 
-        return checkSuccessfulReply();
+        //while(!mainBroker.lock()); // Possible halt
+        successfulReply = checkSuccessfulReply();
+        //Get the other useful info from the message
+
+        //mainBroker.unlock();
+        mainBroker.flushFirstMessage();
+        return successfulReply;
 
     }
 
 
     /**
      * Adds the idRequest field to the current outgoing message
+     * @return the id that's just been added
      */
-    private void addIdRequest(){
-        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, increaseAndGetRequestId());
+    private int addIdRequest(){
+        int idReq = increaseAndGetRequestId();
+        mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, idReq);
+        return idReq;
     }
 
     /**
@@ -258,18 +349,19 @@ public class ClientNetworkManager {
 
         final Future<Void> handler = pingExecutor.submit(() -> {
 
-            while (!pingBroker.lock()); //operation to execute with timeout
+            while (!pingBroker.messagePresent()); //operation to execute with timeout
 
             return null; //no need for a return value
         });
 
         do{
             //send ping message
-            while (!pingBroker.lock());
+            while (!pingBroker.messagePresent());
             pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
             pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
             pingBroker.send(outStream);
-            pingBroker.unlock();
+            //pingBroker.unlock();
+            pingBroker.flushFirstMessage();
             pingBroker.receive(inStream);
 
             //receive pong message
@@ -279,13 +371,15 @@ public class ClientNetworkManager {
                 handler.cancel(true);
                 connected = false;
                 System.err.println("Connection timed out");
-                pingBroker.unlock();
+                //pingBroker.unlock();
+                pingBroker.flushFirstMessage();
                 break;
             } catch (InterruptedException | ExecutionException e) {
                 handler.cancel(true);
                 connected = false;
                 e.printStackTrace();
-                pingBroker.unlock();
+                //pingBroker.unlock();
+                pingBroker.flushFirstMessage();
                 break;
             }
             pingExecutor.shutdownNow();
@@ -306,7 +400,8 @@ public class ClientNetworkManager {
                 System.err.println("Wrong Request Id. Expected: " + progressiveIdPingRequest + ". Received: " + receivedIdPingRequest);
                 connected = false;
             }
-            pingBroker.unlock();
+            //pingBroker.unlock();
+            pingBroker.flushFirstMessage();
         } while (connected);
     }
 

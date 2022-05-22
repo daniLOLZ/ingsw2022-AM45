@@ -15,6 +15,7 @@ public enum CommandEnum {
     PLAY_GAME("Play Game",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, GAME_RULE}),
     READY_TO_START("Ready to Start",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     NOT_READY("Not Ready",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
+    GET_LOBBY_STATUS("Get Lobby Status",                new NetworkFieldEnum[]{ID_USER, ID_REQUEST}),
     LEAVE_LOBBY("Leave Lobby",                          new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     START_GAME("Start Game",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     SELECT_WIZARD("Select Wizard",                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_WIZARD}),

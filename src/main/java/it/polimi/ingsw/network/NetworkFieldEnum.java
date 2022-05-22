@@ -7,6 +7,8 @@ public enum NetworkFieldEnum {
     ID_PING_REQUEST("idPingRequest"),
     NICKNAME("nickname"),
     GAME_RULE("gameRule"),
+    LOBBY_BEAN("lobbyBean"),
+    GAME_BEAN("gameBean"), // inferred, may be modified
     ID_TOWER_COLOR("idTowerColor"),
     ID_WIZARD("idWizard"),
     ID_ASSISTANT("idAssistant"),

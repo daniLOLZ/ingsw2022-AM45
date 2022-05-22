@@ -5,10 +5,12 @@ import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CLI implements UserInterface {
     private StringBuilder View;
@@ -298,26 +300,81 @@ public class CLI implements UserInterface {
     @Override
     public void showLobby() {
         Scanner scanner = new Scanner(System.in);
-        boolean ready = false;
+        AtomicBoolean ready = new AtomicBoolean(false);
+        AtomicBoolean gameStarting = new AtomicBoolean(false);
+        int selection;
         System.out.println("""
                 You are waiting for players to join a game with you...
                 1 - Set yourself as ready
                 2 - Set yourself as not ready
                 """);
-        //Todo
-        while(!scanner.hasNext()){
-            // Possible wait() to avoid sending too many requests
-            networkManager.sendReadyStatus(ready);
+
+        //todo: See if this could be an "interactive" wait, where you can see the players joining, or even
+        // just a simple counter
+        // make a thread for the updating of the lobby and for checking whether or not the game is starting here
+
+        new Thread(()-> {
+
+            LobbyBean oldLobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
+            LobbyBean lobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
+            while(true){
+                if(networkManager.sendReadyStatus(ready.get())){
+                    //signal we're starting the game
+                    gameStarting.set(true);
+                    return;
+                }
+                lobbyBean = networkManager.getLobbyUpdates();
+                if(!lobbyBean.equals(oldLobbyBean)){
+                    printLobby(lobbyBean);
+                    oldLobbyBean = lobbyBean;
+                }
+            }
+        }).start();
+
+        /* Something like:
+        * while(true){
+        *    if(ready) sendReady();
+        *    getLobbyUpdates();
+        * }
+        * */
+
+        while(true) {
+            selection = scanner.nextInt();
+
+            // If the game started, any input is actually ignored
+            if(gameStarting.get()){
+                //TODO: This is probably an ugly way of exchanging information across threads
+                // The player won't be notified the game is starting until they actually
+                // make a selection, even though it will get discarded
+                break;
+            }
+
+            if (selection == 1) {
+                ready.set(true);
+                System.out.println("You set yourself as ready");
+            }
+            else if (selection == 2){
+                ready.set(false);
+                System.out.println("You set yourself as not ready");
+            } else continue;
         }
 
+    }
 
-        //See if this could be an "interactive" wait, where you can see the players joining, or even
-        // just a simple counter
-        // networkManager.waitForStart();
+    private void printLobby(LobbyBean lobbyBean) {
+        for(int index = 0; index < lobbyBean.getNicknames().size(); index++){
+            String optionalNot = "";
+            if(!lobbyBean.getReadyPlayers().get(index)) optionalNot = " not";
+
+            System.out.println(String.format("User %s is%s ready.",
+                    lobbyBean.getNicknames().get(index),
+                    optionalNot));
+        }
     }
 
     @Override
     public void showTowerAndWizardSelection() {
+        System.out.println("Congrats, at least you got the game to start");
         //todo
     }
 
@@ -332,6 +389,7 @@ public class CLI implements UserInterface {
         showLoginScreen();
         showGameruleSelection();
         showLobby();
+        showTowerAndWizardSelection();
     }
 
     @Override

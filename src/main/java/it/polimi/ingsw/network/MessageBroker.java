@@ -27,11 +27,11 @@ public class MessageBroker {
 
     private List<Map<NetworkFieldEnum, Object>> incomingMessages;
     private Map<NetworkFieldEnum, Object> outgoingMessage;
-    private boolean readyForNext;
+    //private boolean readyForNext;
 
     public MessageBroker(){
         gson = new Gson();
-        readyForNext = true;
+        //readyForNext = true;
         outFlush();
         inFlush();
     }
@@ -67,7 +67,7 @@ public class MessageBroker {
     /**
      * Removes the oldest received message from the incoming messages buffer.
      */
-    private void flushFirstMessage(){
+    public void flushFirstMessage(){
         if (incomingMessages.size() > 0) incomingMessages.remove(FIRST_RECEIVED);
     }
 
@@ -145,8 +145,6 @@ public class MessageBroker {
         }
         receivedMessage = tempString.toString();
 
-        //System.out.println("message received");
-
         Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
 
         if (checkValidity(deserializedMessage)) {
@@ -158,6 +156,7 @@ public class MessageBroker {
      * Asks to lock the incoming buffer to process the message
      * @return false if broker is already locked or if there's no incoming message
      */
+    /*
     public boolean lock(){//maybe this should just be synchronized
         if (isReadyForNext()) {
             if (incomingMessages.size() == 0) return false;
@@ -166,17 +165,19 @@ public class MessageBroker {
         }
         return false;
     }
+    */
 
     /**
      * unlocks the incoming buffer and flushes the last executed message
      */
+    /*
     public void unlock(){
         if (!isReadyForNext()) {
             readyForNext = true;
             flushFirstMessage();
         }
     }
-
+    */
     /**
      * Checks if the first message in the buffer is in a valid format
      * @return true if the message is valid, false otherwise
@@ -199,33 +200,7 @@ public class MessageBroker {
         List<NetworkFieldEnum> keyArray = new ArrayList<>(message.keySet());
         for(NetworkFieldEnum field : keyArray){
             object = message.get(field);
-           /*
-            switch (field){
-                case ID_USER : {
-                    try{
-                        int primitiveInt = (int) object;
-                    } catch(ClassCastException e) {
-                        return false;
-                    }
-                }
-                case ID_REQUEST : {
-                    try{
-                        int primitiveInt = (int) object;
-                    } catch(ClassCastException e) {
-                        return false;
-                    }
-                }
-                case NICKNAME : {
-                    try{
-                        String string = (String) object;
-                    } catch(ClassCastException e) {
-                        return false;
-                    }
-                }
-                // TODO add other fields
-                // TODO check for cleaner implementation
-            }
-        */
+
             objClass = object.getClass();
 
             switch (field){
@@ -251,6 +226,14 @@ public class MessageBroker {
                     neededClass = String.class;
                     break;
                 case GAME_RULE:
+                    // This would be read as a String, but we need to make sure it's
+                    // actually a GameRuleEnum
+                    try{
+                        GameRuleEnum.fromObjectToEnum(object);
+                    } catch (IllegalArgumentException e){
+                        objClass = Void.class;
+                    }
+                    objClass = GameRuleEnum.class;
                     neededClass = GameRuleEnum.class;
                     break;
                 case CHOSEN_ENTRANCE_POSITIONS:
@@ -259,12 +242,29 @@ public class MessageBroker {
                     neededClass = Double[].class;
                     break;
                 case CHOSEN_STUDENT_COLORS:
+                    // This would be read as a String, but we need to make sure it's
+                    // actually a StudentEnum
+                    try{
+                        StudentEnum.fromObjectToEnum(object);
+                    } catch (IllegalArgumentException e){
+                        objClass = Void.class;
+                    }
+                    objClass = StudentEnum.class;
                     neededClass = StudentEnum.class;
                     break;
                 case GAME_PHASE:
+                    // This would be read as a String, but we need to make sure it's
+                    // actually a PhaseEnum
+                    try{
+                        PhaseEnum.fromObjectToEnum(object);
+                    } catch (IllegalArgumentException e){
+                        objClass = Void.class;
+                    }
+                    objClass = PhaseEnum.class;
                     neededClass = PhaseEnum.class;
                     break;
                 default:
+                    // If an unrecognized field is encountered, it's implicitly accepted
                     neededClass = objClass;
                     break;
             }
@@ -275,9 +275,11 @@ public class MessageBroker {
         return true;
     }
 
+    /*
     public boolean isReadyForNext(){
         return readyForNext;
     }
+     */
 
     public static boolean isOfType(Object object, Type type){
         return object.getClass().getTypeName().equals(type.getTypeName());
@@ -287,5 +289,20 @@ public class MessageBroker {
         return object.getClass().getTypeName().equals(sample.getClass().getTypeName());
     }
 
-    //TODO IMPLEMENT IDREQUEST CHECKS
+    //for testing purposes
+    public List<Map<NetworkFieldEnum, Object>> getIncomingMessages() {
+        return incomingMessages;
+    }
+
+    //for testing purposes
+    public Map<NetworkFieldEnum, Object> getOutgoingMessage() {
+        return outgoingMessage;
+    }
+
+    /**
+     * True if there is at least a message in the incoming buffer
+     */
+    public synchronized boolean messagePresent() {
+        return (incomingMessages.size() > 0);
+    }
 }

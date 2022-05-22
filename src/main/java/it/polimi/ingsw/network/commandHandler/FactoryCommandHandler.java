@@ -13,6 +13,7 @@ public class FactoryCommandHandler {
         commandHandlers.add(new ChooseCloudHandler());
         commandHandlers.add(new ConnectionRequestHandler());
         commandHandlers.add(new DeselectStudentHandler());
+        commandHandlers.add(new GetLobbyStatusHandler());
         commandHandlers.add(new MoveMNToIslandHandler());
         commandHandlers.add(new PlayCharacterHandler());
         commandHandlers.add(new PlayGameHandler());
