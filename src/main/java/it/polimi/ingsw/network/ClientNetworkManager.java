@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import com.google.gson.internal.LinkedTreeMap;
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.view.LobbyBean;
 
@@ -159,9 +160,24 @@ public class ClientNetworkManager {
         if(!checkSuccessfulReply()) return null;
 
         //Of course, this can't actually be casted, we need to find another way
-        // returnBean = (LobbyBean) mainBroker.readField(NetworkFieldEnum.LOBBY_BEAN);
+        returnBean = BeanTranslator.deserializeLobbyBean(
+                (LinkedTreeMap<String, Object>) mainBroker.readField(NetworkFieldEnum.BEAN));
         mainBroker.flushFirstMessage();
         return returnBean;
+    }
+
+    /**
+     * Tries to start the game
+     * @return true if the game successfully started
+     */
+    public boolean startGame(){
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.START_GAME);
+        if(!sendToServer()) return false;
+
+        if(!checkSuccessfulReply()) return false;
+
+        mainBroker.flushFirstMessage();
+        return true;
     }
 
 

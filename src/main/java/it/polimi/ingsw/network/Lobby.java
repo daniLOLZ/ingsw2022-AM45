@@ -1,12 +1,13 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.DrawableObject;
 import it.polimi.ingsw.view.LobbyBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lobby {
+public class Lobby extends DrawableObject {
 
     private final GameRuleEnum gameType;
     private List<Integer> playersReady; //identified by idUser
@@ -42,6 +43,7 @@ public class Lobby {
         if (players.contains(idUser) &&
             !playersReady.contains(idUser)) playersReady.add(idUser);
         else ;//maybe handle case of idUser not present
+        //notifyAll();
     }
 
     /**
@@ -52,6 +54,7 @@ public class Lobby {
 
         Integer integer = idUser;
         playersReady.remove(integer);
+        // notifyAll();
     }
 
     public GameRuleEnum getGameType(){
@@ -75,6 +78,7 @@ public class Lobby {
         }
 
         if (players.size() == 0) destroyLobby();
+        //notifyAll();
     }
 
     /**
@@ -91,6 +95,7 @@ public class Lobby {
         emptySeats--;
 
         assignHost();
+        //notifyAll();
     }
 
     /**
@@ -103,6 +108,7 @@ public class Lobby {
         if (!players.contains(host)) host = null;
 
         if (host == null) host = players.get(0);
+        //notifyAll();
     }
 
 
@@ -155,15 +161,17 @@ public class Lobby {
      */
     public void setStartGame(){
         gameStarted = true;
+        //notifyAll();
     }
 
     public boolean isGameStarted(){
         return gameStarted;
     }
 
-    public synchronized LobbyBean getBean() {
+    public synchronized LobbyBean toBean() {
         List<String> beanNickList = new ArrayList<>();
         List<Boolean> beanReadyList = new ArrayList<>();
+        Integer returnHostPosition = null;
         for(int index = 0; index < players.size(); index++){
             beanNickList.add(
                     LoginHandler.getNicknameFromId(players.get(index))
@@ -171,7 +179,8 @@ public class Lobby {
             beanReadyList.add(
                 playersReady.contains(players.get(index))
             );
+            if(players.get(index).equals(this.host)) returnHostPosition = index;
         }
-        return new LobbyBean(beanNickList, beanReadyList, this.gameStarted);
+        return new LobbyBean(beanNickList, beanReadyList, this.gameStarted, returnHostPosition);
     }
 }

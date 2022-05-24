@@ -1,17 +1,27 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.BeanEnum;
+
 import java.util.List;
 import java.util.Objects;
 
-public final class LobbyBean {
+public final class LobbyBean extends GameElementBean {
     private List<String> nicknames;
     private List<Boolean> readyPlayers; // positional
     private boolean gameStarted;
+    private Integer host;
 
-    public LobbyBean(List<String> nicknames, List<Boolean> readyPlayers, boolean gameStarted) {
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.LOBBY_BEAN;
+    }
+
+    public LobbyBean(List<String> nicknames, List<Boolean> readyPlayers, boolean gameStarted, Integer host) {
         this.nicknames = nicknames;
         this.readyPlayers = readyPlayers;
         this.gameStarted = gameStarted;
+        this.host = host;
     }
 
     public List<String> getNicknames() {
@@ -37,5 +47,20 @@ public final class LobbyBean {
     @Override
     public int hashCode() {
         return Objects.hash(nicknames, readyPlayers, gameStarted);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for(int index = 0; index < nicknames.size(); index++){
+            builder.append(nicknames.get(index) + " : ");
+            if(getReadyPlayers().get(index)){
+                builder.append("ready");
+            }
+            else { builder.append("not ready"); }
+            if(index == host) builder.append(" [Host]");
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 }

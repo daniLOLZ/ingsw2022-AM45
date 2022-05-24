@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class IslandGroupBeanTest {
 
@@ -20,7 +19,7 @@ public class IslandGroupBeanTest {
         studOnIsland.add(StudentEnum.BLUE);
         studOnIsland.add(StudentEnum.RED);
         IslandGroupBean bean = new IslandGroupBean(1,islands,studOnIsland,true,TeamEnum.NOTEAM);
-        System.out.println(bean.drawCLI());
+        System.out.println(bean.toString());
 
     }
 }

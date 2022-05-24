@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +44,9 @@ public class CLITest {
             SimpleGame game = new SimpleGame(3,selectedWizards,teamColors, nicknames);
             game.initializeGame();
             game.setDrawables();
-            List<GameElementBean> beans = game.getElementView();
+            List<Bean> beans = game.getElementView();
             CLI cli = new CLI();
-            for(GameElementBean bean: beans){
+            for(Bean bean: beans){
                 cli.addBean(bean);
 
             }
@@ -76,7 +77,7 @@ public class CLITest {
             AdvancedGame game = new AdvancedGame(3,selectedWizards,teamColors,nicknames,20,3);
             game.initializeGame();
             game.setDrawables();
-            List<GameElementBean> beans = game.getElementView();
+            List<Bean> beans = game.getElementView();
             game.getParameters().setErrorState("SET ME FREE HUMAN !");
             ErrorBean errorBean = new ErrorBean(game.getParameters().getErrorState());
 
@@ -84,7 +85,7 @@ public class CLITest {
             cli.addCommand(CommandEnum.CHOOSE_ASSISTANT);
             cli.addCommand(CommandEnum.QUIT);
             cli.addBean(errorBean);
-            for(GameElementBean bean: beans){
+            for(Bean bean: beans){
                 cli.addBean(bean);
             }
             cli.show();

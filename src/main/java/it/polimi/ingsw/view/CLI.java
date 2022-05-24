@@ -1,12 +1,8 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
-import it.polimi.ingsw.network.ClientNetworkManager;
-import it.polimi.ingsw.network.CommandEnum;
-import it.polimi.ingsw.network.NetworkFieldEnum;
+import it.polimi.ingsw.network.*;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -18,7 +14,7 @@ public class CLI implements UserInterface {
     private StringBuilder LastElement;
     private final int startPosition = 0;
     private final int centerPosition = 10;
-    private List<GameElementBean> beans;
+    private List<Bean> beans;
     private List<CommandEnum> availableCommands;
     private ClientNetworkManager networkManager;
     private String chosenNickname;
@@ -70,7 +66,7 @@ public class CLI implements UserInterface {
 
         int precPriority = lowestPriority;
         int positionOnScreen = 0;
-        GameElementBean curr = beans.get(0);
+        GameElementBean curr = (GameElementBean) beans.get(0);
         GameElementBean bean;
         int index = 0;
         int min = lowestPriority;
@@ -80,7 +76,7 @@ public class CLI implements UserInterface {
             min = lowestPriority;
             //choosing bean to draw (min priority go first)
             for(int id = 0; id < beans.size(); id++){
-                bean = beans.get(id);
+                bean = (GameElementBean) beans.get(id);
                 if(bean.getPriority() < min ){
                     min = bean.getPriority();
                     curr = bean;
@@ -100,7 +96,7 @@ public class CLI implements UserInterface {
             if(curr.getPriority() == highestPriority )
                 positionOnScreen = centerPosition;
 
-            draw(positionOnScreen, curr.drawCLI());
+            draw(positionOnScreen, curr.toString());
             precPriority = curr.getPriority();
             beans.remove(index);
 
@@ -225,7 +221,7 @@ public class CLI implements UserInterface {
 
     @Override
     public void showWelcomeScreen() {
-        System.out.println("``````CIAO AAAAAAAAA ERIANTYS~~~~~~~~~~~");
+        System.out.println("-- WELCOME TO ERIANTYS! --");
     }
 
     @Override
@@ -302,11 +298,12 @@ public class CLI implements UserInterface {
         Scanner scanner = new Scanner(System.in);
         AtomicBoolean ready = new AtomicBoolean(false);
         AtomicBoolean gameStarting = new AtomicBoolean(false);
-        int selection;
+        String selection;
         System.out.println("""
                 You are waiting for players to join a game with you...
                 1 - Set yourself as ready
                 2 - Set yourself as not ready
+                S - Try to start the game
                 """);
 
         //todo: See if this could be an "interactive" wait, where you can see the players joining, or even
@@ -315,31 +312,32 @@ public class CLI implements UserInterface {
 
         new Thread(()-> {
 
-            LobbyBean oldLobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
-            LobbyBean lobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
+            // Lucario: We might not need to check for sameness here, the server should only update if the
+            // lobby was updated (if there's time to implement that)
+            LobbyBean lobbyBean;
+            LobbyBean oldLobbyBean = new LobbyBean(null, null, false, null);
+
             while(true){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("Interrupted before waiting the full length, requesting lobby updates now");
+                }
                 if(networkManager.sendReadyStatus(ready.get())){
                     //signal we're starting the game
                     gameStarting.set(true);
                     return;
                 }
                 lobbyBean = networkManager.getLobbyUpdates();
-                if(!lobbyBean.equals(oldLobbyBean)){
-                    printLobby(lobbyBean);
+                if(!lobbyBean.equals(oldLobbyBean)) {
+                    System.out.println(lobbyBean.toString());
                     oldLobbyBean = lobbyBean;
                 }
             }
         }).start();
 
-        /* Something like:
-        * while(true){
-        *    if(ready) sendReady();
-        *    getLobbyUpdates();
-        * }
-        * */
-
         while(true) {
-            selection = scanner.nextInt();
+            selection = scanner.next();
 
             // If the game started, any input is actually ignored
             if(gameStarting.get()){
@@ -349,13 +347,16 @@ public class CLI implements UserInterface {
                 break;
             }
 
-            if (selection == 1) {
+            if (selection.equals("1")) {
                 ready.set(true);
                 System.out.println("You set yourself as ready");
             }
-            else if (selection == 2){
+            else if (selection.equals("2")){
                 ready.set(false);
                 System.out.println("You set yourself as not ready");
+            }
+            else if (selection.equals("S")) {
+                networkManager.startGame();
             } else continue;
         }
 
@@ -375,6 +376,7 @@ public class CLI implements UserInterface {
     @Override
     public void showTowerAndWizardSelection() {
         System.out.println("Congrats, at least you got the game to start");
+        while(true);
         //todo
     }
 
@@ -385,20 +387,22 @@ public class CLI implements UserInterface {
 
     @Override
     public void startInterface() {
+
         showWelcomeScreen();
         showLoginScreen();
         showGameruleSelection();
         showLobby();
         showTowerAndWizardSelection();
+
     }
 
     @Override
-    public void addBean(GameElementBean bean) {
+    public void addBean(Bean bean) {
         beans.add(bean);
     }
 
     @Override
-    public GameElementBean removeBean(int index) {
+    public Bean removeBean(int index) {
         return beans.remove(index);
     }
 

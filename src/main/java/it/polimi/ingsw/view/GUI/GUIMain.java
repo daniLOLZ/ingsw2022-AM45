@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.view.UserInterface;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class GUIMain implements UserInterface {
 
-    private List<GameElementBean> beans;
+    private List<Bean> beans;
     private List<CommandEnum> availableCommands;
     private ClientNetworkManager networkManager;
     private String chosenNickname;
@@ -63,12 +64,12 @@ public class GUIMain implements UserInterface {
     }
 
     @Override
-    public void addBean(GameElementBean bean) {
+    public void addBean(Bean bean) {
         beans.add(bean);
     }
 
     @Override
-    public GameElementBean removeBean(int index) {
+    public Bean removeBean(int index) {
         return beans.remove(index);
     }
 

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,11 @@ public class AdvancedGameBoardBean extends GameBoardBean{
         this.numGameCoins = numGameCoins;
         this.idCharacterCards = idCharacterCards;
 
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.ADVANCED_GAMEBOARD_BEAN;
     }
 
     public Integer getNumGameCoins() {
@@ -36,7 +42,7 @@ public class AdvancedGameBoardBean extends GameBoardBean{
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
         String currentPlayer = PlayerEnum.getPlayer(currentPlayerId).name;
         List<String> players = new ArrayList<>();

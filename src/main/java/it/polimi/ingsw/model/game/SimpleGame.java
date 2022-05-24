@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.view.VirtualView;
 import it.polimi.ingsw.view.observer.SimpleGameWatcher;
 import it.polimi.ingsw.view.observer.Watcher;
@@ -952,8 +953,8 @@ public class SimpleGame extends DrawableObject {
      *
      * @return the list with all beans useful for UserInterface
      */
-    public List<GameElementBean> getElementView(){
-        List<GameElementBean> beans = new ArrayList<>();
+    public List<Bean> getElementView(){
+        List<Bean> beans = new ArrayList<>();
         for(DrawableObject object: drawables){
             beans.add(object.toBean());
         }

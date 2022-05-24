@@ -125,7 +125,9 @@ public class ClientHandler implements Runnable{
             break;
         }
 
-        if (!successfulOperation); //TODO close connection?
+        if (!successfulOperation){
+            System.out.println("- Error: No command could be executed");
+        } //TODO close connection?
     }
 
 

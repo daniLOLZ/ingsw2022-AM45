@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
 
@@ -25,9 +26,9 @@ public interface UserInterface {
     }
      */
 
-    public void addBean(GameElementBean bean);
+    public void addBean(Bean bean);
 
-    public GameElementBean removeBean(int index);
+    public Bean removeBean(int index);
 
     public void clearBeans();
 
