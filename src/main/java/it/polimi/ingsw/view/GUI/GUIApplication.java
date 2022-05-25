@@ -1,48 +1,42 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.beans.CloudBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
+import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import static it.polimi.ingsw.view.GUI.Drawer.*;
 
 
-public class GUIApplication extends Application {
-
-    private static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780, REAL_SIZE = 1;
-
-    private static final double left    = 0,
-                                right   = WINDOW_WIDTH,
-                                up      = 0,
-                                down    = WINDOW_HEIGHT,
-                                centerX = WINDOW_WIDTH/2,
-                                centerY = WINDOW_HEIGHT/2;
-
-    private static final Coord upLeftCorner    = new Coord(left,up),
-                               upRightCorner   = new Coord(right,up),
-                               upCenter        = new Coord(centerX,up),
-                               centerRight     = new Coord(right,centerY),
-                               centerLeft      = new Coord(left,centerY),
-                               center          = new Coord(centerX,centerY),
-                               downLeftCorner  = new Coord(left,down),
-                               downRightCorner = new Coord(right,down),
-                               downCenter      = new Coord(centerX,down);
+public class GUIApplication extends Application implements UserInterface{
 
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
@@ -104,12 +98,7 @@ public class GUIApplication extends Application {
         stage.show();
 
     }
-    
-    public static void main(String[] args){
-        launch();
-    }
 
-    //@Override
     public void showLoginScreen(boolean errorOccurred) {
 
         //in case of logout I want to reset the action on close request
@@ -388,6 +377,18 @@ public class GUIApplication extends Application {
             showSearchGameScreen(false);
         });
 
+        //<editor-fold desc="Debug">
+
+        Button success = new Button("Simulate start game");
+        Button failure = new Button("Simulate failure");
+
+        success.setOnAction(event -> startGame());
+        failure.setOnAction(event -> showLobbyScreen(false));
+
+        layout.getChildren().addAll(success,failure);
+
+        //</editor-fold>
+
         layout.getChildren().addAll(gameDetails, userActions, notification);
         root.getChildren().add(layout);
 
@@ -409,98 +410,108 @@ public class GUIApplication extends Application {
     }
 
     private void startGame(){
+        StackPane root = new StackPane();
+
+        Canvas islands = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.getChildren().add(islands);
+
+        List<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
+        ids.add(3);
+//        ids.add(4);
+//        ids.add(5);
+//        ids.add(6);
+//        ids.add(7);
+//        ids.add(8);
+//        ids.add(9);
+//        ids.add(10);
+
+        List<StudentEnum> students = new ArrayList<>();
+        students.add(StudentEnum.GREEN);
+        students.add(StudentEnum.GREEN);
+        students.add(StudentEnum.RED);
+        students.add(StudentEnum.YELLOW);
+        students.add(StudentEnum.BLUE);
+        students.add(StudentEnum.BLUE);
+        students.add(StudentEnum.YELLOW);
+        students.add(StudentEnum.YELLOW);
+        students.add(StudentEnum.GREEN);
+        students.add(StudentEnum.YELLOW);
+        students.add(StudentEnum.YELLOW);
+
+        IslandGroupBean bean = new IslandGroupBean(0, ids, students,true, TeamEnum.WHITE);
+
+        Drawer.drawIslandGroup(islands.getGraphicsContext2D(), bean, center);
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        stage.setScene(scene);
+    }
+
+
+    @Override
+    public void addBean(GameElementBean bean) {
 
     }
 
-    /**
-     * Draws an image scaled by the given scaling factor.
-     * If alignment coordinates are inside the scene, the drawn image is always totally inside the scene (unless it's too big)
-     * @param graphicsContext The graphics context required to draw the image
-     * @param image The image to draw
-     * @param alignment The point the image should be placed
-     * @param scale The scaling factor applied to the image
-     */
-    private void drawImage (GraphicsContext graphicsContext, Image image, Coord alignment, double scale){
-
-        double imageWidth = image.getWidth()*scale, imageHeight = image.getHeight()*scale;
-
-        Coord pos = new Coord(alignment.x/WINDOW_WIDTH, alignment.y/WINDOW_HEIGHT),
-              anchor = new Coord(pos.x * imageWidth, pos.y * imageHeight);
-
-        graphicsContext.drawImage(image, alignment.x - anchor.x, alignment.y - anchor.y, imageWidth, imageHeight);
+    @Override
+    public GameElementBean removeBean(int index) {
+        return null;
     }
 
-    private void drawImage (GraphicsContext graphicsContext, Image image, Coord alignment){
-        drawImage(graphicsContext, image, alignment, REAL_SIZE);
+    @Override
+    public void clearBeans() {
+
     }
 
-    /**
-     * Draws an image scaled by the given scaling factor, positioning its center at the give coordinates.
-     * @param graphicsContext The graphics context required to draw the image
-     * @param image The image to draw
-     * @param pos The point the image's center should be placed
-     * @param scale The scaling factor applied to the image
-     */
-    private void drawFromCenterImage (GraphicsContext graphicsContext, Image image, Coord pos, double scale){
+    @Override
+    public void addCommand(CommandEnum command) {
 
-        double imageWidth = image.getWidth()*scale, imageHeight = image.getHeight()*scale;
-        Coord imageCenter = new Coord(imageWidth/2, imageHeight/2);
-
-        graphicsContext.drawImage(image,pos.x - imageCenter.x,pos.y - imageCenter.y, imageWidth, imageHeight);
     }
 
-    private void drawFromCenterImage (GraphicsContext graphicsContext, Image image, Coord pos){
-        drawFromCenterImage(graphicsContext, image, pos, REAL_SIZE);
+    @Override
+    public CommandEnum removeCommand(int index) {
+        return null;
     }
 
-    private void showMenuBackground(Region region){
-        Image background = new Image("assets/background.jpg");
-        BackgroundImage backgroundImage = new BackgroundImage(background,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                new BackgroundPosition(Side.LEFT,0.5,true,Side.TOP,0.5,true),
-                new BackgroundSize(WINDOW_WIDTH, WINDOW_WIDTH, false, false, false, false));
+    @Override
+    public void clearCommands() {
 
-        region.setBackground(new Background(backgroundImage));
     }
 
-    private void drawLogo(GraphicsContext graphicsContext){
-        Image profsLogo = new Image("assets/decorations/login_screen/professors.png");
-        Image textLogo = new Image("assets/decorations/login_screen/eriantys_text_logo.png");
-        drawImage(graphicsContext,
-                profsLogo,
-                new Coord(centerX, centerY * 0.1),
-                0.6);
-        drawImage(graphicsContext,
-                textLogo,
-                new Coord(centerX, centerY * 0.35),
-                0.15);
+    @Override
+    public void showWelcomeScreen() {
+
     }
 
-    private void showDecorativeIslands(GraphicsContext graphicsContext){
+    @Override
+    public void showLoginScreen() {
+        showLoginScreen(false);
+    }
 
-        Image island1 = new Image("assets/tiles/island1.png");
-        Image island2 = new Image("assets/tiles/island2.png");
-        Image island3 = new Image("assets/tiles/island3.png");
+    @Override
+    public void showGameruleSelection() {
 
-        Image cloud = new Image("assets/tiles/cloud_card.png");
+    }
 
-        double scale = 0.2;
+    @Override
+    public void showLobby() {
 
+    }
 
-        drawImage(graphicsContext, cloud, upLeftCorner, scale);
-        drawImage(graphicsContext, island1, upLeftCorner, scale);
-        drawImage(graphicsContext, cloud, upRightCorner, scale);
-        drawImage(graphicsContext, island1, upRightCorner, scale);
+    @Override
+    public void showTowerAndWizardSelection() {
 
-        drawImage(graphicsContext, cloud, centerLeft, scale);
-        drawImage(graphicsContext, island2, centerLeft, scale);
-        drawImage(graphicsContext, cloud, centerRight, scale);
-        drawImage(graphicsContext, island2, centerRight, scale);
+    }
 
-        drawImage(graphicsContext, cloud, downLeftCorner, scale);
-        drawImage(graphicsContext, island3, downLeftCorner, scale);
-        drawImage(graphicsContext, cloud, downRightCorner, scale);
-        drawImage(graphicsContext, island3, downRightCorner, scale);
+    @Override
+    public void showGameInterface() {
+
+    }
+
+    @Override
+    public void startInterface() {
+
     }
 }

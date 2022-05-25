@@ -41,7 +41,11 @@ public class MessageBroker {
     }
 
     private Map<NetworkFieldEnum, Object> deserialize(String JSONString){
-        return gson.fromJson(JSONString, mapType);
+
+        Map<NetworkFieldEnum, Object> returnableMap = gson.fromJson(JSONString, mapType);
+        returnableMap.replaceAll((k, v) -> (Object) returnableMap.get(k));
+
+        return returnableMap;
     }
 
     /**
@@ -151,6 +155,8 @@ public class MessageBroker {
             incomingMessages.add(deserializedMessage);
         }
     }
+
+
 
     /**
      * Asks to lock the incoming buffer to process the message

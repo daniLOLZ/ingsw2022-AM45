@@ -3,7 +3,6 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.network.Preferences;
 import it.polimi.ingsw.network.Server;
 import it.polimi.ingsw.view.CLI;
-import it.polimi.ingsw.view.GUI.GUIMain;
 import it.polimi.ingsw.view.UserInterface;
 
 import java.util.Arrays;
@@ -36,8 +35,8 @@ public class Eriantys {
             return;
         }
         if(GUIMode){
-            UserInterface gui = new GUIMain(hostname, portNumber);
-            gui.startInterface();
+            //UserInterface gui = new GUIMain(hostname, portNumber);
+            //gui.startInterface();
             return;
         }
         if(CLIMode){

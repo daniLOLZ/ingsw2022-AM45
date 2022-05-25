@@ -4,19 +4,7 @@
 
 package it.polimi.ingsw.network;
 
-import it.polimi.ingsw.view.CLI;
-import it.polimi.ingsw.view.GUI.GUIMain;
-import it.polimi.ingsw.view.UserInterface;
-
 import java.io.*;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.*;
 
 /**
  * Entry point for the client application
