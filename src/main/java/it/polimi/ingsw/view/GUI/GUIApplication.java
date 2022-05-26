@@ -2,17 +2,15 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
-import it.polimi.ingsw.model.beans.CloudBean;
-import it.polimi.ingsw.model.beans.GameElementBean;
-import it.polimi.ingsw.model.beans.IslandGroupBean;
+import it.polimi.ingsw.model.beans.*;
+import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.view.GUI.drawers.BoardDrawer;
+import it.polimi.ingsw.view.GUI.drawers.DecorationsDrawer;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -21,22 +19,40 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import static it.polimi.ingsw.view.GUI.Drawer.*;
+import static it.polimi.ingsw.view.GUI.drawers.IslandDrawer.*;
 
 
 public class GUIApplication extends Application implements UserInterface{
+
+    public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
+
+    public static final double
+            up      = 0,
+            left    = 0,
+            down    = WINDOW_HEIGHT,
+            right   = WINDOW_WIDTH,
+            centerX = WINDOW_WIDTH/2,
+            centerY = WINDOW_HEIGHT/2;
+
+    public static final Coord
+            downCenter      = new Coord(centerX,down),
+            upCenter        = new Coord(centerX,up),
+            center          = new Coord(centerX,centerY),
+            centerLeft      = new Coord(left,centerY),
+            centerRight     = new Coord(right,centerY),
+            downRightCorner = new Coord(right,down),
+            downLeftCorner  = new Coord(left,down),
+            upRightCorner   = new Coord(right,up),
+            upLeftCorner    = new Coord(left,up);
 
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
@@ -67,7 +83,7 @@ public class GUIApplication extends Application implements UserInterface{
 
         //<editor-fold desc="Decorations">
 
-        showMenuBackground(root);
+        DecorationsDrawer.showMenuBackground(root);
 
         Label welcomeMessage = new Label("""
                 Once upon a time, a boy lifted his eyes,
@@ -110,12 +126,12 @@ public class GUIApplication extends Application implements UserInterface{
 
         //<editor-fold desc="Decorations">
 
-        showMenuBackground(root);
+        DecorationsDrawer.showMenuBackground(root);
 
         Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        drawLogo(graphicsContext);
+        DecorationsDrawer.drawLogo(graphicsContext);
 
         Image king = new Image("assets/decorations/login_screen/king_no_bg.png");
         Image pixie = new Image("assets/decorations/login_screen/pixie_no_bg.png");
@@ -214,13 +230,13 @@ public class GUIApplication extends Application implements UserInterface{
 
         //<editor-fold desc="Decorations">
 
-        showMenuBackground(root);
+        DecorationsDrawer.showMenuBackground(root);
 
         Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        drawLogo(graphicsContext);
-        showDecorativeIslands(graphicsContext);
+        DecorationsDrawer.drawLogo(graphicsContext);
+        DecorationsDrawer.showDecorativeIslands(graphicsContext);
 
         root.getChildren().add(canvas);
 
@@ -323,13 +339,13 @@ public class GUIApplication extends Application implements UserInterface{
 
         //<editor-fold desc="Decorations">
 
-        showMenuBackground(root);
+        DecorationsDrawer.showMenuBackground(root);
 
         Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        drawLogo(graphicsContext);
-        showDecorativeIslands(graphicsContext);
+        DecorationsDrawer.drawLogo(graphicsContext);
+        DecorationsDrawer.showDecorativeIslands(graphicsContext);
 
         root.getChildren().add(canvas);
 
@@ -412,6 +428,7 @@ public class GUIApplication extends Application implements UserInterface{
     private void startGame(){
         StackPane root = new StackPane();
 
+        //<editor-fold desc="Islands">
         Canvas islands = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
         root.getChildren().add(islands);
 
@@ -419,8 +436,8 @@ public class GUIApplication extends Application implements UserInterface{
         ids.add(1);
         ids.add(2);
         ids.add(3);
-//        ids.add(4);
-//        ids.add(5);
+        ids.add(4);
+        ids.add(5);
 //        ids.add(6);
 //        ids.add(7);
 //        ids.add(8);
@@ -440,9 +457,39 @@ public class GUIApplication extends Application implements UserInterface{
         students.add(StudentEnum.YELLOW);
         students.add(StudentEnum.YELLOW);
 
-        IslandGroupBean bean = new IslandGroupBean(0, ids, students,true, TeamEnum.WHITE);
+        AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,false, TeamEnum.WHITE, 4);
 
-        Drawer.drawIslandGroup(islands.getGraphicsContext2D(), bean, center);
+        //Drawer.drawAdvancedIslandGroup(islands.getGraphicsContext2D(), bean, center);
+        //</editor-fold>
+
+        //<editor-fold desc="Game Boards">
+
+        Canvas boards = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.getChildren().add(boards);
+
+        List<StudentEnum> atEntrance = new ArrayList<>();
+        atEntrance.add(StudentEnum.GREEN);
+        atEntrance.add(StudentEnum.YELLOW);
+        atEntrance.add(StudentEnum.RED);
+
+        List<Integer> inHall = new ArrayList<>();
+        inHall.add(1);
+        inHall.add(4);
+        inHall.add(3);
+        inHall.add(1);
+        inHall.add(7);
+
+        List<StudentEnum> professors = new ArrayList<>();
+        professors.add(StudentEnum.BLUE);
+        professors.add(StudentEnum.RED);
+
+        List<Integer> assistants = new ArrayList<>();
+
+        PlayerBean board = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants);
+
+        BoardDrawer.drawBoard(boards.getGraphicsContext2D(), board, downCenter.pureSumY(-155));
+
+        //</editor-fold>
 
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 

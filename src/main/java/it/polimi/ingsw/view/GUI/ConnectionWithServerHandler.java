@@ -1,7 +1,5 @@
 package it.polimi.ingsw.view.GUI;
 
-import javafx.application.Platform;
-
 //this is a stub class
 public class ConnectionWithServerHandler {
 
