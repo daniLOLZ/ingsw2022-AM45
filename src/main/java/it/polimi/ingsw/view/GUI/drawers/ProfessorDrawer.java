@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.GUI.drawers;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.view.GUI.Coord;
+import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -22,9 +23,9 @@ public class ProfessorDrawer extends Drawer{
 
     private static final double professorSize = professors.get(0).getWidth();
 
-    public static void drawProfessor(GraphicsContext gc, StudentEnum studentType, Coord pos, double scale){
+    public static void drawProfessor(Group root, StudentEnum studentType, Coord pos, double scale){
 
-        drawFromCenterImage(gc, professors.get(studentType.index), pos, scale);
+        drawFromCenterInteractiveImage(root, professors.get(studentType.index), pos, scale, null);
     }
 
     public static double getProfessorSize(){

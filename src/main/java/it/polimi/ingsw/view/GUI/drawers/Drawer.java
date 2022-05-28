@@ -1,9 +1,16 @@
 package it.polimi.ingsw.view.GUI.drawers;
 
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.GUIApplication;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 
 public abstract class Drawer{
 
@@ -52,5 +59,46 @@ public abstract class Drawer{
 
     public static void drawFromCenterImage (GraphicsContext graphicsContext, Image image, Coord pos){
         Drawer.drawFromCenterImage(graphicsContext, image, pos, REAL_SIZE);
+    }
+
+    public static ImageView drawFromCenterInteractiveImage (Group root, Image image, Coord pos, double scale, EventHandler<MouseEvent> onClick){
+
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(image.getWidth() * scale);
+        imageView.setFitHeight(image.getHeight() * scale);
+        imageView.setX(pos.x - scale * image.getWidth() / 2);
+        imageView.setY(pos.y - scale * image.getHeight() / 2);
+        imageView.setOnMouseClicked(onClick);
+
+        root.getChildren().add(imageView);
+        return imageView;
+    }
+
+    public static void addHoveringEffects(ImageView imageView, Coord pos, double scale,EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom){
+
+        Image image = imageView.getImage();
+        if (hoverZoom != 1){
+
+            Coord anchor = new Coord((pos.x - image.getWidth() * scale / 2) * image.getWidth() * scale / GUIApplication.WINDOW_WIDTH / (1 - image.getWidth() * scale / GUIApplication.WINDOW_WIDTH),
+                    (pos.y - image.getHeight() * scale / 2) * image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT / (1 - image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT));
+
+            imageView.setOnMouseEntered(event -> {
+                imageView.setFitWidth(image.getWidth() * scale * hoverZoom);
+                imageView.setFitHeight(image.getHeight() * scale * hoverZoom);
+                imageView.setX(pos.x - scale * image.getWidth() / 2 - anchor.x * (hoverZoom - 1));
+                imageView.setY(pos.y - scale * image.getHeight() / 2 - anchor.y * (hoverZoom - 1));
+                entered.handle(event);
+
+            });
+
+            imageView.setOnMouseExited(event -> {
+                imageView.setFitWidth(image.getWidth() * scale);
+                imageView.setFitHeight(image.getHeight() * scale);
+                imageView.setX(pos.x - scale * image.getWidth() / 2);
+                imageView.setY(pos.y - scale * image.getHeight() / 2);
+                exited.handle(event);
+
+            });
+        }
     }
 }

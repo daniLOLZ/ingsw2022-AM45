@@ -2,8 +2,12 @@ package it.polimi.ingsw.view.GUI.drawers;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.view.GUI.Coord;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +26,14 @@ public class StudentDrawer extends Drawer{
 
     private static final double studentSize = students.get(0).getWidth();
 
-    public static void drawStudent(GraphicsContext gc, StudentEnum studentType, Coord pos, double scale){
+    public static ImageView drawStudent(Group root, StudentEnum studentType, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
-        drawFromCenterImage(gc, students.get(studentType.index), pos, scale);
+        return drawFromCenterInteractiveImage(root, students.get(studentType.index), pos, scale, onClick);
+    }
+
+    public static ImageView drawStudent(Group root, StudentEnum studentType, Coord pos, double scale){
+
+        return drawFromCenterInteractiveImage(root, students.get(studentType.index), pos, scale, null);
     }
 
     public static double getStudentSize(){

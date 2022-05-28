@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.GUI.drawers;
 
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.view.GUI.Coord;
+import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -21,9 +22,9 @@ public class TowerDrawer extends Drawer{
 
     private static final double towerSize = towers.get(0).getWidth();
 
-    public static void drawTower(GraphicsContext gc, TeamEnum color, Coord pos, double scale){
+    public static void drawTower(Group root, TeamEnum color, Coord pos, double scale){
 
-        drawFromCenterImage(gc, towers.get(color.index), pos, scale);
+        drawFromCenterInteractiveImage(root, towers.get(color.index), pos, scale, null);
     }
 
     public static double getTowerSize(){

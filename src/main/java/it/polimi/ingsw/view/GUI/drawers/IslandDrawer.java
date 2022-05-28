@@ -6,15 +6,16 @@ import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.GUIApplication;
-import javafx.application.Platform;
-import javafx.geometry.Side;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.collections.ObservableList;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class IslandDrawer extends Drawer{
 
@@ -61,36 +62,103 @@ public class IslandDrawer extends Drawer{
 
     private static final Image blockTile = new Image("assets/tiles/blockTile.png");
 
-    private static final double defaultIslandScale = 0.2;
+    private static final double defaultIslandScale = 0.1, hoverZoom = 2.4;
     private static final double islandEdge = 160.0 / 0.4 * defaultIslandScale;
     private static final double islandWidth = islandEdge * 2;
     private static final double islandHeight = Math.sqrt(3) * islandEdge;
     private static final int firstIslandId = 1;
     private static final int differentIslandTiles = 3;
 
-    public static void drawIslandGroup(GraphicsContext gc, IslandGroupBean data, Coord pos){
+    public static void drawAdvancedIslandGroup(Group root, AdvancedIslandGroupBean data, Coord pos){
 
         List<Integer> islands = data.getIdIslands();
         List<Coord> positions = getIslandSlots(islands.size(), pos);
 
-        Iterator<Coord> drawingPosition = positions.iterator();
-        for (int id: islands) {
-            Coord drawingSlot = drawingPosition.next();
-            Platform.runLater(() -> drawFromCenterImage(gc, fromIdToImage(id), drawingSlot, defaultIslandScale));
-
-            if (data.getTowersColor() != TeamEnum.NOTEAM)
-                Platform.runLater(() -> drawFromCenterImage(gc,
-                                                            towers.get(data.getTowersColor().index),
-                                                            new Coord(towerSlot.x * defaultIslandScale, towerSlot.y * defaultIslandScale).pureSum(drawingSlot),
-                                                            specialWoodenSize / towers.get(0).getHeight() * defaultIslandScale));
-
-            }
-
-        if (data.isPresentMN()){
-            int MNPosition = (islands.size() + 1) / 2 - 1;
-            Platform.runLater(() -> drawFromCenterImage(gc, motherNature, new Coord(MNSlot.x * defaultIslandScale, MNSlot.y * defaultIslandScale).pureSum(positions.get(MNPosition)), specialWoodenSize / motherNature.getWidth() * defaultIslandScale));
+        List<Double> actualScales = new ArrayList<>();
+        AtomicReference<List<List<ImageView>>> children = new AtomicReference<>();
+        children.set(new ArrayList<>());
+        for (int ignored : islands) {
+            actualScales.add(defaultIslandScale);
+            children.get().add(new ArrayList<>());
         }
 
+        //draw islands
+        Iterator<Coord> drawingPosition = positions.iterator();
+        for (int id: islands) {
+
+            AtomicReference<ImageView> islandView = new AtomicReference<>();
+            ObservableList<Node> oldLayout = root.getChildren();
+            Coord drawingSlot = drawingPosition.next();
+            islandView.set(drawFromCenterInteractiveImage(root, fromIdToImage(id), drawingSlot, defaultIslandScale, null));
+            /*addHoveringEffects(islandView.get(), drawingSlot, defaultIslandScale,
+                    event -> {
+                        islandView.get().toFront();
+                        actualScales.set(id - firstIslandId, defaultIslandScale * hoverZoom);
+                        //positions.set(id - firstIslandId, new Coord(islandView.get().getX(), islandView.get().getY()));
+                        for (ImageView view:
+                                children.get().get(id - firstIslandId)) {
+                            root.getChildren().remove(view);
+                        }
+                        children.get().set(id - firstIslandId, drawIslandChildEntities(root, data, islands, positions, actualScales));
+                        for (ImageView child : children.get().get(id - firstIslandId)) child.toFront();
+                    },
+                    event -> {
+                        actualScales.set(id - firstIslandId, defaultIslandScale);
+                        //positions.set(id - firstIslandId, getIslandSlots(islands.size(), pos).get(id - firstIslandId));
+                        for (ImageView view:
+                                children.get().get(id - firstIslandId)) {
+                            root.getChildren().remove(view);
+                        }
+                        children.get().set(id - firstIslandId,drawIslandChildEntities(root, data, islands, positions, actualScales));
+                    },
+
+                    hoverZoom);*/
+
+
+            children.get().set(id - firstIslandId ,drawIslandChildEntities(root, data, islands, positions, actualScales));
+            }
+
+
+    }
+
+    public static void drawIslandGroup(Group root, IslandGroupBean data, Coord pos){
+
+        AdvancedIslandGroupBean adaptedData = (AdvancedIslandGroupBean) data;
+        adaptedData.setNumBlockTiles(0);
+
+        drawAdvancedIslandGroup(root, adaptedData, pos);
+    }
+
+    private static List<ImageView> drawIslandChildEntities(Group root, AdvancedIslandGroupBean data, List<Integer> islands, List<Coord> positions, List<Double> actualScales){
+
+        //draw towers
+
+        List<ImageView> children = new ArrayList<>();
+
+        Iterator<Coord> drawingPosition = positions.iterator();
+        if (data.getTowersColor() != TeamEnum.NOTEAM)
+            for (int id: islands){
+                Coord drawingSlot = drawingPosition.next();
+                children.add(drawFromCenterInteractiveImage(
+                        root,
+                        towers.get(data.getTowersColor().index),
+                        new Coord(towerSlot.x * actualScales.get(id - firstIslandId), towerSlot.y * actualScales.get(id - firstIslandId)).pureSum(drawingSlot),
+                        specialWoodenSize / towers.get(0).getHeight() * actualScales.get(id - firstIslandId),
+                        null));
+            }
+
+        //draw mother nature
+        if (data.isPresentMN()){
+            int MNPosition = (islands.size() + 1) / 2 - 1;
+            children.add(drawFromCenterInteractiveImage(
+                    root,
+                    motherNature,
+                    new Coord(MNSlot.x * actualScales.get(MNPosition), MNSlot.y * actualScales.get(MNPosition)).pureSum(positions.get(MNPosition)),
+                    specialWoodenSize / motherNature.getWidth() * actualScales.get(MNPosition),
+                    null));
+        }
+
+        //draw students
         Coord studentSlot = GUIApplication.upLeftCorner;
         Iterator<Coord> studentSlotIterator = studentsOnIslandsSlots.iterator();
 
@@ -99,26 +167,26 @@ public class IslandDrawer extends Drawer{
             StudentEnum studentToDraw = data.getStudentsOnIsland().get(studentIndex);
 
             if (studentIndex % islands.size() == 0) studentSlot = studentSlotIterator.next();
-
-            Coord finalStudentSlot = studentSlot;
-            int finalStudentIndex = studentIndex;
-            Platform.runLater(() -> StudentDrawer.drawStudent(gc, studentToDraw, new Coord(finalStudentSlot.x * defaultIslandScale, finalStudentSlot.y * defaultIslandScale).pureSum(positions.get(finalStudentIndex % positions.size())), defaultWoodenSize / StudentDrawer.getStudentSize() * defaultIslandScale));
+                children.add(StudentDrawer.drawStudent(
+                        root,
+                        studentToDraw,
+                        new Coord(studentSlot.x * actualScales.get(studentIndex % positions.size()), studentSlot.y * actualScales.get(studentIndex % positions.size())).pureSum(positions.get(studentIndex % positions.size())),
+                        defaultWoodenSize / StudentDrawer.getStudentSize() * actualScales.get(studentIndex % positions.size())));
         }
-    }
 
-    public static void drawAdvancedIslandGroup(GraphicsContext gc, AdvancedIslandGroupBean data, Coord pos){
 
-        drawIslandGroup(gc, data, pos);
-
-        int numIslands = data.getIdIslands().size();
-        List<Coord> positions = getIslandSlots(numIslands, pos);
         for (int currBlockTile = 0; currBlockTile < data.getNumBlockTiles(); currBlockTile++) {
 
-            int finalCurrBlockTile = currBlockTile;
-            Platform.runLater(() -> drawFromCenterImage(gc, blockTile, positions.get(finalCurrBlockTile % numIslands).pureSumX((MNSlot.x + 15 * finalCurrBlockTile) * defaultIslandScale).pureSumY((MNSlot.y + 20 - 15 * finalCurrBlockTile) * defaultIslandScale), specialWoodenSize / blockTile.getWidth() * defaultIslandScale));
+            children.add(drawFromCenterInteractiveImage(
+                    root,
+                    blockTile,
+                    positions.get(currBlockTile % islands.size()).pureSumX((MNSlot.x + 15 * currBlockTile) * actualScales.get(currBlockTile % islands.size())).pureSumY((MNSlot.y + 20 - 15 * currBlockTile) * actualScales.get(currBlockTile % islands.size())),
+                    specialWoodenSize / blockTile.getWidth() * actualScales.get(currBlockTile % islands.size()),
+                    null));
 
         }
 
+        return children;
     }
 
     private static Image fromIdToImage(int id){

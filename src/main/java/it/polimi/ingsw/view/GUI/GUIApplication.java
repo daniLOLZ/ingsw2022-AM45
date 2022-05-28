@@ -7,10 +7,13 @@ import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.view.GUI.drawers.BoardDrawer;
 import it.polimi.ingsw.view.GUI.drawers.DecorationsDrawer;
+import it.polimi.ingsw.view.GUI.drawers.Drawer;
+import it.polimi.ingsw.view.GUI.drawers.IslandDrawer;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -19,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -426,18 +430,18 @@ public class GUIApplication extends Application implements UserInterface{
     }
 
     private void startGame(){
-        StackPane root = new StackPane();
+        Group root = new Group();
+
+        List<Coord> useless = getIslandGroupSlots(12, 4, 1, upLeftCorner);
 
         //<editor-fold desc="Islands">
-        Canvas islands = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-        root.getChildren().add(islands);
 
         List<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
-        ids.add(3);
-        ids.add(4);
-        ids.add(5);
+//        ids.add(3);
+//        ids.add(4);
+//        ids.add(5);
 //        ids.add(6);
 //        ids.add(7);
 //        ids.add(8);
@@ -459,13 +463,12 @@ public class GUIApplication extends Application implements UserInterface{
 
         AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,false, TeamEnum.WHITE, 4);
 
-        //Drawer.drawAdvancedIslandGroup(islands.getGraphicsContext2D(), bean, center);
+        for (Coord slot: getIslandGroupSlots(6, 280, 150, center.pureSumY(-90))) {
+            IslandDrawer.drawAdvancedIslandGroup(root, bean, slot);
+        }
         //</editor-fold>
 
         //<editor-fold desc="Game Boards">
-
-        Canvas boards = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-        root.getChildren().add(boards);
 
         List<StudentEnum> atEntrance = new ArrayList<>();
         atEntrance.add(StudentEnum.GREEN);
@@ -487,7 +490,7 @@ public class GUIApplication extends Application implements UserInterface{
 
         PlayerBean board = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants);
 
-        BoardDrawer.drawBoard(boards.getGraphicsContext2D(), board, downCenter.pureSumY(-155));
+        BoardDrawer.drawBoard(root, board, downCenter.pureSumY(-155));
 
         //</editor-fold>
 
@@ -496,6 +499,37 @@ public class GUIApplication extends Application implements UserInterface{
         stage.setScene(scene);
     }
 
+    private List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){
+        if (amount < 3) return null;
+
+        List<Coord> slots = new ArrayList<>();
+        List<Coord> toAddLater = new ArrayList<>();
+
+        double xPos = -semiWidth;
+
+        for (int line = 0; line < amount / 2 + 1; line++){
+
+            double yPos = getIslandGroupY(xPos, semiWidth, semiHeight);
+
+            slots.add(centerPos.pureSumX(xPos).pureSumY(yPos));
+
+            if (line != 0 && (amount % 2 == 1 || line != amount / 2)) toAddLater.add(centerPos.pureSumX(xPos).pureSumY(-yPos));
+
+            xPos = xPos + 4 * semiWidth / amount;
+        }
+
+        while (toAddLater.size() != 0){
+            Coord toAdd = toAddLater.remove(toAddLater.size() - 1);
+            slots.add(toAdd);
+        }
+
+        return slots;
+    }
+
+    private double getIslandGroupY(double x, double semiWidth, double semiHeight){
+
+        return semiHeight * Math.sqrt(1 - Math.pow(x, 2) / Math.pow(semiWidth, 2));
+    }
 
     @Override
     public void addBean(GameElementBean bean) {
