@@ -824,7 +824,8 @@ public class SimpleGame extends DrawableObject {
         IslandGroup positionMN = MN.move(steps);
         parameters.setIdIslandGroupMN(positionMN.getIdGroup());
         alert();
-        positionMN.alert();
+        for(IslandGroup island : islandGroups)
+            island.alert();
         return positionMN.getIdGroup();
     }
 

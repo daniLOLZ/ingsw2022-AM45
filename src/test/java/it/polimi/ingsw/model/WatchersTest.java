@@ -5,6 +5,8 @@ import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
+import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.view.CLI;
@@ -184,7 +186,117 @@ public class WatchersTest {
 
     }
 
+    @Test
+    public void moveMN(){
+        Player player1 = game.getPlayers().get(0);
+        PlayerBean playerBean = virtualView.getAdvancedPlayerBean().get(0); //Player have 10 assistants
+        IslandGroup islandMN = null;
+        game.moveMN(1);
+        for(IslandGroup isla: game.getIslandGroups())
+            if(isla.getIdGroup() == game.getIdIslandMN())
+                islandMN = isla;
 
+
+        //PLAYER 1 PLAY AN ASSISTANT, MOVE 3 STUDENTS AND MOVE MN
+        player1.getBoard().addToEntrance(StudentEnum.RED);
+        game.selectStudentAtEntrance(player1,0);
+        game.moveFromEntranceToIsland(player1,islandMN.
+                getNextIslandGroup().
+                getNextIslandGroup().getIdGroup());                 //Player moves 1 red students
+                                                                    // into future MN island
+
+        player1.getBoard().addToEntrance((StudentEnum.RED));
+        game.selectStudentAtEntrance(player1, 0);
+        game.moveFromEntranceToHall(player1);                       //Player moves 1 red students at table and
+                                                                    //gains red professor
+
+        player1.getBoard().addToEntrance((StudentEnum.RED));
+        game.selectStudentAtEntrance(player1, 0);
+        game.moveFromEntranceToHall(player1);                       //Player moves 1 red students at table
+
+        IslandGroupBean islandBean = null;
+        for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())
+            if(bean.getIdIslandGroup() == islandMN.getIdGroup())
+                islandBean = bean;
+
+        CLI cli = new CLI();
+        cli.addBean(islandBean);
+        cli.addBean(playerBean);
+
+        //cli.show();
+
+        game.playAssistant(player1, 3);                         //Assistant = (turn:3 , MN_steps: 2)
+        game.moveMN(2);
+
+        playerBean = virtualView.getAdvancedPlayerBean().get(0);            //Player have 9 assistants
+        IslandGroupBean prevIslandBean = null;
+        for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //Prev island hasn't MN anymore
+            if(bean.getIdIslandGroup() == islandMN.getIdGroup())
+                prevIslandBean = bean;
+
+        for(IslandGroup isla: game.getIslandGroups())               //Look for new position of MN
+            if(isla.getIdGroup() == game.getIdIslandMN())
+                islandMN = isla;
+
+        for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //new island has MN
+            if(bean.getIdIslandGroup() == islandMN.getIdGroup())
+                islandBean = bean;
+
+        cli.addBean(islandBean);
+        cli.addBean(prevIslandBean);
+        cli.addBean(playerBean);
+
+        //cli.show();
+
+        //PLAYER 1 BUILDS 1 TOWER ON MN ISLAND
+        try {
+            game.evaluateIsland(islandBean.getIdIslandGroup());
+
+        } catch (UnmergeableException e) {
+            //nulla
+        }
+
+        playerBean = virtualView.getAdvancedPlayerBean().get(0);            //Player have 9 assistants
+        for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //Now Mn island has towers
+            if(bean.getIdIslandGroup() == islandMN.getIdGroup())
+                islandBean = bean;
+
+        cli.addBean(playerBean);
+        cli.addBean(islandBean);
+
+        //cli.show();
+
+        //PLAYER 1 PLAY AN ASSISTANT, PUT A RED STUDENT ON AN ISLAND AND MOVE MN ON THAT ISLAND
+        game.playAssistant(player1, 1);                         //Assistant = (turn:1 , MN_steps: 1)
+        player1.getBoard().addToEntrance(StudentEnum.RED);
+        game.selectStudentAtEntrance(player1,0);
+        game.moveFromEntranceToIsland(player1,islandMN.getNextIslandGroup().getIdGroup());
+        game.moveMN(1);
+
+        //PLAYER 1 BUILDS A TOWER ON THIS ISLAND AND THE ISLANDS MERGE THEMSELVES
+        try {
+            game.evaluateIsland(islandMN.getNextIslandGroup().getIdGroup());
+        } catch (UnmergeableException e) {
+            //nulla
+        }
+
+        for(IslandGroup isla: game.getIslandGroups())               //Look for new position of MN
+            if(isla.getIdGroup() == game.getIdIslandMN())
+                islandMN = isla;
+
+        playerBean = virtualView.getAdvancedPlayerBean().get(0);            //Player have 8 assistants
+        for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //Now Mn island has towers
+            if(bean.getIdIslandGroup() == islandMN.getIdGroup())
+                islandBean = bean;
+
+        assertEquals(4, playerBean.getNumTowers());
+        assertEquals(2, islandBean.getIdIslands().size());
+        assertEquals(8, playerBean.getIdAssistants().size());
+        cli.addBean(playerBean);
+        cli.addBean(islandBean);
+        //cli.show();
+
+    }
 
 
 }
