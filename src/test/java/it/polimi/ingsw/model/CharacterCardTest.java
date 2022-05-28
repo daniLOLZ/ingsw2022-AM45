@@ -10,6 +10,8 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.view.VirtualView;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -19,8 +21,44 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CharacterCardTest {
 
-    ParameterHandler parameter = new ParameterHandler(2);
-    AdvancedParameterHandler advancedParameter = new AdvancedParameterHandler(20);
+
+    AdvancedGame game;
+    int players = 3;
+    int CharacterCards = 3;
+    int coins = 20;
+    ParameterHandler parameter ;
+    AdvancedParameterHandler advancedParameter;
+
+
+    @BeforeEach
+    public void initialize(){
+        final List<Integer> selectedWizards = new ArrayList<>();
+        selectedWizards.add(0);
+        selectedWizards.add(10);
+        selectedWizards.add(20);
+        final List<TeamEnum> teamColors = new ArrayList<>();
+        teamColors.add(TeamEnum.WHITE);
+        teamColors.add(TeamEnum.BLACK);
+        teamColors.add(TeamEnum.GREY);
+        final List<String> nicknames = new ArrayList<>();
+        nicknames.add("Franco");
+        nicknames.add("Mario");
+        nicknames.add("Alice");
+
+        VirtualView virtualView = new VirtualView();
+        try {
+            game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,
+                    coins,CharacterCards, virtualView);
+            game.initializeGame();
+            parameter = game.getParameters();
+            advancedParameter = game.getAdvancedParameters();
+        } catch (IncorrectPlayersException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     /**
      * tests if FactoryCharacterCard create a card correctly, with right id and cost
      */
@@ -199,5 +237,103 @@ public class CharacterCardTest {
             }
         }
 
+    }
+
+    /**
+     * Test Minstrel effect and how many times we can use it.
+     */
+    @Test
+    public void MinstrelTest(){
+        Minstrel minstrel = new Minstrel(parameter,advancedParameter);
+        minstrel.initialise(game);
+        Player player = game.getPlayers().get(0);
+
+        //FIRST TRADE
+        player.getBoard().addToEntrance(StudentEnum.BLUE);
+        player.getBoard().addToHall(StudentEnum.RED);
+        game.getParameters().setCurrentPlayer(player);
+        minstrel.tradeStudents(0,StudentEnum.RED);
+
+        assertEquals(0, player.getNumStudentAtTable(StudentEnum.RED));
+        assertEquals(1, player.getNumStudentAtTable(StudentEnum.BLUE));
+        assertEquals(StudentEnum.RED, player.getBoard().getAtEntrance(0));
+
+        player.getBoard().removeFromEntrance(0); //clean entrance
+
+        //SECOND TRADE
+        player.getBoard().addToEntrance(StudentEnum.BLUE);
+        player.getBoard().addToHall(StudentEnum.RED);
+        game.getParameters().setCurrentPlayer(player);
+        minstrel.tradeStudents(0,StudentEnum.RED);
+
+        assertEquals(0, player.getNumStudentAtTable(StudentEnum.RED));
+        assertEquals(2, player.getNumStudentAtTable(StudentEnum.BLUE));
+        assertEquals(StudentEnum.RED, player.getBoard().getAtEntrance(0));
+
+        player.getBoard().removeFromEntrance(0); //clean entrance
+
+
+        //THIRD TRADE (not available, so no change is applied)
+        player.getBoard().addToEntrance(StudentEnum.BLUE);          //remain at entrance
+        player.getBoard().addToHall(StudentEnum.RED);               //remain at hall
+        game.getParameters().setCurrentPlayer(player);
+        minstrel.tradeStudents(0,StudentEnum.RED);
+
+        assertEquals(1, player.getNumStudentAtTable(StudentEnum.RED));
+        assertEquals(2, player.getNumStudentAtTable(StudentEnum.BLUE));
+        assertEquals(StudentEnum.BLUE, player.getBoard().getAtEntrance(0));
+    }
+
+    /**
+     * Test loanshark effect and if player with no enough student at hall loses all his students
+     */
+    @Test
+    public void LoanSharkTest(){
+        LoanShark loanShark = new LoanShark(parameter,advancedParameter);
+        Player player1 = game.getPlayers().get(0);
+        Player player2 = game.getPlayers().get(1);
+        Player player3 = game.getPlayers().get(2);
+
+        player1.getBoard().addToHall(StudentEnum.RED);
+        player1.getBoard().addToHall(StudentEnum.RED);
+        player1.getBoard().addToHall(StudentEnum.RED);
+        player1.getBoard().addToHall(StudentEnum.RED);
+
+        player2.getBoard().addToHall(StudentEnum.RED);
+        player2.getBoard().addToHall(StudentEnum.RED);
+        player2.getBoard().addToHall(StudentEnum.RED);
+
+        player3.getBoard().addToHall(StudentEnum.RED);
+
+
+        game.selectStudentType(StudentEnum.RED);
+        loanShark.extortStudents(game);
+
+        assertEquals(1, player1.getNumStudentAtTable(StudentEnum.RED));
+        assertEquals(0, player2.getNumStudentAtTable(StudentEnum.RED));
+        assertEquals(0, player3.getNumStudentAtTable(StudentEnum.RED));
+    }
+
+    /**
+     * Test flagBearer effect
+     */
+    @Test
+    public void FlagBearerTest(){
+        FlagBearer flagBearer = new FlagBearer(parameter,advancedParameter);
+        Player playerWhite = game.getPlayers().get(0);
+
+        //Gain red prof
+        playerWhite.getBoard().addToEntrance(StudentEnum.RED);
+        game.selectStudentAtEntrance(playerWhite,0);
+        game.moveFromEntranceToHall(playerWhite);
+
+        //1 red student on island
+        IslandGroup island = game.getIslandGroups().get(0);
+        island.addStudent(StudentEnum.RED);
+        game.selectIslandGroup(island.getIdGroup());
+
+        //evaluate island with card effect and playerWhite wins
+        flagBearer.evaluate(game);
+        assertEquals(TeamEnum.WHITE,island.getTowerColor());
     }
 }
