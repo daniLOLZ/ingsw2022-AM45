@@ -164,6 +164,8 @@ public class IslandGroupTest {
      */
     @Test
     public void evaluationTest(){
+        while(! group.get(0).getStudents().isEmpty())
+            group.get(0).getStudents().remove(0);
         group.get(0).addStudent(StudentEnum.GREEN);
         group.get(0).addStudent(StudentEnum.GREEN);
         group.get(0).addStudent(StudentEnum.RED);

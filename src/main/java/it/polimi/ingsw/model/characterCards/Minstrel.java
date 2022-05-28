@@ -76,7 +76,7 @@ public class Minstrel extends CharacterCard {
      * @param colorHall != NOSTUDENT
      */
     public void tradeStudents( int indexStudentEntrance, StudentEnum colorHall){
-        if(trades > maxTradeableStudents)
+        if(trades >= maxTradeableStudents)
             return;
 
         Player player = parameters.getCurrentPlayer();
@@ -86,12 +86,12 @@ public class Minstrel extends CharacterCard {
         board.moveFromEntranceToHall();
         try {
             board.moveFromHallToEntrance(colorHall);
+            trades++;
         } catch (FullEntranceException e) {
             e.printStackTrace();
             parameters.setErrorState("ENTRANCE FULL, OPERATION FAILED");
-            return;
         }
-        trades++;
+
     }
 
 }

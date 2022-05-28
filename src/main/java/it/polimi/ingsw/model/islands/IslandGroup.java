@@ -269,11 +269,11 @@ public class IslandGroup extends DrawableObject {
         for (Player p : players) {
             if (p.getTeamColor().equals(previousTeam) && p.isLeader()) {
                 oldTowers = p.getBoard().getNumberOfTowers();
-                p.getBoard().updateTowers(-numOfIslandsInGroup());
+                p.getBoard().updateTowers(numOfIslandsInGroup());
             }
             if (p.getTeamColor().equals(team) && p.isLeader()){
                 oldTowers = p.getBoard().getNumberOfTowers();
-                p.getBoard().updateTowers(numOfIslandsInGroup());
+                p.getBoard().updateTowers(-numOfIslandsInGroup());
             }
 
             p.alert();

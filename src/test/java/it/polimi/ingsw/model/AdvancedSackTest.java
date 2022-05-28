@@ -3,6 +3,8 @@ package it.polimi.ingsw.model;
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class AdvancedSackTest {
         list.add(StudentEnum.GREEN);
         sack.addStudents(list);
         sizeThen = sack.size();
-        assert (sizeBefore == (sizeThen - 1));  //correct increment of size
+        assertEquals (sizeBefore,  (sizeThen - 1));  //correct increment of size
 
 
         int occurrence[] = new int[5];
@@ -34,6 +36,6 @@ public class AdvancedSackTest {
         }
 
         //correct increment of occurrences
-        assert (occurrence[StudentEnum.GREEN.index] == occurrence[StudentEnum.BLUE.index] +1);
+        assertEquals (occurrence[StudentEnum.GREEN.index], occurrence[StudentEnum.BLUE.index] +1);
     }
 }
