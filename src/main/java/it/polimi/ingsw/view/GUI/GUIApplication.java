@@ -35,7 +35,7 @@ import static it.polimi.ingsw.view.GUI.drawers.IslandDrawer.*;
 public class GUIApplication extends Application implements UserInterface{
 
     public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
-    public final double cloudSize = 40;
+    public final double cloudSize = 40, assistantWidth = 100;
 
     public static final double
             up      = 0,
@@ -55,6 +55,8 @@ public class GUIApplication extends Application implements UserInterface{
             downLeftCorner  = new Coord(left,down),
             upRightCorner   = new Coord(right,up),
             upLeftCorner    = new Coord(left,up);
+
+    private static final Coord firstAssistantSlot = downCenter.pureSumX(WINDOW_WIDTH * 0.28).pureSumY(-WINDOW_HEIGHT / 7);
 
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
@@ -282,7 +284,7 @@ public class GUIApplication extends Application implements UserInterface{
         Button searchGameButton = new Button("Search Game");
         searchGameButton.setOnAction(event -> {
             //game must be searched once
-            searchGameButton.setOnAction(null);
+            searchGameButton.setOnAction(Drawer.NO_ACTION);
 
             //saving selections in case operation fails
             preselectedGameRule = gameRuleSelection.getValue();
@@ -386,7 +388,7 @@ public class GUIApplication extends Application implements UserInterface{
 
         startGame.setOnAction(event -> {
             ready.setDisable(true);
-            leaveLobby.setOnAction(null);
+            leaveLobby.setOnAction(Drawer.NO_ACTION);
             ConnectionWithServerHandler.startGame();
         });
 
@@ -486,6 +488,9 @@ public class GUIApplication extends Application implements UserInterface{
         professors.add(StudentEnum.RED);
 
         List<Integer> assistants = new ArrayList<>();
+        for (int assistant = 1; assistant <= 4; assistant++) {
+            assistants.add(assistant);
+        }
 
         PlayerBean board = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants);
 
@@ -493,6 +498,13 @@ public class GUIApplication extends Application implements UserInterface{
         BoardDrawer.drawBoard(root, board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
         BoardDrawer.drawBoard(root, board, centerLeft.pureSumX(200), 0.5, Coord.COUNTERCLOCKWISE);
         BoardDrawer.drawBoard(root, board, centerRight.pureSumX(-200), 0.5, Coord.CLOCKWISE);
+
+        int assistantIndex = 0;
+
+        for (Integer assistant: board.getIdAssistants()) {
+            Coord slot = firstAssistantSlot.pureSumX(assistantIndex++ * assistantWidth * 0.28 * 10 / board.getIdAssistants().size());
+            AssistantDrawer.drawAssistant(root, assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth());
+        }
 
         //</editor-fold>
 

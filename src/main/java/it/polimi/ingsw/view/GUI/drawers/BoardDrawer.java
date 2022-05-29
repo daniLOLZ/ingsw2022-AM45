@@ -76,6 +76,10 @@ public class BoardDrawer extends Drawer{
 
     private static final double defaultBoardScale = 0.15, hoverZoom = 1.4, woodenSize = 152, towerSize = 500;
     private static final double playerBoxWidth = 700, playerBoxHeight = 420;
+    private static final double
+            assistantWidth = 100 / defaultBoardScale,
+            assistantHeight = assistantWidth * AssistantDrawer.getAssistantHeight() / AssistantDrawer.getAssistantWidth(),
+            assistantLabelHeight = 160;
 
     public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale, int rotation){
 
@@ -120,8 +124,8 @@ public class BoardDrawer extends Drawer{
         root.getChildren().addAll(playerBox, playerInfo);
         Coord boxLocation =
                 actualPos
-                .pureSumX(-board.getWidth()/2 * actualBoardScale.get())
-                .pureSumY((-board.getHeight()/2 - playerBoxHeight) * actualBoardScale.get());
+                .pureSumX((-board.getWidth()/2 - playerBoxWidth) * actualBoardScale.get())
+                .pureSumY(-board.getHeight()/2 * actualBoardScale.get());
 
         Coord actualBoxLocation = boxLocation.pureRotate(actualPos, rotation);
 
@@ -143,6 +147,42 @@ public class BoardDrawer extends Drawer{
         playerInfo.getTransforms().add(new Rotate(90 * rotation, actualBoxLocation.x, actualBoxLocation.y));
         playerInfo.setText(data.getPlayerId().name + "\n" + data.getNickname());
 
+        //draw last assistant played
+        Rectangle assistantLabel = new Rectangle();
+        Text assistantText = new Text("Assistant played");
+        root.getChildren().addAll(assistantLabel, assistantText);
+        Coord assistantSlot =
+                actualPos
+                .pureSumX(board.getWidth() * actualBoardScale.get() / 2)
+                .pureSumY(-board.getHeight() * actualBoardScale.get() / 2);
+
+        Coord labelPos = assistantSlot.pureRotate(actualPos, rotation);
+
+        assistantLabel.setFill(Color.WHITE);
+        assistantLabel.setX(labelPos.x);
+        assistantLabel.setY(labelPos.y);
+        assistantLabel.setWidth(assistantWidth * actualBoardScale.get());
+        assistantLabel.setHeight(assistantLabelHeight * actualBoardScale.get());
+        assistantLabel.getTransforms().add(new Rotate(90 * rotation, labelPos.x, labelPos.y));
+
+        assistantSlot.moveY(assistantLabelHeight / 2 * actualBoardScale.get());
+        labelPos = assistantSlot.pureSumY(assistantLabelHeight / 4 * actualBoardScale.get()).pureRotate(actualPos, rotation);
+        //TODO doesn't work (for some reason)
+        assistantText.setTextAlignment(TextAlignment.CENTER);
+        assistantText.setFont(Font.font(assistantText.getFont().getName(), assistantText.getFont().getSize() * actualBoardScale.get() / defaultBoardScale));
+        assistantText.setX(labelPos.x);
+        assistantText.setY(labelPos.y);
+        assistantText.setWrappingWidth(assistantWidth * actualBoardScale.get());
+        //assistantText.getTransforms().add(new Rotate(90 * rotation, labelPos.x, labelPos.y));
+
+        assistantSlot.moveX(assistantWidth / 2 * actualBoardScale.get());
+        assistantSlot.moveY(assistantHeight / 2 * actualBoardScale.get() + assistantLabelHeight / 2 * actualBoardScale.get());
+        assistantSlot.rotate(actualPos, rotation);
+
+        //TODO change id into last played assistant once the feature is available
+        ImageView assistantView = AssistantDrawer.drawAssistant(root, 5, assistantSlot, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
+
+        assistantText.getTransforms().add(new Rotate(90 * rotation, assistantSlot.x, assistantSlot.y));
 
         //draw students at entrance
         Iterator<Coord> entranceSlot = atEntranceSlots.iterator();

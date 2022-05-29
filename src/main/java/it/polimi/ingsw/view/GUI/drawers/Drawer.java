@@ -14,6 +14,18 @@ import javafx.scene.layout.Pane;
 
 public abstract class Drawer{
 
+    public static final EventHandler<MouseEvent> NO_EFFECT = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+        }
+    };
+
+    public static final EventHandler<ActionEvent> NO_ACTION = new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent event) {
+
+        }
+    };
 
     protected static final double REAL_SIZE = 1;
 
