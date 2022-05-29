@@ -25,6 +25,7 @@ public class TowerDrawer extends Drawer{
     public static void drawTower(Group root, TeamEnum color, Coord pos, double scale){
 
         drawFromCenterInteractiveImage(root, towers.get(color.index), pos, scale, null);
+        //TODO drawing from the exact center messes up rotation handling. needs fixing
     }
 
     public static double getTowerSize(){

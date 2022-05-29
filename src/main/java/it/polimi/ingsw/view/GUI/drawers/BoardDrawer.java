@@ -3,10 +3,16 @@ package it.polimi.ingsw.view.GUI.drawers;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.view.GUI.Coord;
-import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -69,16 +75,18 @@ public class BoardDrawer extends Drawer{
     }
 
     private static final double defaultBoardScale = 0.15, hoverZoom = 1.4, woodenSize = 152, towerSize = 500;
+    private static final double playerBoxWidth = 700, playerBoxHeight = 420;
 
-    public static void drawBoard(Group root, PlayerBean data, Coord pos){
+    public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale, int rotation){
 
-        AtomicReference<Double> actualBoardScale = new AtomicReference<>(defaultBoardScale);
+        AtomicReference<Double> actualBoardScale = new AtomicReference<>(defaultBoardScale * scale);
         Coord actualPos = pos;
 
         //draw the board
-        ImageView boardView = drawFromCenterInteractiveImage(root, board, pos,defaultBoardScale, null);
+        ImageView boardView = drawFromCenterInteractiveImage(root, board, pos,scale * defaultBoardScale, null);
+        boardView.getTransforms().add(new Rotate(90 * rotation, actualPos.x, actualPos.y));
 
-        addHoveringEffects(boardView, pos, defaultBoardScale,
+        /*addHoveringEffects(boardView, pos, defaultBoardScale,
                 event -> {
             actualBoardScale.set(defaultBoardScale * hoverZoom);
             actualPos.x = boardView.getX();
@@ -91,12 +99,51 @@ public class BoardDrawer extends Drawer{
             actualPos.y = pos.y;
             drawBoardChildEntities(root, data, actualPos, actualBoardScale);
         },
-                hoverZoom);
+                hoverZoom);*/
 
-        drawBoardChildEntities(root, data, actualPos, actualBoardScale);
+        drawBoardChildEntities(root, data, actualPos, actualBoardScale, rotation);
     }
 
-    private static void drawBoardChildEntities(Group root, PlayerBean data, Coord actualPos, AtomicReference<Double> actualBoardScale){
+    public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale){
+        drawBoard(root, data, pos, scale, Coord.NO_ROTATION);
+    }
+
+    public static void drawBoard(Group root, PlayerBean data, Coord pos){
+        drawBoard(root, data, pos, REAL_SIZE, Coord.NO_ROTATION);
+    }
+
+    private static void drawBoardChildEntities(Group root, PlayerBean data, Coord actualPos, AtomicReference<Double> actualBoardScale, int rotation){
+
+        //draw player info
+        Rectangle playerBox = new Rectangle();
+        Text playerInfo = new Text();
+        root.getChildren().addAll(playerBox, playerInfo);
+        Coord boxLocation =
+                actualPos
+                .pureSumX(-board.getWidth()/2 * actualBoardScale.get())
+                .pureSumY((-board.getHeight()/2 - playerBoxHeight) * actualBoardScale.get());
+
+        Coord actualBoxLocation = boxLocation.pureRotate(actualPos, rotation);
+
+        playerBox.setFill(Color.WHITE);
+        playerBox.setX(actualBoxLocation.x);
+        playerBox.setY(actualBoxLocation.y);
+        playerBox.setWidth(playerBoxWidth * actualBoardScale.get());
+        playerBox.setHeight(playerBoxHeight * actualBoardScale.get());
+        playerBox.getTransforms().add(new Rotate(90 * rotation, actualBoxLocation.x, actualBoxLocation.y));
+
+        boxLocation.moveY(playerBoxHeight / 2 * actualBoardScale.get());
+        actualBoxLocation = boxLocation.pureRotate(actualPos, rotation);
+
+        playerInfo.setTextAlignment(TextAlignment.CENTER);
+        playerInfo.setFont(Font.font(playerInfo.getFont().getName(), playerInfo.getFont().getSize() * actualBoardScale.get() / defaultBoardScale));
+        playerInfo.setX(actualBoxLocation.x);
+        playerInfo.setY(actualBoxLocation.y);
+        playerInfo.setWrappingWidth(playerBoxWidth * actualBoardScale.get());
+        playerInfo.getTransforms().add(new Rotate(90 * rotation, actualBoxLocation.x, actualBoxLocation.y));
+        playerInfo.setText(data.getPlayerId().name + "\n" + data.getNickname());
+
+
         //draw students at entrance
         Iterator<Coord> entranceSlot = atEntranceSlots.iterator();
 
@@ -106,47 +153,63 @@ public class BoardDrawer extends Drawer{
                 data.getStudentsAtEntrance()) {
 
             Coord studentPos = entranceSlot.next();
-
-            Platform.runLater(() -> StudentDrawer.drawStudent(
+            studentPos =
+                    actualPos
+                    .pureSumX(studentPos.x * actualBoardScale.get())
+                    .pureSumY(studentPos.y * actualBoardScale.get())
+                    .pureRotate(actualPos, rotation);
+            Coord finalStudentPos = studentPos;
+            int finalStudentIndex = studentIndex;
+            StudentDrawer.drawStudent(
                     root,
                     entranceStudent,
-                    actualPos.pureSumX(studentPos.x * actualBoardScale.get()).pureSumY(studentPos.y * actualBoardScale.get()),
+                    finalStudentPos,
                     woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get(),
-                    event -> System.out.println("Clicked on student # " + studentIndex)));
+                    event -> System.out.println("Clicked on student #" + finalStudentIndex));
+            studentIndex++;
         }
 
         //draw students in the dining hall
         Iterator<Integer> studentsAtTable = data.getStudentsPerTable().iterator();
-        List<List<Coord>> tablesSeats = new ArrayList<>();
 
         for (int table = 0; table < StudentEnum.getNumStudentTypes(); table++) {
-            int finalTable = table;
             int students = studentsAtTable.next();
-            List<Coord> tableSeats = new ArrayList<>();
-            tablesSeats.add(tableSeats);
             for (int student = 0; student < students; student++) {
-                tablesSeats.get(table).add(firstSeat.get(table).pureSumX(student * seatStep));
-                int finalTable1 = table;
-                int finalStudent = student;
-                Platform.runLater(() -> StudentDrawer.drawStudent(
+                Coord diningSeat =
+                        actualPos
+                        .pureSumX(firstSeat.get(table).pureSumX(student * seatStep).x * actualBoardScale.get())
+                        .pureSumY(firstSeat.get(table).pureSumX(student * seatStep).y * actualBoardScale.get())
+                        .pureRotate(actualPos, rotation);
+                StudentDrawer.drawStudent(
                         root,
-                        StudentEnum.getColorById(finalTable),
-                        actualPos.pureSumX(tablesSeats.get(finalTable1).get(finalStudent).x * actualBoardScale.get()).pureSumY(tablesSeats.get(finalTable1).get(finalStudent).y * actualBoardScale.get()),
-                        woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get()));
+                        StudentEnum.getColorById(table),
+                        diningSeat,
+                        woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get());
             }
         }
 
         //draw professors
         for (StudentEnum prof:
                 data.getProfessors()) {
-            Platform.runLater(() -> ProfessorDrawer.drawProfessor(root, prof, actualPos.pureSumX(profSeats.get(prof.index).x * actualBoardScale.get()).pureSumY(profSeats.get(prof.index).y * actualBoardScale.get()), woodenSize / ProfessorDrawer.getProfessorSize() * actualBoardScale.get()));
+            Coord profSeat =
+                    actualPos
+                    .pureSumX(profSeats.get(prof.index).x * actualBoardScale.get())
+                    .pureSumY(profSeats.get(prof.index).y * actualBoardScale.get())
+                    .pureRotate(actualPos, rotation);
+            ProfessorDrawer.drawProfessor(root, prof, profSeat, woodenSize / ProfessorDrawer.getProfessorSize() * actualBoardScale.get());
         }
 
         //draw towers
         Iterator<Coord> towerSlot = towerSlots.iterator();
         for (int tower = 0; tower < data.getNumTowers(); tower++) {
             Coord slot = towerSlot.next();
-            Platform.runLater(() -> TowerDrawer.drawTower(root, data.getTowerColor(), actualPos.pureSumX(slot.x * actualBoardScale.get()).pureSumY(slot.y * actualBoardScale.get()), towerSize / TowerDrawer.getTowerSize() * actualBoardScale.get()));
+            slot =
+                    actualPos
+                    .pureSumX(slot.x * actualBoardScale.get())
+                    .pureSumY(slot.y * actualBoardScale.get())
+                    .pureRotate(actualPos, rotation);
+            Coord finalSlot = slot;
+            TowerDrawer.drawTower(root, data.getTowerColor(), finalSlot, towerSize / TowerDrawer.getTowerSize() * actualBoardScale.get());
         }
     }
 }

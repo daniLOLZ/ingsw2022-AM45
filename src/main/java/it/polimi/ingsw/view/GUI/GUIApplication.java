@@ -5,10 +5,7 @@ import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
-import it.polimi.ingsw.view.GUI.drawers.BoardDrawer;
-import it.polimi.ingsw.view.GUI.drawers.DecorationsDrawer;
-import it.polimi.ingsw.view.GUI.drawers.Drawer;
-import it.polimi.ingsw.view.GUI.drawers.IslandDrawer;
+import it.polimi.ingsw.view.GUI.drawers.*;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -22,9 +19,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -38,6 +35,7 @@ import static it.polimi.ingsw.view.GUI.drawers.IslandDrawer.*;
 public class GUIApplication extends Application implements UserInterface{
 
     public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
+    public final double cloudSize = 40;
 
     public static final double
             up      = 0,
@@ -432,21 +430,14 @@ public class GUIApplication extends Application implements UserInterface{
     private void startGame(){
         Group root = new Group();
 
-        List<Coord> useless = getIslandGroupSlots(12, 4, 1, upLeftCorner);
+        //List<Coord> useless = getIslandGroupSlots(12, 4, 1, upLeftCorner);
 
         //<editor-fold desc="Islands">
 
         List<Integer> ids = new ArrayList<>();
-        ids.add(1);
-        ids.add(2);
-//        ids.add(3);
-//        ids.add(4);
-//        ids.add(5);
-//        ids.add(6);
-//        ids.add(7);
-//        ids.add(8);
-//        ids.add(9);
-//        ids.add(10);
+        for (int i = 1; i <= 1; i++) {
+            ids.add(i);
+        }
 
         List<StudentEnum> students = new ArrayList<>();
         students.add(StudentEnum.GREEN);
@@ -463,10 +454,18 @@ public class GUIApplication extends Application implements UserInterface{
 
         AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,false, TeamEnum.WHITE, 4);
 
-        for (Coord slot: getIslandGroupSlots(6, 280, 150, center.pureSumY(-90))) {
+        for (Coord slot: getIslandGroupSlots(12, 380, 140, center.pureSumY(-50))) {
             IslandDrawer.drawAdvancedIslandGroup(root, bean, slot);
         }
+
         //</editor-fold>
+
+        CloudBean cloudBean = new CloudBean(1, students.subList(0,4));
+
+        for (Coord slot:
+             getCloudsSlots(4, center.pureSumY(-50))) {
+            CloudDrawer.drawCloud(root, cloudBean, slot, cloudSize / CloudDrawer.getCloudSize());
+        }
 
         //<editor-fold desc="Game Boards">
 
@@ -490,12 +489,15 @@ public class GUIApplication extends Application implements UserInterface{
 
         PlayerBean board = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants);
 
-        BoardDrawer.drawBoard(root, board, downCenter.pureSumY(-155));
+        BoardDrawer.drawBoard(root, board, downCenter.pureSumY(-145));
+        BoardDrawer.drawBoard(root, board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
+        BoardDrawer.drawBoard(root, board, centerLeft.pureSumX(200), 0.5, Coord.COUNTERCLOCKWISE);
+        BoardDrawer.drawBoard(root, board, centerRight.pureSumX(-200), 0.5, Coord.CLOCKWISE);
 
         //</editor-fold>
 
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-
+        scene.setFill(Color.STEELBLUE);
         stage.setScene(scene);
     }
 
@@ -509,7 +511,7 @@ public class GUIApplication extends Application implements UserInterface{
 
         for (int line = 0; line < amount / 2 + 1; line++){
 
-            double yPos = getIslandGroupY(xPos, semiWidth, semiHeight);
+            double yPos = getIslandGroupY(Math.min(xPos, semiWidth), semiWidth, semiHeight);
 
             slots.add(centerPos.pureSumX(xPos).pureSumY(yPos));
 
@@ -529,6 +531,21 @@ public class GUIApplication extends Application implements UserInterface{
     private double getIslandGroupY(double x, double semiWidth, double semiHeight){
 
         return semiHeight * Math.sqrt(1 - Math.pow(x, 2) / Math.pow(semiWidth, 2));
+    }
+
+    private List<Coord> getCloudsSlots(int amount, Coord center){
+
+        List<Coord> slots = new ArrayList<>();
+
+        Coord startingPos = center.pureSumX(-2 * cloudSize / 3 * (amount - 1));
+        double fluctuation = cloudSize / 5;
+
+        for (int slot = 0; slot < amount; slot++){
+            slots.add(startingPos.pureSumX(slot * 4 * cloudSize / 3).pureSumY(fluctuation));
+            fluctuation = - fluctuation;
+        }
+
+        return slots;
     }
 
     @Override

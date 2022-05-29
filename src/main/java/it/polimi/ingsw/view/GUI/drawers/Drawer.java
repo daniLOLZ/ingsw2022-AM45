@@ -15,7 +15,7 @@ import javafx.scene.layout.Pane;
 public abstract class Drawer{
 
 
-    private static final double REAL_SIZE = 1;
+    protected static final double REAL_SIZE = 1;
 
     /**
      * Draws an image scaled by the given scaling factor.
