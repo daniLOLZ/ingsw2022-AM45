@@ -26,36 +26,36 @@ public interface UserInterface {
     }
      */
 
-    public void addBean(Bean bean);
+    void addBean(GameElementBean bean);
 
-    public Bean removeBean(int index);
+    Bean removeBean(int index);
 
-    public void clearBeans();
+    void clearBeans();
 
-    public void addCommand(CommandEnum command);
+    void addCommand(CommandEnum command);
 
-    public CommandEnum removeCommand(int index);
+    CommandEnum removeCommand(int index);
 
-    public void clearCommands();
+    void clearCommands();
 
     /**
      * Shows a welcome screen for the game
      */
-    public abstract void showWelcomeScreen();
+    void showWelcomeScreen();
 
     /**
      * Shows the login screen;
      * This screen should allow the player to enter their desired
      * username and receive confirmation from the server
      */
-    public abstract void showLoginScreen();
+    void showLoginScreen();
 
     /**
      * Shows the selection of the game rules
      * Here the user can select whether the game is simple or advanced
      * and the number of players to play with
      */
-    public abstract void showGameruleSelection();
+    void showGameruleSelection();
 
     /**
      * Once a lobby with the given rules is found,
@@ -63,22 +63,22 @@ public interface UserInterface {
      * start the game if they're the host and see how many players are ready
      * in the lobby
      */
-    public abstract void showLobby();
+    void showLobby();
 
     /**
      * This screen lets the user choose the wizard and tower color
      * for the game
      */
-    public abstract void showTowerAndWizardSelection();
+    void showTowerAndWizardSelection();
 
     /**
      * The main game interface
      */
-    public abstract void showGameInterface();
+    void showGameInterface();
 
     /**
      * Initializes and starts the application interface
      */
-    public abstract void startInterface();
+    void startInterface();
 
 }

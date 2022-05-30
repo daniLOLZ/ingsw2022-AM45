@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
-import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.view.observer.Watcher;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public abstract class DrawableObject {
      *
      * @return a JavaBean with all information about this class
      */
-    public abstract Bean toBean();
+    public abstract GameElementBean toBean();
 
     public void alert(){
         if(watchers!= null)

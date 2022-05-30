@@ -12,7 +12,7 @@ import java.util.List;
 
 public class GUIMain implements UserInterface {
 
-    private List<Bean> beans;
+    private List<GameElementBean> beans;
     private List<CommandEnum> availableCommands;
     private ClientNetworkManager networkManager;
     private String chosenNickname;
@@ -64,12 +64,12 @@ public class GUIMain implements UserInterface {
     }
 
     @Override
-    public void addBean(Bean bean) {
+    public void addBean(GameElementBean bean) {
         beans.add(bean);
     }
 
     @Override
-    public Bean removeBean(int index) {
+    public GameElementBean removeBean(int index) {
         return beans.remove(index);
     }
 

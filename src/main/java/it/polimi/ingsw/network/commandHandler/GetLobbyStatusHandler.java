@@ -5,11 +5,8 @@ import it.polimi.ingsw.view.LobbyBean;
 
 public class GetLobbyStatusHandler extends CommandHandler{
 
-    private LobbyWatcher lobbyWatcher;
-
     public GetLobbyStatusHandler(){
         this.commandAccepted = CommandEnum.GET_LOBBY_STATUS;
-        lobbyWatcher = null;
     }
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
@@ -37,12 +34,12 @@ public class GetLobbyStatusHandler extends CommandHandler{
             }
         }).start();
         */
-
+/*
         if(lobbyWatcher == null){
             lobbyWatcher = new LobbyWatcher(parameters.getUserLobby());
             lobbyWatcher.update();
         }
-
+*/
         //LobbyBean lobbyBean = lobbyWatcher.getBean();
         LobbyBean lobbyBean = parameters.getUserLobby().toBean();
         messageBroker.addToMessage(NetworkFieldEnum.BEAN_TYPE, lobbyBean.getBeanEnum());

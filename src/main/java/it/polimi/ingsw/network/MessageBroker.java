@@ -55,8 +55,8 @@ public class MessageBroker {
     }
 
     /**
-     * Returns the value of the given fieldName, or null in case the message
-     * received doesn't have the specified field
+     * Returns the value of the given fieldName for the first inbound message,
+     * or null in case the message received doesn't have the specified field
      * @param fieldName the field name of which one wants to know the value
      * @return the value associated with that field, or null in case the field isn't present
      */

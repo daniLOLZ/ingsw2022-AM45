@@ -6,8 +6,10 @@ import it.polimi.ingsw.view.LobbyBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class Lobby extends DrawableObject {
+public class Lobby {
 
     private final GameRuleEnum gameType;
     private List<Integer> playersReady; //identified by idUser
@@ -15,6 +17,7 @@ public class Lobby extends DrawableObject {
     private int emptySeats;
     private Integer host;
     private boolean gameStarted;
+    public ReentrantLock readyLock;
 
     public Lobby(GameRuleEnum gameType){
 
@@ -23,6 +26,7 @@ public class Lobby extends DrawableObject {
         host = null;
         gameStarted = false;
         playersReady = new ArrayList<>();
+        readyLock = new ReentrantLock();
         switch (this.gameType){
             case SIMPLE_2, ADVANCED_2 ->  emptySeats = 2;
             case SIMPLE_3, ADVANCED_3 -> emptySeats = 3;
@@ -43,7 +47,7 @@ public class Lobby extends DrawableObject {
         if (players.contains(idUser) &&
             !playersReady.contains(idUser)) playersReady.add(idUser);
         else ;//maybe handle case of idUser not present
-        //notifyAll();
+
     }
 
     /**
@@ -54,7 +58,7 @@ public class Lobby extends DrawableObject {
 
         Integer integer = idUser;
         playersReady.remove(integer);
-        // notifyAll();
+
     }
 
     public GameRuleEnum getGameType(){
@@ -78,7 +82,7 @@ public class Lobby extends DrawableObject {
         }
 
         if (players.size() == 0) destroyLobby();
-        //notifyAll();
+
     }
 
     /**
@@ -95,7 +99,7 @@ public class Lobby extends DrawableObject {
         emptySeats--;
 
         assignHost();
-        //notifyAll();
+
     }
 
     /**
@@ -108,7 +112,7 @@ public class Lobby extends DrawableObject {
         if (!players.contains(host)) host = null;
 
         if (host == null) host = players.get(0);
-        //notifyAll();
+
     }
 
 
@@ -138,7 +142,7 @@ public class Lobby extends DrawableObject {
 
     /**
      * Checks whether the user is the host of this lobby
-     * @param idUser
+     * @param idUser the user we're checking for
      * @return true if idUser is equal to this.host
      */
     public boolean isHost(int idUser){
@@ -150,7 +154,8 @@ public class Lobby extends DrawableObject {
      * @return true if every player in the lobby is ready
      */
     public boolean everyoneReady(){
-        if(this.players.containsAll(this.playersReady)){
+        if( GameRuleEnum.getNumPlayers(this.gameType.id) == this.players.size() &&
+            this.players.containsAll(this.playersReady)){
             return true;
         }
         else return false;
@@ -161,7 +166,7 @@ public class Lobby extends DrawableObject {
      */
     public void setStartGame(){
         gameStarted = true;
-        //notifyAll();
+
     }
 
     public boolean isGameStarted(){

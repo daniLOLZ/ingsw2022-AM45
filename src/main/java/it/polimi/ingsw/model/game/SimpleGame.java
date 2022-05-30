@@ -296,8 +296,8 @@ public class SimpleGame extends DrawableObject {
 
         //TODO Lucario : Possibile necessità di unificare questo controllo di leader con quello in PlayerCreation.isLeader
         boolean isLeader;
-        for(int player = 0; player < numPlayers; player++){
-            TeamEnum currentColor = selectedColors.get(player);
+        for(int playerPos = 0; playerPos < numPlayers; playerPos++){
+            TeamEnum currentColor = selectedColors.get(playerPos);
 
             if (alreadyAssignedLeaders.contains(currentColor)){ // If a leader of that color has been
                 // assigned already, then the next player(s)
@@ -311,10 +311,10 @@ public class SimpleGame extends DrawableObject {
 
             this.players.add(
                     FactoryPlayer.getPlayer(
-                            nicknames.get(player),
-                            PlayerEnum.getPlayer(player),
-                            selectedColors.get(player),
-                            FactoryWizard.getWizard(selectedWizards.get(player)),
+                            nicknames.get(playerPos),
+                            PlayerEnum.getPlayer(playerPos),
+                            selectedColors.get(playerPos),
+                            FactoryWizard.getWizard(selectedWizards.get(playerPos)),
                             isLeader,
                             parameters,
                             false,
@@ -953,8 +953,8 @@ public class SimpleGame extends DrawableObject {
      *
      * @return the list with all beans useful for UserInterface
      */
-    public List<Bean> getElementView(){
-        List<Bean> beans = new ArrayList<>();
+    public List<GameElementBean> getElementView(){
+        List<GameElementBean> beans = new ArrayList<>();
         for(DrawableObject object: drawables){
             beans.add(object.toBean());
         }

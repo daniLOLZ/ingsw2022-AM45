@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PlayerCreation {
     private final Controller controller;
@@ -35,17 +36,20 @@ public class PlayerCreation {
      * @return true if nick is correctly set
      */
     public synchronized boolean setNickname(String nick, int user){
-            nicknames.add(user,nick);
+            nicknames.set(user,nick);
             return true;
     }
 
 
     /**
      * Check whether a given color has already been assigned
+     * will answer with true in case the game is not a 3-player game and the checked color is grey
      * @param color the color to check
      * @return true if the color is already assigned to a player
      */
     public synchronized boolean isColorTaken(TeamEnum color){
+        if(GameRuleEnum.getNumPlayers(controller.gameRule.id) != 3 &&
+                color.equals(TeamEnum.GREY)) return true;
         return teamColor.contains(color);
     }
 
@@ -71,8 +75,10 @@ public class PlayerCreation {
                     team == TeamEnum.GREY)
                 return false;
 
-            if(teamColor.stream().noneMatch(otherTeam -> team.index == otherTeam.index)){
-                teamColor.add(user, team);
+            if(teamColor.stream()
+                    .filter(Objects::nonNull)
+                    .noneMatch(otherTeam -> team.index == otherTeam.index)){
+                teamColor.set(user, team);
                 return true;
             }
         }
@@ -80,9 +86,11 @@ public class PlayerCreation {
         //GAME WITH 2 PLAYER TEAMS, CHOSEN TEAM COLOR IS VALID ONLY IF THERE IS NOT MORE THAN 2 EQUAL COLORS
         if(numPlayers == numPlayersForTeam){
             if(team != TeamEnum.GREY){
-                long sameColor = teamColor.stream().filter(otherTeam -> otherTeam.index == team.index).count();
+                long sameColor = teamColor.stream()
+                        .filter(Objects::nonNull)
+                        .filter(otherTeam -> otherTeam.index == team.index).count();
                 if(sameColor <= 1){
-                    teamColor.add(user, team);
+                    teamColor.set(user, team);
                     return true;
                 }
             }
@@ -96,7 +104,7 @@ public class PlayerCreation {
      * @param user > 0
      */
     public synchronized void clearTeamColor(int user){
-        teamColor.add(user, null);
+        teamColor.set(user, null);
     }
 
     /**
@@ -121,7 +129,7 @@ public class PlayerCreation {
         if(wizards.contains(idWizard))
             return false;
 
-        wizards.add(user, idWizard);
+        wizards.set(user, idWizard);
         return true;
     }
 
@@ -130,7 +138,7 @@ public class PlayerCreation {
      * @param user > 0
      */
     public synchronized void clearWizard(int user){
-        wizards.add(user, null);
+        wizards.set(user, null);
     }
 
     /**

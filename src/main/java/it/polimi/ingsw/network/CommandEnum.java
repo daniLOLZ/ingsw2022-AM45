@@ -18,6 +18,7 @@ public enum CommandEnum {
     GET_LOBBY_STATUS("Get Lobby Status",                new NetworkFieldEnum[]{ID_USER, ID_REQUEST}),
     LEAVE_LOBBY("Leave Lobby",                          new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     START_GAME("Start Game",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
+    GET_GAME_INITIALIZATION_STATUS("Get game init status", new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     SELECT_WIZARD("Select Wizard",                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_WIZARD}),
     SELECT_TOWER_COLOR("Select Tower Color",            new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_TOWER_COLOR}),
     ASK_FOR_CONTROL("Ask for Control",                  new NetworkFieldEnum[] {ID_USER, ID_REQUEST, GAME_PHASE}),

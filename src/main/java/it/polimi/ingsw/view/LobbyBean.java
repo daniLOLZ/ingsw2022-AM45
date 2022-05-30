@@ -1,16 +1,17 @@
 package it.polimi.ingsw.view;
 
-import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.List;
 import java.util.Objects;
 
-public final class LobbyBean extends GameElementBean {
+public final class LobbyBean implements Bean {
     private List<String> nicknames;
     private List<Boolean> readyPlayers; // positional
     private boolean gameStarted;
     private Integer host;
+    //todo add gameType
 
     @Override
     public BeanEnum getBeanEnum() {

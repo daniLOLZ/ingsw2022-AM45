@@ -44,9 +44,9 @@ public class CLITest {
             SimpleGame game = new SimpleGame(3,selectedWizards,teamColors, nicknames);
             game.initializeGame();
             game.setDrawables();
-            List<Bean> beans = game.getElementView();
+            List<GameElementBean> beans = game.getElementView();
             CLI cli = new CLI();
-            for(Bean bean: beans){
+            for(GameElementBean bean: beans){
                 cli.addBean(bean);
 
             }
@@ -77,7 +77,7 @@ public class CLITest {
             AdvancedGame game = new AdvancedGame(3,selectedWizards,teamColors,nicknames,20,3);
             game.initializeGame();
             game.setDrawables();
-            List<Bean> beans = game.getElementView();
+            List<GameElementBean> beans = game.getElementView();
             game.getParameters().setErrorState("SET ME FREE HUMAN !");
             ErrorBean errorBean = new ErrorBean(game.getParameters().getErrorState());
 
@@ -85,7 +85,7 @@ public class CLITest {
             cli.addCommand(CommandEnum.CHOOSE_ASSISTANT);
             cli.addCommand(CommandEnum.QUIT);
             cli.addBean(errorBean);
-            for(Bean bean: beans){
+            for(GameElementBean bean: beans){
                 cli.addBean(bean);
             }
             cli.show();

@@ -2,6 +2,9 @@ package it.polimi.ingsw.network;
 
 import com.google.gson.internal.LinkedTreeMap;
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.WizardEnum;
+import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 
 import java.io.IOException;
@@ -11,9 +14,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Handles the connection of the client, is a part of the View
+ * Before each method that starts to build a message via the message broker, particularly before the call
+ * broker.addToMessage(NetworkFieldEnum.COMMAND, ... ) that method must acquire the lock brokerLock to avoid
+ * accidental overwriting of message parts
  */
 public class ClientNetworkManager {
 
@@ -28,6 +35,11 @@ public class ClientNetworkManager {
     private MessageBroker mainBroker, pingBroker;
     private boolean connected;
     private int idUser;  // May be removed
+    private ReentrantLock brokerLock; //This lock is necessary because various methods add to the outgoing message
+    // in an asynchronous way, thus they might mix up their inputs or overwrite previous ones
+    // this lock needs to be set before each new message is starting to be built
+    // generally, that means before any method adds the NetworkEnum.COMMAND value to the message
+
 
     public ClientNetworkManager(String hostname, int portNumber) {
         this.hostname = hostname;
@@ -38,6 +50,7 @@ public class ClientNetworkManager {
         this.progressiveIdRequest = 0;
         this.progressiveIdPingRequest = 0;
         this.connected = true; //the ping routine will start before this field has been checked
+        this.brokerLock = new ReentrantLock();
     }
 
     /*
@@ -97,17 +110,22 @@ public class ClientNetworkManager {
         }
         else rule = GameRuleEnum.getAdvancedRule(numPlayers);
 
-        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PLAY_GAME);
-        mainBroker.addToMessage(NetworkFieldEnum.GAME_RULE, rule);
+        brokerLock.lock();
+        try {
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PLAY_GAME);
+            mainBroker.addToMessage(NetworkFieldEnum.GAME_RULE, rule);
 
-        if(!sendToServer()) return false;
+            if (!sendToServer()) return false;
 
-        // Read other params if necessary
-        successfulReply = checkSuccessfulReply();
+            // Read other params if necessary
+            successfulReply = checkSuccessfulReply();
 
-        mainBroker.flushFirstMessage();
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+        } finally {
+            brokerLock.unlock();
+        }
 
-        return successfulReply;
     }
 
     /**
@@ -115,6 +133,7 @@ public class ClientNetworkManager {
      */
     public void quitGame() {
         //todo
+        //remember the lock
     }
 
     //todo handle this true/false better?
@@ -127,18 +146,18 @@ public class ClientNetworkManager {
 
         boolean successfulReply;
 
-        if(ready){
-            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.READY_TO_START);
-        }
-        else {
-            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.NOT_READY);
-        }
-        if(!sendToServer()) return false;
+        brokerLock.lock();
+        try {
+            if (ready) {
+                mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.READY_TO_START);
+            } else {
+                mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.NOT_READY);
+            }
+            if (!sendToServer()) return false;
 
-        //The server will reply with either a "GameIsStarting" or a "GameNotStarting"
+            //The server will reply with either a "GameIsStarting" or a "GameNotStarting"
 
-        //while(!mainBroker.lock()); // Possible halt
-        successfulReply = checkSuccessfulReply();
+            successfulReply = checkSuccessfulReply();
         /*
         if(!successfulReply &&
                 mainBroker.readField(NetworkFieldEnum.ERROR_STATE).equals("GameNotStarting")) { // hardcoding
@@ -146,38 +165,124 @@ public class ClientNetworkManager {
         }
          */
 
-        //mainBroker.unlock();
-        mainBroker.flushFirstMessage();
-        return successfulReply;
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+        }finally {
+            brokerLock.unlock();
+        }
+
     }
 
 
     public LobbyBean getLobbyUpdates() {
         LobbyBean returnBean = null;
-        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.GET_LOBBY_STATUS);
-        if(!sendToServer()) return null;
+        brokerLock.lock();
+        try {
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.GET_LOBBY_STATUS);
+            if (!sendToServer()) return null;
 
-        if(!checkSuccessfulReply()) return null;
+            if (!checkSuccessfulReply()) {
+                mainBroker.flushFirstMessage();
+                return null;
+            }
 
-        //Of course, this can't actually be casted, we need to find another way
-        returnBean = BeanTranslator.deserializeLobbyBean(
-                (LinkedTreeMap<String, Object>) mainBroker.readField(NetworkFieldEnum.BEAN));
-        mainBroker.flushFirstMessage();
-        return returnBean;
+            returnBean = BeanTranslator.deserializeLobbyBean(
+                    (LinkedTreeMap<String, Object>) mainBroker.readField(NetworkFieldEnum.BEAN));
+            mainBroker.flushFirstMessage();
+            return returnBean;
+        } finally {
+            brokerLock.unlock();
+        }
+
     }
 
     /**
-     * Tries to start the game
+     * Tries to start the game from the lobby
      * @return true if the game successfully started
      */
     public boolean startGame(){
-        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.START_GAME);
-        if(!sendToServer()) return false;
+        boolean successfulReply;
 
-        if(!checkSuccessfulReply()) return false;
+        brokerLock.lock();
+        try {
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.START_GAME);
+            if (!sendToServer()) return false;
 
-        mainBroker.flushFirstMessage();
-        return true;
+            successfulReply = checkSuccessfulReply();
+
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+
+        } finally {
+            brokerLock.unlock();
+        }
+    }
+
+    /**
+     * Fetches the current information regarding tower and wizard selection
+     * @return a GameInitBean containing the teams and wizards that HAVEN'T been chosen already
+     */
+    public GameInitBean getGameInitUpdates(){
+        GameInitBean returnBean = null;
+        brokerLock.lock();
+
+        try {
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.GET_GAME_INITIALIZATION_STATUS);
+            if (!sendToServer()) return null;
+
+            if (!checkSuccessfulReply()) {
+                mainBroker.flushFirstMessage();
+                return null;
+            }
+
+            returnBean = BeanTranslator.deserializeGameInitBean(
+                    (LinkedTreeMap<String, Object>) mainBroker.readField(NetworkFieldEnum.BEAN));
+            mainBroker.flushFirstMessage();
+            return returnBean;
+        } finally {
+            brokerLock.unlock();
+        }
+    }
+
+    public boolean sendTeamColorChoice(TeamEnum colorChosen){
+        boolean successfulReply;
+        brokerLock.lock();
+        try {
+//            System.err.println("---got color lock");
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_TOWER_COLOR);
+            mainBroker.addToMessage(NetworkFieldEnum.ID_TOWER_COLOR, colorChosen.index);
+
+            if (!sendToServer()) return false;
+
+            successfulReply = checkSuccessfulReply();
+
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+        } finally {
+            brokerLock.unlock();
+//            System.err.println("---released color lock");
+        }
+    }
+
+    public boolean sendWizardChoice(WizardEnum wizardChosen){
+        boolean successfulReply;
+        brokerLock.lock();
+        try {
+//            System.err.println("---got wizard lock");
+
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_WIZARD);
+            mainBroker.addToMessage(NetworkFieldEnum.ID_WIZARD, wizardChosen.index);
+
+            if (!sendToServer()) return false;
+
+            successfulReply = checkSuccessfulReply();
+
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+        } finally {
+            brokerLock.unlock();
+//            System.err.println("---released wizard lock");
+        }
     }
 
 
@@ -248,9 +353,9 @@ public class ClientNetworkManager {
      * methods
      * It then receives the reply from the server
      * @return true if the message was received successfully
-     * @throws IOException
      */
     //This method could potentially block the client interface if the reply doesn't arrive
+    // Synchronization is probably necessary if we want to avoid receiving wrong replies
     private boolean sendToServer() {
 
         int requestId = addIdRequest();
@@ -266,18 +371,16 @@ public class ClientNetworkManager {
         }
 
         mainBroker.send(outStream);
-        //System.out.println("Sent message to the server");
-
         mainBroker.receive(inStream);
-        //System.out.println("Received reply from the server");
 
         //Checking whether the reply is the correct one
-        //todo bad, we might trash messages meant for someone else
-        Double gottenId = (Double) mainBroker.readField(NetworkFieldEnum.ID_REQUEST);
-        if(requestId != gottenId.intValue() ) {
-            System.out.println("Wrong id request");
-            return false;
-        }
+        //This method will not return until the first message of the broker
+        // is the one needed
+        // todo very heavy busy wait, change it somehow
+        Double gottenId;
+        do {
+            gottenId = (Double) mainBroker.readField(NetworkFieldEnum.ID_REQUEST);
+        } while(requestId != gottenId.intValue());
 
         return true;
     }
@@ -299,20 +402,25 @@ public class ClientNetworkManager {
      */
     private boolean sendNickname(String nickname){
 
+        brokerLock.lock();
         boolean successfulReply;
 
-        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CONNECTION_REQUEST);
-        mainBroker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
+        try {
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CONNECTION_REQUEST);
+            mainBroker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
 
-        if (!sendToServer()) return false;
+            if (!sendToServer()) return false;
 
-        //while(!mainBroker.lock()); // Possible halt
-        successfulReply = checkSuccessfulReply();
-        //Get the other useful info from the message
+            successfulReply = checkSuccessfulReply();
+            //Get the other useful info from the message
 
-        //mainBroker.unlock();
-        mainBroker.flushFirstMessage();
-        return successfulReply;
+            //mainBroker.unlock();
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+        } finally {
+            brokerLock.unlock();
+        }
+
 
     }
 
@@ -418,6 +526,12 @@ public class ClientNetworkManager {
             }
             //pingBroker.unlock();
             pingBroker.flushFirstMessage();
+            //Ping only every second
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.err.println("Ping: Interrupted, starting new ping request immediately");
+            }
         } while (connected);
     }
 
