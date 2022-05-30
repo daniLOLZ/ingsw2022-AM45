@@ -58,6 +58,10 @@ public class GUIApplication extends Application implements UserInterface{
 
     private static final Coord firstAssistantSlot = downCenter.pureSumX(WINDOW_WIDTH * 0.28).pureSumY(-WINDOW_HEIGHT / 7);
 
+    private static final Coord firstCharacterCardSlot = upCenter.pureSumX(WINDOW_WIDTH / 5).pureSumY(WINDOW_HEIGHT / 8);
+
+    private static final double characterCardWidth = 90, characterCardGap = characterCardWidth * 1.2;
+
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
 
@@ -172,18 +176,9 @@ public class GUIApplication extends Application implements UserInterface{
 
         Scene loginScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-
-        Label hostNameLabel = new Label("Hostname");
-        TextField inputHostName = new TextField("127.0.0.1");
-        inputHostName.setPromptText("Insert hostname");
-
         Label loginLabel = new Label("Nickname");
         TextField inputNickname = new TextField();
         Button loginButton = new Button("Login");
-
-        HBox hostNameSelection = new HBox(10);
-        hostNameSelection.getChildren().addAll(hostNameLabel, inputHostName);
-        hostNameSelection.setAlignment(Pos.CENTER);
 
         inputNickname.setPromptText("Insert your nickname");
         inputNickname.setMaxWidth(WINDOW_WIDTH/4);
@@ -194,13 +189,16 @@ public class GUIApplication extends Application implements UserInterface{
         errorMessage.setVisible(errorOccurred);
 
         //calls external class to check input validity
-        loginButton.setOnAction(event -> ConnectionWithServerHandler.login(inputHostName.getText(), inputNickname.getText()));
+        loginButton.setOnAction(event -> {
+            ConnectionWithServerHandler.login(inputNickname.getText());
+            loginButton.setDisable(true);
+        });
 
         HBox nicknameSelection = new HBox(10);
         nicknameSelection.getChildren().addAll(loginLabel, inputNickname);
         nicknameSelection.setAlignment(Pos.CENTER);
 
-        login.getChildren().addAll(hostNameSelection, nicknameSelection, loginButton, errorMessage);
+        login.getChildren().addAll(nicknameSelection, loginButton, errorMessage);
 
         //<editor-fold desc="Debug">
 
@@ -284,7 +282,7 @@ public class GUIApplication extends Application implements UserInterface{
         Button searchGameButton = new Button("Search Game");
         searchGameButton.setOnAction(event -> {
             //game must be searched once
-            searchGameButton.setOnAction(Drawer.NO_ACTION);
+            searchGameButton.setDisable(true);
 
             //saving selections in case operation fails
             preselectedGameRule = gameRuleSelection.getValue();
@@ -387,8 +385,9 @@ public class GUIApplication extends Application implements UserInterface{
         });
 
         startGame.setOnAction(event -> {
+            startGame.setDisable(true);
             ready.setDisable(true);
-            leaveLobby.setOnAction(Drawer.NO_ACTION);
+            leaveLobby.setDisable(true);
             ConnectionWithServerHandler.startGame();
         });
 
@@ -465,7 +464,7 @@ public class GUIApplication extends Application implements UserInterface{
         CloudBean cloudBean = new CloudBean(1, students.subList(0,4));
 
         for (Coord slot:
-             getCloudsSlots(4, center.pureSumY(-50))) {
+             getCloudsSlots(3, center.pureSumY(-50))) {
             CloudDrawer.drawCloud(root, cloudBean, slot, cloudSize / CloudDrawer.getCloudSize());
         }
 
@@ -492,7 +491,7 @@ public class GUIApplication extends Application implements UserInterface{
             assistants.add(assistant);
         }
 
-        PlayerBean board = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants);
+        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 1);
 
         BoardDrawer.drawBoard(root, board, downCenter.pureSumY(-145));
         BoardDrawer.drawBoard(root, board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
@@ -511,6 +510,24 @@ public class GUIApplication extends Application implements UserInterface{
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.STEELBLUE);
         stage.setScene(scene);
+
+        CharacterCardBean
+                priest = new CharacterCardBean(1, "Priest", "priest_description", students.subList(0,4), 1),
+                dame = new CharacterCardBean(11, "Dame", "dame_description", students.subList(0,4), 2),
+                herbalist = new CharacterCardBean(5, "Herbalist", "herbalist_description", new ArrayList<>(), 2);
+
+        List<CharacterCardBean> characters = new ArrayList<>();
+        characters.add(priest);
+        characters.add(dame);
+        characters.add(herbalist);
+
+        int numCharacter = 0;
+
+        for (CharacterCardBean character:
+             characters) {
+
+            CharacterCardDrawer.drawCharacterCard(root, character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter++),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth());
+        }
     }
 
     private List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){
