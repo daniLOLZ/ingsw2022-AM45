@@ -22,6 +22,7 @@ public class LoginHandler {
     public static boolean login(String nickname, int idUser){
 
         synchronized (idUserToNickname) {
+            if (nickname.length() == 0) return false;
             if (checkIfNicknamePresent(nickname)) return false;
             idUserToNickname.put(idUser, nickname);
         }

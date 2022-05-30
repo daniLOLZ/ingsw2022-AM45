@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.network.BeanEnum;
+
 public class ErrorBean extends GameElementBean{
 
     private String error;
@@ -7,6 +9,11 @@ public class ErrorBean extends GameElementBean{
         final int lowestPriority = 9;
         this.error = error;
         priority = lowestPriority;
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.ERROR_BEAN;
     }
 
     public String getError() {
@@ -18,7 +25,7 @@ public class ErrorBean extends GameElementBean{
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         return ("ERROR: " + error + "\n");
     }
 }

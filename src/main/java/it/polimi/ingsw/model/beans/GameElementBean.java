@@ -1,15 +1,17 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.network.Bean;
+
 import java.util.Scanner;
 
-public abstract class GameElementBean {
+public abstract class GameElementBean implements Bean {
     protected int priority;                 //Priority is useful to draw the element in order
 
     /**
      * Show in CLI the Bean information
      * @return the string with information about that bean
      */
-    public abstract String drawCLI();
+    public abstract String toString();
 
 
 

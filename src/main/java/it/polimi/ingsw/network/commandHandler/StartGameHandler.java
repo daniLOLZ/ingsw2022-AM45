@@ -19,22 +19,27 @@ public class StartGameHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        if(!parameters.getUserLobby().isHost(parameters.getIdUser())){
-            notifyError(messageBroker,"You're not the host! You can't start the game.");
-            return false;
-        }
-        else {
-            if(ActiveLobbies.startGame(parameters.getUserLobby())){
-                // the way this will be signaled to every "handler" will be through the lobby with the flag "gameStarted"
-                parameters.setConnectionState(new StartingGame());
-                parameters.setUserController(ActiveGames.getGameFromUserId(parameters.getIdUser()));
-                notifySuccessfulOperation(messageBroker);
-            }
-            else {
-                notifyError(messageBroker,"The game couldn't start, returning to lobby");
-            }
-        }
+        // This, SendNotReady and SendReady should all be synchronized to some lock
+        parameters.getUserLobby().readyLock.lock();
 
+        try {
+            if (!parameters.getUserLobby().isHost(parameters.getIdUser())) {
+                notifyError(messageBroker, "You're not the host! You can't start the game.");
+                return false;
+            } else {
+                if (ActiveLobbies.startGame(parameters.getUserLobby())) {
+                    // the way this will be signaled to every "handler" will be through the lobby with the flag "gameStarted"
+                    parameters.setConnectionState(new StartingGame());
+                    parameters.setUserController(ActiveGames.getGameFromUserId(parameters.getIdUser()));
+                    notifySuccessfulOperation(messageBroker);
+                } else {
+                    notifyError(messageBroker, "The game couldn't start, returning to lobby");
+                }
+            }
+        }
+        finally {
+            parameters.getUserLobby().readyLock.unlock();
+        }
         return true;
     }
 }

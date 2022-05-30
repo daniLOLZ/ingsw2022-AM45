@@ -36,6 +36,18 @@ public enum TeamEnum {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the team with the given id
+     * @param id the id of the team
+     * @return the team with the given id
+     */
+    public static TeamEnum getTeamFromId(int id){
+        for(TeamEnum team : TeamEnum.values()){
+            if(team.index == id) return team;
+        }
+        return NOTEAM;
+    }
+
     public static TeamEnum fromObjectToEnum(Object field) {
         return TeamEnum.valueOf((String)field);
     }

@@ -5,6 +5,10 @@ import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
+/**
+ * This class is to be extended by handlers of a single network command
+ * Each handler deals with one command, which must be assigned in the constructor
+ */
 public abstract class CommandHandler {
 
     CommandEnum commandAccepted;
@@ -60,5 +64,9 @@ public abstract class CommandHandler {
      */
     public boolean checkHandleable(CommandEnum read, CommandEnum required){
         return read.equals(required);
+    }
+
+    public CommandEnum getCommandAccepted(){
+        return commandAccepted;
     }
 }

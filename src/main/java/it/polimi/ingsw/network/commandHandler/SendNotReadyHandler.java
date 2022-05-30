@@ -20,10 +20,17 @@ public class SendNotReadyHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        parameters.getUserLobby().removeReady(parameters.getIdUser());
-        //Like for the SendReadyHandler, we send an error
-        notifyError(messageBroker, "GameNotStarting"); // other checks to do?
+        // This, SendReady and StartGame should all be synchronized to some lock
+        parameters.getUserLobby().readyLock.lock();
+        try {
 
+            parameters.getUserLobby().removeReady(parameters.getIdUser());
+            //Like for the SendReadyHandler, we send an error
+            notifyError(messageBroker, "GameNotStarting"); // other checks to do?
+        }
+        finally {
+            parameters.getUserLobby().readyLock.unlock();
+        }
         return true;
     }
 }

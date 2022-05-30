@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.commandHandler;
 
+import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.network.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
@@ -22,16 +23,16 @@ public class SelectWizardHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer idWizard = (Integer)messageBroker.readField(NetworkFieldEnum.ID_WIZARD);
-        if(parameters.getUserController().setWizard(idWizard, parameters.getIdUser())){
+        Double dIdWizard = (Double) messageBroker.readField(NetworkFieldEnum.ID_WIZARD);
+        int idWizard = dIdWizard.intValue();
+        // todo: Change everything into WizardEnum later
+
+        if(parameters.getUserController().setWizard(idWizard*10, parameters.getIdUser())){
             notifySuccessfulOperation(messageBroker);
         }
         else {
             notifyError(messageBroker,"The chosen wizard isn't available, please change your selection");
         }
-        if (parameters.getUserController().startPlayingGame()){
-            parameters.setConnectionState(new WaitingForControl());
-        } // todo might need better handling
 
         //it might be possible that the UI allows selection of unavailable wizard, so no use returning false in that case
         return true;

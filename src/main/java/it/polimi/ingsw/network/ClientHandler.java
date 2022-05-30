@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientHandler implements Runnable{
 
@@ -21,6 +23,7 @@ public class ClientHandler implements Runnable{
     private MessageBroker mainBroker;
     private MessageBroker pingBroker;
     private boolean isConnected;
+    private ReentrantLock commandLock;
 
 
     private ClientHandlerParameters parameters;
@@ -36,6 +39,7 @@ public class ClientHandler implements Runnable{
         this.pingBroker = new MessageBroker();
         this.parameters = new ClientHandlerParameters();
         this.isConnected = true;
+        commandLock = new ReentrantLock();
     }
 
     /**
@@ -69,28 +73,29 @@ public class ClientHandler implements Runnable{
 
         while(isConnected){ // Message listener loop
 
-            /*
-            if(!mainBroker.lock()){ // Received an invalid message
-                continue;
-            }
-             */
-            while(!mainBroker.messagePresent());
-            System.out.println("---Starting to parse a message");
+            while(!mainBroker.messagePresent()); // this uses a ton of resources!!! we need an interrupt
+            // mechanism like producer/consumer
+            System.out.println("---Starting to parse a message [idUser: " + parameters.getIdUser() + "]");
             CommandEnum command = CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND));
 
             System.out.println("---Message parsed : "+command.toString());
             if(!parameters.getConnectionState().isAllowed(command)){ // Trashes a command given at the wrong time
-                //mainBroker.unlock();
+                System.err.println("--+Command not allowed");
                 mainBroker.flushFirstMessage();
                 continue;
             }
-            handleCommand(mainBroker); // runs the appropriate routine depending on the command received
-            System.out.println("---Command handled");
-            // Sends a reply to the client
-            mainBroker.send(clientOutput);
-            //mainBroker.unlock();
-            mainBroker.flushFirstMessage();
 
+            commandLock.lock();
+            try {
+                handleCommand(mainBroker); // runs the appropriate routine depending on the command received
+                System.out.println("---Command handled");
+                // Sends a reply to the client
+                mainBroker.send(clientOutput);
+                mainBroker.flushFirstMessage();
+            }
+            finally {
+                commandLock.unlock();
+            }
         }
         // This point should never be reached in normal circumstances (unless the client disconnects)
     }
@@ -108,8 +113,7 @@ public class ClientHandler implements Runnable{
      * Finds the command that's been given and runs the appropriate methods
      * @param messageBroker The broker containing the message with the command to handle
      */
-    // Synchronized because one command must be fully handled at one time
-    public synchronized void handleCommand(MessageBroker messageBroker){
+    public void handleCommand(MessageBroker messageBroker){
 
         boolean successfulOperation = false;
 
@@ -117,6 +121,7 @@ public class ClientHandler implements Runnable{
              commandHandlers) {
             try {
                 successfulOperation = commandHandler.executeCommand(messageBroker, parameters);
+
             }
             catch (UnexecutableCommandException e){
                 continue;
@@ -125,7 +130,13 @@ public class ClientHandler implements Runnable{
             break;
         }
 
-        if (!successfulOperation); //TODO close connection?
+        if (!successfulOperation){
+            System.err.println("- Error: No command could be executed");
+            messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
+            messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
+            messageBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, messageBroker.readField(NetworkFieldEnum.ID_REQUEST));
+            messageBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, "The command couldn't be handled");
+        } //TODO close connection?
     }
 
 

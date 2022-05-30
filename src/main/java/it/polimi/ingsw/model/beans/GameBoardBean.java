@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +12,10 @@ public class GameBoardBean extends GameElementBean{
     protected List<Integer> idPlayers;
     protected Integer currentPlayerId;
     protected Integer turn;
-    protected String phase;
+    protected String phase; //WHy is this not a PhaseEnum?
 
 
+    //TODO change to phaseEnum
     public GameBoardBean( List<Integer> idIslandGroups, List<Integer> idAssistantsPlayed,
                           List<Integer> idPlayers, Integer currentPlayerId,
                           Integer turn, String phase){
@@ -25,6 +27,11 @@ public class GameBoardBean extends GameElementBean{
         this.turn = turn;
         this.phase = phase;
         this.currentPlayerId = currentPlayerId;
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.GAMEBOARD_BEAN;
     }
 
     public void setTurn(Integer turn) {
@@ -76,7 +83,7 @@ public class GameBoardBean extends GameElementBean{
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
         String currentPlayer = PlayerEnum.getPlayer(currentPlayerId).name;
         List<String> players = new ArrayList<>();

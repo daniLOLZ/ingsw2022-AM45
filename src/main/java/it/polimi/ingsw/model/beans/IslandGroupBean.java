@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.List;
 import java.util.Scanner;
@@ -24,6 +25,11 @@ public class IslandGroupBean extends GameElementBean {
         this.studentsOnIsland = studentsOnIsland;
         this.isPresentMN = isPresentMN;
         this.towersColor = towersColor;
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.ISLANDGROUP_BEAN;
     }
 
     public int getIdIslandGroup() {
@@ -67,7 +73,7 @@ public class IslandGroupBean extends GameElementBean {
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
         String Mn;
         if(isPresentMN)

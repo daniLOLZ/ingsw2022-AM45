@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.List;
 
@@ -15,6 +16,11 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
         this.numBlockTiles = numBlockTiles;
     }
 
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.ADVANCED_ISLANDGROUP_BEAN;
+    }
+
     public Integer getNumBlockTiles() {
         return numBlockTiles;
     }
@@ -24,7 +30,7 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
         String Mn;
         if(isPresentMN)

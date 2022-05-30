@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.beans;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class AdvancedPlayerBean extends PlayerBean{
         this.numCoins = numCoins;
     }
 
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.ADVANCED_PLAYER_BEAN;
+    }
+
     public Integer getNumCoins() {
         return numCoins;
     }
@@ -27,7 +33,7 @@ public class AdvancedPlayerBean extends PlayerBean{
     }
 
     @Override
-    public String drawCLI(){
+    public String toString(){
         StringBuilder toReturn = new StringBuilder();
 
         toReturn.append("\t________________________________________________________\t\n");

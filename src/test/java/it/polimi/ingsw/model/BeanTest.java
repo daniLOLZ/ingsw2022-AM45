@@ -28,7 +28,7 @@ public class BeanTest {
         assertEquals(1, cloudBean.getIdCloud());
         assertEquals(StudentEnum.YELLOW,cloudBean.getStudents().get(0));
 
-        String string = cloudBean.drawCLI();
+        String string = cloudBean.toString();
         assertNotNull(string);
 
     }
@@ -65,7 +65,7 @@ public class BeanTest {
         assertEquals(TeamEnum.WHITE,bean.getTowersColor());
         assertTrue(bean.isPresentMN());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
     }
 
@@ -84,7 +84,7 @@ public class BeanTest {
 
         assertEquals(2, bean.getNumBlockTiles());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
 
     }
@@ -100,7 +100,7 @@ public class BeanTest {
         assertEquals("Priest",bean.getName());
         assertEquals("NO",bean.getDescription());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
     }
 
@@ -143,7 +143,7 @@ public class BeanTest {
         assertEquals(22, bean.getTurn());
         assertEquals("PLANNING", bean.getPhase());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
     }
 
@@ -197,7 +197,7 @@ public class BeanTest {
         assertEquals(1,bean.getNumGameCoins());
         assertEquals(101,bean.getIdCharacterCards().get(0));
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
 
     }
@@ -257,7 +257,7 @@ public class BeanTest {
         assertEquals(TeamEnum.BLACK,bean.getTowerColor());
         assertTrue(bean.isLeader());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
     }
 
@@ -284,7 +284,7 @@ public class BeanTest {
 
         assertEquals(1, bean.getNumCoins());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
 
     }
@@ -299,7 +299,7 @@ public class BeanTest {
 
         assertEquals("NO ERROR", bean.getError());
 
-        String string = bean.drawCLI();
+        String string = bean.toString();
         assertNotNull(string);
     }
 }

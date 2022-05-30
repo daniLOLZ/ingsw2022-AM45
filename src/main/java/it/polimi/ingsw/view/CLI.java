@@ -1,14 +1,14 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
-import it.polimi.ingsw.network.ClientNetworkManager;
-import it.polimi.ingsw.network.CommandEnum;
-import it.polimi.ingsw.network.NetworkFieldEnum;
+import it.polimi.ingsw.network.*;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,7 +22,10 @@ public class CLI implements UserInterface {
     private List<CommandEnum> availableCommands;
     private ClientNetworkManager networkManager;
     private String chosenNickname;
-
+    private int numberOfPlayers;
+    private String gameMode;
+    private final String colorList3Players = "B - Black, G - Grey, W - White";
+    private final String colorList2or4Players = "B - Black, W - White";
 
     /**
      * Network-less constructor, used for testing
@@ -47,6 +50,8 @@ public class CLI implements UserInterface {
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
+        numberOfPlayers = 0;
+        gameMode = "No game started yet";
     }
 
     /**
@@ -100,7 +105,7 @@ public class CLI implements UserInterface {
             if(curr.getPriority() == highestPriority )
                 positionOnScreen = centerPosition;
 
-            draw(positionOnScreen, curr.drawCLI());
+            draw(positionOnScreen, curr.toString());
             precPriority = curr.getPriority();
             beans.remove(index);
 
@@ -225,7 +230,7 @@ public class CLI implements UserInterface {
 
     @Override
     public void showWelcomeScreen() {
-        System.out.println("``````CIAO AAAAAAAAA ERIANTYS~~~~~~~~~~~");
+        System.out.println("-- WELCOME TO ERIANTYS! --");
     }
 
     @Override
@@ -252,8 +257,8 @@ public class CLI implements UserInterface {
     @Override
     public void showGameruleSelection() {
         Scanner scanner = new Scanner(System.in);
-        int gameMode;
-        int numPlayers;
+        String gameMode;
+        String numPlayers;
         boolean errorChoice, serverError;
         do {
             errorChoice = false;
@@ -264,9 +269,9 @@ public class CLI implements UserInterface {
                     1 - Simple game: No character cards
                     2 - Advanced game: Character cards allowed""");
             do {
-                gameMode = scanner.nextInt();
-                if (!(gameMode == 1 ||
-                        gameMode == 2)) {
+                gameMode = scanner.next();
+                if (!(gameMode.equals("1") ||
+                        gameMode.equals("2"))) {
                     errorChoice = true;
                     System.out.println("Wrong choice! Please select a correct game mode");
                 } else errorChoice = false;
@@ -280,21 +285,23 @@ public class CLI implements UserInterface {
                     4 - 4 Players
                     """);
             do {
-                numPlayers = scanner.nextInt();
-                if (!(numPlayers == 2 ||
-                        numPlayers == 3 ||
-                        numPlayers == 4)) {
+                numPlayers = scanner.next();
+                if (!(numPlayers.equals("2") ||
+                        numPlayers.equals("3") ||
+                        numPlayers.equals("4"))) {
                     errorChoice = true;
                     System.out.println("Wrong choice! Please select a correct amount of players");
                 } else errorChoice = false;
 
             } while (errorChoice);
 
-            if (!networkManager.sendGameModePreference(gameMode, numPlayers)) {
+            if (!networkManager.sendGameModePreference(Integer.parseInt(gameMode),Integer.parseInt(numPlayers))) {
                 serverError = true;
                 System.out.println("There was a problem sending the gamemode preferences, please try again");
             }
         } while(serverError);
+        this.numberOfPlayers = Integer.parseInt(numPlayers);
+        this.gameMode = Integer.parseInt(gameMode) == 1 ? "Simple" : "Advanced"; // find a nicer way
     }
 
     @Override
@@ -302,12 +309,17 @@ public class CLI implements UserInterface {
         Scanner scanner = new Scanner(System.in);
         AtomicBoolean ready = new AtomicBoolean(false);
         AtomicBoolean gameStarting = new AtomicBoolean(false);
-        int selection;
-        System.out.println("""
+        String selection;
+        System.out.println(MessageFormat.format("""
+                Game type selected:
+                    Number of players : {0}
+                    Game type : {1}
+                
                 You are waiting for players to join a game with you...
                 1 - Set yourself as ready
                 2 - Set yourself as not ready
-                """);
+                S - Try to start the game
+                """, this.numberOfPlayers, this.gameMode));
 
         //todo: See if this could be an "interactive" wait, where you can see the players joining, or even
         // just a simple counter
@@ -315,31 +327,39 @@ public class CLI implements UserInterface {
 
         new Thread(()-> {
 
-            LobbyBean oldLobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
-            LobbyBean lobbyBean = new LobbyBean(new ArrayList<>(), new ArrayList<>(), false);
+            // Lucario: We might not need to check for sameness here, the server should only update if the
+            // lobby was updated (if there's time to implement that)
+            LobbyBean lobbyBean;
+            LobbyBean oldLobbyBean = new LobbyBean(null, null, false, null);
+
             while(true){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("Interrupted before waiting the full length, requesting lobby updates now");
+                }
+                /*
+                if(gameStarting.get()){
+                    //This is necessary for the host, for which the sendReadyStatus won't
+                    // stop the thread, since its server-side game state already changed
+                    return;
+                }
+                 */
                 if(networkManager.sendReadyStatus(ready.get())){
                     //signal we're starting the game
                     gameStarting.set(true);
                     return;
                 }
                 lobbyBean = networkManager.getLobbyUpdates();
-                if(!lobbyBean.equals(oldLobbyBean)){
-                    printLobby(lobbyBean);
+                if(lobbyBean != null && !lobbyBean.equals(oldLobbyBean)) {
+                    System.out.println(lobbyBean.toString());
                     oldLobbyBean = lobbyBean;
                 }
             }
         }).start();
 
-        /* Something like:
-        * while(true){
-        *    if(ready) sendReady();
-        *    getLobbyUpdates();
-        * }
-        * */
-
         while(true) {
-            selection = scanner.nextInt();
+            selection = scanner.next();
 
             // If the game started, any input is actually ignored
             if(gameStarting.get()){
@@ -349,13 +369,23 @@ public class CLI implements UserInterface {
                 break;
             }
 
-            if (selection == 1) {
+            if (selection.equals("1")) {
                 ready.set(true);
                 System.out.println("You set yourself as ready");
             }
-            else if (selection == 2){
+            else if (selection.equals("2")){
                 ready.set(false);
                 System.out.println("You set yourself as not ready");
+            }
+            else if (selection.toUpperCase(Locale.ROOT).equals("S")) {
+                if(networkManager.startGame()){
+                    gameStarting.set(true);
+                    System.out.println("Everyone is ready!");
+                    break;
+                }
+                else {
+                    System.out.println("The game  couldn't start");
+                }
             } else continue;
         }
 
@@ -374,22 +404,135 @@ public class CLI implements UserInterface {
 
     @Override
     public void showTowerAndWizardSelection() {
-        System.out.println("Congrats, at least you got the game to start");
-        //todo
+
+        Scanner scanner = new Scanner(System.in);
+        String currentTower = TeamEnum.NOTEAM.name;
+        String currentWizard = WizardEnum.NO_WIZARD.name;
+        AtomicBoolean gameStarting = new AtomicBoolean(false);
+        String selection = null;
+        String colorList = numberOfPlayers == 3 ? colorList3Players : colorList2or4Players;
+
+
+        //Start periodically fetching initialization information
+        new Thread(()->{
+            // Lucario: Same as before, again if we have time
+            GameInitBean initBean;
+            GameInitBean oldInitBean = new GameInitBean(null, null, false);
+
+            while(true){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("Interrupted before waiting the full length, requesting initialization updates now");
+                }
+
+                initBean = networkManager.getGameInitUpdates();
+
+                //Check whether all players have made their selection and if so, signal that the game is starting
+                if(initBean.isAllSetGameStarted()){
+                    gameStarting.set(true);
+                    break;
+                }
+
+                if(!initBean.equals(oldInitBean)) {
+                    System.out.println(initBean.toString());
+                    oldInitBean = initBean;
+                }
+
+            }
+        }).start();
+
+        while(true){
+            System.out.println(MessageFormat.format("""
+                Select your team color ({2}) 
+                and wizard (1 - King, 2 - Pixie, 3 - Sorcerer, 4 - Wizard)
+                (one at a time):
+                
+                Your selection : 
+                    Team color : {0}
+                    Wizard : {1} 
+                """, currentTower, currentWizard, colorList));
+            selection = scanner.nextLine();
+
+            //todo Same as before, the cli waits to notify the user that the game started
+            // until after they made another selection because scanner.nextLine is blocking
+            if(gameStarting.get()){
+                System.out.println("Everyone made their choice, the game is starting!");
+                return;
+            }
+
+            switch (selection) {
+                //Team color
+                case "B":
+                    if(networkManager.sendTeamColorChoice(TeamEnum.BLACK)){
+                        currentTower = TeamEnum.BLACK.name;
+                        System.out.println("You chose the black team.");
+                    }
+                    break;
+                case "G":
+                    if(numberOfPlayers != 3){ //we do a little hardcoding
+                        System.out.println("Please make a valid selection");
+                        break;
+                    }
+                    if(networkManager.sendTeamColorChoice(TeamEnum.GREY)){
+                        currentTower = TeamEnum.GREY.name;
+                        System.out.println("You chose the grey team.");
+                    }
+                    break;
+                case "W":
+                    if(networkManager.sendTeamColorChoice(TeamEnum.WHITE)){
+                        currentTower = TeamEnum.WHITE.name;
+                        System.out.println("You chose the white team.");
+                    }
+                    break;
+                //Wizard
+                case "1":
+                    if(networkManager.sendWizardChoice(WizardEnum.KING)){
+                        currentWizard = WizardEnum.KING.name;
+                        System.out.println("You chose the king");
+                    }
+                    break;
+                case "2":
+                    if(networkManager.sendWizardChoice(WizardEnum.PIXIE)){
+                        currentWizard = WizardEnum.PIXIE.name;
+                        System.out.println("You chose the pixie");
+                    }
+                    break;
+                case "3":
+                    if(networkManager.sendWizardChoice(WizardEnum.SORCERER)){
+                        currentWizard = WizardEnum.SORCERER.name;
+                        System.out.println("You chose the sorcerer");
+                    }
+                    break;
+                case "4":
+                    if(networkManager.sendWizardChoice(WizardEnum.WIZARD)){
+                        currentWizard = WizardEnum.WIZARD.name;
+                        System.out.println("You chose the wizard");
+                    }
+                    break;
+                default:
+                    System.out.println("Please make a valid selection");
+                    break;
+            }
+        }
+
     }
 
     @Override
     public void showGameInterface() {
-        //todo
+        System.out.println("started woohoo");
     }
 
     @Override
     public void startInterface() {
+
         showWelcomeScreen();
         showLoginScreen();
         showGameruleSelection();
         showLobby();
         showTowerAndWizardSelection();
+        showGameInterface();
+
     }
 
     @Override
