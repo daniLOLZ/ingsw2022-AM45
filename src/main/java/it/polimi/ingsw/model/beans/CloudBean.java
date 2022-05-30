@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.List;
 
@@ -14,6 +15,11 @@ public class CloudBean extends GameElementBean{
         this.idCloud = idCloud;
         this.students = students;
         priority = highPriority;
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.CLOUD_BEAN;
     }
 
     public int getIdCloud() {
@@ -34,7 +40,7 @@ public class CloudBean extends GameElementBean{
 
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
 
 

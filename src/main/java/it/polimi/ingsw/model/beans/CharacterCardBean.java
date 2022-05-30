@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,11 @@ public class CharacterCardBean extends GameElementBean {
         this.name = name;
         this.students = students;
         priority = highPriority;
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.CHARACTER_CARD_BEAN;
     }
 
     public List<StudentEnum> getStudents() {
@@ -44,7 +50,7 @@ public class CharacterCardBean extends GameElementBean {
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
 
 

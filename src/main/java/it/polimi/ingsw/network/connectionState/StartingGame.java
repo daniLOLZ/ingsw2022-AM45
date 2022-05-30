@@ -9,5 +9,6 @@ public class StartingGame extends ConnectionState{
         super();
         allow(CommandEnum.SELECT_WIZARD);
         allow(CommandEnum.SELECT_TOWER_COLOR);
+        allow(CommandEnum.GET_GAME_INITIALIZATION_STATUS);
     }
 }

@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
 import org.junit.jupiter.api.Test;
 

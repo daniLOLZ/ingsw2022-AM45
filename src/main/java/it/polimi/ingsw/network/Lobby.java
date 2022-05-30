@@ -1,10 +1,13 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.DrawableObject;
 import it.polimi.ingsw.view.LobbyBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Lobby {
 
@@ -14,6 +17,7 @@ public class Lobby {
     private int emptySeats;
     private Integer host;
     private boolean gameStarted;
+    public ReentrantLock readyLock;
 
     public Lobby(GameRuleEnum gameType){
 
@@ -22,6 +26,7 @@ public class Lobby {
         host = null;
         gameStarted = false;
         playersReady = new ArrayList<>();
+        readyLock = new ReentrantLock();
         switch (this.gameType){
             case SIMPLE_2, ADVANCED_2 ->  emptySeats = 2;
             case SIMPLE_3, ADVANCED_3 -> emptySeats = 3;
@@ -42,6 +47,7 @@ public class Lobby {
         if (players.contains(idUser) &&
             !playersReady.contains(idUser)) playersReady.add(idUser);
         else ;//maybe handle case of idUser not present
+
     }
 
     /**
@@ -52,6 +58,7 @@ public class Lobby {
 
         Integer integer = idUser;
         playersReady.remove(integer);
+
     }
 
     public GameRuleEnum getGameType(){
@@ -75,6 +82,7 @@ public class Lobby {
         }
 
         if (players.size() == 0) destroyLobby();
+
     }
 
     /**
@@ -91,6 +99,7 @@ public class Lobby {
         emptySeats--;
 
         assignHost();
+
     }
 
     /**
@@ -103,6 +112,7 @@ public class Lobby {
         if (!players.contains(host)) host = null;
 
         if (host == null) host = players.get(0);
+
     }
 
 
@@ -132,7 +142,7 @@ public class Lobby {
 
     /**
      * Checks whether the user is the host of this lobby
-     * @param idUser
+     * @param idUser the user we're checking for
      * @return true if idUser is equal to this.host
      */
     public boolean isHost(int idUser){
@@ -144,7 +154,8 @@ public class Lobby {
      * @return true if every player in the lobby is ready
      */
     public boolean everyoneReady(){
-        if(this.players.containsAll(this.playersReady)){
+        if( GameRuleEnum.getNumPlayers(this.gameType.id) == this.players.size() &&
+            this.players.containsAll(this.playersReady)){
             return true;
         }
         else return false;
@@ -155,15 +166,17 @@ public class Lobby {
      */
     public void setStartGame(){
         gameStarted = true;
+
     }
 
     public boolean isGameStarted(){
         return gameStarted;
     }
 
-    public synchronized LobbyBean getBean() {
+    public synchronized LobbyBean toBean() {
         List<String> beanNickList = new ArrayList<>();
         List<Boolean> beanReadyList = new ArrayList<>();
+        Integer returnHostPosition = null;
         for(int index = 0; index < players.size(); index++){
             beanNickList.add(
                     LoginHandler.getNicknameFromId(players.get(index))
@@ -171,7 +184,8 @@ public class Lobby {
             beanReadyList.add(
                 playersReady.contains(players.get(index))
             );
+            if(players.get(index).equals(this.host)) returnHostPosition = index;
         }
-        return new LobbyBean(beanNickList, beanReadyList, this.gameStarted);
+        return new LobbyBean(beanNickList, beanReadyList, this.gameStarted, returnHostPosition);
     }
 }

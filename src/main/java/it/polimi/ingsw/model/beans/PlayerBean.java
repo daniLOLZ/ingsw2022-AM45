@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.beans;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.BeanEnum;
 
 import java.util.List;
 
@@ -33,6 +34,11 @@ public class PlayerBean extends GameElementBean{
         this.professors = professors;
         this.idAssistants = idAssistants;
 
+    }
+
+    @Override
+    public BeanEnum getBeanEnum() {
+        return BeanEnum.PLAYER_BEAN;
     }
 
     public String getNickname() {
@@ -108,7 +114,7 @@ public class PlayerBean extends GameElementBean{
     }
 
     @Override
-    public String drawCLI() {
+    public String toString() {
         StringBuilder toReturn = new StringBuilder();
 
         toReturn.append("\t________________________________________________________\t\n");

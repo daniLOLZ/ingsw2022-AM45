@@ -2,13 +2,18 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.game.SimpleGame;
 import it.polimi.ingsw.view.VirtualView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -26,6 +31,10 @@ public class Controller {
     protected IslandHandler islandHandler;
     protected VirtualView virtualView;
 
+    private ReentrantLock teamLock;
+    private ReentrantLock wizardLock;
+    public ReentrantLock startLock; // not the greatest to be put public but it's needed in the GameInitHandler
+    private boolean gameStarted;
 
     /**
      * Creates a new game controller
@@ -34,9 +43,13 @@ public class Controller {
      * @param gameRule the rules chosen for this game
      */
     public Controller(List<Integer> playerNumbers, GameRuleEnum gameRule){
-        createPlayerCreation();
         this.playerNumbers = playerNumbers;
         this.gameRule = gameRule;
+        createPlayerCreation();
+        teamLock = new ReentrantLock();
+        wizardLock = new ReentrantLock();
+        startLock = new ReentrantLock();
+        gameStarted = false;
 
         // Should we create it here or when the game starts?
         createView();
@@ -164,21 +177,26 @@ public class Controller {
      * Once the relevant information have been obtained, creates and starts the actual game
      * @return true if the game was created successfully
      */
-    public boolean startPlayingGame(){
+    public synchronized boolean startPlayingGame(){
         if (!isAllSet()){
             return false;
         }
-        if(GameRuleEnum.isSimple(gameRule.id)){
+        else if(GameRuleEnum.isSimple(gameRule.id)){
             if(!createSimpleGame()) return false;
         }
-        if(GameRuleEnum.isAdvanced(gameRule.id)){
+        else if(GameRuleEnum.isAdvanced(gameRule.id)){
             if(!createAdvancedGame()) return false;
         }
         createBasicHandlers(GameRuleEnum.isAdvanced(gameRule.id));
 
         simpleGame.initializeGame();
+        this.gameStarted = true;
 
         return true;
+    }
+
+    public synchronized boolean isGameStarted(){
+        return this.gameStarted;
     }
 
     /**
@@ -189,6 +207,35 @@ public class Controller {
         return boardHandler.allStudentsMoved();
     }
 
+    /**
+     * Gets all the team colors that have been chosen already for
+     * this game
+     * @return a list of all the team colors (as TeamEnum) chosen
+     */
+    public List<TeamEnum> getTowerColorsChosen(){
+        return Arrays.stream(TeamEnum.values())
+                .filter(x -> playerCreation.isColorTaken(x))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets all the wizards that have been chosen already for
+     * this game
+     * @return a list of all the wizards (as WizardEnum) chosen
+     */
+    public List<WizardEnum> getWizardsChosen(){
+        return Arrays.stream(WizardEnum.values())
+                .filter(x -> playerCreation.isWizardTaken(x.index*10)) // todo wizard refactoring here too
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks whether all wizards and towers have been chosen for this game
+     * @return true if all selections were made and the game started
+     */
+    public boolean allSelectionsMadeGameStart(){
+        return gameStarted;
+    }
 
     /*____________________________
         Network command handling
@@ -218,16 +265,18 @@ public class Controller {
      */
     public boolean setWizard(Integer idWizard, Integer idUser) {
         int position = getPositionFromUserId(idUser);
-        Object lock = new Object();
         if (position >= 0){
             //The user might have already selected a wizard and changed their mind
-            synchronized (lock) {
+            wizardLock.lock();
+            try {
                 if (!this.playerCreation.isWizardTaken(idWizard)){
                     this.playerCreation.clearWizard(position);
                     this.playerCreation.setWizard(idWizard, position);
                 }
                 // If the wizard was already taken by someone else then the method rightly fails
                 // If it was taken by the same player, the method exits without reassigning an already assigned wizard
+            }finally {
+                wizardLock.unlock();
             }
             return true;
         }
@@ -236,22 +285,25 @@ public class Controller {
 
     /**
      * By calling the appropriate handler, sets the team color for this user
+     * If the color was already taken by someone else then the method rightly fails
+     * If it was taken by the same player, the method exits without reassigning an already assigned team color
      * @param towerColor the tower color chosen
      * @param idUser the user that chooses the team
      * @return true if the assignment succeeded
      */
     public boolean setTeamColor(TeamEnum towerColor, Integer idUser) {
         int position = getPositionFromUserId(idUser);
-        Object lock = new Object();
-        if (position >= 0){
+
+        if (position >= 0) {
             //The user might have already selected a color and changed their mind
-            synchronized (lock) {
-                if (!this.playerCreation.isColorTaken(towerColor)){
+            teamLock.lock();
+            try {
+                if (!this.playerCreation.isColorTaken(towerColor)) {
                     this.playerCreation.clearTeamColor(position);
                     this.playerCreation.setTeamColor(towerColor, position);
                 }
-                // If the color was already taken by someone else then the method rightly fails
-                // If it was taken by the same player, the method exits without reassigning an already assigned team color
+            } finally {
+                teamLock.unlock();
             }
             return true;
         }

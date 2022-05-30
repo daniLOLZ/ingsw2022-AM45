@@ -23,16 +23,16 @@ public class SelectTowerColorHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        TeamEnum teamColor = TeamEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
+        Double dTeamColorId = (Double) messageBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR);
+        int teamColorId = dTeamColorId.intValue();
+        TeamEnum teamColor = TeamEnum.getTeamFromId(teamColorId);
+
         if(parameters.getUserController().setTeamColor(teamColor, parameters.getIdUser())){
             notifySuccessfulOperation(messageBroker);
         }
         else {
             notifyError(messageBroker,"The chosen team isn't available, please change your selection");
         }
-        if (parameters.getUserController().startPlayingGame()){
-            parameters.setConnectionState(new WaitingForControl());
-        } // todo might need better handling
 
         //it might be possible that the UI allows selection of unavailable tower, so no use returning false in that case
         return true;
