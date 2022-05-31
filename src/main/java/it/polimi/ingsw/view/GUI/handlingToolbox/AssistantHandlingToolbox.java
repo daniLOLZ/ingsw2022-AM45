@@ -25,7 +25,6 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
             int index = 0;
             for (EventHandler<MouseEvent> ignored:
                  onAssistantClick) {
-                System.out.println("Playing assistant : " + index);
                 //onAssistantClick.set(index, resourceProvider.chooseAssistant());
                 index++;
             }

@@ -2,10 +2,12 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.view.GUI.drawers.*;
+import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -19,11 +21,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -67,6 +71,8 @@ public class GUIApplication extends Application implements UserInterface{
 
     private String preselectedGameRule = availableGameRules.get(0);
     private Integer preselectedNumPlayers = availablePlayerNumber.get(0);
+    private WizardEnum selectedWizard = WizardEnum.NO_WIZARD;
+    private TeamEnum selectedTowerColor = TeamEnum.NOTEAM;
     private List<CloudBean> clouds;
     private List<IslandGroupBean> islands;
 
@@ -401,8 +407,8 @@ public class GUIApplication extends Application implements UserInterface{
         Button success = new Button("Simulate start game");
         Button failure = new Button("Simulate failure");
 
-        success.setOnAction(event -> startGame());
-        failure.setOnAction(event -> showLobbyScreen(false));
+        success.setOnAction(event -> showWizardSelection(false));
+        failure.setOnAction(event -> showLobbyScreen(true));
 
         layout.getChildren().addAll(success,failure);
 
@@ -426,6 +432,114 @@ public class GUIApplication extends Application implements UserInterface{
 
     public void notifyPlayersNotReady(){
         showLobbyScreen(true);
+    }
+
+    private void showWizardSelection(boolean errorOccurred){
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        DecorationsDrawer.showMenuBackground(root);
+
+        //</editor-fold>
+
+        VBox layout = new VBox(35);
+        layout.setAlignment(Pos.CENTER);
+        root.getChildren().add(layout);
+
+        Label title = new Label("Select your Wizard companion!");
+        title.setAlignment(Pos.CENTER);
+        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setTextFill(Color.DARKRED);
+        layout.getChildren().add(title);
+
+        HBox wizards = new HBox(20);
+        wizards.setAlignment(Pos.CENTER);
+        wizards.setMinHeight(WizardDrawer.getWizardHeight() * 0.5 * 1.2);
+        layout.getChildren().add(wizards);
+
+        Button selectWizard = new Button("vgnkdhdrnhs");
+        selectWizard.setVisible(false);
+        selectWizard.setBackground(Background.EMPTY);
+        selectWizard.setFont(Font.font("Lucida Handwriting", 40));
+        selectWizard.setTextFill(Color.DARKRED);
+        selectWizard.setOnAction(event -> showTowerColorSelection(false));
+        layout.getChildren().add(selectWizard);
+
+        for (WizardEnum wizard:
+             WizardEnum.getWizards()) {
+            ImageView wizardView = WizardDrawer.drawWizard(wizard, center, 0.5);
+            wizardView.setOnMouseClicked(event -> {
+                selectedWizard = wizard;
+                selectWizard.setText("Select " + wizard.name);
+                selectWizard.setVisible(true);
+            });
+            addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1);
+            wizards.getChildren().add(wizardView);
+        }
+
+
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
+    }
+
+    private void showTowerColorSelection(boolean errorOccurred){
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        DecorationsDrawer.showMenuBackground(root);
+
+        //</editor-fold>
+
+        VBox layout = new VBox(35);
+        layout.setAlignment(Pos.CENTER);
+        root.getChildren().add(layout);
+
+        Label title = new Label("Select your Tower color!");
+        title.setAlignment(Pos.CENTER);
+        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setTextFill(Color.DARKRED);
+        layout.getChildren().add(title);
+
+        int numTeams = TeamEnum.getNumTeams() - 1;
+        if(preselectedNumPlayers == 3) numTeams = TeamEnum.getNumTeams();
+
+        HBox towers = new HBox(20.0 * TeamEnum.getNumTeams() / numTeams);
+        towers.setAlignment(Pos.CENTER);
+        towers.setMinHeight(TowerDrawer.getTowerSize() * 0.5 * 1.2);
+        layout.getChildren().add(towers);
+
+        Button selectTower = new Button("vgnkdhdrnhs");
+        selectTower.setVisible(false);
+        selectTower.setBackground(Background.EMPTY);
+        selectTower.setFont(Font.font("Lucida Handwriting", 40));
+        selectTower.setTextFill(Color.DARKRED);
+        selectTower.setOnAction(event -> startGame());
+        layout.getChildren().add(selectTower);
+
+
+        for (int index = 0; index < numTeams; index++) {
+            //TODO remove this
+
+            TeamEnum tower = TeamEnum.getTeamFromId(index);
+
+            Group dummy = new Group();
+            ImageView towerView = TowerDrawer.drawTower(dummy, tower, center, 0.5);
+            towerView.setOnMouseClicked(event -> {
+                selectedTowerColor = tower;
+                selectTower.setText("Select " + tower.name);
+                selectTower.setVisible(true);
+            });
+            addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1);
+            towers.getChildren().add(towerView);
+        }
+
+
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
     }
 
     private void startGame(){

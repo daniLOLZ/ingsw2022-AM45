@@ -32,7 +32,6 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
             for (EventHandler<MouseEvent> ignored:
                  onStudentOnCardClick) {
-                System.out.println("Selecting student : " + index);
                 //onStudentOnCardClick.set(index, resourceProvider.selectStudentOnCard(index));
                 index++;
             }

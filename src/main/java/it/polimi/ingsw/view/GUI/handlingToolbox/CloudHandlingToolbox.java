@@ -30,7 +30,6 @@ public class CloudHandlingToolbox implements HandlingToolbox{
                  onCloudClick) {
                 if (onCloudClick.get(index.get()) == DISABLED) {
                     onCloudClick.set(index.get(), event -> {
-                        System.out.println("Selecting cloud : " + index.get());
                        //resourceProvider.chooseCloud();
                        onCloudClick.set(index.get(), NO_EFFECT);
 

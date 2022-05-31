@@ -23,23 +23,42 @@ public class IslandHandlingToolbox implements HandlingToolbox{
     public void allowCommand(CommandEnum command, ClientNetworkManager resourceProvider) {
         //TODO MOVE_MOTHER_NATURE
 
+        if (command == CommandEnum.PUT_IN_ISLAND) {
+            int index = 0;
+
+            for (EventHandler<MouseEvent> ignored: onIslandClick) {
+                //onIslandClick.set(index, resourceProvider.putInIsland(index));
+                index++;
+            }
+        }
+
         if (command == CommandEnum.SELECT_ISLAND_GROUP){
 
             int index = 0;
 
             for (EventHandler<MouseEvent> ignored: onIslandClick) {
-                System.out.println("Selecting island group : " + index);
-                //onIslandClick.set(index, resourceProvider.selectIslandGroup());
+                //onIslandClick.set(index, resourceProvider.selectIslandGroup(index));
                 index++;
             }
         }
     }
 
     @Override
-    public void disableCommand(CommandEnum commandEnum) {
+    public void disableCommand(CommandEnum command) {
         //TODO MOVE_MOTHER_NATURE
 
-        if (commandEnum == CommandEnum.SELECT_ISLAND_GROUP){
+        if (command == CommandEnum.PUT_IN_ISLAND){
+
+            int index = 0;
+
+            for (EventHandler<MouseEvent> ignored:
+                 onIslandClick) {
+                onIslandClick.set(index, DISABLED);
+                index++;
+            }
+        }
+
+        if (command == CommandEnum.SELECT_ISLAND_GROUP){
 
             int index = 0;
 
