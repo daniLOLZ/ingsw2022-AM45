@@ -2,10 +2,12 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.view.GUI.drawers.*;
+import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -19,11 +21,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -58,11 +62,17 @@ public class GUIApplication extends Application implements UserInterface{
 
     private static final Coord firstAssistantSlot = downCenter.pureSumX(WINDOW_WIDTH * 0.28).pureSumY(-WINDOW_HEIGHT / 7);
 
+    private static final Coord firstCharacterCardSlot = upCenter.pureSumX(WINDOW_WIDTH / 5).pureSumY(WINDOW_HEIGHT / 8);
+
+    private static final double characterCardWidth = 90, characterCardGap = characterCardWidth * 1.2;
+
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
 
     private String preselectedGameRule = availableGameRules.get(0);
     private Integer preselectedNumPlayers = availablePlayerNumber.get(0);
+    private WizardEnum selectedWizard = WizardEnum.NO_WIZARD;
+    private TeamEnum selectedTowerColor = TeamEnum.NOTEAM;
     private List<CloudBean> clouds;
     private List<IslandGroupBean> islands;
 
@@ -172,18 +182,9 @@ public class GUIApplication extends Application implements UserInterface{
 
         Scene loginScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-
-        Label hostNameLabel = new Label("Hostname");
-        TextField inputHostName = new TextField("127.0.0.1");
-        inputHostName.setPromptText("Insert hostname");
-
         Label loginLabel = new Label("Nickname");
         TextField inputNickname = new TextField();
         Button loginButton = new Button("Login");
-
-        HBox hostNameSelection = new HBox(10);
-        hostNameSelection.getChildren().addAll(hostNameLabel, inputHostName);
-        hostNameSelection.setAlignment(Pos.CENTER);
 
         inputNickname.setPromptText("Insert your nickname");
         inputNickname.setMaxWidth(WINDOW_WIDTH/4);
@@ -194,13 +195,16 @@ public class GUIApplication extends Application implements UserInterface{
         errorMessage.setVisible(errorOccurred);
 
         //calls external class to check input validity
-        loginButton.setOnAction(event -> ConnectionWithServerHandler.login(inputHostName.getText(), inputNickname.getText()));
+        loginButton.setOnAction(event -> {
+            ConnectionWithServerHandler.login(inputNickname.getText());
+            loginButton.setDisable(true);
+        });
 
         HBox nicknameSelection = new HBox(10);
         nicknameSelection.getChildren().addAll(loginLabel, inputNickname);
         nicknameSelection.setAlignment(Pos.CENTER);
 
-        login.getChildren().addAll(hostNameSelection, nicknameSelection, loginButton, errorMessage);
+        login.getChildren().addAll(nicknameSelection, loginButton, errorMessage);
 
         //<editor-fold desc="Debug">
 
@@ -284,7 +288,7 @@ public class GUIApplication extends Application implements UserInterface{
         Button searchGameButton = new Button("Search Game");
         searchGameButton.setOnAction(event -> {
             //game must be searched once
-            searchGameButton.setOnAction(Drawer.NO_ACTION);
+            searchGameButton.setDisable(true);
 
             //saving selections in case operation fails
             preselectedGameRule = gameRuleSelection.getValue();
@@ -387,8 +391,9 @@ public class GUIApplication extends Application implements UserInterface{
         });
 
         startGame.setOnAction(event -> {
+            startGame.setDisable(true);
             ready.setDisable(true);
-            leaveLobby.setOnAction(Drawer.NO_ACTION);
+            leaveLobby.setDisable(true);
             ConnectionWithServerHandler.startGame();
         });
 
@@ -402,8 +407,8 @@ public class GUIApplication extends Application implements UserInterface{
         Button success = new Button("Simulate start game");
         Button failure = new Button("Simulate failure");
 
-        success.setOnAction(event -> startGame());
-        failure.setOnAction(event -> showLobbyScreen(false));
+        success.setOnAction(event -> showWizardSelection(false));
+        failure.setOnAction(event -> showLobbyScreen(true));
 
         layout.getChildren().addAll(success,failure);
 
@@ -427,6 +432,114 @@ public class GUIApplication extends Application implements UserInterface{
 
     public void notifyPlayersNotReady(){
         showLobbyScreen(true);
+    }
+
+    private void showWizardSelection(boolean errorOccurred){
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        DecorationsDrawer.showMenuBackground(root);
+
+        //</editor-fold>
+
+        VBox layout = new VBox(35);
+        layout.setAlignment(Pos.CENTER);
+        root.getChildren().add(layout);
+
+        Label title = new Label("Select your Wizard companion!");
+        title.setAlignment(Pos.CENTER);
+        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setTextFill(Color.DARKRED);
+        layout.getChildren().add(title);
+
+        HBox wizards = new HBox(20);
+        wizards.setAlignment(Pos.CENTER);
+        wizards.setMinHeight(WizardDrawer.getWizardHeight() * 0.5 * 1.2);
+        layout.getChildren().add(wizards);
+
+        Button selectWizard = new Button("vgnkdhdrnhs");
+        selectWizard.setVisible(false);
+        selectWizard.setBackground(Background.EMPTY);
+        selectWizard.setFont(Font.font("Lucida Handwriting", 40));
+        selectWizard.setTextFill(Color.DARKRED);
+        selectWizard.setOnAction(event -> showTowerColorSelection(false));
+        layout.getChildren().add(selectWizard);
+
+        for (WizardEnum wizard:
+             WizardEnum.getWizards()) {
+            ImageView wizardView = WizardDrawer.drawWizard(wizard, center, 0.5);
+            wizardView.setOnMouseClicked(event -> {
+                selectedWizard = wizard;
+                selectWizard.setText("Select " + wizard.name);
+                selectWizard.setVisible(true);
+            });
+            addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1);
+            wizards.getChildren().add(wizardView);
+        }
+
+
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
+    }
+
+    private void showTowerColorSelection(boolean errorOccurred){
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        DecorationsDrawer.showMenuBackground(root);
+
+        //</editor-fold>
+
+        VBox layout = new VBox(35);
+        layout.setAlignment(Pos.CENTER);
+        root.getChildren().add(layout);
+
+        Label title = new Label("Select your Tower color!");
+        title.setAlignment(Pos.CENTER);
+        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setTextFill(Color.DARKRED);
+        layout.getChildren().add(title);
+
+        int numTeams = TeamEnum.getNumTeams() - 1;
+        if(preselectedNumPlayers == 3) numTeams = TeamEnum.getNumTeams();
+
+        HBox towers = new HBox(20.0 * TeamEnum.getNumTeams() / numTeams);
+        towers.setAlignment(Pos.CENTER);
+        towers.setMinHeight(TowerDrawer.getTowerSize() * 0.5 * 1.2);
+        layout.getChildren().add(towers);
+
+        Button selectTower = new Button("vgnkdhdrnhs");
+        selectTower.setVisible(false);
+        selectTower.setBackground(Background.EMPTY);
+        selectTower.setFont(Font.font("Lucida Handwriting", 40));
+        selectTower.setTextFill(Color.DARKRED);
+        selectTower.setOnAction(event -> startGame());
+        layout.getChildren().add(selectTower);
+
+
+        for (int index = 0; index < numTeams; index++) {
+            //TODO remove this
+
+            TeamEnum tower = TeamEnum.getTeamFromId(index);
+
+            Group dummy = new Group();
+            ImageView towerView = TowerDrawer.drawTower(dummy, tower, center, 0.5);
+            towerView.setOnMouseClicked(event -> {
+                selectedTowerColor = tower;
+                selectTower.setText("Select " + tower.name);
+                selectTower.setVisible(true);
+            });
+            addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1);
+            towers.getChildren().add(towerView);
+        }
+
+
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
     }
 
     private void startGame(){
@@ -465,7 +578,7 @@ public class GUIApplication extends Application implements UserInterface{
         CloudBean cloudBean = new CloudBean(1, students.subList(0,4));
 
         for (Coord slot:
-             getCloudsSlots(4, center.pureSumY(-50))) {
+             getCloudsSlots(3, center.pureSumY(-50))) {
             CloudDrawer.drawCloud(root, cloudBean, slot, cloudSize / CloudDrawer.getCloudSize());
         }
 
@@ -492,7 +605,7 @@ public class GUIApplication extends Application implements UserInterface{
             assistants.add(assistant);
         }
 
-        PlayerBean board = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants);
+        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 1);
 
         BoardDrawer.drawBoard(root, board, downCenter.pureSumY(-145));
         BoardDrawer.drawBoard(root, board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
@@ -511,6 +624,24 @@ public class GUIApplication extends Application implements UserInterface{
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.STEELBLUE);
         stage.setScene(scene);
+
+        CharacterCardBean
+                priest = new CharacterCardBean(1, "Priest", "priest_description", students.subList(0,4), 1),
+                dame = new CharacterCardBean(11, "Dame", "dame_description", students.subList(0,4), 2),
+                herbalist = new CharacterCardBean(5, "Herbalist", "herbalist_description", new ArrayList<>(), 2);
+
+        List<CharacterCardBean> characters = new ArrayList<>();
+        characters.add(priest);
+        characters.add(dame);
+        characters.add(herbalist);
+
+        int numCharacter = 0;
+
+        for (CharacterCardBean character:
+             characters) {
+
+            CharacterCardDrawer.drawCharacterCard(root, character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter++),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth());
+        }
     }
 
     private List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){

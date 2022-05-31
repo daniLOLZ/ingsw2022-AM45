@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.GUI.drawers;
 
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.view.GUI.Coord;
 import javafx.scene.Group;
@@ -81,7 +82,12 @@ public class BoardDrawer extends Drawer{
             assistantHeight = assistantWidth * AssistantDrawer.getAssistantHeight() / AssistantDrawer.getAssistantWidth(),
             assistantLabelHeight = 160;
 
-    public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale, int rotation){
+    private static final double coinStep = 45, coinSize = 260;
+
+    private static final Coord firstCoinSlot = upLeftCorner.pureSumX(-board.getWidth() / 2 - playerBoxWidth / 2).pureSumY(-board.getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2);
+
+
+    public static void drawBoard(Group root, AdvancedPlayerBean data, Coord pos, double scale, int rotation){
 
         AtomicReference<Double> actualBoardScale = new AtomicReference<>(defaultBoardScale * scale);
         Coord actualPos = pos;
@@ -108,15 +114,29 @@ public class BoardDrawer extends Drawer{
         drawBoardChildEntities(root, data, actualPos, actualBoardScale, rotation);
     }
 
+    public static void drawBoard(Group root, AdvancedPlayerBean data, Coord pos, double scale){
+        drawBoard(root, data, pos, scale, Coord.NO_ROTATION);
+    }
+
+    public static void drawBoard(Group root, AdvancedPlayerBean data, Coord pos){
+        drawBoard(root, data, pos, REAL_SIZE);
+    }
+
+    public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale, int rotation){
+        AdvancedPlayerBean adaptedData = (AdvancedPlayerBean) data;
+        ((AdvancedPlayerBean) data).setNumCoins(0);
+        drawBoard(root, adaptedData, pos, scale, rotation);
+    }
+
     public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale){
         drawBoard(root, data, pos, scale, Coord.NO_ROTATION);
     }
 
     public static void drawBoard(Group root, PlayerBean data, Coord pos){
-        drawBoard(root, data, pos, REAL_SIZE, Coord.NO_ROTATION);
+        drawBoard(root, data, pos, REAL_SIZE);
     }
 
-    private static void drawBoardChildEntities(Group root, PlayerBean data, Coord actualPos, AtomicReference<Double> actualBoardScale, int rotation){
+    private static void drawBoardChildEntities(Group root, AdvancedPlayerBean data, Coord actualPos, AtomicReference<Double> actualBoardScale, int rotation){
 
         //draw player info
         Rectangle playerBox = new Rectangle();
@@ -167,13 +187,13 @@ public class BoardDrawer extends Drawer{
 
         assistantSlot.moveY(assistantLabelHeight / 2 * actualBoardScale.get());
         labelPos = assistantSlot.pureSumY(assistantLabelHeight / 4 * actualBoardScale.get()).pureRotate(actualPos, rotation);
-        //TODO doesn't work (for some reason)
+
         assistantText.setTextAlignment(TextAlignment.CENTER);
         assistantText.setFont(Font.font(assistantText.getFont().getName(), assistantText.getFont().getSize() * actualBoardScale.get() / defaultBoardScale));
         assistantText.setX(labelPos.x);
         assistantText.setY(labelPos.y);
         assistantText.setWrappingWidth(assistantWidth * actualBoardScale.get());
-        //assistantText.getTransforms().add(new Rotate(90 * rotation, labelPos.x, labelPos.y));
+        assistantText.getTransforms().add(new Rotate(90 * rotation, labelPos.x, labelPos.y));
 
         assistantSlot.moveX(assistantWidth / 2 * actualBoardScale.get());
         assistantSlot.moveY(assistantHeight / 2 * actualBoardScale.get() + assistantLabelHeight / 2 * actualBoardScale.get());
@@ -182,7 +202,7 @@ public class BoardDrawer extends Drawer{
         //TODO change id into last played assistant once the feature is available
         ImageView assistantView = AssistantDrawer.drawAssistant(root, 5, assistantSlot, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
 
-        assistantText.getTransforms().add(new Rotate(90 * rotation, assistantSlot.x, assistantSlot.y));
+        assistantView.getTransforms().add(new Rotate(90 * rotation, assistantSlot.x, assistantSlot.y));
 
         //draw students at entrance
         Iterator<Coord> entranceSlot = atEntranceSlots.iterator();
@@ -250,6 +270,38 @@ public class BoardDrawer extends Drawer{
                     .pureRotate(actualPos, rotation);
             Coord finalSlot = slot;
             TowerDrawer.drawTower(root, data.getTowerColor(), finalSlot, towerSize / TowerDrawer.getTowerSize() * actualBoardScale.get());
+        }
+
+        //draw coins (if any)
+        if (data.getNumCoins() != 0){
+            Coord coinSlot = actualPos.pureSumX(firstCoinSlot.x * actualBoardScale.get()).pureSumY(firstCoinSlot.y * actualBoardScale.get());
+
+            int coinIndex;
+
+            for (coinIndex = 0; coinIndex < data.getNumCoins(); coinIndex++) {
+
+                Coord actualCoinSlot =
+                        coinSlot
+                        .pureSumY(coinIndex * coinStep * actualBoardScale.get())
+                        .pureRotate(actualPos, rotation);
+                ImageView coinView = CoinDrawer.drawCoin(root, actualCoinSlot, coinSize / CoinDrawer.getCoinSize() * actualBoardScale.get());
+                coinView.getTransforms().add(new Rotate(90 * rotation, actualCoinSlot.x, actualCoinSlot.y));
+            }
+
+            Text numCoins = new Text(String.valueOf(data.getNumCoins()));
+
+            root.getChildren().add(numCoins);
+
+            Coord numCoinsPos =
+                    coinSlot
+                    .pureSumX(-coinSize * actualBoardScale.get())
+                    .pureSumY((coinIndex + 1) * coinStep * actualBoardScale.get())
+                    .pureRotate(actualPos, rotation);
+
+            numCoins.setX(numCoinsPos.x);
+            numCoins.setY(numCoinsPos.y);
+            numCoins.setFont(Font.font("Sylfaen", 35 * actualBoardScale.get() / defaultBoardScale));
+            numCoins.setTextAlignment(TextAlignment.CENTER);
         }
     }
 }

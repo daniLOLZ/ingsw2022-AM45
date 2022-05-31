@@ -3,7 +3,7 @@ package it.polimi.ingsw.view.GUI;
 //this is a stub class
 public class ConnectionWithServerHandler {
 
-    public static void login(String hostName, String nickname){
+    public static void login(String nickname){
 
     }
 
