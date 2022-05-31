@@ -80,22 +80,28 @@ public class ClientHandler implements Runnable{
 
             System.out.println("---Message parsed : "+command.toString());
             if(!parameters.getConnectionState().isAllowed(command)){ // Trashes a command given at the wrong time
-                System.err.println("--+Command not allowed");
-                mainBroker.flushFirstMessage();
-                continue;
+                System.err.println("-+-Command not allowed");
+                //We also need to send an error to the client, not leaving it hanging
+                //todo duplicate code
+                mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
+                mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
+                mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
+                mainBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, "The command couldn't be handled");
             }
+            else {
+                commandLock.lock();
+                try {
+                    handleCommand(mainBroker); // runs the appropriate routine depending on the command received
+                    System.out.println("---Command handled");
+                }
+                finally {
+                    commandLock.unlock();
+                }
+            }
+            // Sends a reply to the client
+            mainBroker.send(clientOutput);
+            mainBroker.flushFirstMessage();
 
-            commandLock.lock();
-            try {
-                handleCommand(mainBroker); // runs the appropriate routine depending on the command received
-                System.out.println("---Command handled");
-                // Sends a reply to the client
-                mainBroker.send(clientOutput);
-                mainBroker.flushFirstMessage();
-            }
-            finally {
-                commandLock.unlock();
-            }
         }
         // This point should never be reached in normal circumstances (unless the client disconnects)
     }

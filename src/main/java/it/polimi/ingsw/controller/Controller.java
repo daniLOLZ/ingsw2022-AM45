@@ -259,6 +259,9 @@ public class Controller {
 
     /**
      * By calling the appropriate handler, selects the wizard for this user
+     * If the wizard was already taken by someone else then the method rightly fails
+     * If it was taken by the same player, the method exits without reassigning an already assigned wizard,
+     * returning false
      * @param idWizard the wizard chosen by the user
      * @param idUser the user that selects the wizard
      * @return true if the assignment succeeded
@@ -273,6 +276,7 @@ public class Controller {
                     this.playerCreation.clearWizard(position);
                     this.playerCreation.setWizard(idWizard, position);
                 }
+                else return false;
                 // If the wizard was already taken by someone else then the method rightly fails
                 // If it was taken by the same player, the method exits without reassigning an already assigned wizard
             }finally {
@@ -286,10 +290,11 @@ public class Controller {
     /**
      * By calling the appropriate handler, sets the team color for this user
      * If the color was already taken by someone else then the method rightly fails
-     * If it was taken by the same player, the method exits without reassigning an already assigned team color
+     * If it was taken by the same player, the method exits without reassigning an already assigned team color,
+     * returning false
      * @param towerColor the tower color chosen
      * @param idUser the user that chooses the team
-     * @return true if the assignment succeeded
+     * @return true if the new assignment succeeded
      */
     public boolean setTeamColor(TeamEnum towerColor, Integer idUser) {
         int position = getPositionFromUserId(idUser);
@@ -302,6 +307,7 @@ public class Controller {
                     this.playerCreation.clearTeamColor(position);
                     this.playerCreation.setTeamColor(towerColor, position);
                 }
+                else return false;
             } finally {
                 teamLock.unlock();
             }

@@ -338,13 +338,7 @@ public class CLI implements UserInterface {
                 } catch (InterruptedException e) {
                     System.err.println("Interrupted before waiting the full length, requesting lobby updates now");
                 }
-                /*
-                if(gameStarting.get()){
-                    //This is necessary for the host, for which the sendReadyStatus won't
-                    // stop the thread, since its server-side game state already changed
-                    return;
-                }
-                 */
+
                 if(networkManager.sendReadyStatus(ready.get())){
                     //signal we're starting the game
                     gameStarting.set(true);
