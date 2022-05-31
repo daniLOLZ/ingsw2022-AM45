@@ -29,6 +29,7 @@ public class CLI implements UserInterface {
     private String gameMode;
     private final String colorList3Players = "B - Black, G - Grey, W - White";
     private final String colorList2or4Players = "B - Black, W - White";
+    private boolean inLobby;
 
     /**
      * Network-less constructor, used for testing
@@ -39,6 +40,7 @@ public class CLI implements UserInterface {
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
+        inLobby = false;
     }
 
     /**
@@ -305,6 +307,7 @@ public class CLI implements UserInterface {
         } while(serverError);
         this.numberOfPlayers = Integer.parseInt(numPlayers);
         this.gameMode = Integer.parseInt(gameMode) == 1 ? "Simple" : "Advanced"; // find a nicer way
+        this.inLobby = true;
     }
 
     @Override
@@ -322,8 +325,11 @@ public class CLI implements UserInterface {
                 1 - Set yourself as ready
                 2 - Set yourself as not ready
                 S - Try to start the game
+                L - Leave the lobby, go back to selecting the game rules
                 """, this.numberOfPlayers, this.gameMode));
 
+        //todo factor this runnable into its own class so it doesn't print the bean but simply
+        // returns it to the UI, which whill then handle it
         new Thread(()-> {
 
             // Lucario: We might not need to check for sameness here, the server should only update if the
@@ -369,16 +375,27 @@ public class CLI implements UserInterface {
                 System.out.println("You set yourself as not ready");
             }
             else if (selection.toUpperCase(Locale.ROOT).equals("S")) {
-                if(networkManager.startGame()){
+                if (networkManager.startGame()) {
                     gameStarting.set(true);
                     System.out.println("Everyone is ready!");
                     break;
-                }
-                else {
+                } else {
                     System.out.println("The game  couldn't start");
                 }
-            } else {
-                System.out.println("Insert a correct naiodbaido!");
+            }
+            else if(selection.toUpperCase(Locale.ROOT).equals("L")){
+                if(networkManager.leaveLobby()){
+                    //Leave the lobby locally
+                    System.out.println("Leaving the current lobby...");
+                    this.inLobby = false;
+                    break;
+                }
+                else {
+                    System.out.println("Couldn't leave, you're stuck in the lobby °_°");
+                }
+            }
+            else {
+                System.out.println("Insert a correct option please!");
             }
             selection = "";
         }
@@ -409,6 +426,8 @@ public class CLI implements UserInterface {
 
 
         //Start periodically fetching initialization information
+        //todo factor this runnable into its own class so it doesn't print the bean but simply
+        // returns it to the UI, which whill then handle it
         new Thread(()->{
             // Lucario: Same as before, again if we have time
             GameInitBean initBean;
@@ -439,13 +458,13 @@ public class CLI implements UserInterface {
 
         while(true){
             System.out.println(MessageFormat.format("""
-                Select your team color ({2}) 
+                Select your team color ({2})
                 and wizard (1 - King, 2 - Pixie, 3 - Sorcerer, 4 - Wizard)
                 (one at a time):
                 
-                Your selection : 
+                Your selection :
                     Team color : {0}
-                    Wizard : {1} 
+                    Wizard : {1}
                 """, currentTower, currentWizard, colorList));
 
             selection = getInputNonBlocking(reader, gameStarting);
@@ -514,16 +533,26 @@ public class CLI implements UserInterface {
 
     @Override
     public void showGameInterface() {
+        boolean genericVariableThatTellsUsIfTheGameIsStillGoing = true;
+
+        //Game loop
+        while(genericVariableThatTellsUsIfTheGameIsStillGoing){
+
+        }
         System.out.println("started woohoo");
     }
 
     @Override
     public void startInterface() {
 
+        // Orchestrator for the CLI
         showWelcomeScreen();
         showLoginScreen();
-        showGameruleSelection();
-        showLobby();
+
+        while(!inLobby) { // todo i don't like this way of handling views
+            showGameruleSelection();
+            showLobby();
+        }
         showTowerAndWizardSelection();
         showGameInterface();
 
@@ -548,10 +577,9 @@ public class CLI implements UserInterface {
                 //If not, we exited because the game is starting
             } catch (InterruptedException e) {
                 //Run the next loop
-                continue;
+                System.err.println("Interrupted before receiving input, continuing");
             } catch (IOException e) {
                 System.err.println("I/O error, continuing");
-                continue;
             }
         }
         return selection;

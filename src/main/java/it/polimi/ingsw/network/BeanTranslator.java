@@ -16,6 +16,8 @@ import java.util.List;
 
 /**
  * Translates from a LinkedTreeMap to a bean of the correct type
+ * This class is fairly fragile, as it needs updating every time an attribute
+ * name changes
  */
 public class BeanTranslator {
 

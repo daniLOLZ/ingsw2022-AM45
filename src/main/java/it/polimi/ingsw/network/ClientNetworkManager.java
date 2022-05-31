@@ -219,6 +219,28 @@ public class ClientNetworkManager {
     }
 
     /**
+     * The user asks to leave the current lobby
+     * @return true if the call succeeded and the user left the lobby
+     */
+    public boolean leaveLobby(){
+        boolean successfulReply;
+
+        brokerLock.lock();
+        try{
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.LEAVE_LOBBY);
+            if(!sendToServer()) return false;
+
+            successfulReply = checkSuccessfulReply();
+
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+
+        } finally {
+            brokerLock.unlock();
+        }
+    }
+
+    /**
      * Fetches the current information regarding tower and wizard selection
      * @return a GameInitBean containing the teams and wizards that HAVEN'T been chosen already
      */
