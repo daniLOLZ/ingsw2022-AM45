@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.drawers;
 
-import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -33,8 +33,8 @@ public class AssistantDrawer extends Drawer{
 
     public static ImageView drawAssistant(Group root, int id, Coord pos, double scale){
 
-        ImageView assistantView = drawFromCenterInteractiveImage(root, assistants.get(id - firstAssistantId), pos, scale, Drawer.NO_EFFECT);
-        addHoveringEffects(assistantView, pos, scale, NO_EFFECT, NO_EFFECT, hoverZoom);
+        ImageView assistantView = drawFromCenterInteractiveImage(root, assistants.get(id - firstAssistantId), pos, scale, HandlingToolbox.NO_EFFECT);
+        addHoveringEffects(assistantView, pos, scale, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, hoverZoom);
         return assistantView;
     }
 

@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.GUI.drawers;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.CharacterCardBean;
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -15,7 +16,6 @@ import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static it.polimi.ingsw.view.GUI.GUIApplication.upLeftCorner;
 
@@ -58,7 +58,7 @@ public class CharacterCardDrawer extends Drawer{
 
     public static void drawCharacterCard(Group root, CharacterCardBean data, Coord pos, double scale){
 
-        ImageView characterView = drawFromCenterInteractiveImage(root, characterCards.get(data.getId() - firstCharacterId), pos, scale, NO_EFFECT);
+        ImageView characterView = drawFromCenterInteractiveImage(root, characterCards.get(data.getId() - firstCharacterId), pos, scale, HandlingToolbox.NO_EFFECT);
 
         Text description = new Text(data.getDescription());
         Rectangle descBox = new Rectangle();

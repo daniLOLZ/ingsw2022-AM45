@@ -2,8 +2,29 @@ package it.polimi.ingsw.view.GUI.handlingToolbox;
 
 import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 
 public interface HandlingToolbox {
+    EventHandler<MouseEvent> NO_EFFECT = new EventHandler<MouseEvent>() {
+    @Override
+    public void handle(MouseEvent event) {
+        }
+    };
+
+    EventHandler<MouseEvent> DISABLED = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+        }
+    };
+
+    EventHandler<ActionEvent> NO_ACTION = new EventHandler<ActionEvent>() {
+    @Override
+    public void handle(ActionEvent event) {
+
+        }
+    };
 
     //note: commands can be allowed and disabled infinitely.
     //      No effect will result if the toolbox doesn't
@@ -17,7 +38,7 @@ public interface HandlingToolbox {
 
     /**
      * Changes the handling resources to make sure the given command isn't allowed
-     * @param commandEnum the command to disable
+     * @param command the command to disable
      */
-    void disableCommand(CommandEnum commandEnum);
+    void disableCommand(CommandEnum command);
 }

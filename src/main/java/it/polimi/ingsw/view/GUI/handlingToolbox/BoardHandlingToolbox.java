@@ -2,34 +2,45 @@ package it.polimi.ingsw.view.GUI.handlingToolbox;
 
 import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
-import it.polimi.ingsw.view.GUI.drawers.Drawer;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoardHandlingToolbox implements HandlingToolbox{
 
     private List<EventHandler<MouseEvent>> onEntranceStudentClick;
-    private List<EventHandler<MouseEvent>> onSelectedEntranceStudentClick;
     private EventHandler<MouseEvent> onHallClick;
 
     public BoardHandlingToolbox(int entranceStudents){
 
         onEntranceStudentClick = new ArrayList<>();
-        onSelectedEntranceStudentClick = new ArrayList<>();
 
         for (int student = 0; student < entranceStudents; student++) {
-            onEntranceStudentClick.add(Drawer.NO_EFFECT);
-            onSelectedEntranceStudentClick.add(Drawer.NO_EFFECT);
+            onEntranceStudentClick.add(DISABLED);
         }
 
-        onHallClick = Drawer.NO_EFFECT;
+        onHallClick = DISABLED;
     }
 
     @Override
     public void allowCommand(CommandEnum command, ClientNetworkManager resourceProvider) {
+        if (command == CommandEnum.SELECT_STUDENT){
+            AtomicInteger index = new AtomicInteger();
+            for (EventHandler<MouseEvent> ignored :
+                 onEntranceStudentClick) {
+                if (onEntranceStudentClick.get(index.get()) == DISABLED) {
+                    onEntranceStudentClick.set(index.get(), event -> {
+                        System.out.println("Selecting student : " + index);
+                        //resourceProvider.selectStudent(index);
+                        onEntranceStudentClick.set(index.get(), NO_EFFECT);
+                        index.getAndIncrement();
+                    });
+                }
+            }
+        }
         //TODO
     }
 
@@ -46,7 +57,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
      * @return The EventHandler to assign to the Entrance student
      */
     public EventHandler<MouseEvent> getOnEntranceStudentClick(int pos, boolean selected){
-        return selected ? onSelectedEntranceStudentClick.get(pos) : onEntranceStudentClick.get(pos);
+        return onEntranceStudentClick.get(pos);
     }
 
     public EventHandler<MouseEvent> getOnHallClick() {
