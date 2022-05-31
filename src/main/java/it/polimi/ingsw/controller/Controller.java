@@ -208,24 +208,22 @@ public class Controller {
     }
 
     /**
-     * Gets all the team colors that have been chosen already for
-     * this game
+     * Gets all the team colors that are still available for choosing
      * @return a list of all the team colors (as TeamEnum) chosen
      */
-    public List<TeamEnum> getTowerColorsChosen(){
-        return Arrays.stream(TeamEnum.values())
-                .filter(x -> playerCreation.isColorTaken(x))
+    public List<TeamEnum> getTowerColorsAvailable(){
+        return  TeamEnum.getTeams().stream()
+                .filter(x -> playerCreation.isColorAvailable(x))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Gets all the wizards that have been chosen already for
-     * this game
+     * Gets all the wizards that are still available for choosing
      * @return a list of all the wizards (as WizardEnum) chosen
      */
-    public List<WizardEnum> getWizardsChosen(){
-        return Arrays.stream(WizardEnum.values())
-                .filter(x -> playerCreation.isWizardTaken(x.index*10)) // todo wizard refactoring here too
+    public List<WizardEnum> getWizardsAvailable(){
+        return  WizardEnum.getWizards().stream()
+                .filter(x -> playerCreation.isWizardAvailable(x.index*10)) // todo wizard refactoring here too
                 .collect(Collectors.toList());
     }
 
@@ -272,7 +270,7 @@ public class Controller {
             //The user might have already selected a wizard and changed their mind
             wizardLock.lock();
             try {
-                if (!this.playerCreation.isWizardTaken(idWizard)){
+                if (this.playerCreation.isWizardAvailable(idWizard)){
                     this.playerCreation.clearWizard(position);
                     this.playerCreation.setWizard(idWizard, position);
                 }
@@ -303,7 +301,7 @@ public class Controller {
             //The user might have already selected a color and changed their mind
             teamLock.lock();
             try {
-                if (!this.playerCreation.isColorTaken(towerColor)) {
+                if (this.playerCreation.isColorAvailable(towerColor)) {
                     this.playerCreation.clearTeamColor(position);
                     this.playerCreation.setTeamColor(towerColor, position);
                 }

@@ -372,6 +372,13 @@ public class ClientNetworkManager {
 
         mainBroker.send(outStream);
         mainBroker.receive(inStream);
+        try {
+            mainBroker.takeIncomingMessage();
+        } catch (InterruptedException e) {
+            System.err.println("Interrupted while waiting for message");
+            e.printStackTrace();
+            return false;
+        }
 
         //Checking whether the reply is the correct one
         //This method will not return until the first message of the broker
@@ -473,20 +480,25 @@ public class ClientNetworkManager {
 
         final Future<Void> handler = pingExecutor.submit(() -> {
 
-            while (!pingBroker.messagePresent()); //operation to execute with timeout
+            pingBroker.takeIncomingMessage(); //operation to execute with timeout
 
             return null; //no need for a return value
         });
 
         do{
             //send ping message
-            while (!pingBroker.messagePresent());
+            try {
+                pingBroker.takeIncomingMessage(); // why is this needed here?
+            } catch (InterruptedException e) {
+                System.err.println("Error while waiting for ping ");
+                e.printStackTrace();
+            }
             pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
             pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
             pingBroker.send(outStream);
             //pingBroker.unlock();
             pingBroker.flushFirstMessage();
-            pingBroker.receive(inStream);
+            pingBroker.receive(inStream); // ?receive is blocking
 
             //receive pong message
             try {

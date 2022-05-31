@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class PlayerCreation {
     private final Controller controller;
@@ -42,15 +43,27 @@ public class PlayerCreation {
 
 
     /**
-     * Check whether a given color has already been assigned
-     * will answer with true in case the game is not a 3-player game and the checked color is grey
+     * Check whether a given color can be assigned to another player
+     * will answer with true in case the color wasn't chosen (2 or 3 player game)
+     * if it's not grey (2 or 4 player game)
+     * or if only one player chose a particular color (4 player game)
      * @param color the color to check
-     * @return true if the color is already assigned to a player
+     * @return true if the color is available for selection
      */
-    public synchronized boolean isColorTaken(TeamEnum color){
-        if(GameRuleEnum.getNumPlayers(controller.gameRule.id) != 3 &&
-                color.equals(TeamEnum.GREY)) return true;
-        return teamColor.contains(color);
+    public synchronized boolean isColorAvailable(TeamEnum color){
+        int numberOfPlayers = GameRuleEnum.getNumPlayers(controller.gameRule.id);
+
+        if(numberOfPlayers != 3 && color.equals(TeamEnum.GREY)) return false;
+
+        if(numberOfPlayers == 2 || numberOfPlayers == 3){
+            return !teamColor.contains(color);
+        }
+        else { // 4 players
+            return teamColor.stream()
+                    .filter(Objects::nonNull)
+                    .filter(x -> x.equals(color))
+                    .count() < 2;
+        }
     }
 
     /**
@@ -108,12 +121,13 @@ public class PlayerCreation {
     }
 
     /**
-     * Check whether a given wizard id has already been assigned
-     * @param idWizard the wizard to check
-     * @return true if the wizard is already assigned to a player
+     * Check whether a given color can be assigned to another player
+     * will answer with true in case the color wasn't chosen
+     * @param idWizard the color to check
+     * @return true if the wizard is available for selection
      */
-    public synchronized boolean isWizardTaken(int idWizard){
-        return wizards.contains(idWizard);
+    public synchronized boolean isWizardAvailable(int idWizard){
+        return !wizards.contains(idWizard);
     }
     /**
      * set, in user position, a new wizard id in wizards list only if there not are

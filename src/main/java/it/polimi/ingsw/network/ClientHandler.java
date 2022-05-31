@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientHandler implements Runnable{
@@ -73,8 +72,14 @@ public class ClientHandler implements Runnable{
 
         while(isConnected){ // Message listener loop
 
-            while(!mainBroker.messagePresent()); // this uses a ton of resources!!! we need an interrupt
-            // mechanism like producer/consumer
+            try {
+                mainBroker.takeIncomingMessage();
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted while waiting for message");
+                e.printStackTrace();
+                continue;
+            }
+
             System.out.println("---Starting to parse a message [idUser: " + parameters.getIdUser() + "]");
             CommandEnum command = CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND));
 
@@ -184,7 +189,8 @@ public class ClientHandler implements Runnable{
         final Future<Void> handler = pingExecutor.submit(() -> {
 
             //todo might have broken it
-            while (!pingBroker.messagePresent()); //operation to execute with timeout
+            pingBroker.takeIncomingMessage(); //operation to execute with timeout
+
 
             return null; //no need for a return value
         });

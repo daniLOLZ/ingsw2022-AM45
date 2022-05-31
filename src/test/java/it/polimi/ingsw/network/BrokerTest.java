@@ -61,6 +61,11 @@ public class BrokerTest {
                     "NICKNAME" : "gigio"
                 }""");
         broker.receive(stream);
+        try {
+            broker.takeIncomingMessage();
+        } catch (InterruptedException e) {
+            fail();
+        }
         //while (!broker.lock());
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
@@ -80,12 +85,18 @@ public class BrokerTest {
                 }""");
         broker.receive(stream);
         broker.receive(stream);
-        if(!broker.messagePresent()){
+
+        try {
+            broker.takeIncomingMessage();
+        } catch (InterruptedException e) {
             fail("No first message to read");
         }
         assertEquals("gigio", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
         broker.flushFirstMessage();
-        if(!broker.messagePresent()){
+
+        try {
+            broker.takeIncomingMessage();
+        } catch (InterruptedException e) {
             fail("No second message to read");
         }
         assertEquals("gigio2", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));

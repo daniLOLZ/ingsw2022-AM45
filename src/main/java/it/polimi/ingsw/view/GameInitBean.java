@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class GameInitBean implements Bean {
-    private final List<TeamEnum> chosenColors;
-    private final List<WizardEnum> chosenWizards;
+    private final List<TeamEnum> availableColors;
+    private final List<WizardEnum> availableWizards;
     private final boolean allSetGameStarted;
 
     @Override
@@ -20,24 +20,21 @@ public class GameInitBean implements Bean {
 
     /**
      * Returns a bean containing the already chosen team colors and wizards
-     * IMPORTANT: Even if the color wasn't actually chosen by someone, but
-     * is simply not selectable, the array will contain it anyways
-     * Example: Grey team in a 2 or 4 player game
-     * @param chosenColors the colors chosen by the players
-     * @param chosenWizards the wizards chosen by the players
+     * @param availableColors the colors still available to be selected by the players
+     * @param availableWizards the wizards still available to be selected by the players
      */
-    public GameInitBean(List<TeamEnum> chosenColors, List<WizardEnum> chosenWizards, boolean allSetGameStarted) {
-        this.chosenColors = chosenColors;
-        this.chosenWizards = chosenWizards;
+    public GameInitBean(List<TeamEnum> availableColors, List<WizardEnum> availableWizards, boolean allSetGameStarted) {
+        this.availableColors = availableColors;
+        this.availableWizards = availableWizards;
         this.allSetGameStarted = allSetGameStarted;
     }
 
     public List<TeamEnum> getChosenColors() {
-        return chosenColors;
+        return availableColors;
     }
 
     public List<WizardEnum> getChosenWizards() {
-        return chosenWizards;
+        return availableWizards;
     }
 
     public boolean isAllSetGameStarted() {
@@ -49,12 +46,12 @@ public class GameInitBean implements Bean {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GameInitBean that = (GameInitBean) o;
-        return allSetGameStarted == that.allSetGameStarted && chosenColors.equals(that.chosenColors) && chosenWizards.equals(that.chosenWizards);
+        return allSetGameStarted == that.allSetGameStarted && availableColors.equals(that.availableColors) && availableWizards.equals(that.availableWizards);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chosenColors, chosenWizards, allSetGameStarted);
+        return Objects.hash(availableColors, availableWizards, allSetGameStarted);
     }
 
     @Override
@@ -62,7 +59,7 @@ public class GameInitBean implements Bean {
         StringBuilder returnString = new StringBuilder();
         returnString.append("Available team colors:\n");
         for(TeamEnum team : TeamEnum.getTeams()){
-            if(!chosenColors.contains(team)){
+            if(availableColors.contains(team)){
                 returnString.append("- ");
                 returnString.append(team.name);
                 returnString.append("\n");
@@ -70,7 +67,7 @@ public class GameInitBean implements Bean {
         }
         returnString.append("Available wizards:\n");
         for(WizardEnum wizard : WizardEnum.getWizards()){
-            if(!chosenWizards.contains(wizard)){
+            if(availableWizards.contains(wizard)){
                 returnString.append("- ");
                 returnString.append(wizard.name);
                 returnString.append("\n");

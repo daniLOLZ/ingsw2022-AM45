@@ -5,6 +5,9 @@ import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.network.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -306,10 +309,10 @@ public class CLI implements UserInterface {
 
     @Override
     public void showLobby() {
-        Scanner scanner = new Scanner(System.in);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         AtomicBoolean ready = new AtomicBoolean(false);
         AtomicBoolean gameStarting = new AtomicBoolean(false);
-        String selection;
+        String selection = "";
         System.out.println(MessageFormat.format("""
                 Game type selected:
                     Number of players : {0}
@@ -320,10 +323,6 @@ public class CLI implements UserInterface {
                 2 - Set yourself as not ready
                 S - Try to start the game
                 """, this.numberOfPlayers, this.gameMode));
-
-        //todo: See if this could be an "interactive" wait, where you can see the players joining, or even
-        // just a simple counter
-        // make a thread for the updating of the lobby and for checking whether or not the game is starting here
 
         new Thread(()-> {
 
@@ -339,6 +338,9 @@ public class CLI implements UserInterface {
                     System.err.println("Interrupted before waiting the full length, requesting lobby updates now");
                 }
 
+                if(gameStarting.get()) return; // Necessary for the host of
+                // the game, could be handled better
+
                 if(networkManager.sendReadyStatus(ready.get())){
                     //signal we're starting the game
                     gameStarting.set(true);
@@ -353,15 +355,10 @@ public class CLI implements UserInterface {
         }).start();
 
         while(true) {
-            selection = scanner.next();
 
-            // If the game started, any input is actually ignored
-            if(gameStarting.get()){
-                //TODO: This is probably an ugly way of exchanging information across threads
-                // The player won't be notified the game is starting until they actually
-                // make a selection, even though it will get discarded
-                break;
-            }
+            selection = getInputNonBlocking(reader, gameStarting);
+
+            if(gameStarting.get()) break;
 
             if (selection.equals("1")) {
                 ready.set(true);
@@ -380,8 +377,12 @@ public class CLI implements UserInterface {
                 else {
                     System.out.println("The game  couldn't start");
                 }
-            } else continue;
+            } else {
+                System.out.println("Insert a correct naiodbaido!");
+            }
+            selection = "";
         }
+
 
     }
 
@@ -399,7 +400,7 @@ public class CLI implements UserInterface {
     @Override
     public void showTowerAndWizardSelection() {
 
-        Scanner scanner = new Scanner(System.in);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String currentTower = TeamEnum.NOTEAM.name;
         String currentWizard = WizardEnum.NO_WIZARD.name;
         AtomicBoolean gameStarting = new AtomicBoolean(false);
@@ -446,10 +447,9 @@ public class CLI implements UserInterface {
                     Team color : {0}
                     Wizard : {1} 
                 """, currentTower, currentWizard, colorList));
-            selection = scanner.nextLine();
 
-            //todo Same as before, the cli waits to notify the user that the game started
-            // until after they made another selection because scanner.nextLine is blocking
+            selection = getInputNonBlocking(reader, gameStarting);
+
             if(gameStarting.get()){
                 System.out.println("Everyone made their choice, the game is starting!");
                 return;
@@ -527,6 +527,34 @@ public class CLI implements UserInterface {
         showTowerAndWizardSelection();
         showGameInterface();
 
+    }
+
+    /**
+     * Gets user input from the stream in the reader, exiting and returning the empty string
+     * in case the interruptingCondition is true
+     * @param reader the BufferedReader to get input from
+     * @param interruptingCondition the condition that exits the method, in case the input wasn't
+     *                              read
+     * @return the string input by the user, or the empty string if the interruptingCondition was triggered
+     */
+    public String getInputNonBlocking(BufferedReader reader, AtomicBoolean interruptingCondition){
+        String selection = "";
+        while(selection.equals("") && !interruptingCondition.get()) {
+            try {
+                while (!reader.ready() && !interruptingCondition.get()) {
+                    Thread.sleep(200);
+                }
+                if(reader.ready()) selection = reader.readLine();
+                //If not, we exited because the game is starting
+            } catch (InterruptedException e) {
+                //Run the next loop
+                continue;
+            } catch (IOException e) {
+                System.err.println("I/O error, continuing");
+                continue;
+            }
+        }
+        return selection;
     }
 
     @Override

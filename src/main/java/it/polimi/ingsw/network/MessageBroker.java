@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class MessageBroker {
 
@@ -25,8 +27,11 @@ public class MessageBroker {
                                                                                                         //when using gson functions toJson and fromJson
     private final String connectionResetString = "Connection Reset";
 
-    private List<Map<NetworkFieldEnum, Object>> incomingMessages;
+    private BlockingQueue<Map<NetworkFieldEnum, Object>> incomingMessages;
+    private Map<NetworkFieldEnum, Object> currentIncomingMessage;
     private Map<NetworkFieldEnum, Object> outgoingMessage;
+
+    private final int BLOCKING_QUEUE_CAPACITY = 100;
     //private boolean readyForNext;
 
     public MessageBroker(){
@@ -59,20 +64,32 @@ public class MessageBroker {
     }
 
     /**
-     * Returns the value of the given fieldName for the first inbound message,
+     * Returns the value of the given fieldName for the first inbound message, taken from the queue
      * or null in case the message received doesn't have the specified field
      * @param fieldName the field name of which one wants to know the value
      * @return the value associated with that field, or null in case the field isn't present
+     * @throws NullPointerException if there is no message read with the
+     *                              takeIncomoingMessage() method
      */
-    public Object readField(NetworkFieldEnum fieldName){
-        return incomingMessages.get(FIRST_RECEIVED).get(fieldName);
+    public Object readField(NetworkFieldEnum fieldName) throws NullPointerException {
+        return currentIncomingMessage.get(fieldName);
+    }
+
+    /**
+     * Acts as a buffer between the queue and the list of messages received.
+     * Puts the first message from the Queue into the current incoming message
+     * To be called before any readField() is called
+     * @throws InterruptedException if the thread is interrupted before a message was available
+     */
+    public void takeIncomingMessage() throws InterruptedException{
+        currentIncomingMessage = incomingMessages.take();
     }
 
     /**
      * Removes the oldest received message from the incoming messages buffer.
      */
     public void flushFirstMessage(){
-        if (incomingMessages.size() > 0) incomingMessages.remove(FIRST_RECEIVED);
+        currentIncomingMessage = null;
     }
 
     private void outFlush(){
@@ -80,7 +97,7 @@ public class MessageBroker {
     }
 
     private void inFlush(){
-        incomingMessages = new ArrayList<>();
+        incomingMessages = new ArrayBlockingQueue<>(BLOCKING_QUEUE_CAPACITY);
     }
 
     /**
@@ -152,7 +169,9 @@ public class MessageBroker {
         Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
 
         if (checkValidity(deserializedMessage)) {
-            incomingMessages.add(deserializedMessage);
+            if(!incomingMessages.offer(deserializedMessage)){
+                System.err.println("ERROR: Message buffer full, the message was dropped");
+            }
         }
     }
 
@@ -188,8 +207,9 @@ public class MessageBroker {
      * Checks if the first message in the buffer is in a valid format
      * @return true if the message is valid, false otherwise
      */
-    public boolean checkFirstValidity(){
-        return checkValidity(incomingMessages.get(FIRST_RECEIVED));
+    @Deprecated
+    public boolean checkFirstValidity() throws InterruptedException{
+        return checkValidity(incomingMessages.take());
     }
 
     /**
@@ -281,12 +301,6 @@ public class MessageBroker {
         return true;
     }
 
-    /*
-    public boolean isReadyForNext(){
-        return readyForNext;
-    }
-     */
-
     public static boolean isOfType(Object object, Type type){
         return object.getClass().getTypeName().equals(type.getTypeName());
     }
@@ -296,7 +310,7 @@ public class MessageBroker {
     }
 
     //for testing purposes
-    public List<Map<NetworkFieldEnum, Object>> getIncomingMessages() {
+    public BlockingQueue<Map<NetworkFieldEnum, Object>> getIncomingMessages() {
         return incomingMessages;
     }
 
@@ -308,6 +322,7 @@ public class MessageBroker {
     /**
      * True if there is at least a message in the incoming buffer
      */
+    @Deprecated
     public synchronized boolean messagePresent() {
         return (incomingMessages.size() > 0);
     }

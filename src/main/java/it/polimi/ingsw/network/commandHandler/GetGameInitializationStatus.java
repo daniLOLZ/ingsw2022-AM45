@@ -34,8 +34,8 @@ public class GetGameInitializationStatus extends CommandHandler{
           parameters.getUserController().startLock.unlock();
         }
         GameInitBean gameInitBean = new GameInitBean(
-                parameters.getUserController().getTowerColorsChosen(),
-                parameters.getUserController().getWizardsChosen(),
+                parameters.getUserController().getTowerColorsAvailable(),
+                parameters.getUserController().getWizardsAvailable(),
                 parameters.getUserController().allSelectionsMadeGameStart() //...Then the bean will have immediately after the value true,
                                                                             // and the client will be notified of the change
         );
