@@ -26,10 +26,8 @@ public class WizardDrawer extends Drawer{
 
     public static ImageView drawWizard(WizardEnum wizard, Coord pos, double scale){
 
-        //will be removed after updating Drawer class
-        Group dummy = new Group();
 
-        return drawFromCenterInteractiveImage(dummy, wizards.get(wizard.index), pos, scale, HandlingToolbox.NO_EFFECT);
+        return drawFromCenterInteractiveImage(wizards.get(wizard.index), pos, scale, HandlingToolbox.NO_EFFECT);
     }
 
     public static double getWizardWidth() {

@@ -24,22 +24,20 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.view.GUI.drawers.IslandDrawer.*;
+import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 
 
 public class GUIApplication extends Application implements UserInterface{
 
     public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
-    public final double cloudSize = 40, assistantWidth = 100;
+    public final double cloudSize = 40, assistantWidth = 100, islandSize = 120;
 
     public static final double
             up      = 0,
@@ -521,12 +519,10 @@ public class GUIApplication extends Application implements UserInterface{
 
 
         for (int index = 0; index < numTeams; index++) {
-            //TODO remove this
 
             TeamEnum tower = TeamEnum.getTeamFromId(index);
 
-            Group dummy = new Group();
-            ImageView towerView = TowerDrawer.drawTower(dummy, tower, center, 0.5);
+            ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
             towerView.setOnMouseClicked(event -> {
                 selectedTowerColor = tower;
                 selectTower.setText("Select " + tower.name);
@@ -550,7 +546,7 @@ public class GUIApplication extends Application implements UserInterface{
         //<editor-fold desc="Islands">
 
         List<Integer> ids = new ArrayList<>();
-        for (int i = 1; i <= 1; i++) {
+        for (int i = 1; i <= 3; i++) {
             ids.add(i);
         }
 
@@ -569,8 +565,8 @@ public class GUIApplication extends Application implements UserInterface{
 
         AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,false, TeamEnum.WHITE, 4);
 
-        for (Coord slot: getIslandGroupSlots(12, 380, 140, center.pureSumY(-50))) {
-            IslandDrawer.drawAdvancedIslandGroup(root, bean, slot);
+        for (Coord slot: getIslandGroupSlots(4, 380, 140, center.pureSumY(-50))) {
+            root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(bean, slot, islandSize / IslandDrawer.getIslandSize()));
         }
 
         //</editor-fold>
@@ -579,7 +575,7 @@ public class GUIApplication extends Application implements UserInterface{
 
         for (Coord slot:
              getCloudsSlots(3, center.pureSumY(-50))) {
-            CloudDrawer.drawCloud(root, cloudBean, slot, cloudSize / CloudDrawer.getCloudSize());
+            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize()));
         }
 
         //<editor-fold desc="Game Boards">
@@ -607,16 +603,16 @@ public class GUIApplication extends Application implements UserInterface{
 
         AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 1);
 
-        BoardDrawer.drawBoard(root, board, downCenter.pureSumY(-145));
-        BoardDrawer.drawBoard(root, board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
-        BoardDrawer.drawBoard(root, board, centerLeft.pureSumX(200), 0.5, Coord.COUNTERCLOCKWISE);
-        BoardDrawer.drawBoard(root, board, centerRight.pureSumX(-200), 0.5, Coord.CLOCKWISE);
+        BoardDrawer.drawBoard(board, downCenter.pureSumY(-145));
+        BoardDrawer.drawBoard(board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
+        BoardDrawer.drawBoard(board, centerLeft.pureSumX(200), 0.5, Coord.COUNTERCLOCKWISE);
+        BoardDrawer.drawBoard(board, centerRight.pureSumX(-200), 0.5, Coord.CLOCKWISE);
 
         int assistantIndex = 0;
 
         for (Integer assistant: board.getIdAssistants()) {
             Coord slot = firstAssistantSlot.pureSumX(assistantIndex++ * assistantWidth * 0.28 * 10 / board.getIdAssistants().size());
-            AssistantDrawer.drawAssistant(root, assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth());
+            root.getChildren().addAll(AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth()));
         }
 
         //</editor-fold>
@@ -640,7 +636,7 @@ public class GUIApplication extends Application implements UserInterface{
         for (CharacterCardBean character:
              characters) {
 
-            CharacterCardDrawer.drawCharacterCard(root, character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter++),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth());
+            root.getChildren().addAll(CharacterCardDrawer.drawCharacterCard(character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter++),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth()));
         }
     }
 

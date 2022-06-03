@@ -3,7 +3,9 @@ package it.polimi.ingsw.view.GUI.drawers;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.CloudBean;
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -26,27 +28,27 @@ public class CloudDrawer extends Drawer{
     private static final double studentSize = 420;
     private static final double cloudSize = clouds.get(0).getWidth();
 
-    public static ImageView drawCloud(Group root, CloudBean data, Coord pos, double scale){
+    public static List<Node> drawCloud(CloudBean data, Coord pos, double scale){
+
+        List<Node> toDraw = new ArrayList<>();
 
         List<StudentEnum> students = data.getStudents();
         List<Coord> slots = getStudentsSlot(students.size());
 
         //draw cloud
-        drawFromCenterInteractiveImage(root, clouds.get(data.getIdCloud()), pos, scale, null);
+        toDraw.add(drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, HandlingToolbox.NO_EFFECT));
 
         int index = 0;
         //draw students
-        for (StudentEnum student:
-             students) {
-            StudentDrawer.drawStudent(
-                    root,
+        for (StudentEnum student: students) {
+            toDraw.add(StudentDrawer.drawStudent(
                     student,
                     pos.pureSumX(slots.get(index).x * scale).pureSumY(slots.get(index).y * scale),
-                    studentSize / StudentDrawer.getStudentSize() * scale);
+                    studentSize / StudentDrawer.getStudentSize() * scale));
             index++;
         }
 
-        return null;
+        return toDraw;
     }
 
     private static List<Coord> getStudentsSlot(int amount){

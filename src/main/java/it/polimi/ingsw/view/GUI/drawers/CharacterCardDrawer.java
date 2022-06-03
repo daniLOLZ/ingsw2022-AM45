@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.beans.CharacterCardBean;
 import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -56,15 +56,21 @@ public class CharacterCardDrawer extends Drawer{
         studentsSlots.add(upLeftCorner.pureSumY(characterCardHeight / 2));
     }
 
-    public static void drawCharacterCard(Group root, CharacterCardBean data, Coord pos, double scale){
+    public static List<Node> drawCharacterCard(CharacterCardBean data, Coord pos, double scale){
 
-        ImageView characterView = drawFromCenterInteractiveImage(root, characterCards.get(data.getId() - firstCharacterId), pos, scale, HandlingToolbox.NO_EFFECT);
+        List<Node> toDraw = new ArrayList<>();
+
+        ImageView characterView = drawFromCenterInteractiveImage(characterCards.get(data.getId() - firstCharacterId), pos, scale, HandlingToolbox.NO_EFFECT);
+
+        toDraw.add(characterView);
 
         Text description = new Text(data.getDescription());
         Rectangle descBox = new Rectangle();
         descBox.setVisible(false);
         description.setVisible(false);
-        root.getChildren().addAll(descBox, description);
+
+        toDraw.add(descBox);
+        toDraw.add(description);
 
         description.setFont(Font.font(description.getFont().getName(), 120 * scale));
 
@@ -77,7 +83,7 @@ public class CharacterCardDrawer extends Drawer{
         for (StudentEnum student:
                 data.getStudents()) {
 
-            studentViews.add(StudentDrawer.drawStudent(root,
+            studentViews.add(StudentDrawer.drawStudent(
                     student,
                     pos
                             .pureSumX(studentsSlots.get(studentIndex).x * scale)
@@ -86,6 +92,8 @@ public class CharacterCardDrawer extends Drawer{
 
             studentIndex++;
         }
+
+        toDraw.addAll(studentViews);
 
 
         EventHandler<MouseEvent> showDescription = event -> {
@@ -130,9 +138,9 @@ public class CharacterCardDrawer extends Drawer{
             }
         };
 
-        addHoveringEffects(characterView, pos, scale, showDescription, hideDescription, hoverZoom);
+        addHoveringEffects(characterView, pos, scale, showDescription, hideDescription, hoverZoom, toDraw.subList(1, toDraw.size()));
 
-
+        return toDraw;
     }
 
     public static double getCharacterCardHeight() {

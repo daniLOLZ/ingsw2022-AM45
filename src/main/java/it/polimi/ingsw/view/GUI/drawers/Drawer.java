@@ -1,20 +1,26 @@
 package it.polimi.ingsw.view.GUI.drawers;
 
+import com.sun.javafx.collections.ImmutableObservableList;
+import com.sun.javafx.collections.ObservableListWrapper;
 import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.GUIApplication;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Drawer{
 
     protected static final double REAL_SIZE = 1;
+
 
     /**
      * Draws an image scaled by the given scaling factor.
@@ -60,7 +66,7 @@ public abstract class Drawer{
         Drawer.drawFromCenterImage(graphicsContext, image, pos, REAL_SIZE);
     }
 
-    public static ImageView drawFromCenterInteractiveImage (Group root, Image image, Coord pos, double scale, EventHandler<MouseEvent> onClick){
+    public static ImageView drawFromCenterInteractiveImage (Image image, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(image.getWidth() * scale);
@@ -69,35 +75,101 @@ public abstract class Drawer{
         imageView.setY(pos.y - scale * image.getHeight() / 2);
         imageView.setOnMouseClicked(onClick);
 
-        root.getChildren().add(imageView);
         return imageView;
     }
 
     public static void addHoveringEffects(ImageView imageView, Coord pos, double scale,EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom){
 
-        Image image = imageView.getImage();
+        List<Node> allNodes = new ArrayList<>();
+
+        List<Node> aboveNodes = new ArrayList<>();
+
         if (hoverZoom != 1){
 
-            Coord anchor = new Coord((pos.x - image.getWidth() * scale / 2) * image.getWidth() * scale / GUIApplication.WINDOW_WIDTH / (1 - image.getWidth() * scale / GUIApplication.WINDOW_WIDTH),
-                    (pos.y - image.getHeight() * scale / 2) * image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT / (1 - image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT));
-
             imageView.setOnMouseEntered(event -> {
-                imageView.setFitWidth(image.getWidth() * scale * hoverZoom);
-                imageView.setFitHeight(image.getHeight() * scale * hoverZoom);
-                imageView.setX(pos.x - scale * image.getWidth() / 2 - anchor.x * (hoverZoom - 1));
-                imageView.setY(pos.y - scale * image.getHeight() / 2 - anchor.y * (hoverZoom - 1));
-                entered.handle(event);
+                //todo create a new class that will look for the node containing the ImageView. This is now blocking the GUI
+                allNodes.addAll(imageView.getScene().getRoot().getChildrenUnmodifiable());
 
+                if (!allNodes.isEmpty()) {
+                    aboveNodes.addAll(allNodes.subList(allNodes.indexOf(imageView), allNodes.size()));
+                }
+
+                getOnMouseEnteredHandler(imageView, pos, scale, entered, hoverZoom).handle(event);
             });
 
             imageView.setOnMouseExited(event -> {
-                imageView.setFitWidth(image.getWidth() * scale);
-                imageView.setFitHeight(image.getHeight() * scale);
-                imageView.setX(pos.x - scale * image.getWidth() / 2);
-                imageView.setY(pos.y - scale * image.getHeight() / 2);
-                exited.handle(event);
+                for (Node node:
+                     aboveNodes) {
+                    node.toFront();
+                }
 
+                getOnMouseExitedHandler(imageView, pos, scale, exited);
             });
         }
+    }
+
+    private static EventHandler<MouseEvent> getOnMouseEnteredHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, double hoverZoom) {
+        return event -> {
+
+            enterZoom(imageView, pos, scale, hoverZoom).handle(event);
+            imageView.toFront();
+            entered.handle(event);
+
+        };
+    }
+
+    private static EventHandler<MouseEvent> getOnMouseExitedHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> exited) {
+        return event -> {
+            exitZoom(imageView, pos, scale).handle(event);
+            exited.handle(event);
+
+        };
+    }
+
+    public static void addHoveringEffects(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, List<Node> children){
+        addHoveringEffects(imageView, pos, scale, entered, exited, hoverZoom);
+
+        for (Node child:
+             children) {
+
+            child.toFront();
+
+            child.setOnMouseEntered(getOnMouseEnteredHandler(imageView, pos, scale, entered, hoverZoom));
+
+            child.setOnMouseExited(getOnMouseExitedHandler(imageView, pos, scale, exited));
+        }
+    }
+
+    private static EventHandler<MouseEvent> enterZoom(ImageView imageView, Coord pos, double scale, double hoverZoom){
+
+        return event -> {
+            Image image = imageView.getImage();
+
+            Coord anchor = getAnchor(image, pos, scale);
+
+            imageView.setFitWidth(image.getWidth() * scale * hoverZoom);
+            imageView.setFitHeight(image.getHeight() * scale * hoverZoom);
+            imageView.setX(pos.x - scale * image.getWidth() / 2 - anchor.x * (hoverZoom - 1));
+            imageView.setY(pos.y - scale * image.getHeight() / 2 - anchor.y * (hoverZoom - 1));
+        };
+    }
+
+    private static Coord getAnchor(Image image, Coord pos, double scale) {
+        return new Coord((pos.x - image.getWidth() * scale / 2) * image.getWidth() * scale / GUIApplication.WINDOW_WIDTH / (1 - image.getWidth() * scale / GUIApplication.WINDOW_WIDTH),
+                (pos.y - image.getHeight() * scale / 2) * image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT / (1 - image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT));
+    }
+
+    private static EventHandler<MouseEvent> exitZoom(ImageView imageView, Coord pos, double scale){
+
+        return event -> {
+
+            Image image = imageView.getImage();
+
+            imageView.setFitWidth(image.getWidth() * scale);
+            imageView.setFitHeight(image.getHeight() * scale);
+            imageView.setX(pos.x - scale * image.getWidth() / 2);
+            imageView.setY(pos.y - scale * image.getHeight() / 2);
+
+        };
     }
 }

@@ -31,9 +31,9 @@ public class AssistantDrawer extends Drawer{
     private final static double hoverZoom = 1.7;
     private final static int firstAssistantId = 1;
 
-    public static ImageView drawAssistant(Group root, int id, Coord pos, double scale){
+    public static ImageView drawAssistant(int id, Coord pos, double scale){
 
-        ImageView assistantView = drawFromCenterInteractiveImage(root, assistants.get(id - firstAssistantId), pos, scale, HandlingToolbox.NO_EFFECT);
+        ImageView assistantView = drawFromCenterInteractiveImage(assistants.get(id - firstAssistantId), pos, scale, HandlingToolbox.NO_EFFECT);
         addHoveringEffects(assistantView, pos, scale, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, hoverZoom);
         return assistantView;
     }

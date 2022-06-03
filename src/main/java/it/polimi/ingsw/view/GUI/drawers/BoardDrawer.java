@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.view.GUI.Coord;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -87,13 +88,16 @@ public class BoardDrawer extends Drawer{
     private static final Coord firstCoinSlot = upLeftCorner.pureSumX(-board.getWidth() / 2 - playerBoxWidth / 2).pureSumY(-board.getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2);
 
 
-    public static void drawBoard(Group root, AdvancedPlayerBean data, Coord pos, double scale, int rotation){
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, int rotation){
+
+        List<Node> toDraw = new ArrayList<>();
 
         AtomicReference<Double> actualBoardScale = new AtomicReference<>(defaultBoardScale * scale);
         Coord actualPos = pos;
 
         //draw the board
-        ImageView boardView = drawFromCenterInteractiveImage(root, board, pos,scale * defaultBoardScale, null);
+        ImageView boardView = drawFromCenterInteractiveImage(board, pos,scale * defaultBoardScale, null);
+        toDraw.add(boardView);
         boardView.getTransforms().add(new Rotate(90 * rotation, actualPos.x, actualPos.y));
 
         /*addHoveringEffects(boardView, pos, defaultBoardScale,
@@ -111,37 +115,44 @@ public class BoardDrawer extends Drawer{
         },
                 hoverZoom);*/
 
-        drawBoardChildEntities(root, data, actualPos, actualBoardScale, rotation);
+        toDraw.addAll(drawBoardChildEntities(data, actualPos, actualBoardScale, rotation));
+
+        return toDraw;
     }
 
-    public static void drawBoard(Group root, AdvancedPlayerBean data, Coord pos, double scale){
-        drawBoard(root, data, pos, scale, Coord.NO_ROTATION);
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale){
+        return drawBoard(data, pos, scale, Coord.NO_ROTATION);
     }
 
-    public static void drawBoard(Group root, AdvancedPlayerBean data, Coord pos){
-        drawBoard(root, data, pos, REAL_SIZE);
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos){
+        return drawBoard(data, pos, REAL_SIZE);
     }
 
-    public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale, int rotation){
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation){
         AdvancedPlayerBean adaptedData = (AdvancedPlayerBean) data;
         ((AdvancedPlayerBean) data).setNumCoins(0);
-        drawBoard(root, adaptedData, pos, scale, rotation);
+        return drawBoard(adaptedData, pos, scale, rotation);
     }
 
-    public static void drawBoard(Group root, PlayerBean data, Coord pos, double scale){
-        drawBoard(root, data, pos, scale, Coord.NO_ROTATION);
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale){
+        return drawBoard(data, pos, scale, Coord.NO_ROTATION);
     }
 
-    public static void drawBoard(Group root, PlayerBean data, Coord pos){
-        drawBoard(root, data, pos, REAL_SIZE);
+    public static List<Node> drawBoard(PlayerBean data, Coord pos){
+        return drawBoard(data, pos, REAL_SIZE);
     }
 
-    private static void drawBoardChildEntities(Group root, AdvancedPlayerBean data, Coord actualPos, AtomicReference<Double> actualBoardScale, int rotation){
+    private static List<Node> drawBoardChildEntities(AdvancedPlayerBean data, Coord actualPos, AtomicReference<Double> actualBoardScale, int rotation){
+
+        List<Node> toDraw = new ArrayList<>();
 
         //draw player info
         Rectangle playerBox = new Rectangle();
         Text playerInfo = new Text();
-        root.getChildren().addAll(playerBox, playerInfo);
+
+        toDraw.add(playerBox);
+        toDraw.add(playerInfo);
+
         Coord boxLocation =
                 actualPos
                 .pureSumX((-board.getWidth()/2 - playerBoxWidth) * actualBoardScale.get())
@@ -170,7 +181,10 @@ public class BoardDrawer extends Drawer{
         //draw last assistant played
         Rectangle assistantLabel = new Rectangle();
         Text assistantText = new Text("Assistant played");
-        root.getChildren().addAll(assistantLabel, assistantText);
+
+        toDraw.add(assistantLabel);
+        toDraw.add(assistantText);
+
         Coord assistantSlot =
                 actualPos
                 .pureSumX(board.getWidth() * actualBoardScale.get() / 2)
@@ -200,7 +214,8 @@ public class BoardDrawer extends Drawer{
         assistantSlot.rotate(actualPos, rotation);
 
         //TODO change id into last played assistant once the feature is available
-        ImageView assistantView = AssistantDrawer.drawAssistant(root, 5, assistantSlot, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
+        ImageView assistantView = AssistantDrawer.drawAssistant(5, assistantSlot, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
+        toDraw.add(assistantView);
 
         assistantView.getTransforms().add(new Rotate(90 * rotation, assistantSlot.x, assistantSlot.y));
 
@@ -220,12 +235,11 @@ public class BoardDrawer extends Drawer{
                     .pureRotate(actualPos, rotation);
             Coord finalStudentPos = studentPos;
             int finalStudentIndex = studentIndex;
-            StudentDrawer.drawStudent(
-                    root,
+            toDraw.add(StudentDrawer.drawStudent(
                     entranceStudent,
                     finalStudentPos,
                     woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get(),
-                    event -> System.out.println("Clicked on student #" + finalStudentIndex));
+                    event -> System.out.println("Clicked on student #" + finalStudentIndex)));
             studentIndex++;
         }
 
@@ -240,11 +254,10 @@ public class BoardDrawer extends Drawer{
                         .pureSumX(firstSeat.get(table).pureSumX(student * seatStep).x * actualBoardScale.get())
                         .pureSumY(firstSeat.get(table).pureSumX(student * seatStep).y * actualBoardScale.get())
                         .pureRotate(actualPos, rotation);
-                StudentDrawer.drawStudent(
-                        root,
+                toDraw.add(StudentDrawer.drawStudent(
                         StudentEnum.getColorById(table),
                         diningSeat,
-                        woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get());
+                        woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get()));
             }
         }
 
@@ -256,7 +269,7 @@ public class BoardDrawer extends Drawer{
                     .pureSumX(profSeats.get(prof.index).x * actualBoardScale.get())
                     .pureSumY(profSeats.get(prof.index).y * actualBoardScale.get())
                     .pureRotate(actualPos, rotation);
-            ProfessorDrawer.drawProfessor(root, prof, profSeat, woodenSize / ProfessorDrawer.getProfessorSize() * actualBoardScale.get());
+            toDraw.add(ProfessorDrawer.drawProfessor(prof, profSeat, woodenSize / ProfessorDrawer.getProfessorSize() * actualBoardScale.get()));
         }
 
         //draw towers
@@ -269,7 +282,7 @@ public class BoardDrawer extends Drawer{
                     .pureSumY(slot.y * actualBoardScale.get())
                     .pureRotate(actualPos, rotation);
             Coord finalSlot = slot;
-            TowerDrawer.drawTower(root, data.getTowerColor(), finalSlot, towerSize / TowerDrawer.getTowerSize() * actualBoardScale.get());
+            toDraw.add(TowerDrawer.drawTower(data.getTowerColor(), finalSlot, towerSize / TowerDrawer.getTowerSize() * actualBoardScale.get()));
         }
 
         //draw coins (if any)
@@ -284,13 +297,14 @@ public class BoardDrawer extends Drawer{
                         coinSlot
                         .pureSumY(coinIndex * coinStep * actualBoardScale.get())
                         .pureRotate(actualPos, rotation);
-                ImageView coinView = CoinDrawer.drawCoin(root, actualCoinSlot, coinSize / CoinDrawer.getCoinSize() * actualBoardScale.get());
+                ImageView coinView = CoinDrawer.drawCoin(actualCoinSlot, coinSize / CoinDrawer.getCoinSize() * actualBoardScale.get());
+                toDraw.add(coinView);
                 coinView.getTransforms().add(new Rotate(90 * rotation, actualCoinSlot.x, actualCoinSlot.y));
             }
 
             Text numCoins = new Text(String.valueOf(data.getNumCoins()));
+            toDraw.add(numCoins);
 
-            root.getChildren().add(numCoins);
 
             Coord numCoinsPos =
                     coinSlot
@@ -303,5 +317,7 @@ public class BoardDrawer extends Drawer{
             numCoins.setFont(Font.font("Sylfaen", 35 * actualBoardScale.get() / defaultBoardScale));
             numCoins.setTextAlignment(TextAlignment.CENTER);
         }
+
+        return toDraw;
     }
 }
