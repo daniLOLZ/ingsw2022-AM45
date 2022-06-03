@@ -60,7 +60,12 @@ public class BrokerTest {
                     "COMMAND" : "CONNECTION_REQUEST",
                     "NICKNAME" : "gigio"
                 }""");
+        try{
         broker.receive(stream);
+        }
+        catch (IOException e){
+            //null
+        }
         try {
             broker.takeIncomingMessage();
         } catch (InterruptedException e) {
@@ -83,8 +88,13 @@ public class BrokerTest {
                     "COMMAND" : "CONNECTION_REQUEST",
                     "NICKNAME" : "gigio2"
                 }""");
+        try{
         broker.receive(stream);
         broker.receive(stream);
+        }
+        catch (IOException e){
+            //null
+        }
 
         try {
             broker.takeIncomingMessage();
@@ -116,8 +126,13 @@ public class BrokerTest {
                 }
                 """);
         OutputStream out = System.out;
+        try{
         broker.send(out);
         assertEquals(broker.getOutgoingMessage(), new HashMap<>());
+        }
+        catch (IOException e){
+            //null
+        }
     }
 
 

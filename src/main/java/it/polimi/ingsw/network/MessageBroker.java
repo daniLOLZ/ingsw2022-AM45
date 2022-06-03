@@ -104,7 +104,7 @@ public class MessageBroker {
      * Send the message stored in the object as a JSON file to the specified output stream
      * @param destinationOutput the OutputStream of the host to send the message to
      */
-    public void send(OutputStream destinationOutput){
+    public void send(OutputStream destinationOutput) throws IOException {
 
         String sendable = serialise(outgoingMessage);
 
@@ -116,6 +116,7 @@ public class MessageBroker {
         } catch (IOException e) {
             System.err.println("Couldn't send the message via the network");
             e.printStackTrace();
+            throw e;
         }
         outFlush();
     }
@@ -126,7 +127,7 @@ public class MessageBroker {
      */
     //todo make receive throw the exceptions instead of handling them, so the controller is able to notify via ErrorBean to all clients
 
-    public void receive(InputStream sourceInput) // throws SocketException
+    public void receive(InputStream sourceInput) throws IOException  //IOException includes SocketException
     {
         String receivedMessage;
         StringBuilder tempString = new StringBuilder();
@@ -160,11 +161,13 @@ public class MessageBroker {
             System.err.println(e.getMessage());
             //TODO handle user disconnection by passing it to ClientHandler somehow
             e.printStackTrace();
-            return;
+            throw e;
+
         } catch (IOException e) {
             System.err.println("Error reading message from the network");
             e.printStackTrace();
-            return;
+            throw e;
+
         }
         receivedMessage = tempString.toString();
 

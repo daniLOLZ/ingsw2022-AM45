@@ -483,7 +483,15 @@ public class Controller {
 
     }
 
-    //What is this for?
+    /**
+     * Set error message to show
+     * @param error the error message to show
+     */
+    public void setError(String error){
+        simpleGame.getParameters().setErrorState(error);
+    }
+
+    //What is this for?  Maybe for test when there was the deprecated one
     public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
         try {
 
@@ -491,5 +499,12 @@ public class Controller {
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
+    }
+
+    public void lostConnectionHandle(){
+        /*TODO Aggiorna la view con il messaggio di errore settato dal ClientHandler
+         * che ha perso la connessione (in teoria già fatto dal clientHandler)*/
+        /*TODO invia la view a tutti gli user della lobby incriminata */
+        //TODO chiudi le connessioni
     }
 }

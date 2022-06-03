@@ -6,6 +6,7 @@ import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.*;
@@ -61,12 +62,23 @@ public class ClientHandler implements Runnable{
             clientOutput = mainSocket.getOutputStream();
         } catch (IOException e) {
             System.err.println("Error obtaining streams");
+            System.out.println("Error obtaining streams");
             System.err.println(e.getMessage());
             //quitGame(); // Maybe useless
+            //connectionLostAlert(); forse no
             return;
         }
 
-        new Thread(()->{while (isConnected) mainBroker.receive(clientInput);}).start();
+        new Thread(()->{
+
+            while (isConnected){
+                try{
+                    mainBroker.receive(clientInput);
+                }catch(IOException e){
+                    connectionLostAlert();
+                }
+            }
+        }).start();
 
         new Thread(this::pong).start();
 
@@ -103,12 +115,31 @@ public class ClientHandler implements Runnable{
                     commandLock.unlock();
                 }
             }
+
+            try{
             // Sends a reply to the client
             mainBroker.send(clientOutput);
             mainBroker.flushFirstMessage();
+            }
+            catch (IOException e){
+                connectionLostAlert();
+            }
 
         }
         // This point should never be reached in normal circumstances (unless the client disconnects)
+    }
+
+    /**
+     * Handle the exceptions thrown by losing connection.
+     * Set error state in order to show the error to the other players in future view.
+     * Set isConnected to false.
+     * Close connection.
+     */
+    public void connectionLostAlert(){
+        parameters.getUserController().setError("Connection Lost With "+ parameters.getIdUser());
+        isConnected = false;
+        parameters.getUserController().lostConnectionHandle();
+        closeConnection();
     }
 
     //below methods moved to CommandHandler
@@ -197,7 +228,14 @@ public class ClientHandler implements Runnable{
 
         while (isConnected) {
 
-            pingBroker.receive(clientInput);
+            try {
+                pingBroker.receive(clientInput);
+            }
+            catch (IOException e){
+                connectionLostAlert();
+                return;
+            }
+
             try {
                 handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
@@ -223,7 +261,13 @@ public class ClientHandler implements Runnable{
             else {
                 pingBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PONG);
                 pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST));
+
+                try{
                 pingBroker.send(clientOutput);
+                }
+                catch (IOException e){
+                    connectionLostAlert();
+                }
             }
             //pingBroker.unlock();
             mainBroker.flushFirstMessage();
