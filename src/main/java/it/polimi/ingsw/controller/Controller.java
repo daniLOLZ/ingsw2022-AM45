@@ -208,24 +208,22 @@ public class Controller {
     }
 
     /**
-     * Gets all the team colors that have been chosen already for
-     * this game
+     * Gets all the team colors that are still available for choosing
      * @return a list of all the team colors (as TeamEnum) chosen
      */
-    public List<TeamEnum> getTowerColorsChosen(){
-        return Arrays.stream(TeamEnum.values())
-                .filter(x -> playerCreation.isColorTaken(x))
+    public List<TeamEnum> getTowerColorsAvailable(){
+        return  TeamEnum.getTeams().stream()
+                .filter(x -> playerCreation.isColorAvailable(x))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Gets all the wizards that have been chosen already for
-     * this game
+     * Gets all the wizards that are still available for choosing
      * @return a list of all the wizards (as WizardEnum) chosen
      */
-    public List<WizardEnum> getWizardsChosen(){
-        return Arrays.stream(WizardEnum.values())
-                .filter(x -> playerCreation.isWizardTaken(x.index*10)) // todo wizard refactoring here too
+    public List<WizardEnum> getWizardsAvailable(){
+        return  WizardEnum.getWizards().stream()
+                .filter(x -> playerCreation.isWizardAvailable(x.index*10)) // todo wizard refactoring here too
                 .collect(Collectors.toList());
     }
 
@@ -259,6 +257,9 @@ public class Controller {
 
     /**
      * By calling the appropriate handler, selects the wizard for this user
+     * If the wizard was already taken by someone else then the method rightly fails
+     * If it was taken by the same player, the method exits without reassigning an already assigned wizard,
+     * returning false
      * @param idWizard the wizard chosen by the user
      * @param idUser the user that selects the wizard
      * @return true if the assignment succeeded
@@ -269,10 +270,11 @@ public class Controller {
             //The user might have already selected a wizard and changed their mind
             wizardLock.lock();
             try {
-                if (!this.playerCreation.isWizardTaken(idWizard)){
+                if (this.playerCreation.isWizardAvailable(idWizard)){
                     this.playerCreation.clearWizard(position);
                     this.playerCreation.setWizard(idWizard, position);
                 }
+                else return false;
                 // If the wizard was already taken by someone else then the method rightly fails
                 // If it was taken by the same player, the method exits without reassigning an already assigned wizard
             }finally {
@@ -286,10 +288,11 @@ public class Controller {
     /**
      * By calling the appropriate handler, sets the team color for this user
      * If the color was already taken by someone else then the method rightly fails
-     * If it was taken by the same player, the method exits without reassigning an already assigned team color
+     * If it was taken by the same player, the method exits without reassigning an already assigned team color,
+     * returning false
      * @param towerColor the tower color chosen
      * @param idUser the user that chooses the team
-     * @return true if the assignment succeeded
+     * @return true if the new assignment succeeded
      */
     public boolean setTeamColor(TeamEnum towerColor, Integer idUser) {
         int position = getPositionFromUserId(idUser);
@@ -298,10 +301,11 @@ public class Controller {
             //The user might have already selected a color and changed their mind
             teamLock.lock();
             try {
-                if (!this.playerCreation.isColorTaken(towerColor)) {
+                if (this.playerCreation.isColorAvailable(towerColor)) {
                     this.playerCreation.clearTeamColor(position);
                     this.playerCreation.setTeamColor(towerColor, position);
                 }
+                else return false;
             } finally {
                 teamLock.unlock();
             }
@@ -479,7 +483,15 @@ public class Controller {
 
     }
 
-    //What is this for?
+    /**
+     * Set error message to show
+     * @param error the error message to show
+     */
+    public void setError(String error){
+        simpleGame.getParameters().setErrorState(error);
+    }
+
+    //What is this for?  Maybe for test when there was the deprecated one
     public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
         try {
 
@@ -487,5 +499,12 @@ public class Controller {
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
+    }
+
+    public void lostConnectionHandle(){
+        /*TODO Aggiorna la view con il messaggio di errore settato dal ClientHandler
+         * che ha perso la connessione (in teoria già fatto dal clientHandler)*/
+        /*TODO invia la view a tutti gli user della lobby incriminata */
+        //TODO chiudi le connessioni
     }
 }

@@ -16,6 +16,8 @@ import java.util.List;
 
 /**
  * Translates from a LinkedTreeMap to a bean of the correct type
+ * This class is fairly fragile, as it needs updating every time an attribute
+ * name changes
  */
 public class BeanTranslator {
 
@@ -37,8 +39,8 @@ public class BeanTranslator {
     }
 
     public static GameInitBean deserializeGameInitBean(LinkedTreeMap<String, Object> map){
-        List<TeamEnum> chosenColors = toListOfEnum(TeamEnum.class, (ArrayList<String>) map.get("chosenColors"));
-        List<WizardEnum> chosenWizards = toListOfEnum(WizardEnum.class, (ArrayList<String>) map.get("chosenWizards"));
+        List<TeamEnum> chosenColors = toListOfEnum(TeamEnum.class, (ArrayList<String>) map.get("availableColors"));
+        List<WizardEnum> chosenWizards = toListOfEnum(WizardEnum.class, (ArrayList<String>) map.get("availableWizards"));
         Boolean allSetGameStarted = (Boolean) map.get("allSetGameStarted");
         return new GameInitBean(chosenColors,chosenWizards, allSetGameStarted);
     }

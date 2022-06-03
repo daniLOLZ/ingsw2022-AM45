@@ -35,6 +35,7 @@ public class Eriantys {
             return;
         }
         if(GUIMode){
+            //todo re-add functionality
             //UserInterface gui = new GUIMain(hostname, portNumber);
             //gui.startInterface();
             return;

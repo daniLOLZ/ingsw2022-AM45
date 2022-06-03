@@ -6,10 +6,10 @@ import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientHandler implements Runnable{
@@ -62,42 +62,84 @@ public class ClientHandler implements Runnable{
             clientOutput = mainSocket.getOutputStream();
         } catch (IOException e) {
             System.err.println("Error obtaining streams");
+            System.out.println("Error obtaining streams");
             System.err.println(e.getMessage());
             //quitGame(); // Maybe useless
+            //connectionLostAlert(); forse no
             return;
         }
 
-        new Thread(()->{while (isConnected) mainBroker.receive(clientInput);}).start();
+        new Thread(()->{
+
+            while (isConnected){
+                try{
+                    mainBroker.receive(clientInput);
+                }catch(IOException e){
+                    connectionLostAlert();
+                }
+            }
+        }).start();
 
         new Thread(this::pong).start();
 
         while(isConnected){ // Message listener loop
 
-            while(!mainBroker.messagePresent()); // this uses a ton of resources!!! we need an interrupt
-            // mechanism like producer/consumer
+            try {
+                mainBroker.takeIncomingMessage();
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted while waiting for message");
+                e.printStackTrace();
+                continue;
+            }
+
             System.out.println("---Starting to parse a message [idUser: " + parameters.getIdUser() + "]");
             CommandEnum command = CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND));
 
             System.out.println("---Message parsed : "+command.toString());
             if(!parameters.getConnectionState().isAllowed(command)){ // Trashes a command given at the wrong time
-                System.err.println("--+Command not allowed");
-                mainBroker.flushFirstMessage();
-                continue;
+                System.err.println("-+-Command not allowed");
+                //We also need to send an error to the client, not leaving it hanging
+                //todo duplicate code
+                mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
+                mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
+                mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
+                mainBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, "The command couldn't be handled");
+            }
+            else {
+                commandLock.lock();
+                try {
+                    handleCommand(mainBroker); // runs the appropriate routine depending on the command received
+                    System.out.println("---Command handled");
+                }
+                finally {
+                    commandLock.unlock();
+                }
             }
 
-            commandLock.lock();
-            try {
-                handleCommand(mainBroker); // runs the appropriate routine depending on the command received
-                System.out.println("---Command handled");
-                // Sends a reply to the client
-                mainBroker.send(clientOutput);
-                mainBroker.flushFirstMessage();
+            try{
+            // Sends a reply to the client
+            mainBroker.send(clientOutput);
+            mainBroker.flushFirstMessage();
             }
-            finally {
-                commandLock.unlock();
+            catch (IOException e){
+                connectionLostAlert();
             }
+
         }
         // This point should never be reached in normal circumstances (unless the client disconnects)
+    }
+
+    /**
+     * Handle the exceptions thrown by losing connection.
+     * Set error state in order to show the error to the other players in future view.
+     * Set isConnected to false.
+     * Close connection.
+     */
+    public void connectionLostAlert(){
+        parameters.getUserController().setError("Connection Lost With "+ parameters.getIdUser());
+        isConnected = false;
+        parameters.getUserController().lostConnectionHandle();
+        closeConnection();
     }
 
     //below methods moved to CommandHandler
@@ -178,14 +220,22 @@ public class ClientHandler implements Runnable{
         final Future<Void> handler = pingExecutor.submit(() -> {
 
             //todo might have broken it
-            while (!pingBroker.messagePresent()); //operation to execute with timeout
+            pingBroker.takeIncomingMessage(); //operation to execute with timeout
+
 
             return null; //no need for a return value
         });
 
         while (isConnected) {
 
-            pingBroker.receive(clientInput);
+            try {
+                pingBroker.receive(clientInput);
+            }
+            catch (IOException e){
+                connectionLostAlert();
+                return;
+            }
+
             try {
                 handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
@@ -211,7 +261,13 @@ public class ClientHandler implements Runnable{
             else {
                 pingBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PONG);
                 pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST));
+
+                try{
                 pingBroker.send(clientOutput);
+                }
+                catch (IOException e){
+                    connectionLostAlert();
+                }
             }
             //pingBroker.unlock();
             mainBroker.flushFirstMessage();

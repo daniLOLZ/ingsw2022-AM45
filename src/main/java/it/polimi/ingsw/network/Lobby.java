@@ -107,7 +107,10 @@ public class Lobby {
      */
     private void assignHost(){
 
-        if (players.size() == 0) host = null;
+        if (players.size() == 0){
+            host = null;
+            return;
+        }
 
         if (!players.contains(host)) host = null;
 
@@ -155,7 +158,8 @@ public class Lobby {
      */
     public boolean everyoneReady(){
         if( GameRuleEnum.getNumPlayers(this.gameType.id) == this.players.size() &&
-            this.players.containsAll(this.playersReady)){
+            this.players.containsAll(this.playersReady) &&
+            this.playersReady.containsAll(this.players)){
             return true;
         }
         else return false;

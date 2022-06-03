@@ -60,7 +60,17 @@ public class BrokerTest {
                     "COMMAND" : "CONNECTION_REQUEST",
                     "NICKNAME" : "gigio"
                 }""");
+        try{
         broker.receive(stream);
+        }
+        catch (IOException e){
+            //null
+        }
+        try {
+            broker.takeIncomingMessage();
+        } catch (InterruptedException e) {
+            fail();
+        }
         //while (!broker.lock());
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
@@ -78,14 +88,25 @@ public class BrokerTest {
                     "COMMAND" : "CONNECTION_REQUEST",
                     "NICKNAME" : "gigio2"
                 }""");
+        try{
         broker.receive(stream);
         broker.receive(stream);
-        if(!broker.messagePresent()){
+        }
+        catch (IOException e){
+            //null
+        }
+
+        try {
+            broker.takeIncomingMessage();
+        } catch (InterruptedException e) {
             fail("No first message to read");
         }
         assertEquals("gigio", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
         broker.flushFirstMessage();
-        if(!broker.messagePresent()){
+
+        try {
+            broker.takeIncomingMessage();
+        } catch (InterruptedException e) {
             fail("No second message to read");
         }
         assertEquals("gigio2", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
@@ -105,8 +126,13 @@ public class BrokerTest {
                 }
                 """);
         OutputStream out = System.out;
+        try{
         broker.send(out);
         assertEquals(broker.getOutgoingMessage(), new HashMap<>());
+        }
+        catch (IOException e){
+            //null
+        }
     }
 
 

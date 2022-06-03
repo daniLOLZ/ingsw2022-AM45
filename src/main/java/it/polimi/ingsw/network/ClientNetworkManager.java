@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -206,7 +207,32 @@ public class ClientNetworkManager {
         brokerLock.lock();
         try {
             mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.START_GAME);
-            if (!sendToServer()) return false;
+            if (!sendToServer()){
+                return false;}
+
+            successfulReply = checkSuccessfulReply();
+
+
+
+            mainBroker.flushFirstMessage();
+            return successfulReply;
+
+        } finally {
+            brokerLock.unlock();
+        }
+    }
+
+    /**
+     * The user asks to leave the current lobby
+     * @return true if the call succeeded and the user left the lobby
+     */
+    public boolean leaveLobby(){
+        boolean successfulReply;
+
+        brokerLock.lock();
+        try{
+            mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.LEAVE_LOBBY);
+            if(!sendToServer()) return false;
 
             successfulReply = checkSuccessfulReply();
 
@@ -331,7 +357,7 @@ public class ClientNetworkManager {
      * @return The client's side socket of the established connection if successful
      * @exception ConnectionFailedException Contains a message error if the connection was unsuccessful
      */
-    private Socket connect(String hostname, int port) throws ConnectionFailedException{
+    public Socket connect(String hostname, int port) throws ConnectionFailedException{
 
         Socket returnableSocket;
 
@@ -370,8 +396,23 @@ public class ClientNetworkManager {
             return false;
         }
 
-        mainBroker.send(outStream);
-        mainBroker.receive(inStream);
+        try{
+         mainBroker.send(outStream);
+         mainBroker.receive(inStream);
+        }
+        catch (IOException e){
+            connectionLostAlert();
+            return false;
+        }
+        try {
+            mainBroker.takeIncomingMessage();
+
+
+        } catch (InterruptedException e) {
+            System.err.println("Interrupted while waiting for message");
+            e.printStackTrace();
+            return false;
+        }
 
         //Checking whether the reply is the correct one
         //This method will not return until the first message of the broker
@@ -393,6 +434,24 @@ public class ClientNetworkManager {
     private boolean checkSuccessfulReply(){
         return "OK".equals(
                 (String) mainBroker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE));
+    }
+
+    /**
+     * Useful for tests
+     * @return the error message string sent by Server if this is present
+     */
+    public String getErrorMessage(){
+        String errorMes = "NO ERROR";
+        String replyMessage;
+
+        if(!mainBroker.messagePresent())
+            return  errorMes;
+
+        replyMessage = (String) mainBroker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE);
+        if(replyMessage.equals("ERR"))
+            errorMes = (String) mainBroker.readField(NetworkFieldEnum.ERROR_STATE);
+
+        return errorMes;
     }
 
     /**
@@ -473,20 +532,39 @@ public class ClientNetworkManager {
 
         final Future<Void> handler = pingExecutor.submit(() -> {
 
-            while (!pingBroker.messagePresent()); //operation to execute with timeout
+            pingBroker.takeIncomingMessage(); //operation to execute with timeout
 
             return null; //no need for a return value
         });
 
         do{
             //send ping message
-            while (!pingBroker.messagePresent());
+            try {
+                pingBroker.takeIncomingMessage(); // why is this needed here?
+            } catch (InterruptedException e) {
+                System.err.println("Error while waiting for ping ");
+                e.printStackTrace();
+            }
             pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
             pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
-            pingBroker.send(outStream);
+
+            try{
+                pingBroker.send(outStream);
+            }
+            catch (IOException e){
+                connectionLostAlert();
+                return;
+            }
+
             //pingBroker.unlock();
             pingBroker.flushFirstMessage();
-            pingBroker.receive(inStream);
+
+            try {
+                pingBroker.receive(inStream); // ?receive is blocking
+            }
+            catch (IOException e){
+                connectionLostAlert();
+            }
 
             //receive pong message
             try {
@@ -545,6 +623,26 @@ public class ClientNetworkManager {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    /**
+     * Handle the exceptions thrown by losing connection.
+     * Set connected false.
+     * close mainSocket and pingSocket.
+     */
+    public void connectionLostAlert() {
+        connected = false;
+        System.out.println("Connection with Server lost");
+        System.out.println("Disconnecting...");
+        try{
+        mainSocket.close();
+        pingSocket.close();
+        System.out.println("Socket closed");
+
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
 }

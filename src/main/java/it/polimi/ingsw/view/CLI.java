@@ -5,6 +5,9 @@ import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.network.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,7 @@ public class CLI implements UserInterface {
     private String gameMode;
     private final String colorList3Players = "B - Black, G - Grey, W - White";
     private final String colorList2or4Players = "B - Black, W - White";
+    private boolean inLobby;
 
     /**
      * Network-less constructor, used for testing
@@ -36,6 +40,7 @@ public class CLI implements UserInterface {
         View = new StringBuilder("");
         LastView = new StringBuilder("");
         LastElement = new StringBuilder();
+        inLobby = false;
     }
 
     /**
@@ -302,14 +307,15 @@ public class CLI implements UserInterface {
         } while(serverError);
         this.numberOfPlayers = Integer.parseInt(numPlayers);
         this.gameMode = Integer.parseInt(gameMode) == 1 ? "Simple" : "Advanced"; // find a nicer way
+        this.inLobby = true;
     }
 
     @Override
     public void showLobby() {
-        Scanner scanner = new Scanner(System.in);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         AtomicBoolean ready = new AtomicBoolean(false);
         AtomicBoolean gameStarting = new AtomicBoolean(false);
-        String selection;
+        String selection = "";
         System.out.println(MessageFormat.format("""
                 Game type selected:
                     Number of players : {0}
@@ -319,12 +325,11 @@ public class CLI implements UserInterface {
                 1 - Set yourself as ready
                 2 - Set yourself as not ready
                 S - Try to start the game
+                L - Leave the lobby, go back to selecting the game rules
                 """, this.numberOfPlayers, this.gameMode));
 
-        //todo: See if this could be an "interactive" wait, where you can see the players joining, or even
-        // just a simple counter
-        // make a thread for the updating of the lobby and for checking whether or not the game is starting here
-
+        //todo factor this runnable into its own class so it doesn't print the bean but simply
+        // returns it to the UI, which whill then handle it
         new Thread(()-> {
 
             // Lucario: We might not need to check for sameness here, the server should only update if the
@@ -338,13 +343,10 @@ public class CLI implements UserInterface {
                 } catch (InterruptedException e) {
                     System.err.println("Interrupted before waiting the full length, requesting lobby updates now");
                 }
-                /*
-                if(gameStarting.get()){
-                    //This is necessary for the host, for which the sendReadyStatus won't
-                    // stop the thread, since its server-side game state already changed
-                    return;
-                }
-                 */
+
+                if(gameStarting.get()) return; // Necessary for the host of
+                // the game, could be handled better
+
                 if(networkManager.sendReadyStatus(ready.get())){
                     //signal we're starting the game
                     gameStarting.set(true);
@@ -359,15 +361,10 @@ public class CLI implements UserInterface {
         }).start();
 
         while(true) {
-            selection = scanner.next();
 
-            // If the game started, any input is actually ignored
-            if(gameStarting.get()){
-                //TODO: This is probably an ugly way of exchanging information across threads
-                // The player won't be notified the game is starting until they actually
-                // make a selection, even though it will get discarded
-                break;
-            }
+            selection = getInputNonBlocking(reader, gameStarting);
+
+            if(gameStarting.get()) break;
 
             if (selection.equals("1")) {
                 ready.set(true);
@@ -378,16 +375,31 @@ public class CLI implements UserInterface {
                 System.out.println("You set yourself as not ready");
             }
             else if (selection.toUpperCase(Locale.ROOT).equals("S")) {
-                if(networkManager.startGame()){
+                if (networkManager.startGame()) {
                     gameStarting.set(true);
                     System.out.println("Everyone is ready!");
                     break;
-                }
-                else {
+                } else {
                     System.out.println("The game  couldn't start");
                 }
-            } else continue;
+            }
+            else if(selection.toUpperCase(Locale.ROOT).equals("L")){
+                if(networkManager.leaveLobby()){
+                    //Leave the lobby locally
+                    System.out.println("Leaving the current lobby...");
+                    this.inLobby = false;
+                    break;
+                }
+                else {
+                    System.out.println("Couldn't leave, you're stuck in the lobby °_°");
+                }
+            }
+            else {
+                System.out.println("Insert a correct option please!");
+            }
+            selection = "";
         }
+
 
     }
 
@@ -405,7 +417,7 @@ public class CLI implements UserInterface {
     @Override
     public void showTowerAndWizardSelection() {
 
-        Scanner scanner = new Scanner(System.in);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String currentTower = TeamEnum.NOTEAM.name;
         String currentWizard = WizardEnum.NO_WIZARD.name;
         AtomicBoolean gameStarting = new AtomicBoolean(false);
@@ -414,6 +426,8 @@ public class CLI implements UserInterface {
 
 
         //Start periodically fetching initialization information
+        //todo factor this runnable into its own class so it doesn't print the bean but simply
+        // returns it to the UI, which whill then handle it
         new Thread(()->{
             // Lucario: Same as before, again if we have time
             GameInitBean initBean;
@@ -444,18 +458,17 @@ public class CLI implements UserInterface {
 
         while(true){
             System.out.println(MessageFormat.format("""
-                Select your team color ({2}) 
+                Select your team color ({2})
                 and wizard (1 - King, 2 - Pixie, 3 - Sorcerer, 4 - Wizard)
                 (one at a time):
                 
-                Your selection : 
+                Your selection :
                     Team color : {0}
-                    Wizard : {1} 
+                    Wizard : {1}
                 """, currentTower, currentWizard, colorList));
-            selection = scanner.nextLine();
 
-            //todo Same as before, the cli waits to notify the user that the game started
-            // until after they made another selection because scanner.nextLine is blocking
+            selection = getInputNonBlocking(reader, gameStarting);
+
             if(gameStarting.get()){
                 System.out.println("Everyone made their choice, the game is starting!");
                 return;
@@ -520,19 +533,56 @@ public class CLI implements UserInterface {
 
     @Override
     public void showGameInterface() {
+        boolean genericVariableThatTellsUsIfTheGameIsStillGoing = true;
+
+        //Game loop
+        while(genericVariableThatTellsUsIfTheGameIsStillGoing){
+
+        }
         System.out.println("started woohoo");
     }
 
     @Override
     public void startInterface() {
 
+        // Orchestrator for the CLI
         showWelcomeScreen();
         showLoginScreen();
-        showGameruleSelection();
-        showLobby();
+
+        while(!inLobby) { // todo i don't like this way of handling views
+            showGameruleSelection();
+            showLobby();
+        }
         showTowerAndWizardSelection();
         showGameInterface();
 
+    }
+
+    /**
+     * Gets user input from the stream in the reader, exiting and returning the empty string
+     * in case the interruptingCondition is true
+     * @param reader the BufferedReader to get input from
+     * @param interruptingCondition the condition that exits the method, in case the input wasn't
+     *                              read
+     * @return the string input by the user, or the empty string if the interruptingCondition was triggered
+     */
+    public String getInputNonBlocking(BufferedReader reader, AtomicBoolean interruptingCondition){
+        String selection = "";
+        while(selection.equals("") && !interruptingCondition.get()) {
+            try {
+                while (!reader.ready() && !interruptingCondition.get()) {
+                    Thread.sleep(200);
+                }
+                if(reader.ready()) selection = reader.readLine();
+                //If not, we exited because the game is starting
+            } catch (InterruptedException e) {
+                //Run the next loop
+                System.err.println("Interrupted before receiving input, continuing");
+            } catch (IOException e) {
+                System.err.println("I/O error, continuing");
+            }
+        }
+        return selection;
     }
 
     @Override

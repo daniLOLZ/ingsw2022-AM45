@@ -84,4 +84,11 @@ public class ActiveLobbies {
         }
         return false;
     }
+
+    /**
+     * FOR TESTING PURPOSES ONLY
+     */
+    public static List<Lobby> getLobbies() {
+        return lobbies;
+    }
 }
