@@ -1,8 +1,11 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.network.*;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 import it.polimi.ingsw.network.connectionState.InLobby;
+import it.polimi.ingsw.network.server.ActiveLobbies;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 
 public class PlayGameHandler extends CommandHandler{
 

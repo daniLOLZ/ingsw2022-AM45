@@ -1,6 +1,9 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.network.*;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ActiveGames;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 
 public class QuitGameHandler extends CommandHandler{
 

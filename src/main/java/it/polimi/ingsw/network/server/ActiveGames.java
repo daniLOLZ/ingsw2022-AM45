@@ -1,4 +1,4 @@
-package it.polimi.ingsw.network;
+package it.polimi.ingsw.network.server;
 
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.GameRuleEnum;
@@ -13,10 +13,15 @@ public class ActiveGames {
     private static List<Controller> gameControllers = new ArrayList<>();
     private static Map<Integer, Controller> userToGameAssociation = new HashMap<>();
 
+    /**
+     * We don't want to instantiate this class
+     */
+    private ActiveGames(){}
 
     /**
      * Creates a new game controller based on information from the lobby.
      * The lobby contains information on the number of players, the rules of the game and the ids of the players
+     * This method will set the lobby to a 'started' status
      * @param lobby the lobby to get the information from
      */
     public static void createGame(Lobby lobby){
@@ -44,7 +49,7 @@ public class ActiveGames {
         for(Integer user : lobby.getPlayers()){
             userToGameAssociation.put(user, newController);
         }
-        lobby.setStartGame();
+        lobby.setStartGame(true);
     }
 
     /**
@@ -61,6 +66,7 @@ public class ActiveGames {
      * other user in the game
      * @param idUser the user whose game will end
      */
+    @Deprecated // maybe
     public static void endGame(Integer idUser){
 
         Controller gameToEnd = getGameFromUserId(idUser);

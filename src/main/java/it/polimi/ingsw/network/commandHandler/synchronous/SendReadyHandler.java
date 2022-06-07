@@ -1,7 +1,8 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.network.*;
-import it.polimi.ingsw.network.connectionState.StartingGame;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 
 public class SendReadyHandler extends CommandHandler{
 
@@ -25,15 +26,7 @@ public class SendReadyHandler extends CommandHandler{
             parameters.getUserLobby().addReady(parameters.getIdUser());
             //The operation will be successful, but we need to tell the user with an error message
             // that the game isn't ready to start yet, as per the network protocol
-            if(parameters.getUserLobby().isGameStarted()){
-                //Sets the user's handler to the appropriate configuration
-                parameters.setConnectionState(new StartingGame());
-                parameters.setUserController(ActiveGames.getGameFromUserId(parameters.getIdUser()));
-                notifySuccessfulOperation(messageBroker);
-            }
-            else{
-                notifyError(messageBroker, "GameNotStarting");
-            }
+            notifySuccessfulOperation(messageBroker);
         }
         finally {
             parameters.getUserLobby().readyLock.unlock();

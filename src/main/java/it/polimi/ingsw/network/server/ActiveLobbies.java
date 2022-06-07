@@ -1,4 +1,4 @@
-package it.polimi.ingsw.network;
+package it.polimi.ingsw.network.server;
 import it.polimi.ingsw.controller.GameRuleEnum;
 
 import java.util.ArrayList;
@@ -9,6 +9,10 @@ public class ActiveLobbies {
     private static final Object genericLock = new Object();
     private static List<Lobby> lobbies = new ArrayList<>();
 
+    /**
+     * We don't want to instantiate this class
+     */
+    private ActiveLobbies(){}
 
     /**
      * If there's already an available Lobby with the same game rules and at least an empty seat it returns the said lobby.
@@ -77,7 +81,6 @@ public class ActiveLobbies {
 
         if (lobbies.contains(lobby) &&
             lobby.everyoneReady()   ) {
-
             ActiveGames.createGame(lobby);
             return true; //TODO create everything
             //todo destroy lobby after creating game?

@@ -1,20 +1,21 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
-import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.connectionState.EndTurn;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 import it.polimi.ingsw.network.connectionState.WaitingForControl;
 
-public class ChooseAssistantHandler extends CommandHandler{
+public class ChooseCloudHandler extends CommandHandler{
 
-    public ChooseAssistantHandler(){
-        commandAccepted = CommandEnum.CHOOSE_ASSISTANT;
+    public ChooseCloudHandler(){
+        commandAccepted = CommandEnum.CHOOSE_CLOUD;
     }
 
     /**
-     * The user selects which assistant they want to play, the server replies with an error
-     * if the assistant can't be played
+     * The user chooses a cloud to refill their entrance with
      */
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
@@ -22,14 +23,14 @@ public class ChooseAssistantHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer idAssistant = (Integer)messageBroker.readField(NetworkFieldEnum.ID_ASSISTANT);
-        if(parameters.getUserController().playAssistant(idAssistant)){
+        Integer idCloud = (Integer) messageBroker.readField(NetworkFieldEnum.ID_CLOUD);
+        if(parameters.getUserController().chooseCloud(idCloud)){
+            parameters.setConnectionState(new EndTurn());
             notifySuccessfulOperation(messageBroker);
-            parameters.setConnectionState(new WaitingForControl());
             return true;
         }
         else {
-            notifyError(messageBroker,"The assistant couldn't be played");
+            notifyError(messageBroker,"Couldn't select the cloud");
             return false;
         }
     }

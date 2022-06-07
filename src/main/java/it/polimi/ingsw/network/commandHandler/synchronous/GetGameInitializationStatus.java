@@ -1,19 +1,17 @@
 
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
-import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 import it.polimi.ingsw.network.connectionState.WaitingForControl;
 import it.polimi.ingsw.view.GameInitBean;
-import it.polimi.ingsw.view.LobbyBean;
 
+@Deprecated
 public class GetGameInitializationStatus extends CommandHandler{
 
-    public GetGameInitializationStatus(){
-        this.commandAccepted = CommandEnum.GET_GAME_INITIALIZATION_STATUS;
-    }
     @Override
     public boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters) throws UnexecutableCommandException {
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
@@ -35,11 +33,9 @@ public class GetGameInitializationStatus extends CommandHandler{
         }
         GameInitBean gameInitBean = new GameInitBean(
                 parameters.getUserController().getTowerColorsAvailable(),
-                parameters.getUserController().getWizardsAvailable(),
-                parameters.getUserController().allSelectionsMadeGameStart() //...Then the bean will have immediately after the value true,
-                                                                            // and the client will be notified of the change
+                parameters.getUserController().getWizardsAvailable()
         );
-        messageBroker.addToMessage(NetworkFieldEnum.BEAN_TYPE, gameInitBean.getBeanEnum());
+        messageBroker.addToMessage(NetworkFieldEnum.BEAN_TYPE, gameInitBean.getBeanType());
         messageBroker.addToMessage(NetworkFieldEnum.BEAN, gameInitBean);
         notifySuccessfulOperation(messageBroker);
         return true;

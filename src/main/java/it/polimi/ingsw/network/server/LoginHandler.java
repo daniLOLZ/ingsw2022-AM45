@@ -1,4 +1,4 @@
-package it.polimi.ingsw.network;
+package it.polimi.ingsw.network.server;
 
 import java.util.HashMap;
 import java.util.Map;

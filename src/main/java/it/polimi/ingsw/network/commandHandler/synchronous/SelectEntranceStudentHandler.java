@@ -1,11 +1,15 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
-import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 import it.polimi.ingsw.network.connectionState.StudentMoving;
 
+/**
+ * The user asks to select a student from their entrance
+ */
 public class SelectEntranceStudentHandler extends CommandHandler{
 
     public SelectEntranceStudentHandler(){

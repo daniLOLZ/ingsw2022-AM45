@@ -1,11 +1,12 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.model.TeamEnum;
-import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.ApplicationHelper;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
-import it.polimi.ingsw.network.connectionState.WaitingForControl;
 
 public class SelectTowerColorHandler extends CommandHandler{
 
@@ -23,12 +24,14 @@ public class SelectTowerColorHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Double dTeamColorId = (Double) messageBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR);
-        int teamColorId = dTeamColorId.intValue();
+        int teamColorId = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.ID_TOWER_COLOR));
         TeamEnum teamColor = TeamEnum.getTeamFromId(teamColorId);
 
         if(parameters.getUserController().setTeamColor(teamColor, parameters.getIdUser())){
             notifySuccessfulOperation(messageBroker);
+            if(parameters.getUserController().startPlayingGame()){
+                //todo? maybe something needs to happen here?
+            }
         }
         else {
             notifyError(messageBroker,"The chosen team isn't available, please change your selection");

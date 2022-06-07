@@ -1,4 +1,6 @@
-package it.polimi.ingsw.network;
+package it.polimi.ingsw.network.server;
+
+import it.polimi.ingsw.network.server.ClientHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;

@@ -1,6 +1,7 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
-import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
@@ -23,10 +24,9 @@ public class SendNotReadyHandler extends CommandHandler{
         // This, SendReady and StartGame should all be synchronized to some lock
         parameters.getUserLobby().readyLock.lock();
         try {
-
             parameters.getUserLobby().removeReady(parameters.getIdUser());
             //Like for the SendReadyHandler, we send an error
-            notifyError(messageBroker, "GameNotStarting"); // other checks to do?
+            notifySuccessfulOperation(messageBroker);
         }
         finally {
             parameters.getUserLobby().readyLock.unlock();

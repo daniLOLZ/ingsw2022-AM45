@@ -1,7 +1,9 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.network.*;
-import it.polimi.ingsw.network.connectionState.StartingGame;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ActiveLobbies;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 
 public class StartGameHandler extends CommandHandler{
 
@@ -28,9 +30,6 @@ public class StartGameHandler extends CommandHandler{
                 return false;
             } else {
                 if (ActiveLobbies.startGame(parameters.getUserLobby())) {
-                    // the way this will be signaled to every "handler" will be through the lobby with the flag "gameStarted"
-                    parameters.setConnectionState(new StartingGame());
-                    parameters.setUserController(ActiveGames.getGameFromUserId(parameters.getIdUser()));
                     notifySuccessfulOperation(messageBroker);
                 } else {
                     notifyError(messageBroker, "The game couldn't start, returning to lobby");
@@ -40,6 +39,7 @@ public class StartGameHandler extends CommandHandler{
         finally {
             parameters.getUserLobby().readyLock.unlock();
         }
+
         return true;
     }
 }
