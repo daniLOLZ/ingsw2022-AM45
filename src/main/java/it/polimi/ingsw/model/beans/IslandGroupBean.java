@@ -28,7 +28,7 @@ public class IslandGroupBean extends GameElementBean {
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.ISLANDGROUP_BEAN;
     }
 

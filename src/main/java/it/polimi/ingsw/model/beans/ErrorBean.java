@@ -12,7 +12,7 @@ public class ErrorBean extends GameElementBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.ERROR_BEAN;
     }
 

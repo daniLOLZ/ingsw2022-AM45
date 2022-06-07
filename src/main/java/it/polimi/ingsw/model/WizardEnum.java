@@ -34,4 +34,10 @@ public enum WizardEnum {
         return WizardEnum.valueOf((String)field);
     }
 
+    public static WizardEnum getWizardFromId(int id) {
+        for(WizardEnum wizard : WizardEnum.values()){
+            if(wizard.index == id) return wizard;
+        }
+        return NO_WIZARD;
+    }
 }

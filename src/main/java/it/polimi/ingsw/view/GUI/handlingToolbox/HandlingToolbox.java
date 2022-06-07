@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import it.polimi.ingsw.network.ClientNetworkManager;
+import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

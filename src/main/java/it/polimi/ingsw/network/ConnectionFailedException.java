@@ -11,4 +11,7 @@ public class ConnectionFailedException extends Exception{
     public void printErrorMessage(){
         System.err.println(errorMessage);
     }
+    public String getErrorMessage(){
+        return errorMessage;
+    }
 }

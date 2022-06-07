@@ -18,7 +18,7 @@ public class CloudBean extends GameElementBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.CLOUD_BEAN;
     }
 

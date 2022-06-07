@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -67,7 +64,7 @@ public class BrokerTest {
             //null
         }
         try {
-            broker.takeIncomingMessage();
+            broker.waitSyncMessage();
         } catch (InterruptedException e) {
             fail();
         }
@@ -75,7 +72,7 @@ public class BrokerTest {
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
         //broker.unlock();
-        broker.flushFirstMessage();
+        broker.flushFirstSyncMessage();
     }
 
     @Test
@@ -97,20 +94,20 @@ public class BrokerTest {
         }
 
         try {
-            broker.takeIncomingMessage();
+            broker.waitSyncMessage();
         } catch (InterruptedException e) {
             fail("No first message to read");
         }
         assertEquals("gigio", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
-        broker.flushFirstMessage();
+        broker.flushFirstSyncMessage();
 
         try {
-            broker.takeIncomingMessage();
+            broker.waitSyncMessage();
         } catch (InterruptedException e) {
             fail("No second message to read");
         }
         assertEquals("gigio2", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
-        broker.flushFirstMessage();
+        broker.flushFirstSyncMessage();
         //If the messages were correctly parsed, the broker should be able to read two different messages correctly
     }
 

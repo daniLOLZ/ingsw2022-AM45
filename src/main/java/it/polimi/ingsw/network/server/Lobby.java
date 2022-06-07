@@ -1,12 +1,10 @@
-package it.polimi.ingsw.network;
+package it.polimi.ingsw.network.server;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
-import it.polimi.ingsw.model.DrawableObject;
 import it.polimi.ingsw.view.LobbyBean;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Lobby {
@@ -18,6 +16,7 @@ public class Lobby {
     private Integer host;
     private boolean gameStarted;
     public ReentrantLock readyLock;
+    private boolean modified;
 
     public Lobby(GameRuleEnum gameType){
 
@@ -32,6 +31,7 @@ public class Lobby {
             case SIMPLE_3, ADVANCED_3 -> emptySeats = 3;
             case SIMPLE_4, ADVANCED_4 -> emptySeats = 4;
         }
+        modified = true;
     }
 
     public boolean isFull(){
@@ -45,9 +45,11 @@ public class Lobby {
     public void addReady(int idUser){
         //We don't add them twice if already present
         if (players.contains(idUser) &&
-            !playersReady.contains(idUser)) playersReady.add(idUser);
+            !playersReady.contains(idUser)) {
+            playersReady.add(idUser);
+            modified = true;
+        }
         else ;//maybe handle case of idUser not present
-
     }
 
     /**
@@ -58,7 +60,7 @@ public class Lobby {
 
         Integer integer = idUser;
         playersReady.remove(integer);
-
+        modified = true;
     }
 
     public GameRuleEnum getGameType(){
@@ -79,6 +81,7 @@ public class Lobby {
             playersReady.remove(integer);
             emptySeats++;
             assignHost();
+            modified = true;
         }
 
         if (players.size() == 0) destroyLobby();
@@ -97,6 +100,8 @@ public class Lobby {
         players.add(idUser);
 
         emptySeats--;
+
+        modified = true;
 
         assignHost();
 
@@ -165,16 +170,20 @@ public class Lobby {
         else return false;
     }
 
-    /**
-     * Sets the flag "gameStarted" to true
-     */
-    public void setStartGame(){
-        gameStarted = true;
-
+    public void setStartGame(boolean status){
+        gameStarted = status;
     }
 
     public boolean isGameStarted(){
         return gameStarted;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 
     public synchronized LobbyBean toBean() {
