@@ -1,12 +1,17 @@
-package it.polimi.ingsw.network;
+package it.polimi.ingsw.network.server;
 
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.network.connectionState.Authentication;
 import it.polimi.ingsw.network.connectionState.ConnectionState;
 
+/**
+ * Holds the parameters for this user's connection: <br>
+ * - user id  <br>
+ * - connection state (and its callback for character card playing) <br>
+ * - lobby <br>
+ * - controller <br>
+ */
 public class ClientHandlerParameters {
-
-
 
     private int idUser;
     private ConnectionState connectionState;

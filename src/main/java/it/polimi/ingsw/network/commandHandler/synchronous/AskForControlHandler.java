@@ -1,18 +1,16 @@
-package it.polimi.ingsw.network.commandHandler;
+package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.model.game.PhaseEnum;
-import it.polimi.ingsw.network.ClientHandlerParameters;
+import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 import it.polimi.ingsw.network.connectionState.PlanningPhaseTurn;
 import it.polimi.ingsw.network.connectionState.StudentChoosing;
-
+@Deprecated
 public class AskForControlHandler extends CommandHandler{
 
-    public AskForControlHandler(){
-        commandAccepted = CommandEnum.ASK_FOR_CONTROL;
-    }
     /**
      * While waiting for their turn, the user periodically sends this message to ask for their turn to start
      */

@@ -27,8 +27,10 @@ public class MessageBroker {
                                                                                                         //when using gson functions toJson and fromJson
     private final String connectionResetString = "Connection Reset";
 
-    private BlockingQueue<Map<NetworkFieldEnum, Object>> incomingMessages;
-    private Map<NetworkFieldEnum, Object> currentIncomingMessage;
+    private BlockingQueue<Map<NetworkFieldEnum, Object>> incomingSyncMessages;
+    private BlockingQueue<Map<NetworkFieldEnum, Object>> incomingAsyncMessages;
+    private Map<NetworkFieldEnum, Object> currentIncomingSyncMessage;
+    private Map<NetworkFieldEnum, Object> currentIncomingAsyncMessage;
     private Map<NetworkFieldEnum, Object> outgoingMessage;
 
     private final int BLOCKING_QUEUE_CAPACITY = 100;
@@ -55,6 +57,7 @@ public class MessageBroker {
 
     /**
      * Adds an object to the outgoing message. Requires a field name
+     * If a field was set already, it gets overwritten
      * @param fieldName The name used to identify the object
      * @param messageObject The object to be sent
      */
@@ -64,32 +67,63 @@ public class MessageBroker {
     }
 
     /**
-     * Returns the value of the given fieldName for the first inbound message, taken from the queue
+     * Returns the value of the given fieldName for the first SYNCHRONOUS inbound message, taken from the queue
      * or null in case the message received doesn't have the specified field
      * @param fieldName the field name of which one wants to know the value
      * @return the value associated with that field, or null in case the field isn't present
      * @throws NullPointerException if there is no message read with the
-     *                              takeIncomoingMessage() method
+     *                              waitSyncMessage() method
      */
     public Object readField(NetworkFieldEnum fieldName) throws NullPointerException {
-        return currentIncomingMessage.get(fieldName);
+        return currentIncomingSyncMessage.get(fieldName);
     }
 
     /**
+     * Returns the value of the given fieldName for the first ASYNCHRONOUS inbound message, taken from the queue
+     * or null in case the message received doesn't have the specified field
+     * @param fieldName the field name of which one wants to know the value
+     * @return the value associated with that field, or null in case the field isn't present
+     * @throws NullPointerException if there is no message read with the
+     *                              waitAsyncMessage() method
+     */
+    public Object readAsyncField(NetworkFieldEnum fieldName) throws NullPointerException {
+        return currentIncomingAsyncMessage.get(fieldName);
+    }
+
+    /**
+     * Waits for a new message on the synchronous message buffer
      * Acts as a buffer between the queue and the list of messages received.
-     * Puts the first message from the Queue into the current incoming message
+     * Puts the first message from the Queue into the current incoming synchronous message
      * To be called before any readField() is called
      * @throws InterruptedException if the thread is interrupted before a message was available
      */
-    public void takeIncomingMessage() throws InterruptedException{
-        currentIncomingMessage = incomingMessages.take();
+    public void waitSyncMessage() throws InterruptedException{
+        currentIncomingSyncMessage = incomingSyncMessages.take();
     }
 
     /**
-     * Removes the oldest received message from the incoming messages buffer.
+     * Waits for a new message on the asynchronous message buffer
+     * Acts as a buffer between the queue and the list of messages received.
+     * Puts the first message from the Queue into the current incoming asynchronous message
+     * To be called before any readAsyncField() is called
+     * @throws InterruptedException if the thread is interrupted before a message was available
      */
-    public void flushFirstMessage(){
-        currentIncomingMessage = null;
+    public void waitAsyncMessage() throws InterruptedException{
+        currentIncomingAsyncMessage = incomingAsyncMessages.take();
+    }
+
+    /**
+     * Removes the oldest received synchronous message from the incoming messages buffer.
+     */
+    public void flushFirstSyncMessage(){
+        currentIncomingSyncMessage = null;
+    }
+
+    /**
+     * Removes the oldest received asynchronous message from the incoming messages buffer.
+     */
+    public void flushFirstAsyncMessage(){
+        currentIncomingAsyncMessage = null;
     }
 
     private void outFlush(){
@@ -97,11 +131,13 @@ public class MessageBroker {
     }
 
     private void inFlush(){
-        incomingMessages = new ArrayBlockingQueue<>(BLOCKING_QUEUE_CAPACITY);
+        incomingSyncMessages = new ArrayBlockingQueue<>(BLOCKING_QUEUE_CAPACITY);
+        incomingAsyncMessages = new ArrayBlockingQueue<>(BLOCKING_QUEUE_CAPACITY);
     }
 
     /**
      * Send the message stored in the object as a JSON file to the specified output stream
+     * and then empties the message body for the next message to send
      * @param destinationOutput the OutputStream of the host to send the message to
      */
     public void send(OutputStream destinationOutput) throws IOException {
@@ -174,47 +210,44 @@ public class MessageBroker {
         Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
 
         if (checkValidity(deserializedMessage)) {
-            if(!incomingMessages.offer(deserializedMessage)){
-                System.err.println("ERROR: Message buffer full, the message was dropped");
+            if(isAsynchronous(deserializedMessage)){
+                if (!incomingAsyncMessages.offer(deserializedMessage)) {
+                    System.err.println("ERROR: Message buffer full, the message was dropped");
+                }
+            }
+            else {
+                if (!incomingSyncMessages.offer(deserializedMessage)) {
+                    System.err.println("ERROR: Message buffer full, the message was dropped");
+                }
             }
         }
     }
 
-
-
     /**
-     * Asks to lock the incoming buffer to process the message
-     * @return false if broker is already locked or if there's no incoming message
+     * An asynchronous message is a message sent by the server to the client when a client didn't
+     * specifically send a message first. An asynchronous message is characterized either by its
+     * request id, which will have different names depending on the type of message
+     * (specified in the relative Network field enumerator)
+     * @param deserializedMessage the message for which twe want to check its asynchronousness
+     * @return true if the message is asynchronous
      */
-    /*
-    public boolean lock(){//maybe this should just be synchronized
-        if (isReadyForNext()) {
-            if (incomingMessages.size() == 0) return false;
-            readyForNext = false;
+    private boolean isAsynchronous(Map<NetworkFieldEnum, Object> deserializedMessage) {
+        //Here we will check whether a message is one or the other looking at the id_request field
+        // for sync messages
+        if(deserializedMessage.get(NetworkFieldEnum.ID_REQUEST) == null &&
+            deserializedMessage.get(NetworkFieldEnum.ASYNC_ID_REQUEST) != null){
             return true;
         }
-        return false;
+        else return false;
     }
-    */
 
-    /**
-     * unlocks the incoming buffer and flushes the last executed message
-     */
-    /*
-    public void unlock(){
-        if (!isReadyForNext()) {
-            readyForNext = true;
-            flushFirstMessage();
-        }
-    }
-    */
     /**
      * Checks if the first message in the buffer is in a valid format
      * @return true if the message is valid, false otherwise
      */
     @Deprecated
     public boolean checkFirstValidity() throws InterruptedException{
-        return checkValidity(incomingMessages.take());
+        return checkValidity(incomingSyncMessages.take());
     }
 
     /**
@@ -315,8 +348,8 @@ public class MessageBroker {
     }
 
     //for testing purposes
-    public BlockingQueue<Map<NetworkFieldEnum, Object>> getIncomingMessages() {
-        return incomingMessages;
+    public BlockingQueue<Map<NetworkFieldEnum, Object>> getIncomingSyncMessages() {
+        return incomingSyncMessages;
     }
 
     //for testing purposes
@@ -329,6 +362,8 @@ public class MessageBroker {
      */
     @Deprecated
     public synchronized boolean messagePresent() {
-        return (incomingMessages.size() > 0);
+        return (incomingSyncMessages.size() > 0);
     }
+
+
 }

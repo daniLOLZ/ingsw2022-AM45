@@ -1,9 +1,8 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.network.client.ClientMain;
 import it.polimi.ingsw.network.Preferences;
-import it.polimi.ingsw.network.Server;
-import it.polimi.ingsw.view.CLI;
-import it.polimi.ingsw.view.UserInterface;
+import it.polimi.ingsw.network.server.Server;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,13 +35,13 @@ public class Eriantys {
         }
         if(GUIMode){
             //todo re-add functionality
-            //UserInterface gui = new GUIMain(hostname, portNumber);
+            //ClientMain client = new ClientMain(hostname, portNumber, true);
             //gui.startInterface();
             return;
         }
         if(CLIMode){
-            UserInterface cli = new CLI(hostname, portNumber);
-            cli.startInterface();
+            ClientMain client = new ClientMain(hostname, portNumber, false);
+            client.startApplication();
             return;
         }
     }
