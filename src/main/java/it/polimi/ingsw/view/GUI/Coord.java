@@ -2,7 +2,7 @@ package it.polimi.ingsw.view.GUI;
 
 public class Coord {
 
-    public final static int COUNTERCLOCKWISE = 1, CLOCKWISE = -1, NO_ROTATION = 0, UPSIDE_DOWN = 2;
+    public final static int  NO_ROTATION = 0, COUNTERCLOCKWISE = 1, UPSIDE_DOWN = 2, CLOCKWISE = 3, FULL_ROTATION = 4;
 
     public double x;
     public double y;

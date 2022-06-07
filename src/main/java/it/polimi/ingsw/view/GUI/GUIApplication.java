@@ -37,7 +37,7 @@ import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 public class GUIApplication extends Application implements UserInterface{
 
     public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
-    public final double cloudSize = 40, assistantWidth = 100, islandSize = 120;
+    public final double cloudSize = 40, assistantWidth = 100, islandSize = 120, boardWidth = 505;
 
     public static final double
             up      = 0,
@@ -472,7 +472,7 @@ public class GUIApplication extends Application implements UserInterface{
                 selectWizard.setText("Select " + wizard.name);
                 selectWizard.setVisible(true);
             });
-            addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1);
+            addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
             wizards.getChildren().add(wizardView);
         }
 
@@ -528,7 +528,7 @@ public class GUIApplication extends Application implements UserInterface{
                 selectTower.setText("Select " + tower.name);
                 selectTower.setVisible(true);
             });
-            addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1);
+            addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
             towers.getChildren().add(towerView);
         }
 
@@ -563,7 +563,7 @@ public class GUIApplication extends Application implements UserInterface{
         students.add(StudentEnum.YELLOW);
         students.add(StudentEnum.YELLOW);
 
-        AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,false, TeamEnum.WHITE, 4);
+        AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,true, TeamEnum.WHITE, 4);
 
         for (Coord slot: getIslandGroupSlots(4, 380, 140, center.pureSumY(-50))) {
             root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(bean, slot, islandSize / IslandDrawer.getIslandSize()));
@@ -597,22 +597,24 @@ public class GUIApplication extends Application implements UserInterface{
         professors.add(StudentEnum.RED);
 
         List<Integer> assistants = new ArrayList<>();
-        for (int assistant = 1; assistant <= 4; assistant++) {
+        for (int assistant = 1; assistant <= 10; assistant++) {
             assistants.add(assistant);
         }
 
-        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 1);
+        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 12);
 
-        BoardDrawer.drawBoard(board, downCenter.pureSumY(-145));
-        BoardDrawer.drawBoard(board, upCenter.pureSumY(70), 0.5, Coord.UPSIDE_DOWN);
-        BoardDrawer.drawBoard(board, centerLeft.pureSumX(200), 0.5, Coord.COUNTERCLOCKWISE);
-        BoardDrawer.drawBoard(board, centerRight.pureSumX(-200), 0.5, Coord.CLOCKWISE);
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, downCenter.pureSumY(-145), boardWidth / BoardDrawer.getBoardWidth()));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, upCenter.pureSumY(70), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), Coord.UPSIDE_DOWN));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerLeft.pureSumX(200), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), Coord.COUNTERCLOCKWISE));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerRight.pureSumX(-200), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), Coord.CLOCKWISE));
 
         int assistantIndex = 0;
 
         for (Integer assistant: board.getIdAssistants()) {
             Coord slot = firstAssistantSlot.pureSumX(assistantIndex++ * assistantWidth * 0.28 * 10 / board.getIdAssistants().size());
-            root.getChildren().addAll(AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth()));
+            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth());
+            addHoveringEffects(assistantView, slot, assistantWidth / AssistantDrawer.getAssistantWidth(), HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.7, false);
+            root.getChildren().add(assistantView);
         }
 
         //</editor-fold>

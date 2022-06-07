@@ -5,9 +5,11 @@ import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.GUIApplication;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,8 @@ public class IslandDrawer extends Drawer{
 
     private static final Coord MNSlot = GUIApplication.upLeftCorner.pureSumX(145).pureSumY(158),
                                towerSlot = GUIApplication.upLeftCorner.pureSumX(268).pureSumY(-230);
+
+    private static final double blockTileOffset = 20, blockTileGap = 15;
 
     private static final double defaultWoodenSize = 130;
     private static final double specialWoodenSize = 220;
@@ -54,8 +58,12 @@ public class IslandDrawer extends Drawer{
 
         List<Node> toDraw = new ArrayList<>();
 
+        List<EventHandler<MouseEvent>> entered = new ArrayList<>();
+        List<EventHandler<MouseEvent>> exited = new ArrayList<>();
+
         //draw island
-        toDraw.add(drawFromCenterInteractiveImage(islands.get((id - firstIslandId) % differentIslandTiles), pos, scale, HandlingToolbox.NO_EFFECT));
+        ImageView islandView = drawFromCenterInteractiveImage(islands.get((id - firstIslandId) % differentIslandTiles), pos, scale, HandlingToolbox.NO_EFFECT);
+        toDraw.add(islandView);
 
         //draw students
         if (students.size() <= studentsOnIslandSlots.size()) {
@@ -63,27 +71,68 @@ public class IslandDrawer extends Drawer{
 
             for (StudentEnum student:
                  students) {
-                toDraw.add(
-                        StudentDrawer.drawStudent(
-                                student,
-                                pos.pureSumX(studentsOnIslandSlots.get(studentIndex).x * scale).pureSumY(studentsOnIslandSlots.get(studentIndex).y * scale),
-                                defaultWoodenSize / StudentDrawer.getStudentSize() * scale));
+
+                ImageView studentView = StudentDrawer.drawStudent(
+                        student,
+                        pos.pureSumX(studentsOnIslandSlots.get(studentIndex).x * scale).pureSumY(studentsOnIslandSlots.get(studentIndex).y * scale),
+                        defaultWoodenSize / StudentDrawer.getStudentSize() * scale);
+
+                toDraw.add(studentView);
+
+                int finalStudentIndex = studentIndex;
+                entered.add(getChildrenEnteredZoom(studentView, studentsOnIslandSlots.get(studentIndex), scale, hoverZoom, islandView));
+
+                exited.add(getChildrenExitedZoom(studentView, studentsOnIslandSlots.get(studentIndex), scale, hoverZoom, islandView));
+
                 studentIndex++;
             }
         }
 
         //draw tower
-        toDraw.add(TowerDrawer.drawTower(towerColor, pos.pureSumX(towerSlot.x * scale).pureSumY(towerSlot.y * scale), specialWoodenSize / TowerDrawer.getTowerSize() * scale));
+        ImageView towerView = TowerDrawer.drawTower(towerColor, pos.pureSumX(towerSlot.x * scale).pureSumY(towerSlot.y * scale), specialWoodenSize / TowerDrawer.getTowerSize() * scale);
+        toDraw.add(towerView);
 
-        //draw mother nature (if present)
-        if (isPresentMotherNature) toDraw.add(MotherNatureDrawer.drawMotherNature(pos.pureSumX(MNSlot.x * scale).pureSumY(MNSlot.y), specialWoodenSize / MotherNatureDrawer.getMotherNatureSize() * scale));
+        entered.add(getChildrenEnteredZoom(towerView, towerSlot, scale, hoverZoom, islandView));
+        exited.add(getChildrenExitedZoom(towerView, towerSlot, scale, hoverZoom, islandView));
 
         //draw block tiles
-        for (int blockTile = 0; blockTile < numBlockTile; blockTile++) {
-            toDraw.add(BlockTileDrawer.drawBlockTile(pos.pureSumX((MNSlot.x + 15 * blockTile) * scale).pureSumY((MNSlot.y + 20 + 15 * blockTile) * scale), specialWoodenSize /BlockTileDrawer.getBlockTileSize() * scale));
+
+        List<Coord> blockTilesSlots = getBlockTileSlots(numBlockTile);
+
+        for (Coord blockTileSlot : blockTilesSlots) {
+
+            ImageView blockTileView = BlockTileDrawer.drawBlockTile(pos.pureSumX(blockTileSlot.x * scale).pureSumY(blockTileSlot.y * scale), specialWoodenSize / BlockTileDrawer.getBlockTileSize() * scale);
+            toDraw.add(blockTileView);
+
+            entered.add(getChildrenEnteredZoom(blockTileView, blockTileSlot, scale, hoverZoom, islandView));
+            exited.add(getChildrenExitedZoom(blockTileView, blockTileSlot, scale, hoverZoom, islandView));
         }
 
-        addHoveringEffects( (ImageView) toDraw.get(0), pos, scale, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, hoverZoom, toDraw.subList(1, toDraw.size()));
+        //draw mother nature (if present)
+        if (isPresentMotherNature) {
+            ImageView motherNatureView = MotherNatureDrawer.drawMotherNature(pos.pureSumX(MNSlot.x * scale).pureSumY(MNSlot.y * scale), specialWoodenSize / MotherNatureDrawer.getMotherNatureSize() * scale);
+            toDraw.add(motherNatureView);
+            entered.add(getChildrenEnteredZoom(motherNatureView, MNSlot, scale, hoverZoom, islandView));
+            exited.add(getChildrenExitedZoom(motherNatureView, MNSlot, scale, hoverZoom, islandView));
+        }
+
+        EventHandler<MouseEvent> zoomChildren = event -> {
+
+            for (EventHandler<MouseEvent> handler:
+                 entered) {
+                handler.handle(event);
+            }
+        };
+
+        EventHandler<MouseEvent> shrinkChildren = event -> {
+
+            for (EventHandler<MouseEvent> handler:
+                 exited) {
+                handler.handle(event);
+            }
+        };
+
+        addHoveringEffects( (ImageView) toDraw.get(0), pos, scale, zoomChildren, shrinkChildren, hoverZoom, toDraw.subList(1, toDraw.size()));
 
         return toDraw;
     }
@@ -94,6 +143,20 @@ public class IslandDrawer extends Drawer{
 
     public static double getIslandSize() {
         return islandSize;
+    }
+
+    private static List<Coord> getBlockTileSlots(int amount){
+
+        Coord start = GUIApplication.upLeftCorner;
+
+        List<Coord> slots = new ArrayList<>();
+
+        for (int blockTile = 0; blockTile < amount; blockTile++) {
+
+            slots.add(start.pureSumX(MNSlot.x + blockTileGap * blockTile).pureSumY(MNSlot.y + blockTileOffset + blockTileGap * blockTile));
+        }
+
+        return slots;
     }
 }
 

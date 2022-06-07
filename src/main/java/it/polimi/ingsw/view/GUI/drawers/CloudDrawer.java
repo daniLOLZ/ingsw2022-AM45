@@ -4,10 +4,12 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.CloudBean;
 import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class CloudDrawer extends Drawer{
 
     private static final double studentSize = 420;
     private static final double cloudSize = clouds.get(0).getWidth();
+    private static final double hoverZoom = 2.4;
 
     public static List<Node> drawCloud(CloudBean data, Coord pos, double scale){
 
@@ -35,18 +38,46 @@ public class CloudDrawer extends Drawer{
         List<StudentEnum> students = data.getStudents();
         List<Coord> slots = getStudentsSlot(students.size());
 
+        List<EventHandler<MouseEvent>> entered = new ArrayList<>();
+        List<EventHandler<MouseEvent>> exited = new ArrayList<>();
+
+
         //draw cloud
-        toDraw.add(drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, HandlingToolbox.NO_EFFECT));
+        ImageView cloudView = drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, HandlingToolbox.NO_EFFECT);
+        toDraw.add(cloudView);
 
         int index = 0;
         //draw students
         for (StudentEnum student: students) {
-            toDraw.add(StudentDrawer.drawStudent(
+
+            Coord studentSlot = slots.get(index);
+
+            ImageView studentView = StudentDrawer.drawStudent(
                     student,
-                    pos.pureSumX(slots.get(index).x * scale).pureSumY(slots.get(index).y * scale),
-                    studentSize / StudentDrawer.getStudentSize() * scale));
+                    pos.pureSumX(studentSlot.x * scale).pureSumY(studentSlot.y * scale),
+                    studentSize / StudentDrawer.getStudentSize() * scale);
+
+            toDraw.add(studentView);
+
+            entered.add(getChildrenEnteredZoom(studentView, studentSlot, scale, hoverZoom, cloudView));
+            exited.add(getChildrenExitedZoom(studentView, studentSlot, scale, hoverZoom, cloudView));
+
             index++;
         }
+
+        EventHandler<MouseEvent> zoomChildren = event -> {
+            for (EventHandler<MouseEvent> handler: entered) {
+                handler.handle(event);
+            }
+        };
+
+        EventHandler<MouseEvent> shrinkChildren = event -> {
+            for (EventHandler<MouseEvent> handler: exited) {
+                handler.handle(event);
+            }
+        };
+
+        addHoveringEffects(cloudView, pos, scale, zoomChildren, shrinkChildren, hoverZoom, toDraw.subList(1, toDraw.size()));
 
         return toDraw;
     }

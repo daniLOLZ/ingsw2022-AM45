@@ -33,7 +33,7 @@ public class IslandGroupDrawer extends Drawer{
         int blockTilesPerIsland = getNumBlockTilePerIsland(numBlockTiles, numIslands);
         int blockTilesToDraw = blockTilesPerIsland;
 
-        boolean drawMN = false;
+        boolean drawMN;
 
         int index = 0;
 

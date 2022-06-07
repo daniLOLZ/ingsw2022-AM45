@@ -13,6 +13,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +81,7 @@ public abstract class Drawer{
         return imageView;
     }
 
-    public static void addHoveringEffects(ImageView imageView, Coord pos, double scale,EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom){
+    public static void addHoveringEffects(ImageView imageView, Coord pos, double scale,EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, boolean bringToFront){
 
         List<Node> allNodes = new ArrayList<>();
 
@@ -87,32 +90,35 @@ public abstract class Drawer{
         if (hoverZoom != 1){
 
             imageView.setOnMouseEntered(event -> {
-                //todo create a new class that will look for the node containing the ImageView. This is now blocking the GUI
-                allNodes.addAll(imageView.getScene().getRoot().getChildrenUnmodifiable());
+                if (bringToFront) {
+                    allNodes.addAll(imageView.getParent().getChildrenUnmodifiable());
 
-                if (!allNodes.isEmpty()) {
-                    aboveNodes.addAll(allNodes.subList(allNodes.indexOf(imageView), allNodes.size()));
+                    if (!allNodes.isEmpty()) {
+                        aboveNodes.addAll(allNodes.subList(allNodes.indexOf(imageView), allNodes.size()));
+                    }
                 }
 
-                getOnMouseEnteredHandler(imageView, pos, scale, entered, hoverZoom).handle(event);
+                getOnMouseEnteredHandler(imageView, pos, scale, entered, hoverZoom, bringToFront).handle(event);
             });
 
             imageView.setOnMouseExited(event -> {
-                for (Node node:
-                     aboveNodes) {
-                    node.toFront();
+                if (bringToFront) {
+                    for (Node node:
+                         aboveNodes) {
+                        node.toFront();
+                    }
                 }
 
-                getOnMouseExitedHandler(imageView, pos, scale, exited);
+                getOnMouseExitedHandler(imageView, pos, scale, exited).handle(event);
             });
         }
     }
 
-    private static EventHandler<MouseEvent> getOnMouseEnteredHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, double hoverZoom) {
+    private static EventHandler<MouseEvent> getOnMouseEnteredHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, double hoverZoom, boolean bringToFront) {
         return event -> {
 
             enterZoom(imageView, pos, scale, hoverZoom).handle(event);
-            imageView.toFront();
+            if (bringToFront)imageView.toFront();
             entered.handle(event);
 
         };
@@ -127,14 +133,25 @@ public abstract class Drawer{
     }
 
     public static void addHoveringEffects(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, List<Node> children){
-        addHoveringEffects(imageView, pos, scale, entered, exited, hoverZoom);
+        addHoveringEffects(imageView, pos, scale, event -> {
+            entered.handle(event);
+            for (Node child:
+                 children) {
+                child.toFront();
+            }
+        }, exited, hoverZoom, true);
 
         for (Node child:
              children) {
 
-            child.toFront();
+            child.setOnMouseEntered(getOnMouseEnteredHandler(imageView, pos, scale, event -> {
+                entered.handle(event);
+                for (Node brother:
+                     children) {
+                    brother.toFront();
+                }
 
-            child.setOnMouseEntered(getOnMouseEnteredHandler(imageView, pos, scale, entered, hoverZoom));
+            }, hoverZoom, true));
 
             child.setOnMouseExited(getOnMouseExitedHandler(imageView, pos, scale, exited));
         }
@@ -170,6 +187,132 @@ public abstract class Drawer{
             imageView.setX(pos.x - scale * image.getWidth() / 2);
             imageView.setY(pos.y - scale * image.getHeight() / 2);
 
+        };
+    }
+
+    public static EventHandler<MouseEvent> getChildrenEnteredZoom(ImageView children, Coord slot, double scale, double hoverZoom, ImageView parentView){
+        return event -> {
+            children.setFitWidth(children.getFitWidth() * hoverZoom);
+            children.setFitHeight(children.getFitHeight() * hoverZoom);
+            children.setX(slot.x * scale * hoverZoom + parentView.getX() + parentView.getFitWidth() / 2 - children.getFitWidth() / 2);
+            children.setY(slot.y * scale * hoverZoom + parentView.getY() + parentView.getFitHeight() / 2 - children.getFitHeight() / 2);
+        };
+    }
+
+    public static EventHandler<MouseEvent> getChildrenExitedZoom(ImageView children, Coord slot, double scale, double hoverZoom, ImageView parentView){
+        return event -> {
+            children.setFitWidth(children.getFitWidth() / hoverZoom);
+            children.setFitHeight(children.getFitHeight() / hoverZoom);
+            children.setX(slot.x * scale + parentView.getX() + parentView.getFitWidth() / 2 - children.getFitWidth() / 2);
+            children.setY(slot.y * scale + parentView.getY() + parentView.getFitHeight() / 2 - children.getFitHeight() / 2);
+        };
+    }
+
+    public static EventHandler<MouseEvent> getChildrenEnteredZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
+
+        double childWidth, childHeight, parentWidth, parentHeight;
+
+        if (rotation == Coord.CLOCKWISE || rotation == Coord.COUNTERCLOCKWISE){
+
+            childWidth = rectangle.getHeight();
+            childHeight = rectangle.getWidth();
+            parentWidth = parentView.getFitHeight();
+            parentHeight = parentView.getFitWidth();
+        }
+
+        else {
+            childWidth = rectangle.getWidth();
+            childHeight = rectangle.getHeight();
+            parentWidth = parentView.getFitWidth();
+            parentHeight = parentView.getFitHeight();
+        }
+
+        return event -> {
+            rectangle.setWidth(rectangle.getWidth() * hoverZoom);
+            rectangle.setHeight(rectangle.getHeight() * hoverZoom);
+            rectangle.setX(parentView.getX() + parentWidth * hoverZoom / 2 + slot.x * scale * hoverZoom - childWidth * hoverZoom / 2);
+            rectangle.setY(parentView.getY() + parentHeight * hoverZoom / 2 + slot.y * scale * hoverZoom - childHeight * hoverZoom / 2);
+        };
+    }
+
+    public static EventHandler<MouseEvent> getChildrenExitedZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
+
+        double childWidth, childHeight, parentWidth, parentHeight;
+
+        if (rotation == Coord.CLOCKWISE || rotation == Coord.COUNTERCLOCKWISE){
+
+            childWidth = rectangle.getHeight();
+            childHeight = rectangle.getWidth();
+            parentWidth = parentView.getFitHeight();
+            parentHeight = parentView.getFitWidth();
+        }
+
+        else {
+            childWidth = rectangle.getWidth();
+            childHeight = rectangle.getHeight();
+            parentWidth = parentView.getFitWidth();
+            parentHeight = parentView.getFitHeight();
+        }
+
+        return event -> {
+            rectangle.setWidth(rectangle.getWidth() / hoverZoom);
+            rectangle.setHeight(rectangle.getHeight() / hoverZoom);
+            rectangle.setX(parentView.getX() + parentWidth / 2 + slot.x * scale - childWidth / 2);
+            rectangle.setY(parentView.getY() + parentHeight / 2 + slot.y * scale - childHeight / 2);
+        };
+    }
+
+    public static EventHandler<MouseEvent> getChildrenEnteredZoom(Text text, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
+
+        double childWidth, childHeight, parentWidth, parentHeight;
+
+        if (rotation == Coord.CLOCKWISE || rotation == Coord.COUNTERCLOCKWISE){
+
+            childWidth = text.minHeight(-1);
+            childHeight = text.getWrappingWidth();
+            parentWidth = parentView.getFitHeight();
+            parentHeight = parentView.getFitWidth();
+        }
+
+        else {
+            childWidth = text.getWrappingWidth();
+            childHeight = text.minHeight(-1);
+            parentWidth = parentView.getFitWidth();
+            parentHeight = parentView.getFitHeight();
+        }
+
+        return event -> {
+            text.setX(parentView.getX() + parentWidth * hoverZoom / 2 + slot.x * scale * hoverZoom - childWidth * hoverZoom / 2);
+            text.setY(parentView.getY() + parentHeight * hoverZoom / 2 + slot.y * scale * hoverZoom - childHeight * hoverZoom / 2);
+            text.setWrappingWidth(text.getWrappingWidth() * hoverZoom);
+            text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() * hoverZoom));
+        };
+    }
+
+    public static EventHandler<MouseEvent> getChildrenExitedZoom(Text text, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
+
+        double childWidth, childHeight, parentWidth, parentHeight;
+
+        if (rotation == Coord.CLOCKWISE || rotation == Coord.COUNTERCLOCKWISE){
+
+            childWidth = text.minHeight(-1);
+            childHeight = text.getWrappingWidth();
+            parentWidth = parentView.getFitHeight();
+            parentHeight = parentView.getFitWidth();
+        }
+
+        else {
+            childWidth = text.getWrappingWidth();
+            childHeight = text.minHeight(-1);
+            parentWidth = parentView.getFitWidth();
+            parentHeight = parentView.getFitHeight();
+        }
+
+        return event -> {
+            text.setX(parentView.getX() + parentWidth / 2 + slot.x * scale - childWidth / 2);
+            text.setY(parentView.getY() + parentHeight / 2 + slot.y * scale - childHeight / 2);
+            text.setWrappingWidth(text.getWrappingWidth() / hoverZoom);
+            text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() / hoverZoom));
         };
     }
 }

@@ -112,10 +112,8 @@ public class CharacterCardDrawer extends Drawer{
 
             for (ImageView studentView:
                  studentViews) {
-                studentView.setX(studentsSlots.get(index).x * scale * hoverZoom + characterView.getX() + characterView.getFitWidth() / 2 - childrenSize * scale * hoverZoom / 2);
-                studentView.setY(studentsSlots.get(index).y * scale * hoverZoom + characterView.getY() + characterView.getFitHeight() / 2 - childrenSize * scale * hoverZoom / 2);
-                studentView.setFitWidth(studentView.getFitWidth() * hoverZoom);
-                studentView.setFitHeight(studentView.getFitHeight() * hoverZoom);
+
+                getChildrenEnteredZoom(studentView, studentsSlots.get(index), scale, hoverZoom, characterView).handle(event);
 
                 index++;
             }
@@ -129,10 +127,7 @@ public class CharacterCardDrawer extends Drawer{
 
             for (ImageView studentView:
                     studentViews) {
-                studentView.setX(studentsSlots.get(index).x * scale + characterView.getX() + characterView.getFitWidth() / 2 - childrenSize * scale / 2);
-                studentView.setY(studentsSlots.get(index).y * scale + characterView.getY() + characterView.getFitHeight() / 2 - childrenSize * scale / 2);
-                studentView.setFitWidth(studentView.getFitWidth() / hoverZoom);
-                studentView.setFitHeight(studentView.getFitHeight() / hoverZoom);
+                getChildrenExitedZoom(studentView, studentsSlots.get(index), scale, hoverZoom, characterView).handle(event);
 
                 index++;
             }
