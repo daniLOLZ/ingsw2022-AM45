@@ -37,7 +37,13 @@ public enum NetworkFieldEnum {
     ENTRANCE_REQUIRED("entranceRequired"),
     COLORS_REQUIRED("colorRequired"),
     ISLANDS_REQUIRED("islandsRequired"),
-    ON_CARD_REQUIRED("onCardRequired");
+    ON_CARD_REQUIRED("onCardRequired"),
+
+    //Asynchronous fields
+    ASYNC_ID_REQUEST("asyncIdRequest"),
+    ASYNC_ID_USER("asyncIdUser"),
+    ASYNC_GAME_PHASE("asyncGamePhase"),
+    ASYNC_VIEW("asyncView");
 
     private String fieldName;
 

@@ -13,7 +13,7 @@ public class PlayerCreation {
     protected final List<TeamEnum> teamColor;
     protected final List<String> nicknames;
     private final List<Integer> wizards; // Wizard ids
-
+    private boolean modified;
 
     public PlayerCreation(Controller controller){
         this.controller = controller;
@@ -28,6 +28,8 @@ public class PlayerCreation {
             nicknames.add(user,null);
             wizards.add(user,null);
         }
+
+        modified = false;
     }
 
     /**
@@ -92,6 +94,7 @@ public class PlayerCreation {
                     .filter(Objects::nonNull)
                     .noneMatch(otherTeam -> team.index == otherTeam.index)){
                 teamColor.set(user, team);
+                modified = true;
                 return true;
             }
         }
@@ -104,6 +107,7 @@ public class PlayerCreation {
                         .filter(otherTeam -> otherTeam.index == team.index).count();
                 if(sameColor <= 1){
                     teamColor.set(user, team);
+                    modified = true;
                     return true;
                 }
             }
@@ -118,6 +122,7 @@ public class PlayerCreation {
      */
     public synchronized void clearTeamColor(int user){
         teamColor.set(user, null);
+        modified = true;
     }
 
     /**
@@ -144,6 +149,7 @@ public class PlayerCreation {
             return false;
 
         wizards.set(user, idWizard);
+        modified = true;
         return true;
     }
 
@@ -153,6 +159,7 @@ public class PlayerCreation {
      */
     public synchronized void clearWizard(int user){
         wizards.set(user, null);
+        modified = true;
     }
 
     /**
@@ -189,5 +196,13 @@ public class PlayerCreation {
 
     public List<Integer> getWizards() {
         return wizards;
+    }
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
     }
 }

@@ -30,7 +30,7 @@ public class GameBoardBean extends GameElementBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.GAMEBOARD_BEAN;
     }
 

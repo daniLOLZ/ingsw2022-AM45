@@ -17,7 +17,7 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.ADVANCED_ISLANDGROUP_BEAN;
     }
 

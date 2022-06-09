@@ -14,7 +14,7 @@ public final class LobbyBean implements Bean {
     //todo add gameType
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.LOBBY_BEAN;
     }
 
@@ -36,6 +36,8 @@ public final class LobbyBean implements Bean {
     public boolean isGameStarted() {
         return gameStarted;
     }
+
+    public int getHost(){return host;}
 
     @Override
     public boolean equals(Object o) {

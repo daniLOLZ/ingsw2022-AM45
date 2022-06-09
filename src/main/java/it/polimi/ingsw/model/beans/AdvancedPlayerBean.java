@@ -20,7 +20,7 @@ public class AdvancedPlayerBean extends PlayerBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.ADVANCED_PLAYER_BEAN;
     }
 

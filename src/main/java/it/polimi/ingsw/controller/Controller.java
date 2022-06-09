@@ -9,9 +9,8 @@ import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.game.SimpleGame;
 import it.polimi.ingsw.view.VirtualView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -31,10 +30,13 @@ public class Controller {
     protected IslandHandler islandHandler;
     protected VirtualView virtualView;
 
+    //these two might be redundant
     private ReentrantLock teamLock;
     private ReentrantLock wizardLock;
+
     public ReentrantLock startLock; // not the greatest to be put public but it's needed in the GameInitHandler
     private boolean gameStarted;
+    private AtomicBoolean gameUpdated;
 
     /**
      * Creates a new game controller
@@ -50,7 +52,7 @@ public class Controller {
         wizardLock = new ReentrantLock();
         startLock = new ReentrantLock();
         gameStarted = false;
-
+        gameUpdated = new AtomicBoolean(true);
         // Should we create it here or when the game starts?
         createView();
     }
@@ -174,7 +176,7 @@ public class Controller {
     }
 
     /**
-     * Once the relevant information have been obtained, creates and starts the actual game
+     * Once the relevant information has been obtained, creates and starts the actual game
      * @return true if the game was created successfully
      */
     public synchronized boolean startPlayingGame(){
@@ -195,8 +197,22 @@ public class Controller {
         return true;
     }
 
+
+    /**
+     * Checks whether all wizards and towers have been chosen for this game
+     * @return true if all selections were made and the game started
+     */
     public synchronized boolean isGameStarted(){
         return this.gameStarted;
+    }
+
+    /**
+     * Sets the flag used for detecting whether the game started to true
+     */
+    //todo maybe instead of unsetting this flag, make the clientHandler remember whether the user
+    // already joined the game
+    public void unsetGameStarted(){
+        this.gameStarted = false;
     }
 
     /**
@@ -227,12 +243,20 @@ public class Controller {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Checks whether all wizards and towers have been chosen for this game
-     * @return true if all selections were made and the game started
-     */
-    public boolean allSelectionsMadeGameStart(){
-        return gameStarted;
+    public boolean isPlayerCreationModified() {
+        return playerCreation.isModified();
+    }
+
+    public void setPlayerCreationModified(boolean modified) {
+        playerCreation.setModified(modified);
+    }
+
+    public boolean isGameUpdated(){
+        return gameUpdated.get();
+    }
+
+    public void setGameUpdated(boolean value){
+        gameUpdated.set(value);
     }
 
     /*____________________________
@@ -264,7 +288,7 @@ public class Controller {
      * @param idUser the user that selects the wizard
      * @return true if the assignment succeeded
      */
-    public boolean setWizard(Integer idWizard, Integer idUser) {
+    public synchronized boolean setWizard(Integer idWizard, Integer idUser) {
         int position = getPositionFromUserId(idUser);
         if (position >= 0){
             //The user might have already selected a wizard and changed their mind
@@ -294,7 +318,7 @@ public class Controller {
      * @param idUser the user that chooses the team
      * @return true if the new assignment succeeded
      */
-    public boolean setTeamColor(TeamEnum towerColor, Integer idUser) {
+    public synchronized boolean setTeamColor(TeamEnum towerColor, Integer idUser) {
         int position = getPositionFromUserId(idUser);
 
         if (position >= 0) {
@@ -507,4 +531,5 @@ public class Controller {
         /*TODO invia la view a tutti gli user della lobby incriminata */
         //TODO chiudi le connessioni
     }
+
 }
