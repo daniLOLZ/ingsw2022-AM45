@@ -24,7 +24,7 @@ public class ClientReceiver {
     private MessageBroker mainBroker;
     private AtomicBoolean connected;
 
-    private ReentrantLock brokerLock;
+    private AtomicBoolean isCommandScheduled;
     private final InitialConnector initialConnector; //Used only to communicate network error to the sender
     private final ClientController clientController;
 
@@ -34,12 +34,12 @@ public class ClientReceiver {
         this.clientController = new ClientController();
     }
 
-    public void initialize(InputStream inputStream, MessageBroker mainBroker, AtomicBoolean connected, ReentrantLock brokerLock) {
+    public void initialize(InputStream inputStream, MessageBroker mainBroker, AtomicBoolean connected, AtomicBoolean isCommandScheduled) {
         this.inputStream = inputStream;
         this.mainBroker = mainBroker;
         clientController.setBroker(mainBroker);
         this.connected = connected;
-        this.brokerLock = brokerLock;
+        this.isCommandScheduled = isCommandScheduled;
         receiveMessages();
         parseAsyncMessages();
     }
@@ -80,7 +80,7 @@ public class ClientReceiver {
             //This locking/unlocking across different classes might lead to some errors, be careful
             // are we sure it's the same thread that's requesting and releasing the lock?
             // After the first command, theoretically yes
-            brokerLock.unlock();
+            isCommandScheduled.set(false);
 
             switch (CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND))) {
                 //Synchronous commands
@@ -92,6 +92,7 @@ public class ClientReceiver {
                 case LEAVE_LOBBY -> clientController.validateLobbyLeave();
                 case SELECT_TOWER_COLOR -> clientController.validateSelectTeamColor();
                 case SELECT_WIZARD -> clientController.validateSelectWizard();
+                //todo
                 case QUIT -> closeConnection();
                 default -> closeConnection();
                 //todo make the response to QUIT its own method, right now it's the same as if a network error occurred

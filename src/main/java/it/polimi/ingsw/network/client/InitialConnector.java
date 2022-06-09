@@ -21,7 +21,7 @@ public class InitialConnector {
     private PingHandler pingHandler;
 
     private AtomicBoolean connected;
-    private ReentrantLock brokerLock; //Related to the main broker
+    private AtomicBoolean isCommandScheduled; //Related to the main broker
 
 
     public InitialConnector(String hostname, int portNumber){
@@ -31,7 +31,7 @@ public class InitialConnector {
         this.mainBroker = new MessageBroker();
         this.pingBroker = new MessageBroker();
         this.connected = new AtomicBoolean(true); //the ping routine will start before this field has been checked
-        this.brokerLock = new ReentrantLock();
+        this.isCommandScheduled = new AtomicBoolean(false);
     }
 
     /**
@@ -64,10 +64,10 @@ public class InitialConnector {
         this.pingHandler = new PingHandler(this, pingBroker, pingSocket);
 
         //Start the sender
-        sender.initialize(outputStream, mainBroker, connected, brokerLock);
+        sender.initialize(outputStream, mainBroker, connected, isCommandScheduled);
 
         //Start the receiver
-        receiver.initialize(inputStream, mainBroker, connected, brokerLock);
+        receiver.initialize(inputStream, mainBroker, connected, isCommandScheduled);
 
         sender.sendNickname(nickname);
 

@@ -137,6 +137,7 @@ public class ClientController {
     public void handleLobbyStart(){
         userInterface.setLobbyStarting(); //This will make the other method, showLobby, return after
                                         // the atomic boolean has been set
+        userInterface.showTowerAndWizardSelection();
     }
 
     public void handleGameInitUpdate(){
@@ -148,6 +149,7 @@ public class ClientController {
     public void handleGameStart(){
         userInterface.setGameStarting(); //This will make the other method, showTowerAndWizardSelection, return
                                         // after the atomic boolean has been set
+        userInterface.showGameInterface();
     }
 
     public void handleTurnUpdate(){

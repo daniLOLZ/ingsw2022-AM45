@@ -9,7 +9,6 @@ import it.polimi.ingsw.network.NetworkFieldEnum;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,11 +24,7 @@ public class ClientSender {
     private AtomicBoolean connected;
     private int progressiveIdRequest;
     private int idUser;
-    private ReentrantLock brokerLock;
-    //This lock is necessary because various methods add to the outgoing message
-    // in an asynchronous way, thus they might mix up their inputs or overwrite previous ones
-    // this lock needs to be set before each new message is starting to be built
-    // generally, that means before any method adds the NetworkEnum.COMMAND value to the message
+    private AtomicBoolean isCommandScheduled;
     private InitialConnector initialConnector; //Used only to communicate network error to the receiver
 
     public ClientSender(InitialConnector initialConnector){
@@ -37,12 +32,11 @@ public class ClientSender {
         progressiveIdRequest = 1;
     }
 
-    public void initialize(OutputStream outputStream, MessageBroker mainBroker, AtomicBoolean connected, ReentrantLock brokerLock) {
+    public void initialize(OutputStream outputStream, MessageBroker mainBroker, AtomicBoolean connected, AtomicBoolean isCommandScheduled) {
         this.outputStream = outputStream;
         this.mainBroker = mainBroker;
         this.connected = connected;
-        this.brokerLock = brokerLock;
-        this.outputStream = outputStream;
+        this.isCommandScheduled = isCommandScheduled;
     }
 
     /*
@@ -52,10 +46,11 @@ public class ClientSender {
     /**
      * Sends the chosen nickname to the server to evaluate whether it's acceptable or not
      * @param nickname the nickname chosen by the user
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void sendNickname(String nickname){
+    public boolean sendNickname(String nickname){
 
-        if(!acquireLock()) return;
+        if(!acquireSendingRights()) return false;
 // This command exclusively won't require the lock to be acquired, to allow for the revving up of the
 // sending / receiving system
 
@@ -63,14 +58,16 @@ public class ClientSender {
         mainBroker.addToMessage(NetworkFieldEnum.NICKNAME, nickname);
 
         sendToServer();
+        return true;
     }
 
     /**
      * Sends the gamerule preferences to the server
      * @param gamemode the gamemode chosen, "1" for Simple, "2" for Advanced
      * @param numPlayers the number of players chosen
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void sendGameModePreference(int gamemode, int numPlayers){
+    public boolean sendGameModePreference(int gamemode, int numPlayers){
 
         GameRuleEnum rule;
         //Converts the input to a gamerule
@@ -79,22 +76,24 @@ public class ClientSender {
         }
         else rule = GameRuleEnum.getAdvancedRule(numPlayers);
 
-        if(!acquireLock()) return;
+        if(!acquireSendingRights()) return false;
 
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PLAY_GAME);
         mainBroker.addToMessage(NetworkFieldEnum.GAME_RULE, rule);
 
         sendToServer();
 
+        return true;
     }
 
     /**
      * Updates the server on the readiness of the user
      * @param ready true if the client is signaling that they're ready
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void sendReadyStatus(boolean ready){
+    public boolean sendReadyStatus(boolean ready){
 
-        if(!acquireLock()) return;
+        if(!acquireSendingRights()) return false;
 
         if (ready) {
             mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.READY_TO_START);
@@ -102,28 +101,33 @@ public class ClientSender {
             mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.NOT_READY);
         }
         sendToServer();
+        return true;
     }
 
     /**
      * Tries to start the game from the lobby
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void startGame(){
+    public boolean startGame(){
 
-        if(!acquireLock()) return;
+        if(!acquireSendingRights()) return false;
 
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.START_GAME);
         sendToServer();
+        return true;
     }
 
     /**
      * The user asks to leave the current lobby
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void leaveLobby(){
+    public boolean leaveLobby(){
 
-        if(!acquireLock()) return;
+        if(!acquireSendingRights()) return false;
 
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.LEAVE_LOBBY);
         sendToServer();
+        return true;
 
     }
 
@@ -131,28 +135,32 @@ public class ClientSender {
      * Sends the color preference for the game
      * @param colorChosen the color (white, grey or black, depending on the game mode)
      *                    the user chooses
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void sendTeamColorChoice(TeamEnum colorChosen){
+    public boolean sendTeamColorChoice(TeamEnum colorChosen){
 
-        if(!acquireLock()) return;
+        if(!acquireSendingRights()) return false;
 
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_TOWER_COLOR);
         mainBroker.addToMessage(NetworkFieldEnum.ID_TOWER_COLOR, colorChosen.index);
 
         sendToServer();
+        return true;
     }
 
     /**
      * Sends the wizard chosen for this game
      * @param wizardChosen the wizard, among the 4 available, chosen by the user
+     * @return true if the message was successfully sent, false if nothing was sent to the server
      */
-    public void sendWizardChoice(WizardEnum wizardChosen){
-        if(!acquireLock()) return;
+    public boolean sendWizardChoice(WizardEnum wizardChosen){
+        if(!acquireSendingRights()) return false;
 
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_WIZARD);
         mainBroker.addToMessage(NetworkFieldEnum.ID_WIZARD, wizardChosen.index);
 
         sendToServer();
+        return true;
     }
 
     /*
@@ -214,11 +222,18 @@ public class ClientSender {
     }
 
     /**
-     * Tries to acquire the lock via the tryLock method
-     * @return true if the lock was successfully acquired, false otherwise
+     * Tries to acquire sending rights by checking the atomic boolean.
+     * @return true if the boolean was successfully set, false otherwise
      */
-    private boolean acquireLock() {
-        return brokerLock.tryLock();
+    private synchronized boolean acquireSendingRights() {
+        //It's not atomic but it does not cause problems with the other thread since
+        // this method is synchronized
+       if(isCommandScheduled.get()){
+           return false;
+       } else {
+           isCommandScheduled.set(true);
+           return true;
+       }
     }
 
 

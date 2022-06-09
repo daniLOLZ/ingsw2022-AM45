@@ -50,8 +50,8 @@ public class CLI implements UserInterface {
     public CLI(InitialConnector initialConnector){
         beans = new ArrayList<>();
         availableCommands = new ArrayList<>();
-        View = new StringBuilder("");
-        LastView = new StringBuilder("");
+        View = new StringBuilder();
+        LastView = new StringBuilder();
         LastElement = new StringBuilder();
 
         numberOfPlayers = 0;
@@ -70,8 +70,8 @@ public class CLI implements UserInterface {
     public CLI(){
         beans = new ArrayList<>();
         availableCommands = new ArrayList<>();
-        View = new StringBuilder("");
-        LastView = new StringBuilder("");
+        View = new StringBuilder();
+        LastView = new StringBuilder();
         LastElement = new StringBuilder();
         inLobby = false;
     }
@@ -368,7 +368,6 @@ public class CLI implements UserInterface {
             selection = getInputNonBlocking(reader, lobbyStarting);
 
             if (lobbyStarting.get()){
-                showTowerAndWizardSelection();
                 break;
             }
 
@@ -403,9 +402,8 @@ public class CLI implements UserInterface {
     @Override
     public void showSuccessStartGame() {
         System.out.println("The game could start");
-        showLobby(); // We return to showLobby to avoid conflicts with the lock between two threads
-        //todo should this call anything or do we wait for the asynchronous "game starting" message from the server?
-        // i think the second
+        showLobby(); // We return to showLobby waiting for the asynchronous message to arrive
+
     }
 
     @Override
@@ -451,7 +449,6 @@ public class CLI implements UserInterface {
 
             if(gameStarting.get()){
                 System.out.println("Everyone made their choice, the game is starting!");
-                showGameInterface();
                 return;
             }
 
