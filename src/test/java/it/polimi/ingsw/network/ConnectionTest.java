@@ -1,4 +1,9 @@
+/*
 package it.polimi.ingsw.network;
+
+import it.polimi.ingsw.network.client.ClientNetworkManager;
+import it.polimi.ingsw.network.server.ClientHandler;
+import it.polimi.ingsw.network.server.Server;
 
 import java.util.Scanner;
 
@@ -69,3 +74,5 @@ public class ConnectionTest {
 
     }
 
+
+ */

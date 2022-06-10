@@ -21,7 +21,7 @@ public class AdvancedGameBoardBean extends GameBoardBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.ADVANCED_GAMEBOARD_BEAN;
     }
 

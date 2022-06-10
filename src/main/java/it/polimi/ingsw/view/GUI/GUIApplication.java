@@ -6,8 +6,11 @@ import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.view.GUI.drawers.*;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
+import it.polimi.ingsw.view.GameInitBean;
+import it.polimi.ingsw.view.LobbyBean;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -822,6 +825,141 @@ public class GUIApplication extends Application implements UserInterface{
 
     @Override
     public void startInterface() {
+
+    }
+
+    @Override
+    public void setSender(ClientSender sender) {
+
+    }
+
+    @Override
+    public void showLoginScreenFailure() {
+
+    }
+
+    @Override
+    public void showSuccessLoginScreen() {
+
+    }
+
+    @Override
+    public void showSuccessJoiningLobby() {
+
+    }
+
+    @Override
+    public void showErrorJoiningLobby() {
+
+    }
+
+    @Override
+    public void showSuccessReadyStatus(boolean status) {
+
+    }
+
+    @Override
+    public void showErrorReadyStatus(boolean status) {
+
+    }
+
+    @Override
+    public void showSuccessStartGame() {
+
+    }
+
+    @Override
+    public void showErrorStartGame() {
+
+    }
+
+    @Override
+    public void showSuccessLeaveLobby() {
+
+    }
+
+    @Override
+    public void showErrorLeaveLobby() {
+
+    }
+
+    @Override
+    public void showErrorSelectingColor(String color) {
+
+    }
+
+    @Override
+    public void showSuccessSelectingColor(String color) {
+
+    }
+
+    @Override
+    public void showErrorSelectingWizard(String wizard) {
+
+    }
+
+    @Override
+    public void showSuccessSelectingWizard(String wizard) {
+
+    }
+
+    @Override
+    public void showNetworkError() {
+
+    }
+
+    @Override
+    public void showUserDisconnected() {
+
+    }
+
+    @Override
+    public void printLobby(LobbyBean lobbyBean) {
+
+    }
+
+    @Override
+    public void printGameInitInfo(GameInitBean gameInitBean) {
+
+    }
+
+    @Override
+    public void setChosenNickname(String nickname) {
+
+    }
+
+    @Override
+    public void setNumberOfPlayers(int numberOfPlayers) {
+
+    }
+
+    @Override
+    public void setGameMode(String gameMode) {
+
+    }
+
+    @Override
+    public void setTeamColor(String teamColor) {
+
+    }
+
+    @Override
+    public void setWizard(String wizard) {
+
+    }
+
+    @Override
+    public void setInLobby(boolean inLobby) {
+
+    }
+
+    @Override
+    public void setLobbyStarting() {
+
+    }
+
+    @Override
+    public void setGameStarting() {
 
     }
 }

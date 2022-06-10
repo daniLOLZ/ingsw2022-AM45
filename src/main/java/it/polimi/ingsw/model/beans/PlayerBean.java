@@ -37,7 +37,7 @@ public class PlayerBean extends GameElementBean{
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.PLAYER_BEAN;
     }
 

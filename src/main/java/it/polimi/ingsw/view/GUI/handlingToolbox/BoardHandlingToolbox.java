@@ -1,8 +1,7 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import it.polimi.ingsw.model.StudentEnum;
-import it.polimi.ingsw.network.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.network.client.ClientNetworkManager;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 

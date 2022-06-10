@@ -1,5 +1,8 @@
 package it.polimi.ingsw.network.commandHandler;
 
+import it.polimi.ingsw.network.commandHandler.asynchronous.*;
+import it.polimi.ingsw.network.commandHandler.synchronous.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,13 +11,11 @@ public class FactoryCommandHandler {
     public static List<CommandHandler> getAllCommandHandlers(){
 
         List<CommandHandler> commandHandlers = new ArrayList<>();
-        commandHandlers.add(new AskForControlHandler());
         commandHandlers.add(new ChooseAssistantHandler());
         commandHandlers.add(new ChooseCloudHandler());
         commandHandlers.add(new ConnectionRequestHandler());
         commandHandlers.add(new DeselectStudentHandler());
-        commandHandlers.add(new GetLobbyStatusHandler());
-        commandHandlers.add(new GetGameInitializationStatus());
+        commandHandlers.add(new EndTurnHandler());
         commandHandlers.add(new MoveMNToIslandHandler());
         commandHandlers.add(new PlayCharacterHandler());
         commandHandlers.add(new PlayGameHandler());
@@ -35,5 +36,20 @@ public class FactoryCommandHandler {
         commandHandlers.add(new StartGameHandler());
 
         return commandHandlers;
+    }
+
+    public static List<AsyncCommandHandler> getAsyncCommandHandlers() {
+        List<AsyncCommandHandler> asyncHandlers = new ArrayList<>();
+        //LobbyStart must come before GameInitUpdate!
+        // Do not change!
+        asyncHandlers.add(new LobbyStartHandler());
+        asyncHandlers.add(new GameInitUpdateHandler());
+        asyncHandlers.add(new GameStartHandler());
+        asyncHandlers.add(new GameUpdateHandler());
+        asyncHandlers.add(new LobbyUpdateHandler());
+        asyncHandlers.add(new UserDisconnectedHandler());
+        asyncHandlers.add(new YourTurnHandler());
+
+        return asyncHandlers;
     }
 }

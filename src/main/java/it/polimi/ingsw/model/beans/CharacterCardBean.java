@@ -25,7 +25,7 @@ public class CharacterCardBean extends GameElementBean {
     }
 
     @Override
-    public BeanEnum getBeanEnum() {
+    public BeanEnum getBeanType() {
         return BeanEnum.CHARACTER_CARD_BEAN;
     }
 

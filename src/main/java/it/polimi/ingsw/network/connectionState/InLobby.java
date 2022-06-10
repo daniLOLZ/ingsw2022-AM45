@@ -9,7 +9,6 @@ public class InLobby extends ConnectionState{
         super();
         allow(CommandEnum.READY_TO_START);
         allow(CommandEnum.NOT_READY);
-        allow(CommandEnum.GET_LOBBY_STATUS);
         allow(CommandEnum.LEAVE_LOBBY);
         allow(CommandEnum.START_GAME);
     }

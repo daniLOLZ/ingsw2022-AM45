@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.network.server.ActiveLobbies;
+import it.polimi.ingsw.network.server.Lobby;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

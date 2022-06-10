@@ -33,28 +33,25 @@ public class BeanTranslator {
         List<String> nicknames = (List<String>) map.get("nicknames");
         List<Boolean> readyPlayers = (List<Boolean>) map.get("readyPlayers");
         boolean gameStarted = (boolean) map.get("gameStarted");
-        Double dhost = (Double) map.get("host");
-        Integer host = dhost.intValue();
+
+        Integer host = ApplicationHelper.getIntFromBrokerField( map.get("host"));
         return new LobbyBean(nicknames, readyPlayers, gameStarted, host);
     }
 
     public static GameInitBean deserializeGameInitBean(LinkedTreeMap<String, Object> map){
         List<TeamEnum> chosenColors = toListOfEnum(TeamEnum.class, (ArrayList<String>) map.get("availableColors"));
         List<WizardEnum> chosenWizards = toListOfEnum(WizardEnum.class, (ArrayList<String>) map.get("availableWizards"));
-        Boolean allSetGameStarted = (Boolean) map.get("allSetGameStarted");
-        return new GameInitBean(chosenColors,chosenWizards, allSetGameStarted);
+        return new GameInitBean(chosenColors,chosenWizards);
     }
 
     public static AdvancedGameBoardBean deserializeAdvancedGameBoardBean(LinkedTreeMap<String, Object> map){
         List<Integer> idIslandGroups = (List<Integer>) map.get("idIslandGroups");
         List<Integer> idAssistantsPlayed = (List<Integer>) map.get("idAssistantsPlayed");
         List<Integer> idPlayers = (List<Integer>) map.get("idPlayers");
-        Double dcurrentPlayerId = (Double) map.get("currentPlayerId");
-        Integer currentPlayerId = dcurrentPlayerId.intValue();
-        Double dturn = (Double) map.get("turn");
-        Integer turn = dturn.intValue();
+        Integer currentPlayerId = ApplicationHelper.getIntFromBrokerField(map.get("currentPlayerId"));
+        Integer turn = ApplicationHelper.getIntFromBrokerField(map.get("turn"));
         String phase = (String) map.get("phase");
-        int numGameCoins = (int) map.get("numGameCoins");
+        Integer numGameCoins = ApplicationHelper.getIntFromBrokerField(map.get("numGameCoins"));
         List<Integer> idCharacterCards = (List<Integer>) map.get("idCharacterCards");
         return new AdvancedGameBoardBean(idIslandGroups,idAssistantsPlayed, idPlayers, currentPlayerId, turn, phase, numGameCoins, idCharacterCards);
     }
