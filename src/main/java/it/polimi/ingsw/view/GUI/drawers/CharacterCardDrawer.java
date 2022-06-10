@@ -17,6 +17,7 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.polimi.ingsw.view.GUI.GUIApplication.right;
 import static it.polimi.ingsw.view.GUI.GUIApplication.upLeftCorner;
 
 public class CharacterCardDrawer extends Drawer{

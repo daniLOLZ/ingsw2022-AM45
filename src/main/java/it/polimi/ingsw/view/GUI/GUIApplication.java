@@ -26,6 +26,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -208,16 +209,86 @@ public class GUIApplication extends Application implements UserInterface{
 
         Button success = new Button("Simulate success");
         Button failure = new Button("Simulate failure");
+        Button debugScene = new Button("Show debug scene");
 
         success.setOnAction(event -> notifySuccessfulLogin());
         failure.setOnAction(event -> notifyLoginFailure());
+        debugScene.setOnAction(event -> debug_showDebugScene());
 
-        login.getChildren().addAll(success, failure);
+        login.getChildren().addAll(success, failure, debugScene);
 
         //</editor-fold>
 
         stage.setScene(loginScene);
     }
+
+    //<editor-fold desc="Debugging methods">
+    private void debug_showDebugScene(){
+        Group root = new Group();
+
+        Group group = new Group();
+        root.getChildren().add(group);
+
+        ImageView testImage = drawFromCenterInteractiveImage(new Image("assets/board/no_borders.png"), center, 0.08, HandlingToolbox.NO_EFFECT);
+
+        group.getChildren().add(testImage);
+
+        ImageView tracker = drawFromCenterInteractiveImage(new Image("assets/tiles/blockTile.png"), new Coord(testImage.getX(), testImage.getY()), 0.05, HandlingToolbox.NO_EFFECT);
+        group.getChildren().add(tracker);
+
+        HBox options = new HBox(5);
+        root.getChildren().add(options);
+
+        Button rotateClockwise = new Button("Rotate clockwise");
+        //Button rotateCounterclockwise = new Button("Rotate counterclockwise");
+        Button zoom = new Button("Zoom");
+        Button shrink = new Button("Shrink");
+        Button moveLeft = new Button("Move left");
+        //Button moveRight = new Button("Move right");
+        Button moveUp = new Button("Move up");
+        //Button moveDown = new Button("Move down");
+        TextField input = new TextField();
+
+        options.getChildren().addAll(rotateClockwise, zoom, shrink, moveLeft, moveUp, input);
+
+        rotateClockwise.setOnAction(event -> {
+            testImage.getTransforms().add(new Rotate(-90, testImage.getX() + testImage.getFitWidth() / 2, testImage.getY() + testImage.getFitHeight() / 2));
+            debug_trackImage(testImage, tracker);
+        });
+
+        zoom.setOnAction(event -> {
+            testImage.setFitWidth(testImage.getFitWidth() * 1.3);
+            testImage.setFitHeight(testImage.getFitHeight() * 1.3);
+            debug_trackImage(testImage, tracker);
+        });
+
+        shrink.setOnAction(event -> {
+            testImage.setFitWidth(testImage.getFitWidth() / 1.3);
+            testImage.setFitHeight(testImage.getFitHeight() / 1.3);
+            debug_trackImage(testImage, tracker);
+        });
+
+        moveLeft.setOnAction(event -> {
+            testImage.setX(Integer.parseInt(input.getCharacters().toString()));
+            debug_trackImage(testImage, tracker);
+        });
+
+        moveUp.setOnAction(event -> {
+            testImage.setY(Integer.parseInt(input.getCharacters().toString()));
+            debug_trackImage(testImage, tracker);
+        });
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
+
+    }
+
+    private void debug_trackImage(ImageView imageView, ImageView tracker){
+        tracker.setX(imageView.getX() - tracker.getFitWidth() / 2);
+        tracker.setY(imageView.getY() - tracker.getFitHeight() / 2);
+    }
+
+    //</editor-fold>
 
     public void notifySuccessfulLogin(){
         showSearchGameScreen(false);
@@ -604,9 +675,9 @@ public class GUIApplication extends Application implements UserInterface{
         AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 12);
 
         root.getChildren().addAll(BoardDrawer.drawBoard(board, downCenter.pureSumY(-145), boardWidth / BoardDrawer.getBoardWidth()));
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, upCenter.pureSumY(70), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), Coord.UPSIDE_DOWN));
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerLeft.pureSumX(200), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), Coord.COUNTERCLOCKWISE));
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerRight.pureSumX(-200), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), Coord.CLOCKWISE));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, upCenter.pureSumY(120), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.TOP));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerLeft.pureSumX(100), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.RIGHT));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerRight.pureSumX(-100), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.LEFT));
 
         int assistantIndex = 0;
 
