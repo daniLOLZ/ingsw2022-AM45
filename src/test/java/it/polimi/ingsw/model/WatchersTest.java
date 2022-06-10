@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
+import it.polimi.ingsw.model.islands.Island;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
@@ -74,7 +75,7 @@ public class WatchersTest {
         assertFalse(cardBean.isEmpty());
 
         assertEquals(1,gameBean.getTurn());
-        assertEquals(PhaseEnum.PLANNING.name,gameBean.getPhase());
+        assertEquals(PhaseEnum.PLANNING,gameBean.getPhase());
         assertEquals(3, cardBean.size());
 
         for(CharacterCardBean bean: cardBean){
@@ -106,7 +107,7 @@ public class WatchersTest {
         Player player2 = game.getPlayers().get(1);
         Player player3 = game.getPlayers().get(2);
 
-        assertEquals(PhaseEnum.PLANNING.name, gameBean.getPhase());
+        assertEquals(PhaseEnum.PLANNING, gameBean.getPhase());
         for(Integer id: gameBean.getIdAssistantsPlayed()){
             assertEquals(0, id);
         }
@@ -223,7 +224,7 @@ public class WatchersTest {
         cli.addBean(islandBean);
         cli.addBean(playerBean);
 
-        //cli.show();
+        cli.show();
 
         game.playAssistant(player1, 3);                         //Assistant = (turn:3 , MN_steps: 2)
         game.moveMN(2);
@@ -246,7 +247,7 @@ public class WatchersTest {
         cli.addBean(prevIslandBean);
         cli.addBean(playerBean);
 
-        //cli.show();
+        cli.show();
 
         //PLAYER 1 BUILDS 1 TOWER ON MN ISLAND
         try {
@@ -264,7 +265,7 @@ public class WatchersTest {
         cli.addBean(playerBean);
         cli.addBean(islandBean);
 
-        //cli.show();
+        cli.show();
 
         //PLAYER 1 PLAY AN ASSISTANT, PUT A RED STUDENT ON AN ISLAND AND MOVE MN ON THAT ISLAND
         game.playAssistant(player1, 1);                         //Assistant = (turn:1 , MN_steps: 1)
@@ -294,7 +295,10 @@ public class WatchersTest {
         assertEquals(8, playerBean.getIdAssistants().size());
         cli.addBean(playerBean);
         cli.addBean(islandBean);
-        //cli.show();
+        cli.addBean(game.toBean());
+        for(IslandGroup i : game.getIslandGroups())
+            cli.addBean(i.toBean());
+        cli.show();
 
     }
 

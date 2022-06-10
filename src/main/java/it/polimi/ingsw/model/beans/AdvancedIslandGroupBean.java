@@ -9,10 +9,18 @@ import java.util.List;
 public class AdvancedIslandGroupBean extends IslandGroupBean{
     private Integer numBlockTiles;
 
+    @Deprecated
     public AdvancedIslandGroupBean(int idIslandGroup, List<Integer> idIslands,
                                    List<StudentEnum> studentsOnIsland, boolean isPresentMN,
                                    TeamEnum towersColor, int numBlockTiles) {
         super(idIslandGroup, idIslands, studentsOnIsland, isPresentMN, towersColor);
+        this.numBlockTiles = numBlockTiles;
+    }
+
+    public AdvancedIslandGroupBean(int idIslandGroup, List<Integer> idIslands,
+                                   List<StudentEnum> studentsOnIsland, boolean isPresentMN,
+                                   TeamEnum towersColor, int numBlockTiles, int prev, int next) {
+        super(idIslandGroup, idIslands, studentsOnIsland, isPresentMN, towersColor,prev,next);
         this.numBlockTiles = numBlockTiles;
     }
 
@@ -48,6 +56,8 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
         toReturn.append("\t|Island Group : ").append(idIslandGroup).append("\n");
         toReturn.append("\t|\tNumber of islands: ").append(idIslands.size()).append("\n");
         toReturn.append("\t|\tIslands: ").append(idIslands).append("\n");
+        toReturn.append("\t|\tPrev-Island: ").append(idPrevIslandGroup).append("\n");
+        toReturn.append("\t|\tNext-Island: ").append(idNextIslandGroup).append("\n");
         toReturn.append("\t|\tStudents: ").append(studentsOnIsland).append("\n");
         toReturn.append("\t|\tIs present Mother Nature: ").append(Mn).append("\n");
         toReturn.append("\t|\tTower color: ").append(towersColor).append("\n");

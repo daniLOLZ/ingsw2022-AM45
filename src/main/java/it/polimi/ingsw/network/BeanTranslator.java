@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.AdvancedGameBoardBean;
 import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
 import it.polimi.ingsw.model.beans.CloudBean;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 
@@ -50,7 +51,7 @@ public class BeanTranslator {
         List<Integer> idPlayers = (List<Integer>) map.get("idPlayers");
         Integer currentPlayerId = ApplicationHelper.getIntFromBrokerField(map.get("currentPlayerId"));
         Integer turn = ApplicationHelper.getIntFromBrokerField(map.get("turn"));
-        String phase = (String) map.get("phase");
+        PhaseEnum phase = (PhaseEnum) map.get("phase");
         Integer numGameCoins = ApplicationHelper.getIntFromBrokerField(map.get("numGameCoins"));
         List<Integer> idCharacterCards = (List<Integer>) map.get("idCharacterCards");
         return new AdvancedGameBoardBean(idIslandGroups,idAssistantsPlayed, idPlayers, currentPlayerId, turn, phase, numGameCoins, idCharacterCards);

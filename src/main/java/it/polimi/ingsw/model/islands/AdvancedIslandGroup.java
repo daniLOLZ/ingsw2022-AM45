@@ -232,6 +232,10 @@ public class AdvancedIslandGroup extends IslandGroup {
                 mergedStudents, getTowerColor(), mergedBlocks, getParameters(),
                 advancedParameters, parameters.getVirtualView());
 
+        mergedGroup.nextIslandGroup.setPrevIslandGroup(mergedGroup);
+        mergedGroup.prevIslandGroup.setNextIslandGroup(mergedGroup);
+        mergedGroup.nextIslandGroup.alert();
+        mergedGroup.prevIslandGroup.alert();
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
 
         return mergedGroup;
@@ -357,9 +361,17 @@ public class AdvancedIslandGroup extends IslandGroup {
         for(Island island: islands)
             idIsland.add(island.getId());
 
+        int prev=0,next=0;
+
+        if(prevIslandGroup != null)
+            prev = prevIslandGroup.idGroup;
+
+        if(nextIslandGroup != null)
+            next = nextIslandGroup.idGroup;
+
 
         AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(idIslandGroup, idIsland,
-                studentsOnIsland, isPresentMN, tower, numBlockTiles);
+                studentsOnIsland, isPresentMN, tower, numBlockTiles, prev, next);
         return  bean;
     }
 }
