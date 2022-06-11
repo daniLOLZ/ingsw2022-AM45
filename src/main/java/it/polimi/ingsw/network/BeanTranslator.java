@@ -97,6 +97,7 @@ public class BeanTranslator {
                 islandGroupBean.getTowersColor(),
                 numBlockTiles
         );
+        //todo fix
     }
 
     private static ErrorBean deserializeErrorBean(LinkedTreeMap<String, Object> map) {
@@ -134,7 +135,7 @@ public class BeanTranslator {
         List<Integer> studentsPerTable = ApplicationHelper.getIntListFromBrokerField(map.get("studentsPerTable"));
         List<StudentEnum> professors = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("professors"));
         List<Integer> idAssistants = ApplicationHelper.getIntListFromBrokerField(map.get("idAssistants"));
-        //todo update with the new fields
+        //todo update with the new fields!
 
         return new PlayerBean(nickname, playerId, leader, towerColor, numTowers, studentsAtEntrance, studentsPerTable, professors, idAssistants);
     }
