@@ -33,6 +33,9 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
         return numBlockTiles;
     }
 
+    /**
+     * For tests only
+     */
     public void setNumBlockTiles(Integer numBlockTiles) {
         this.numBlockTiles = numBlockTiles;
     }

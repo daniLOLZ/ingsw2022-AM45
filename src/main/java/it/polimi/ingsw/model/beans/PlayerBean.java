@@ -7,7 +7,6 @@ import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class PlayerBean extends GameElementBean{
     protected int numTowers;
     protected List<StudentEnum> studentsAtEntrance;
     protected List<Integer> studentsPerTable;
-    protected List<Assistant> Assistants;
+    protected List<Assistant> assistants;
     protected Assistant assistantPlayed;
     protected List<StudentEnum> professors;
 
@@ -38,12 +37,12 @@ public class PlayerBean extends GameElementBean{
         this.studentsAtEntrance = studentsAtEntrance;
         this.studentsPerTable = studentsPerTable;
         this.professors = professors;
-        this.Assistants = Assistants;
+        this.assistants = Assistants;
         this.assistantPlayed = assistantPlayed;
 
     }
 
-
+    @Deprecated
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
                       int numTowers, List<StudentEnum> studentsAtEntrance,
                       List<Integer> studentsPerTable, List<StudentEnum> professors,
@@ -58,9 +57,9 @@ public class PlayerBean extends GameElementBean{
         this.studentsAtEntrance = studentsAtEntrance;
         this.studentsPerTable = studentsPerTable;
         this.professors = professors;
-        Assistants = new ArrayList<>();
+        assistants = new ArrayList<>();
         for(Integer x: idAssistants){
-            Assistants.add(FactoryAssistant.getAssistant(x));
+            assistants.add(FactoryAssistant.getAssistant(x));
         }
 
 
@@ -80,7 +79,7 @@ public class PlayerBean extends GameElementBean{
     }
 
     public List<Assistant> getAssistants() {
-        return Assistants;
+        return assistants;
     }
 
     public List<Integer> getStudentsPerTable() {
@@ -109,7 +108,7 @@ public class PlayerBean extends GameElementBean{
 
     public List<Integer> getIdAssistants(){
         List<Integer> list = new ArrayList<>();
-        for(Assistant a: Assistants)
+        for(Assistant a: assistants)
             list.add(a.id);
         return list;
     }
@@ -118,7 +117,7 @@ public class PlayerBean extends GameElementBean{
         List<Assistant> list= new ArrayList<>();
         for(Integer x: idAssistants)
             list.add(FactoryAssistant.getAssistant(x));
-        this.Assistants = list;
+        this.assistants = list;
     }
 
     public void setAssistantPlayed(Assistant assistantPlayed) {
@@ -126,7 +125,7 @@ public class PlayerBean extends GameElementBean{
     }
 
     public void setAssistants(List<Assistant> Assistants) {
-        this.Assistants = Assistants;
+        this.assistants = Assistants;
     }
 
     public void setLeader(boolean leader) {
@@ -199,21 +198,21 @@ public class PlayerBean extends GameElementBean{
         toReturn.append("\t|\tAssistant Played: ").append(assistantPlayed).append("\n");
 
 
-        if(Assistants.size() > 4){
+        if(assistants.size() > 4){
             List<Assistant> list1 = new ArrayList<>();
             for(int i=0; i<4; i++)
-                list1.add(Assistants.get(i));
+                list1.add(assistants.get(i));
 
             List<Assistant> list2 = new ArrayList<>();
-            for(int i=4; i< Assistants.size(); i++)
-                list2.add(Assistants.get(i));
+            for(int i = 4; i< assistants.size(); i++)
+                list2.add(assistants.get(i));
 
             toReturn.append("\t|\tAssistants: ").append(list1).append("\n");
             toReturn.append("\t|\t").append(list2).append("\n");
 
         }
         else
-            toReturn.append("\t|\tAssistants: ").append(Assistants).append("\n");
+            toReturn.append("\t|\tAssistants: ").append(assistants).append("\n");
 
         toReturn.append("\t________________________________________________________\t\n");
         String border = 	"AAAAAAAA___________________________________________________\t\n";

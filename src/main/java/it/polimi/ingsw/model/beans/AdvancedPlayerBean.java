@@ -22,7 +22,7 @@ public class AdvancedPlayerBean extends PlayerBean{
         this.numCoins = numCoins;
     }
 
-
+    @Deprecated
     public AdvancedPlayerBean(String nickname, PlayerEnum playerId, boolean leader,
                               TeamEnum towerColor, int numTowers, List<StudentEnum> studentsAtEntrance,
                               List<Integer> studentsPerTable, List<StudentEnum> professors,
@@ -79,21 +79,21 @@ public class AdvancedPlayerBean extends PlayerBean{
 
         toReturn.append("\t|\tAssistant Played: ").append(assistantPlayed).append("\n");
 
-        if(Assistants.size() > 4){
+        if(assistants.size() > 4){
             List<Assistant> list1 = new ArrayList<>();
             for(int i=0; i<4; i++)
-                list1.add(Assistants.get(i));
+                list1.add(assistants.get(i));
 
             List<Assistant> list2 = new ArrayList<>();
-            for(int i=4; i< Assistants.size(); i++)
-                list2.add(Assistants.get(i));
+            for(int i = 4; i< assistants.size(); i++)
+                list2.add(assistants.get(i));
 
             toReturn.append("\t|\tAssistants: ").append(list1).append("\n");
             toReturn.append("\t|\t").append(list2).append("\n");
 
         }
         else
-            toReturn.append("\t|\tAssistants: ").append(Assistants).append("\n");
+            toReturn.append("\t|\tAssistants: ").append(assistants).append("\n");
 
         toReturn.append("\t________________________________________________________\t\n");
         String border = 	"AAAAAAAA___________________________________________________\t\n";
