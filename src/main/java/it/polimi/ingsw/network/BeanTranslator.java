@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 
@@ -49,8 +50,7 @@ public class BeanTranslator {
         List<Integer> idPlayers = ApplicationHelper.getIntListFromBrokerField(map.get("idPlayers"));
         Integer currentPlayerId = ApplicationHelper.getIntFromBrokerField(map.get("currentPlayerId"));
         Integer turn = ApplicationHelper.getIntFromBrokerField(map.get("turn"));
-        String phase = (String) map.get("phase");
-        //todo fix phaseenum
+        PhaseEnum phase = PhaseEnum.fromObjectToEnum(map.get("phase"));
         return new GameBoardBean(idIslandGroups,idAssistantsPlayed,idPlayers,currentPlayerId,turn,phase);
     }
 

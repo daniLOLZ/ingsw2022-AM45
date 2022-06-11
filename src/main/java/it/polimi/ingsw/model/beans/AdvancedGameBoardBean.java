@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
 
@@ -12,7 +13,7 @@ public class AdvancedGameBoardBean extends GameBoardBean{
     private List<Integer> idCharacterCards;
     public AdvancedGameBoardBean(List<Integer> idIslandGroups, List<Integer> idAssistantsPlayed,
                                  List<Integer> idPlayers, Integer currentPlayerId, Integer turn,
-                                 String phase, int numGameCoins,
+                                 PhaseEnum phase, int numGameCoins,
                                  List<Integer> idCharacterCards) {
         super(idIslandGroups, idAssistantsPlayed, idPlayers, currentPlayerId, turn, phase);
         this.numGameCoins = numGameCoins;
@@ -56,6 +57,7 @@ public class AdvancedGameBoardBean extends GameBoardBean{
         toReturn.append("\t|\t\t\t::ADVANCED::").append("\n");
         toReturn.append("\t|\tTURN: ").append(turn).append("\n");
         toReturn.append("\t|\tPHASE: ").append(phase).append("\n");
+        toReturn.append("\t|\tISLANDS: ").append(idIslandGroups).append("\n");
         toReturn.append("\t|\tGAME COINS: ").append(numGameCoins).append("\n");
         toReturn.append("\t|\tCHARACTER CARDS: ").append(idCharacterCards).append("\n");
         toReturn.append("\t|\tCURRENT PLAYER: ").append(currentPlayer).append("\n");

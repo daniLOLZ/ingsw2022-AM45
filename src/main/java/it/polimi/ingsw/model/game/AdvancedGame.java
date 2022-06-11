@@ -371,12 +371,13 @@ public class AdvancedGame extends SimpleGame {
         List<Integer> idPlayers = new ArrayList<>();
         int currentPlayerId = parameters.getCurrentPlayer().getPlayerId().index;
         int turn = parameters.getTurn();
-        String phase = parameters.getCurrentPhase().name;
+        PhaseEnum phase = parameters.getCurrentPhase();
         int numCoins = advancedParameters.getNumCoins();
 
         List<Integer> idCharacterCards = CharacterCards.stream().mapToInt(card -> card.id).
                                                 collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 
+        sortIslandGroups();
         for(IslandGroup islandGroup: islandGroups){
             idIslands.add(islandGroup.getIdGroup());
         }

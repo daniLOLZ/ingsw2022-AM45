@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
 
@@ -12,13 +13,13 @@ public class GameBoardBean extends GameElementBean{
     protected List<Integer> idPlayers;
     protected Integer currentPlayerId;
     protected Integer turn;
-    protected String phase; //WHy is this not a PhaseEnum?
+    protected PhaseEnum phase;
 
 
     //TODO change to phaseEnum
     public GameBoardBean( List<Integer> idIslandGroups, List<Integer> idAssistantsPlayed,
                           List<Integer> idPlayers, Integer currentPlayerId,
-                          Integer turn, String phase){
+                          Integer turn, PhaseEnum phase){
         final int highPriority = 1;
         priority = highPriority;
         this.idIslandGroups = idIslandGroups;
@@ -54,7 +55,7 @@ public class GameBoardBean extends GameElementBean{
         this.idPlayers = idPlayers;
     }
 
-    public void setPhase(String phase) {
+    public void setPhase(PhaseEnum phase) {
         this.phase = phase;
     }
 
@@ -78,7 +79,7 @@ public class GameBoardBean extends GameElementBean{
         return idPlayers;
     }
 
-    public String getPhase() {
+    public PhaseEnum getPhase() {
         return phase;
     }
 
@@ -96,6 +97,7 @@ public class GameBoardBean extends GameElementBean{
         toReturn.append("\t|\t\t\t::ERYANTIS::").append("\n");
         toReturn.append("\t|\tTURN: ").append(turn).append("\n");
         toReturn.append("\t|\tPHASE: ").append(phase).append("\n");
+        toReturn.append("\t|\tISLANDS: ").append(idIslandGroups).append("\n");
         toReturn.append("\t|\tCURRENT PLAYER: ").append(currentPlayer).append("\n");
         toReturn.append("\t|\tPLAYERS: ").append(players).append("\n");
         toReturn.append("\t|\tASSISTANTS PLAYED: ").append(idAssistantsPlayed).append("\n");

@@ -2,9 +2,13 @@ package it.polimi.ingsw.model.beans;
 
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerBean extends GameElementBean{
@@ -15,14 +19,15 @@ public class PlayerBean extends GameElementBean{
     protected int numTowers;
     protected List<StudentEnum> studentsAtEntrance;
     protected List<Integer> studentsPerTable;
+    protected List<Assistant> Assistants;
+    protected Assistant assistantPlayed;
     protected List<StudentEnum> professors;
-    protected List<Integer> idAssistants;
-
 
 
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
                       int numTowers, List<StudentEnum> studentsAtEntrance,
-                      List<Integer> studentsPerTable, List<StudentEnum> professors, List<Integer> idAssistants){
+                      List<Integer> studentsPerTable, List<StudentEnum> professors,
+                      List<Assistant> Assistants, Assistant assistantPlayed){
         final int lowPriority = 5;
         priority = lowPriority;
         this.nickname = nickname;
@@ -33,7 +38,31 @@ public class PlayerBean extends GameElementBean{
         this.studentsAtEntrance = studentsAtEntrance;
         this.studentsPerTable = studentsPerTable;
         this.professors = professors;
-        this.idAssistants = idAssistants;
+        this.Assistants = Assistants;
+        this.assistantPlayed = assistantPlayed;
+
+    }
+
+
+    public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
+                      int numTowers, List<StudentEnum> studentsAtEntrance,
+                      List<Integer> studentsPerTable, List<StudentEnum> professors,
+                      List<Integer> idAssistants){
+        final int lowPriority = 5;
+        priority = lowPriority;
+        this.nickname = nickname;
+        this.playerId = playerId;
+        this.leader = leader;
+        this.towerColor = towerColor;
+        this.numTowers = numTowers;
+        this.studentsAtEntrance = studentsAtEntrance;
+        this.studentsPerTable = studentsPerTable;
+        this.professors = professors;
+        Assistants = new ArrayList<>();
+        for(Integer x: idAssistants){
+            Assistants.add(FactoryAssistant.getAssistant(x));
+        }
+
 
     }
 
@@ -50,8 +79,8 @@ public class PlayerBean extends GameElementBean{
         return numTowers;
     }
 
-    public List<Integer> getIdAssistants() {
-        return idAssistants;
+    public List<Assistant> getAssistants() {
+        return Assistants;
     }
 
     public List<Integer> getStudentsPerTable() {
@@ -74,8 +103,30 @@ public class PlayerBean extends GameElementBean{
         return towerColor;
     }
 
-    public void setIdAssistants(List<Integer> idAssistants) {
-        this.idAssistants = idAssistants;
+    public Assistant getAssistantPlayed() {
+        return assistantPlayed;
+    }
+
+    public List<Integer> getIdAssistants(){
+        List<Integer> list = new ArrayList<>();
+        for(Assistant a: Assistants)
+            list.add(a.id);
+        return list;
+    }
+
+    public void setIdAssistants(List<Integer> idAssistants){
+        List<Assistant> list= new ArrayList<>();
+        for(Integer x: idAssistants)
+            list.add(FactoryAssistant.getAssistant(x));
+        this.Assistants = list;
+    }
+
+    public void setAssistantPlayed(Assistant assistantPlayed) {
+        this.assistantPlayed = assistantPlayed;
+    }
+
+    public void setAssistants(List<Assistant> Assistants) {
+        this.Assistants = Assistants;
     }
 
     public void setLeader(boolean leader) {
@@ -144,7 +195,26 @@ public class PlayerBean extends GameElementBean{
                 append(StudentEnum.PINK).append(" Table: ").
                 append(studentsPerTable.get(StudentEnum.PINK.index)).append("\n");
         toReturn.append("\t|\tProfessors: ").append(professors).append("\n");
-        toReturn.append("\t|\tAssistants: ").append(idAssistants).append("\n");
+
+        toReturn.append("\t|\tAssistant Played: ").append(assistantPlayed).append("\n");
+
+
+        if(Assistants.size() > 4){
+            List<Assistant> list1 = new ArrayList<>();
+            for(int i=0; i<4; i++)
+                list1.add(Assistants.get(i));
+
+            List<Assistant> list2 = new ArrayList<>();
+            for(int i=4; i< Assistants.size(); i++)
+                list2.add(Assistants.get(i));
+
+            toReturn.append("\t|\tAssistants: ").append(list1).append("\n");
+            toReturn.append("\t|\t").append(list2).append("\n");
+
+        }
+        else
+            toReturn.append("\t|\tAssistants: ").append(Assistants).append("\n");
+
         toReturn.append("\t________________________________________________________\t\n");
         String border = 	"AAAAAAAA___________________________________________________\t\n";
 

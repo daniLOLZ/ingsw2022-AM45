@@ -251,7 +251,7 @@ public class Player extends DrawableObject {
         List<StudentEnum> studAtEntrance = board.getStudentsAtEntrance();   //Get students at entrance
         List<Integer> studPerTable = new ArrayList<>();
         List<StudentEnum> professors;
-        List<Integer> idAssistants = wizard.getRemainedAssistants();        //Get assistant cards id
+        List<Assistant> Assistants = wizard.getRemainedAssistants();        //Get assistant cards id
         for(StudentEnum color: StudentEnum.values()){                       //Get students per table
             if(color != StudentEnum.NOSTUDENT)
                 studPerTable.add(board.getStudentsAtTable(color));
@@ -262,7 +262,7 @@ public class Player extends DrawableObject {
 
 
         PlayerBean bean = new PlayerBean(nickname, playerId, leader, teamColor, numTowers,
-                studAtEntrance,studPerTable,professors, idAssistants);
+                studAtEntrance,studPerTable,professors, Assistants,assistantPlayed);
         return bean;
     }
 

@@ -447,7 +447,7 @@ public class SimpleGameTest {
 
         assertEquals(game.getParameters().getCurrentPlayer().getPlayerId().index,bean.getCurrentPlayerId());
         assertEquals(game.getParameters().getTurn(),bean.getTurn());
-        assertEquals(game.getParameters().getCurrentPhase().name, bean.getPhase());
+        assertEquals(game.getParameters().getCurrentPhase(), bean.getPhase());
     }
 
     /**

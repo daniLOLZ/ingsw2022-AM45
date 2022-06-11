@@ -19,8 +19,8 @@ public class IslandGroup extends DrawableObject {
     protected ParameterHandler parameters;
     protected final int idGroup;
     protected final List<Island> islands;
-    private IslandGroup nextIslandGroup;
-    private IslandGroup prevIslandGroup;
+    protected IslandGroup nextIslandGroup;
+    protected IslandGroup prevIslandGroup;
     protected List<StudentEnum> students;
     protected TeamEnum towerColor;
 
@@ -292,13 +292,13 @@ public class IslandGroup extends DrawableObject {
      */
     public IslandGroup mergeAdjacent(int newId, List<IslandGroup> islandGroups) throws UnmergeableException{
 
-        //todo move to controller
+
         //Checks if the island has a tower built on top of it
         if(towerColor.equals(TeamEnum.NOTEAM)){
             throw new UnmergeableException();
         }
 
-        //todo move to controller
+
         //Checking if it can merge with any island at all
         if(!towerColor.equals(nextIslandGroup.towerColor) && !towerColor.equals(prevIslandGroup.towerColor)){
             throw new UnmergeableException();
@@ -338,9 +338,15 @@ public class IslandGroup extends DrawableObject {
         IslandGroup previousPointer = predecessor.prevIslandGroup;
 
 
+
+
         IslandGroup mergedGroup = new IslandGroup(newId, mergedIslands,
                 nextPointer, previousPointer, mergedStudents, towerColor, parameters, parameters.getVirtualView());
 
+        mergedGroup.nextIslandGroup.setPrevIslandGroup(mergedGroup);
+        mergedGroup.prevIslandGroup.setNextIslandGroup(mergedGroup);
+        mergedGroup.nextIslandGroup.alert();
+        mergedGroup.prevIslandGroup.alert();
         islandGroups.add(mergedGroup); // possibly unsafe handling of game attribute
 
 
@@ -390,9 +396,17 @@ public class IslandGroup extends DrawableObject {
         for(Island island: islands)
             idIsland.add(island.getId());
 
+        int prev=0,next=0;
+
+        if(prevIslandGroup != null)
+            prev = prevIslandGroup.idGroup;
+
+        if(nextIslandGroup != null)
+            next = nextIslandGroup.idGroup;
+
 
         IslandGroupBean bean = new IslandGroupBean(idIslandGroup, idIsland,
-                studentsOnIsland, isPresentMN, tower);
+                studentsOnIsland, isPresentMN, tower,prev, next);
         return bean;
     }
 }
