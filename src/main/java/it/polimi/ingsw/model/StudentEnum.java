@@ -1,16 +1,18 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.view.StaticColorCLI;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public enum StudentEnum {
 
-    GREEN(0, "Green"),
-    RED(1, "Red"),
-    YELLOW(2, "Yellow"),
-    PINK(3, "Pink"),
-    BLUE(4, "Blue"),
+    GREEN(0, StaticColorCLI.ANSI_GREEN + "*" + StaticColorCLI.ANSI_RESET),
+    RED(1, StaticColorCLI.ANSI_RED + "*" + StaticColorCLI.ANSI_RESET),
+    YELLOW(2, StaticColorCLI.ANSI_YELLOW + "*" + StaticColorCLI.ANSI_RESET),
+    PINK(3, StaticColorCLI.ANSI_PURPLE + "*" + StaticColorCLI.ANSI_RESET),
+    BLUE(4, StaticColorCLI.ANSI_CYAN + "*" + StaticColorCLI.ANSI_RESET),
     NOSTUDENT(5, "NOSTUDENT");
 
     public final int index;

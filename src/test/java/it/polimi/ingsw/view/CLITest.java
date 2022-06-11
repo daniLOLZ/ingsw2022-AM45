@@ -16,6 +16,7 @@ import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -24,38 +25,50 @@ import java.util.List;
 public class CLITest {
 
 
-    //todo update with new virtualView
-    @Test
-    public void simple(){
-        List<Integer> selectedWizards = new ArrayList<>();
+    AdvancedGame game;
+    int players = 3;
+    int coins = 20;
+    int CharacterCards = 3;
+    VirtualView virtualView;
+
+    @BeforeEach
+    public void initialize(){
+        final List<Integer> selectedWizards = new ArrayList<>();
         selectedWizards.add(0);
         selectedWizards.add(10);
         selectedWizards.add(20);
-        List<TeamEnum> teamColors = new ArrayList<>();
+        final List<TeamEnum> teamColors = new ArrayList<>();
         teamColors.add(TeamEnum.WHITE);
         teamColors.add(TeamEnum.BLACK);
         teamColors.add(TeamEnum.GREY);
-        List<String> nicknames = new ArrayList<>();
+        final List<String> nicknames = new ArrayList<>();
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
+        virtualView = new VirtualView();
+
 
         try {
-            SimpleGame game = new SimpleGame(3,selectedWizards,teamColors, nicknames);
+            game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,
+                    coins,CharacterCards, virtualView);
             game.initializeGame();
-            game.setDrawables();
-            List<GameElementBean> beans = game.getElementView();
-            CLI cli = new CLI();
-            for(GameElementBean bean: beans){
-                cli.addBean(bean);
-
-            }
-            cli.show();
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
+    }
 
-
+    @Test
+    public void test(){
+        CLI cli = new CLI();
+        game.fillClouds();
+        AdvancedPlayer player = (AdvancedPlayer)game.getPlayers().get(0);
+        Player player2 = game.getPlayers().get(2);
+        game.getFromCloud(player,0);
+        game.getFromCloud(player2,1);
+        player.addEntrance(StudentEnum.RED);
+        game.selectStudentAtEntrance(player,0);
+        game.moveFromEntranceToIsland(player,0);
+        cli.printGameInterface(virtualView.renderAdvancedView());
     }
 
     //todo update with new virtualView

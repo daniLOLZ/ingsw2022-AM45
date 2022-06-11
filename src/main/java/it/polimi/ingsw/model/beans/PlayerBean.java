@@ -169,34 +169,35 @@ public class PlayerBean extends GameElementBean{
     public String toString() {
         StringBuilder toReturn = new StringBuilder();
 
-        toReturn.append("\t________________________________________________________\t\n");
-        toReturn.append("\t|Nickname : ").append(nickname).append("\n");
-        toReturn.append("\t|\tPlayer id: ").append(playerId).append("\n");
-        toReturn.append("\t|\tTower color: ").append(towerColor).append("\n");
-        toReturn.append("\t|\tNumber of Towers: ").append(numTowers).append("\n");
-        toReturn.append("\t|\tEntrance: ").append(studentsAtEntrance).append("\n");
-        toReturn.append("\t|\t").
+
+        toReturn.append("    ________________________________________________________    \n");
+        toReturn.append("    |Nickname : ").append(nickname).append("\n");
+        toReturn.append("    |    Player id: ").append(playerId).append("\n");
+        toReturn.append("    |    Tower color: ").append(towerColor).append("\n");
+        toReturn.append("    |    Number of Towers: ").append(numTowers).append("\n");
+        toReturn.append("    |    Entrance: ").append(studentsAtEntrance).append("\n");
+        toReturn.append("    |    ").
                 append(StudentEnum.RED).append(" Table: ").
                 append(studentsPerTable.get(StudentEnum.RED.index)).append("\n");
 
-        toReturn.append("\t|\t").
+        toReturn.append("    |    ").
                 append(StudentEnum.GREEN).append(" Table: ").
                 append(studentsPerTable.get(StudentEnum.GREEN.index)).append("\n");
 
-        toReturn.append("\t|\t").
+        toReturn.append("    |    ").
                 append(StudentEnum.BLUE).append(" Table: ").
                 append(studentsPerTable.get(StudentEnum.BLUE.index)).append("\n");
 
-        toReturn.append("\t|\t").
+        toReturn.append("    |    ").
                 append(StudentEnum.YELLOW).append(" Table: ").
                 append(studentsPerTable.get(StudentEnum.YELLOW.index)).append("\n");
 
-        toReturn.append("\t|\t").
+        toReturn.append("    |    ").
                 append(StudentEnum.PINK).append(" Table: ").
                 append(studentsPerTable.get(StudentEnum.PINK.index)).append("\n");
-        toReturn.append("\t|\tProfessors: ").append(professors).append("\n");
+        toReturn.append("    |    Professors: ").append(professors).append("\n");
 
-        toReturn.append("\t|\tAssistant Played: ").append(assistantPlayed).append("\n");
+        toReturn.append("    |    Assistant Played: ").append(assistantPlayed).append("\n");
 
 
         if(Assistants.size() > 4){
@@ -208,15 +209,15 @@ public class PlayerBean extends GameElementBean{
             for(int i=4; i< Assistants.size(); i++)
                 list2.add(Assistants.get(i));
 
-            toReturn.append("\t|\tAssistants: ").append(list1).append("\n");
-            toReturn.append("\t|\t").append(list2).append("\n");
+            toReturn.append("    |    Assistants: ").append(list1).append("\n");
+            toReturn.append("    |    ").append(list2).append("\n");
 
         }
         else
-            toReturn.append("\t|\tAssistants: ").append(Assistants).append("\n");
+            toReturn.append("    |    Assistants: ").append(Assistants).append("\n");
 
-        toReturn.append("\t________________________________________________________\t\n");
-        String border = 	"AAAAAAAA___________________________________________________\t\n";
+        toReturn.append("    ________________________________________________________    \n");
+        String border = "________________________________________________________";
 
         return setTab(toReturn.toString(), border.length() );
     }

@@ -15,8 +15,6 @@ public class GameBoardBean extends GameElementBean{
     protected Integer turn;
     protected PhaseEnum phase;
 
-
-    //TODO change to phaseEnum
     public GameBoardBean( List<Integer> idIslandGroups, List<Integer> idAssistantsPlayed,
                           List<Integer> idPlayers, Integer currentPlayerId,
                           Integer turn, PhaseEnum phase){
@@ -93,15 +91,15 @@ public class GameBoardBean extends GameElementBean{
         }
 
 
-        toReturn.append("\t____________________________________________\t\n");
-        toReturn.append("\t|\t\t\t::ERYANTIS::").append("\n");
-        toReturn.append("\t|\tTURN: ").append(turn).append("\n");
-        toReturn.append("\t|\tPHASE: ").append(phase).append("\n");
-        toReturn.append("\t|\tISLANDS: ").append(idIslandGroups).append("\n");
-        toReturn.append("\t|\tCURRENT PLAYER: ").append(currentPlayer).append("\n");
-        toReturn.append("\t|\tPLAYERS: ").append(players).append("\n");
-        toReturn.append("\t|\tASSISTANTS PLAYED: ").append(idAssistantsPlayed).append("\n");
-        toReturn.append("\t____________________________________________\t\n");
+        toReturn.append("\t______________________________________________________\t\n");
+        toReturn.append("\t\t\t\t::ERYANTIS::").append("\n");
+        toReturn.append("\t\tTURN: ").append(turn).append("\n");
+        toReturn.append("\t\tPHASE: ").append(phase).append("\n");
+        toReturn.append("\t\tISLANDS: ").append(idIslandGroups).append("\n");
+        toReturn.append("\t\tCURRENT PLAYER: ").append(currentPlayer).append("\n");
+        toReturn.append("\t\tPLAYERS: ").append(players).append("\n");
+        toReturn.append("\t\tASSISTANTS PLAYED: ").append(idAssistantsPlayed).append("\n");
+        toReturn.append("\t______________________________________________________\t\n");
 
         return toReturn.toString();
     }

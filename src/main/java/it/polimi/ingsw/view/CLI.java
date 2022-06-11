@@ -1,10 +1,12 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.model.Cloud;
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
-import it.polimi.ingsw.model.beans.GameElementBean;
-import it.polimi.ingsw.model.beans.VirtualViewBean;
+import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.game.PhaseEnum;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.client.ClientSender;
@@ -588,7 +590,536 @@ public class CLI implements UserInterface {
     @Override
     public void printGameInterface(VirtualViewBean view) {
         //todo stub
-        System.out.println(view.toString());
+        GameBoardBean simpleGame = view.getGameBoardBean();
+        AdvancedGameBoardBean advancedGame = view.getAdvancedGameBoardBean();
+        List<CloudBean> clouds = view.getCloudBeans();
+        List<PlayerBean> simplePlayers = view.getPlayerBeans();
+        List<AdvancedPlayerBean> advancedPlayers = view.getAdvancedPlayerBeans();
+        List<IslandGroupBean> simpleIslands = view.getIslandGroupBeans();
+        List<AdvancedIslandGroupBean> advancedIslands = view.getAdvancedIslandGroupBeans();
+        List<CharacterCardBean> characterCardBeans = view.getCharacterCardBeans();
+
+        //Show gameBoardBean.
+        if(simpleGame != null)
+            System.out.println(simpleGame);
+        else
+            System.out.println(advancedGame);
+
+        //Show Character Cards
+        StringBuilder characterString = new StringBuilder();
+        int done= 0;
+        while (done < characterCardBeans.size()) {
+            characterString = new StringBuilder();
+            characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
+            characterString.append(characterCardBeans.get(done).getName());
+            if(characterCardBeans.get(done).getName().length() >= 8)
+                characterString.append("\t\t\t\t\t");
+            else
+                characterString.append("\t\t\t\t\t\t");
+            characterString.append(characterCardBeans.get(done + 1).getName());
+            if(characterCardBeans.get(done + 1).getName().length() >= 8)
+                characterString.append("\t\t\t\t\t");
+            else
+                characterString.append("\t\t\t\t\t\t");
+            characterString.append(characterCardBeans.get(done + 2).getName());
+            characterString.append("\nCost: ").append(characterCardBeans.get(done).getCost()).
+                    append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 1).getCost()).
+                    append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 2).getCost()).append("\n");
+            if(characterCardBeans.get(done).getStudents()!= null &&
+                    !characterCardBeans.get(done).getStudents().isEmpty())
+                characterString.append(characterCardBeans.get(done).getStudents());
+            else
+                characterString.append("\t\t\t\t\t\t\t");
+
+            if(characterCardBeans.get(done + 1).getStudents()!= null &&
+                    !characterCardBeans.get(done + 1).getStudents().isEmpty())
+                characterString.append("\t\t").append(characterCardBeans.get(done+1).getStudents());
+            else
+                characterString.append("\t\t\t\t\t\t\t");
+
+            if(characterCardBeans.get(done + 2).getStudents()!= null &&
+                    !characterCardBeans.get(done + 2).getStudents().isEmpty())
+                characterString.append("\t\t").append(characterCardBeans.get(done+2).getStudents());
+            characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
+
+            done+=3;
+        }
+        System.out.println(characterString.toString());
+
+        //Show clouds
+        if(clouds.size() == 2){
+        String offsetStud = "    ";
+        CloudBean cloudBean = clouds.get(0);
+        CloudBean cloudBean2 = clouds.get(1);
+        List<StudentEnum> list = cloudBean.getStudents();
+        List<StudentEnum> list2 = cloudBean2.getStudents();
+        StringBuilder cloudsString = new StringBuilder();
+        cloudsString.append("---------------------\t\t---------------------\n");
+        cloudsString.append("CLOUD: ").append(cloudBean.getIdCloud())
+                .append("\t\t\t\t\tCLOUD: ").append(cloudBean2.getIdCloud());
+        cloudsString.append("\nStudents:").append(list);
+        if(!list.isEmpty())
+            cloudsString.append(offsetStud);
+        else
+            cloudsString.append("\t\t\t\t");
+        cloudsString.append("\tStudents:").append(list2);
+        cloudsString.append("\n---------------------\t\t---------------------\n");
+        System.out.println(cloudsString);
+        }
+
+        else{
+            String offsetStud = "    ";
+            CloudBean cloudBean = clouds.get(0);
+            CloudBean cloudBean2 = clouds.get(1);
+            CloudBean cloudBean3 = clouds.get(2);
+            List<StudentEnum> list = cloudBean.getStudents();
+            List<StudentEnum> list2 = cloudBean2.getStudents();
+            List<StudentEnum> list3 = cloudBean3.getStudents();
+            StringBuilder cloudsString = new StringBuilder();
+            cloudsString.append("---------------------\t\t---------------------\t\t---------------------\n");
+            cloudsString.append("CLOUD: ").append(cloudBean.getIdCloud())
+                    .append("\t\t\t\t\tCLOUD: ").append(cloudBean2.getIdCloud())
+                    .append("\t\t\t\t\tCLOUD: ").append(cloudBean3.getIdCloud());
+            cloudsString.append("\nStudents:").append(list);
+            if(!list.isEmpty())
+                cloudsString.append(offsetStud);
+            else
+                cloudsString.append("\t\t\t\t");
+            cloudsString.append("\tStudents:").append(list2);
+            if(!list2.isEmpty())
+                cloudsString.append(offsetStud);
+            else
+                cloudsString.append("\t\t\t\t");
+            cloudsString.append("\tStudents:").append(list3);
+            cloudsString.append("\n---------------------\t\t---------------------\t\t---------------------\n");
+            System.out.println(cloudsString);
+        }
+
+        //ShowIslands
+        if(simpleIslands != null){
+            int MN = simpleIslands.stream().filter(x -> x.isPresentMN()).findFirst().get().getIdIslandGroup();
+            System.out.println("\nMother nature is on Island " + MN);
+            int numIslands = simpleIslands.size();
+            done = 0;
+            StringBuilder islandString = new StringBuilder();
+            while(done < numIslands){
+
+
+                if(done + 4 < numIslands){
+
+                    List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
+                    List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
+                    List<String> list3 = studentsToNumStud(simpleIslands.get(done + 2).getStudentsOnIsland());
+                    List<String> list4 = studentsToNumStud(simpleIslands.get(done + 3).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslands());
+                    islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 2).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 3).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list2);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list3);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list4);
+
+                    islandString.append("\n---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    done+=4;
+
+                }
+
+
+                else if(done + 3 < numIslands){
+
+                    List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
+                    List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
+                    List<String> list3 = studentsToNumStud(simpleIslands.get(done + 2).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslands());
+                    islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 2).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list2);
+                    islandString.append("\t\t\t");
+
+                    islandString.append("Students: ").append(list3);
+
+                    islandString.append("\n---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    done+=3;
+
+                }
+
+                else if(done + 2 < numIslands){
+                    List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
+                    List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslands());
+                    islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list2);
+
+
+                    islandString.append("\n---------------------------=>\t\t>---------------------------=>\n");
+                    done+=2;
+                }
+
+                else{
+                    List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands());
+                    islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+
+                    islandString.append("\n---------------------------=>\n");
+                    done++;
+                }
+            }
+
+            System.out.println(islandString);
+        }
+        else if(advancedIslands != null){
+            int MN = advancedIslands.stream().filter(x -> x.isPresentMN()).findFirst().get().getIdIslandGroup();
+            System.out.println("\nMother nature is on Island " + MN);
+            int numIslands = advancedIslands.size();
+            done = 0;
+            StringBuilder islandString = new StringBuilder();
+            while(done < numIslands){
+
+                if(done + 4 <= numIslands){
+                    List<String> list1 = studentsToNumStud(advancedIslands.get(done).getStudentsOnIsland());
+                    List<String> list2 = studentsToNumStud(advancedIslands.get(done + 1).getStudentsOnIsland());
+                    List<String> list3 = studentsToNumStud(advancedIslands.get(done + 2).getStudentsOnIsland());
+                    List<String> list4 = studentsToNumStud(advancedIslands.get(done + 3).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslands());
+                    islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 3).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list2);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list3);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list4);
+
+                    islandString.append("\nBlocks: ").append(advancedIslands.get(done).getNumBlockTiles()).
+                            append("\t\t\t\t\t\t\tBlocks: ").append(advancedIslands.get(done + 1).getNumBlockTiles()).
+                            append("\t\t\t\t\t\t\tBlocks: ").append(advancedIslands.get(done + 2).getNumBlockTiles()).
+                            append("\t\t\t\t\t\t\tBlocks: ").append(advancedIslands.get(done + 3).getNumBlockTiles());
+
+
+
+                    islandString.append("\n---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    done+=4;
+
+                }
+
+                else if(done + 3 <= numIslands){
+                    List<String> list1 = studentsToNumStud(advancedIslands.get(done).getStudentsOnIsland());
+                    List<String> list2 = studentsToNumStud(advancedIslands.get(done + 1).getStudentsOnIsland());
+                    List<String> list3 = studentsToNumStud(advancedIslands.get(done + 2).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslands());
+                    islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list2);
+                    islandString.append("\t\t\t");
+
+                    islandString.append("Students: ").append(list3);
+
+                    islandString.append("\nBlocks: ").append(advancedIslands.get(done).getNumBlockTiles()).
+                            append("\t\t\t\t\t\t\tBlocks: ").append(advancedIslands.get(done + 1).getNumBlockTiles()).
+                            append("\t\t\t\t\t\t\tBlocks: ").append(advancedIslands.get(done + 2).getNumBlockTiles());
+
+
+
+                    islandString.append("\n---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
+                    done+=3;
+
+                }
+
+                else if(done + 2 <= numIslands){
+                    List<String> list1 = studentsToNumStud(advancedIslands.get(done).getStudentsOnIsland());
+                    List<String> list2 = studentsToNumStud(advancedIslands.get(done + 1).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands()).
+                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslands());
+                    islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
+                            append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\t\t\t");
+                    islandString.append("Students: ").append(list2);
+                    islandString.append("\nBlocks: ").append(advancedIslands.get(done).getNumBlockTiles()).
+                            append("\t\t\t\t\t\t\tBlocks: ").append(advancedIslands.get(done + 1).getNumBlockTiles());
+
+
+
+                    islandString.append("\n---------------------------=>\t\t>---------------------------=>\n");
+                    done+=2;
+
+                }
+
+                else{
+                    List<String> list1 = studentsToNumStud(advancedIslands.get(done).getStudentsOnIsland());
+
+                    islandString.append("\n>---------------------------=>\n");
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands());
+                    islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor());
+                    islandString.append("\nStudents: ").append(list1);
+                    islandString.append("\nBlocks: ").append(advancedIslands.get(done).getNumBlockTiles());
+
+                    islandString.append("\n---------------------------=>\n");
+                    done++;
+
+                }
+
+            }
+
+            System.out.println(islandString);
+        }
+
+
+        //Show Players
+        if(simplePlayers != null){
+            done = 1;
+            StringBuilder playerString = new StringBuilder();
+            playerString.append("\n--------------------\t\t");
+            while(done < simplePlayers.size()){
+                playerString.append("\t\t--------------------");
+                done++;
+            }
+
+            playerString.append(simplePlayers.get(0).getPlayerId());
+            done=1;
+            while (done < simplePlayers.size()){
+                playerString.append("\t\t\t\t").
+                        append(simplePlayers.get(done).getPlayerId());
+                done++;
+            }
+
+            playerString.append("\n");
+            playerString.append(simplePlayers.get(0).getNickname());
+            done=1;
+            while (done < simplePlayers.size()){
+                playerString.append("\t\t\t\t").
+                    append(simplePlayers.get(done).getNickname());
+                done++;
+            }
+            playerString.append("\n");
+
+            playerString.append("Color: ").
+                    append(simplePlayers.get(0).getTowerColor());
+            done=1;
+            while (done < simplePlayers.size()){
+                playerString.append("\t\t\t\t").
+                        append("Color: ").
+                        append(simplePlayers.get(done).getTowerColor());
+                done++;
+            }
+            playerString.append("\n");
+
+
+
+            List<StudentEnum> list1 = new ArrayList<>();
+            List<StudentEnum> list2 = new ArrayList<>();
+
+            for(int i=0; i < 4; i++ )
+                list1.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
+
+
+            playerString.append("Entrance: ").append(list1);
+            done=1;
+            while (done < simplePlayers.size()){
+                list1.clear();
+                for(int i=0; i < 4; i++ )
+                    list1.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
+
+
+                playerString.append("\t\t\t\t").
+                        append("Entrance: ").append(list1);
+                done++;
+            }
+            playerString.append("\n");
+
+
+            for(int i=4; i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                list2.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
+
+
+            playerString.append(list2);
+            done=1;
+            while (done < simplePlayers.size()){
+                list2.clear();
+                for(int i=0; i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                    list2.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
+
+                playerString.append("\t\t\t\t").
+                        append(list2);
+                done++;
+            }
+            playerString.append("\n");
+
+            System.out.println(playerString);
+
+
+        }
+        else if(advancedPlayers != null){
+
+
+            done = 1;
+            StringBuilder playerString = new StringBuilder();
+            playerString.append("\n--------------------");
+            while(done < advancedPlayers.size()){
+                playerString.append("\t\t--------------------");
+                done++;
+            }
+
+            playerString.append("\n");
+
+
+            playerString.append(advancedPlayers.get(0).getPlayerId());
+            done=1;
+            while (done < advancedPlayers.size()){
+                playerString.append("\t\t\t\t\t\t").
+                        append(advancedPlayers.get(done).getPlayerId());
+                done++;
+            }
+
+            playerString.append("\n");
+            playerString.append(advancedPlayers.get(0).getNickname());
+            done=1;
+            while (done < advancedPlayers.size()){
+                playerString.append("\t\t\t\t\t\t").
+                        append(advancedPlayers.get(done).getNickname());
+                done++;
+            }
+            playerString.append("\n");
+
+            playerString.append("Color: ").
+                    append(advancedPlayers.get(0).getTowerColor());
+            done=1;
+            while (done < advancedPlayers.size()){
+                playerString.append("\t\t\t\t").
+                        append("Color: ").
+                        append(advancedPlayers.get(done).getTowerColor());
+                done++;
+            }
+            playerString.append("\n");
+
+            playerString.append("Coins: ").
+                    append(advancedPlayers.get(0).getNumCoins());
+            done=1;
+            while (done < advancedPlayers.size()){
+                playerString.append("\t\t\t\t\t").
+                        append("Coins: ").
+                        append(advancedPlayers.get(done).getNumCoins());
+                done++;
+            }
+            playerString.append("\n");
+
+
+
+            List<StudentEnum> list1 = new ArrayList<>();
+            List<StudentEnum> list2 = new ArrayList<>();
+
+            if(!advancedPlayers.get(0).getStudentsAtEntrance().isEmpty())
+            for(int i=0; i < 4; i++ )
+                list1.add(advancedPlayers.get(0).getStudentsAtEntrance().get(i));
+
+
+            playerString.append("Entrance: ").append(list1);
+            done=1;
+            while (done < advancedPlayers.size()){
+                list1.clear();
+                if(!advancedPlayers.get(done).getStudentsAtEntrance().isEmpty())
+                    for(int i=0; i < 4; i++ )
+                    list1.add(advancedPlayers.get(done).getStudentsAtEntrance().get(i));
+
+
+                if(advancedPlayers.get(done - 1 ).getStudentsAtEntrance().size() > 0)
+                    playerString.append("\t\t");
+                else
+                playerString.append("\t\t\t\t");
+                playerString.append("Entrance: ").append(list1);
+                done++;
+            }
+            playerString.append("\n");
+
+            if(!advancedPlayers.get(0).getStudentsAtEntrance().isEmpty())
+            for(int i=4; i < advancedPlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                list2.add(advancedPlayers.get(0).getStudentsAtEntrance().get(i));
+
+
+            if(!list2.isEmpty())
+                playerString.append(list2);
+
+            done=1;
+            while (done < advancedPlayers.size()){
+                list2.clear();
+                if(!advancedPlayers.get(done).getStudentsAtEntrance().isEmpty())
+                    for(int i=4; i < advancedPlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                    list2.add(advancedPlayers.get(done).getStudentsAtEntrance().get(i));
+
+
+                playerString.append("\t\t\t\t");
+                if(!list2.isEmpty())
+                    playerString.append(list2);
+                done++;
+            }
+            playerString.append("\n");
+            playerString.append("Table:[");
+            for(int i=0; i < StudentEnum.getNumStudentTypes(); i++ )
+                playerString.append(StaticColorCLI.getColor(i)).
+                        append(advancedPlayers.get(0).getStudentsPerTable().get(i)).append(" ");
+            playerString.append(StaticColorCLI.ANSI_RESET).append("]");
+            done=1;
+            while (done < advancedPlayers.size()){
+                playerString.append("\t\t\t");
+                playerString.append("Table: [");
+                for(int i=0; i < StudentEnum.getNumStudentTypes(); i++ )
+                    playerString.append(StaticColorCLI.getColor(i)).
+                            append(advancedPlayers.get(done).getStudentsPerTable().get(i)).append(" ");
+                playerString.append(StaticColorCLI.ANSI_RESET).append("]");
+
+
+                done++;
+            }
+
+            playerString.append("\n");
+
+            System.out.println(playerString);
+        }
+
+        //System.out.println(view.toString());
     }
 
     @Override
@@ -700,5 +1231,85 @@ public class CLI implements UserInterface {
     @Override
     public void clearCommands() {
         availableCommands.clear();
+    }
+
+    private List<String> studentsToNumStud(List<StudentEnum> list1){
+        List<String> list1s = new ArrayList<>();
+        list1s.add(StaticColorCLI.ANSI_GREEN +
+                String.valueOf(list1.stream().filter(x -> x == StudentEnum.GREEN).count()) +
+                StaticColorCLI.ANSI_RESET);
+        list1s.add(StaticColorCLI.ANSI_RED +
+                String.valueOf(list1.stream().filter(x -> x == StudentEnum.RED).count())+
+                StaticColorCLI.ANSI_RESET);
+        list1s.add(StaticColorCLI.ANSI_YELLOW +
+                String.valueOf(list1.stream().filter(x -> x == StudentEnum.YELLOW).count())+
+                StaticColorCLI.ANSI_RESET);
+        list1s.add(StaticColorCLI.ANSI_PURPLE +
+                String.valueOf(list1.stream().filter(x -> x == StudentEnum.PINK).count())+
+                StaticColorCLI.ANSI_RESET);
+        list1s.add(StaticColorCLI.ANSI_BLUE +
+                String.valueOf(list1.stream().filter(x -> x == StudentEnum.BLUE).count())+
+                StaticColorCLI.ANSI_RESET);
+
+        return list1s;
+    }
+
+    private String sideBySide(String left, String right ){
+        final int width = 4;
+        final int position = 1;
+        final String tab ="    ";
+
+        Scanner moreRowsLeftElement = new Scanner(left);
+        Scanner moreRowsRightElement = new Scanner(right);
+        moreRowsLeftElement.useDelimiter("\n");
+        moreRowsRightElement.useDelimiter("\n");
+        int leftElementRows = 0;
+        int rightElementRows = 0;
+        while(moreRowsLeftElement.hasNext()){
+            moreRowsLeftElement.next();
+            leftElementRows++;
+        }
+
+        while(moreRowsRightElement.hasNext()){
+            moreRowsRightElement.next();
+            rightElementRows++;
+        }
+
+        if(rightElementRows > leftElementRows){
+            String toggle = right;
+            right = left;
+            left = right;
+        }
+
+
+        //Old element to show in left position on screen
+        Scanner scannerLastElement = new Scanner(left);
+        scannerLastElement.useDelimiter("\n");
+
+        //new element to show in right position on screen
+        Scanner scannerThisElement = new Scanner(right);
+        scannerThisElement.useDelimiter("\n");
+
+        //OFFSET
+        StringBuilder offsetBuilder = new StringBuilder();
+        for(int i = 0; i < width * position; i++){
+            offsetBuilder.append(tab);
+        }
+
+        String offset = offsetBuilder.toString();
+        StringBuilder newString = new StringBuilder();
+
+         /*
+        now for each left element's row I append the right element's row with an offset.
+         */
+        while(scannerLastElement.hasNext() || scannerThisElement.hasNext()){
+            if(!scannerThisElement.hasNext())
+                newString.append(scannerLastElement.next()).append("\n");
+            else
+                newString.append(scannerLastElement.next()).append(offset).append(scannerThisElement.next()).append("\n");
+        }
+
+        return newString.toString();
+
     }
 }
