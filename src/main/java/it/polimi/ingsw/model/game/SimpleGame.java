@@ -421,6 +421,7 @@ public class SimpleGame extends DrawableObject {
             if(cloud.isEmpty())
                 cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
         }
+        alert();
     }
 
     /**

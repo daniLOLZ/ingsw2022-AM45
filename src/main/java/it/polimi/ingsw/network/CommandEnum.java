@@ -26,6 +26,7 @@ public enum CommandEnum {
     DESELECT_STUDENT("Deselect Student",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     MOVE_MN_TO_ISLAND("Move MN to Island",                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, STEPS_MN}),
     CHOOSE_CLOUD("Choose Cloud",                                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_CLOUD}),
+    END_TURN("End of turn",                                     new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     SELECT_CHARACTER("Select Character",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION}),
     SELECT_STUDENT_COLOR("Select Student Color",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_STUDENT_COLORS}),
     SELECT_ENTRANCE_STUDENTS("Select Entrance Student",         new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_POSITIONS}), //TODO duplicated of SELECT_STUDENT?
@@ -33,7 +34,6 @@ public enum CommandEnum {
     SELECT_ISLAND_GROUP("Select Island Group",                  new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLANDS}),
     SELECT_STUDENT_ON_CARD("Select Student on Card",            new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_CARD_POSITIONS}),
     PLAY_CHARACTER("Play Character",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
-    END_TURN("End of turn",                                     new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
 
     //From here we're talking about server commands
     SERVER_LOBBY_STATUS("Lobby status",                         new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.commandHandler.asynchronous;
 
+import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
@@ -18,7 +19,8 @@ public class GameUpdateHandler extends AsyncCommandHandler {
 
         messageBroker.addToMessage(NetworkFieldEnum.COMMAND, commandHandled);
         //todo do we send a single bean containing all other beans? might be best
-//        messageBroker.addToMessage(NetworkFieldEnum.ASYNC_VIEW, );
+        VirtualViewBean viewBean = parameters.getUserController().getView();
+        messageBroker.addToMessage(NetworkFieldEnum.ASYNC_VIEW, viewBean);
         return true;
     }
 

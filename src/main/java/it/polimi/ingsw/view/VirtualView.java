@@ -21,6 +21,7 @@ public class VirtualView {
     private List<IslandGroupWatcher> islandGroupWatchers;
     private List<AdvancedIslandGroupWatcher> advancedIslandGroupWatchers;
     private List<PlayerWatcher> playerWatchers;
+    //separate into player and board?
     private List<AdvancedPlayerWatcher> advancedPlayerWatchers;
     private List<ErrorWatcher> errorWatchers;
     private SimpleGameWatcher simpleGameWatcher;
@@ -128,6 +129,52 @@ public class VirtualView {
     public GameBoardBean getSimpleGameBean() {
         return simpleGameWatcher.getBean();
     }
+
+    /**
+     * Combines all currently held beans and returns them as a single virtual view bean (simple)
+     * @return the combined virtual view bean
+     */
+    public VirtualViewBean renderSimpleView() {
+        return new VirtualViewBean(
+                getCloudBean(),
+                null,
+                getIslandBean(),
+                null,
+                getPlayerBean(),
+                null,
+                getErrorBean(),
+                getSimpleGameBean(),
+                null);
+    }
+
+    /**
+     * Combines all currently held beans and returns them as a single virtual view bean (simple)
+     * @return the combined virtual view bean
+     */
+    public VirtualViewBean renderAdvancedView(){
+        return new VirtualViewBean(
+                getCloudBean(),
+                getCharacterBean(),
+                null,
+                getAdvancedIslandBean(),
+                null,
+                getAdvancedPlayerBean(),
+                getErrorBean(),
+                null,
+                getAdvancedGameBean());
+    }
+
+
+    /*
+
+    private <S extends GameElementBean, T extends Watcher> List<S> getBeansFromWatchers(List<T> watchers) {
+        return watchers.stream()
+                .map(Watcher::getBean)
+                .map( x -> (S) x)
+                .collect(Collectors.toList());
+    }
+
+     */
 }
 
 

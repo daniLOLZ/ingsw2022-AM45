@@ -12,7 +12,8 @@ public enum BeanEnum {
     ERROR_BEAN("ErrorBean"),
     GAMEBOARD_BEAN("GameBoardBean"),
     ISLANDGROUP_BEAN("IslandGroupBean"),
-    PLAYER_BEAN("PlayerBean");
+    PLAYER_BEAN("PlayerBean"),
+    VIRTUAL_VIEW_BEAN("VirtualViewBean");
 
     public final String name;
 

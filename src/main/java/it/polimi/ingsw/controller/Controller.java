@@ -3,6 +3,7 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
+import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
@@ -52,7 +53,7 @@ public class Controller {
         wizardLock = new ReentrantLock();
         startLock = new ReentrantLock();
         gameStarted = false;
-        gameUpdated = new AtomicBoolean(true);
+        gameUpdated = new AtomicBoolean(false);
         // Should we create it here or when the game starts?
         createView();
     }
@@ -193,6 +194,7 @@ public class Controller {
 
         simpleGame.initializeGame();
         this.gameStarted = true;
+        this.gameUpdated.set(true);
 
         return true;
     }
@@ -257,6 +259,17 @@ public class Controller {
 
     public void setGameUpdated(boolean value){
         gameUpdated.set(value);
+    }
+
+    /**
+     * Gets the current virtual view as a bean containing all the beans of game elements
+     * @return a VirtualViewBean
+     */
+    public VirtualViewBean getView() {
+        if(GameRuleEnum.isSimple(gameRule.id)){
+            return virtualView.renderSimpleView();
+        }
+        else return virtualView.renderAdvancedView();
     }
 
     /*____________________________
@@ -531,5 +544,6 @@ public class Controller {
         /*TODO invia la view a tutti gli user della lobby incriminata */
         //TODO chiudi le connessioni
     }
+
 
 }

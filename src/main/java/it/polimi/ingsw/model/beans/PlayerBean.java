@@ -15,8 +15,9 @@ public class PlayerBean extends GameElementBean{
     protected int numTowers;
     protected List<StudentEnum> studentsAtEntrance;
     protected List<Integer> studentsPerTable;
-    protected List<Integer> idAssistants;
     protected List<StudentEnum> professors;
+    protected List<Integer> idAssistants;
+
 
 
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,

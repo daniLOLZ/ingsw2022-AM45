@@ -1,6 +1,8 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.VirtualViewBean;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.CommandEnum;
@@ -17,6 +19,7 @@ public interface UserInterface {
 
     void clearBeans();
 
+    //todo? wrap these in a client state like with the server?
     void addCommand(CommandEnum command);
 
     CommandEnum removeCommand(int index);
@@ -27,7 +30,7 @@ public interface UserInterface {
      * Sets the message sender for this UI
      * @param sender the sender that will communicate with the server
      */
-    public void setSender(ClientSender sender);
+    void setSender(ClientSender sender);
 
     /**
      * Shows a welcome screen for the game
@@ -114,33 +117,39 @@ public interface UserInterface {
     void showTowerAndWizardSelection();
 
     /**
-     * Shows an error with the color selection, calls showTowerAndWizardSelection
+     * Shows an error with the color selection
      * @param color the color chosen
      */
     void showErrorSelectingColor(String color);
 
     /**
-     * Shows success with the color selection, calls showTowerAndWizardSelection
+     * Shows success with the color selection
      * @param color the color chosen
      */
     void showSuccessSelectingColor(String color);
 
     /**
-     * SShows an error with the wizard selection, calls showTowerAndWizardSelection
+     * SShows an error with the wizard selection
      * @param wizard the wizard chosen
      */
     void showErrorSelectingWizard(String wizard);
 
     /**
-     * Shows success with the wizard selection, calls showTowerAndWizardSelection
+     * Shows success with the wizard selection
      * @param wizard the wizard chosen
      */
     void showSuccessSelectingWizard(String wizard);
 
     /**
-     * The main game interface
+     * This screen will be used to get commands from the client
      */
-    void showGameInterface();
+    void showMainGameInterface();
+
+    /**
+     * Shows the user that it's their turn to play
+     * @param phase the phase in which the game is currently in
+     */
+    void showItsYourTurn(PhaseEnum phase);
 
     /**
      * Initializes and starts the application interface
@@ -162,6 +171,12 @@ public interface UserInterface {
     void printLobby(LobbyBean lobbyBean);
 
     void printGameInitInfo(GameInitBean gameInitBean);
+
+    /**
+     * The main game interface, will be called by an asynchronous update whenever the game state changes
+     */
+    void printGameInterface(VirtualViewBean virtualView);
+
 
     // Setters
 

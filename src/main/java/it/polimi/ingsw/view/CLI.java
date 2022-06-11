@@ -3,6 +3,8 @@ package it.polimi.ingsw.view;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.VirtualViewBean;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.client.ClientSender;
@@ -87,6 +89,8 @@ public class CLI implements UserInterface {
         return command;
     }
 
+    //change in a more descriptive name
+    //actually parse the beans instead of letting them draw themselves
     public void show(){
         final int highestPriority = 1;
         final int lowestPriority = 10;
@@ -248,12 +252,34 @@ public class CLI implements UserInterface {
         }
 
     }
+    public String getOptions(){
+        StringBuilder retString = new StringBuilder();
+        retString.append("\n\t\t\t\t::CHOICES::\n");
+        for(int index=0;index<availableCommands.size();index++){
+            CommandEnum command = availableCommands.get(index);
+            retString.append(" ________________________________________\n");
+            retString.append("|" + command +"\n");
+            retString.append("|REQUIRES: ");
+            for(NetworkFieldEnum field: command.allowedFields){
+                if(field != NetworkFieldEnum.ID_USER &&
+                        field != NetworkFieldEnum.ID_REQUEST &&
+                        field!= NetworkFieldEnum.ID_PING_REQUEST)
+                    retString.append("-"+field+"- ");
+            }
+            retString.append("\n| PRESS " + index + " to choose this action\n");
+            retString.append("|________________________________________\n");
+        }
+        return retString.toString();
+    }
+
 
 
     @Override
     public void showWelcomeScreen() {
         System.out.println("-- WELCOME TO ERIANTYS! --");
     }
+
+    //<editor-fold desc="Synchronous methods">
 
     @Override
     public void showLoginScreen() {
@@ -279,7 +305,6 @@ public class CLI implements UserInterface {
     @Override
     public void showLoginScreenFailure(){
         System.out.println("The username was rejected by the server, choose another one");
-        showLoginScreen();
     }
 
     /**
@@ -288,7 +313,6 @@ public class CLI implements UserInterface {
     @Override
     public void showSuccessLoginScreen() {
         System.out.println("Username " + chosenNickname + " was accepted");
-        showGameruleSelection();
     }
 
     @Override
@@ -337,13 +361,11 @@ public class CLI implements UserInterface {
     @Override
     public void showErrorJoiningLobby(){
         System.out.println("There was a problem sending the gamemode preferences, please try again");
-        showGameruleSelection();
     }
 
     @Override
     public void showSuccessJoiningLobby(){
         System.out.println("You joined a lobby!");
-        showLobby();
     }
 
     @Override
@@ -368,6 +390,7 @@ public class CLI implements UserInterface {
             selection = getInputNonBlocking(reader, lobbyStarting);
 
             if (lobbyStarting.get()){
+                showTowerAndWizardSelection();
                 break;
             }
 
@@ -390,26 +413,21 @@ public class CLI implements UserInterface {
     public void showSuccessReadyStatus(boolean status) {
         String readyOrNotHereICome = status?"":"not";
         System.out.println("You set yourself as "+readyOrNotHereICome+" ready");
-        showLobby();
     }
 
     @Override
     public void showErrorReadyStatus(boolean status) {
         System.out.println("There was an error sending your readiness status");
-        showLobby();
     }
 
     @Override
     public void showSuccessStartGame() {
         System.out.println("The game could start");
-        showLobby(); // We return to showLobby waiting for the asynchronous message to arrive
-
     }
 
     @Override
     public void showErrorStartGame() {
         System.out.println("The game couldn't start");
-        showLobby();
     }
 
     @Override
@@ -449,6 +467,7 @@ public class CLI implements UserInterface {
 
             if(gameStarting.get()){
                 System.out.println("Everyone made their choice, the game is starting!");
+//              showGameInterface();
                 return;
             }
 
@@ -491,37 +510,38 @@ public class CLI implements UserInterface {
     @Override
     public void showErrorSelectingColor(String color) {
         System.out.println("There was an error selecting the color " + color);
-        showTowerAndWizardSelection();
     }
 
     @Override
     public void showSuccessSelectingColor(String color) {
         System.out.println("You chose the " + color + " team.");
-        showTowerAndWizardSelection();
     }
 
     @Override
     public void showErrorSelectingWizard(String wizard) {
         System.out.println("There was an error selecting the " + wizard);
-        showTowerAndWizardSelection();
     }
 
     @Override
     public void showSuccessSelectingWizard(String wizard) {
         System.out.println("You chose the " + wizard);
-        showTowerAndWizardSelection();
     }
 
     @Override
-    public void showGameInterface() {
-        boolean genericVariableThatTellsUsIfTheGameIsStillGoing = true;
-        System.out.println("started woohoo");
-        //Game loop
-        while(genericVariableThatTellsUsIfTheGameIsStillGoing){
-
-        }
-
+    public void showMainGameInterface() {
+        requestCommand();
     }
+
+    private void requestCommand() {
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//        System.out.println(getOptions());
+//        getInputNonBlocking(reader, lobbyStarting);
+    }
+
+    // </editor-fold>
+
+    //<editor-fold desc="Network Errors">
+
 
     @Override
     public void showNetworkError() {
@@ -534,6 +554,8 @@ public class CLI implements UserInterface {
         System.out.println("TODO");
     }
 
+    // </editor-fold>
+
     @Override
     public void startInterface() {
         showWelcomeScreen();
@@ -542,9 +564,7 @@ public class CLI implements UserInterface {
         //This ends here basically, everything else derives from the receiver
     }
 
-    /*
-            ASYNCHRONOUS METHODS
-                                     */
+    //<editor-fold desc="Asynchronous methods">
 
     public void printLobby(LobbyBean lobbyBean) {
         for(int index = 0; index < lobbyBean.getNicknames().size(); index++){
@@ -565,9 +585,20 @@ public class CLI implements UserInterface {
         System.out.println(gameInitBean.toString());
     }
 
-    /*
-               UTILITY METHODS
-                                     */
+    @Override
+    public void printGameInterface(VirtualViewBean view) {
+        //todo stub
+        System.out.println(view.toString());
+    }
+
+    @Override
+    public void showItsYourTurn(PhaseEnum phase) {
+        System.out.println("It's your turn! Starting your "+ phase.toString()+" phase");
+    }
+
+    // </editor-fold>
+
+    //<editor-fold desc="Utility methods">
 
     /**
      * Gets user input from the stream in the reader, exiting and returning the empty string
@@ -595,6 +626,9 @@ public class CLI implements UserInterface {
         }
         return selection;
     }
+
+    // </editor-fold>
+
 
     @Override
     public void setSender(ClientSender sender) {

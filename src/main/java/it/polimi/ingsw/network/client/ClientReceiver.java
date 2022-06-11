@@ -92,10 +92,22 @@ public class ClientReceiver {
                 case LEAVE_LOBBY -> clientController.validateLobbyLeave();
                 case SELECT_TOWER_COLOR -> clientController.validateSelectTeamColor();
                 case SELECT_WIZARD -> clientController.validateSelectWizard();
-                //todo
-                case QUIT -> closeConnection();
+                case CHOOSE_ASSISTANT -> clientController.validateChooseAssistant();
+                case SELECT_STUDENT -> clientController.validateSelectStudent();
+                case PUT_IN_HALL -> clientController.validatePutInHall();
+                case PUT_IN_ISLAND -> clientController.validatePutInIsland();
+                case DESELECT_STUDENT -> clientController.validateDeselectStudent();
+                case MOVE_MN_TO_ISLAND -> clientController.validateMoveMN();
+                case CHOOSE_CLOUD -> clientController.validateChooseCloud();
+                case END_TURN -> clientController.validateEndTurn();
+                case SELECT_CHARACTER -> clientController.validateSelectCharacter();
+                case SELECT_STUDENT_COLOR -> clientController.validateSelectStudentColor();
+                case SELECT_ENTRANCE_STUDENTS -> clientController.validateSelectEntranceStudents();
+                case SELECT_ISLAND_GROUP -> clientController.validateSelectIslandGroup();
+                case SELECT_STUDENT_ON_CARD -> clientController.validateSelectStudentOnCard();
+                case PLAY_CHARACTER -> clientController.validatePlayCharacter();
+                case QUIT -> closeConnection(); //todo make the response to QUIT its own method, right now it's the same as if a network error occurred
                 default -> closeConnection();
-                //todo make the response to QUIT its own method, right now it's the same as if a network error occurred
             }
             mainBroker.flushFirstSyncMessage();
         }
