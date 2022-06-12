@@ -2,9 +2,11 @@ package it.polimi.ingsw.model.assistantCards;
 
 import java.util.Objects;
 
+/**
+ * Can be interpreted as beans aussi
+ */
 public class Assistant {
     public final int id;
-
     public final int motherNatureSteps;
     public final int turnOrder;
 

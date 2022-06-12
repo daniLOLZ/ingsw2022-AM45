@@ -61,11 +61,11 @@ public class Wizard {
      *
      * @return a list with the remained Assistants' ids
      */
-    public List<Integer> getRemainedAssistants(){
-        List<Integer> idList = new ArrayList<>();
+    public List<Assistant> getRemainedAssistants(){
+        List<Assistant> assistantList = new ArrayList<>();
         for(Assistant assistant: assistants)
-            idList.add(assistant.id);
-        return idList;
+            assistantList.add(assistant);
+        return assistantList;
     }
 
 }

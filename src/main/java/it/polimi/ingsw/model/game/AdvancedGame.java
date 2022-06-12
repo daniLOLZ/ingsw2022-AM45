@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdvancedGame extends SimpleGame {
-    private final List<CharacterCard> CharacterCards;
+    private List<CharacterCard> CharacterCards;
     private AdvancedParameterHandler advancedParameters;
 
 
@@ -371,12 +371,13 @@ public class AdvancedGame extends SimpleGame {
         List<Integer> idPlayers = new ArrayList<>();
         int currentPlayerId = parameters.getCurrentPlayer().getPlayerId().index;
         int turn = parameters.getTurn();
-        String phase = parameters.getCurrentPhase().name;
+        PhaseEnum phase = parameters.getCurrentPhase();
         int numCoins = advancedParameters.getNumCoins();
 
         List<Integer> idCharacterCards = CharacterCards.stream().mapToInt(card -> card.id).
                                                 collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 
+        sortIslandGroups();
         for(IslandGroup islandGroup: islandGroups){
             idIslands.add(islandGroup.getIdGroup());
         }
@@ -401,6 +402,10 @@ public class AdvancedGame extends SimpleGame {
         super.initialiseSelection();
         List<Integer> emptyStudentsOnCard = new ArrayList<>();
         advancedParameters.setSelectedStudentsOnCard(emptyStudentsOnCard);
+    }
+
+    public void setCharacterCards(List<CharacterCard> characterCards) {
+        CharacterCards = characterCards;
     }
 }
 

@@ -269,6 +269,7 @@ public class ClientHandler implements Runnable{
                 try {
                     mainBroker.send(outStream);
                     mainBroker.flushFirstAsyncMessage();
+                    System.out.println("-++Async message sent [idUser: "+parameters.getIdUser()+"]");
                 } catch (IOException e) {
                     connectionLostAlert("Couldn't send the asynchronous message");
                 }

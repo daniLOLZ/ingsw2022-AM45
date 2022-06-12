@@ -52,4 +52,8 @@ public enum PlayerEnum {
 
         return NOPLAYER;
     }
+
+    public static PlayerEnum fromObjectToEnum(Object field) {
+        return PlayerEnum.valueOf((String)field);
+    }
 }

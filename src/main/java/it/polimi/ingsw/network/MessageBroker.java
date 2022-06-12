@@ -196,12 +196,12 @@ public class MessageBroker {
             System.err.println("Socket error, couldn't read the message");
             System.err.println(e.getMessage());
             //TODO handle user disconnection by passing it to ClientHandler somehow
-            e.printStackTrace();
+            //e.printStackTrace();
             throw e;
 
         } catch (IOException e) {
             System.err.println("Error reading message from the network");
-            e.printStackTrace();
+            //e.printStackTrace();
             throw e;
 
         }

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.beans.*;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -113,14 +114,14 @@ public class BeanTest {
         List<Integer> players= new ArrayList<>();
         players.add(10);
 
-        GameBoardBean bean = new GameBoardBean(islands2,assistant,players,12,2,"ACTION");
+        GameBoardBean bean = new GameBoardBean(islands2,assistant,players,12,2, PhaseEnum.ACTION);
 
         assertEquals(12, bean.getIdIslandGroups().get(0));
         assertEquals(1, bean.getIdAssistantsPlayed().get(0));
         assertEquals(10, bean.getIdPlayers().get(0));
         assertEquals(12, bean.getCurrentPlayerId());
         assertEquals(2, bean.getTurn());
-        assertEquals("ACTION", bean.getPhase());
+        assertEquals(PhaseEnum.ACTION, bean.getPhase());
 
 
         List<Integer> players2= new ArrayList<>();
@@ -134,14 +135,14 @@ public class BeanTest {
         bean.setIdIslandGroups(islands);
         bean.setIdPlayers(players2);
         bean.setTurn(22);
-        bean.setPhase("PLANNING");
+        bean.setPhase(PhaseEnum.PLANNING);
 
         assertEquals(100, bean.getIdIslandGroups().get(0));
         assertEquals(22, bean.getIdAssistantsPlayed().get(0));
         assertEquals(10, bean.getIdPlayers().get(0));
         assertEquals(1, bean.getCurrentPlayerId());
         assertEquals(22, bean.getTurn());
-        assertEquals("PLANNING", bean.getPhase());
+        assertEquals(PhaseEnum.PLANNING, bean.getPhase());
 
         String string = bean.toString();
         assertNotNull(string);
@@ -159,14 +160,14 @@ public class BeanTest {
         cards.add(111);
 
         AdvancedGameBoardBean bean = new AdvancedGameBoardBean(islands2,
-                assistant,players,12,2,"ACTION",33,cards);
+                assistant,players,12,2,PhaseEnum.ACTION,33,cards);
 
         assertEquals(12, bean.getIdIslandGroups().get(0));
         assertEquals(1, bean.getIdAssistantsPlayed().get(0));
         assertEquals(10, bean.getIdPlayers().get(0));
         assertEquals(12, bean.getCurrentPlayerId());
         assertEquals(2, bean.getTurn());
-        assertEquals("ACTION", bean.getPhase());
+        assertEquals(PhaseEnum.ACTION, bean.getPhase());
         assertEquals(33,bean.getNumGameCoins());
         assertEquals(111,bean.getIdCharacterCards().get(0));
 
@@ -184,7 +185,7 @@ public class BeanTest {
         bean.setIdIslandGroups(islands);
         bean.setIdPlayers(players2);
         bean.setTurn(22);
-        bean.setPhase("PLANNING");
+        bean.setPhase(PhaseEnum.PLANNING);
         bean.setNumGameCoins(1);
         bean.setIdCharacterCards(cards2);
 
@@ -193,7 +194,7 @@ public class BeanTest {
         assertEquals(10, bean.getIdPlayers().get(0));
         assertEquals(1, bean.getCurrentPlayerId());
         assertEquals(22, bean.getTurn());
-        assertEquals("PLANNING", bean.getPhase());
+        assertEquals(PhaseEnum.PLANNING, bean.getPhase());
         assertEquals(1,bean.getNumGameCoins());
         assertEquals(101,bean.getIdCharacterCards().get(0));
 
@@ -211,11 +212,11 @@ public class BeanTest {
         List<Integer> table = new ArrayList<>();
         table.add(12);
         List<Integer> assistant = new ArrayList<>();
-        assistant.add(42);
+        assistant.add(22);
         PlayerBean bean = new PlayerBean("FRANCO", PlayerEnum.PLAYER1,false,
                 TeamEnum.WHITE,6,list2,table,prof,assistant);
 
-        assertEquals(42,bean.getIdAssistants().get(0));
+        assertEquals(22,bean.getIdAssistants().get(0));
         assertEquals(6,bean.getNumTowers());
         assertEquals(12,bean.getStudentsPerTable().get(0));
         assertEquals(PlayerEnum.PLAYER1,bean.getPlayerId());
@@ -236,7 +237,7 @@ public class BeanTest {
         table2.add(12);
         table2.add(12);
         List<Integer> assistant2 = new ArrayList<>();
-        assistant2.add(42);
+        assistant2.add(22);
 
         bean.setLeader(true);
         bean.setNickname("MARIO");
@@ -247,7 +248,7 @@ public class BeanTest {
         bean.setStudentsAtEntrance(list);
         bean.setIdAssistants(assistant2);
 
-        assertEquals(42,bean.getIdAssistants().get(0));
+        assertEquals(22,bean.getIdAssistants().get(0));
         assertEquals(7,bean.getNumTowers());
         assertEquals(12,bean.getStudentsPerTable().get(0));
         assertEquals(PlayerEnum.PLAYER2,bean.getPlayerId());
@@ -274,7 +275,7 @@ public class BeanTest {
         table.add(12);
         table.add(12);
         List<Integer> assistant = new ArrayList<>();
-        assistant.add(42);
+        assistant.add(22);
         AdvancedPlayerBean bean = new AdvancedPlayerBean("FRANCO", PlayerEnum.PLAYER1,false,
                 TeamEnum.WHITE,6,list2,table,prof,assistant,20);
 

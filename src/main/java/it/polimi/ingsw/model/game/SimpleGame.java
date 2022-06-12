@@ -181,6 +181,12 @@ public class SimpleGame extends DrawableObject {
         createPlayingSack();
 
         hasBeenInitialized = true;
+        for(IslandGroup islandGroup: islandGroups)
+            islandGroup.alert();
+        for(Player player: players)
+            player.alert();
+        for(Cloud cloud: clouds)
+            cloud.alert();
         alert();
     }
 
@@ -421,6 +427,7 @@ public class SimpleGame extends DrawableObject {
             if(cloud.isEmpty())
                 cloud.fill(sack.drawNStudents(parameters.getStudentsPerCloud()));
         }
+        alert();
     }
 
     /**
@@ -908,11 +915,13 @@ public class SimpleGame extends DrawableObject {
 
         int turn = parameters.getTurn();
 
-        String phase;
+        PhaseEnum phase;
         if((parameters.getCurrentPhase() != null))
-             phase = parameters.getCurrentPhase().name;
+             phase = parameters.getCurrentPhase();
         else
-            phase = "No phase";
+            phase = null;
+
+        sortIslandGroups();
         for(IslandGroup islandGroup: islandGroups){
             idIslands.add(islandGroup.getIdGroup());
         }
@@ -983,6 +992,27 @@ public class SimpleGame extends DrawableObject {
         parameters.setSelectedEntranceStudents(emptyEntranceStudents);
         parameters.setSelectedIslands(emptyIslands);
         parameters.setSelectedStudentTypes(emptyColors);
+    }
+
+
+    /**
+     * This method sort the islandGroups list.
+     * In this way islandGroups[0] will be the previous node group pointed by islandGroups[1] ecc...
+     */
+    public void sortIslandGroups(){
+        List<IslandGroup> sortedList = new ArrayList<>();
+        IslandGroup start = islandGroups.get(0);
+        IslandGroup curr = start;
+        int numGroups = islandGroups.size();
+        sortedList.add(start);
+        int addedIsland = 1;
+        while(addedIsland < numGroups){
+            curr = curr.getNextIslandGroup();
+            sortedList.add(curr);
+            addedIsland++;
+        }
+
+        islandGroups = sortedList;
     }
 
 }

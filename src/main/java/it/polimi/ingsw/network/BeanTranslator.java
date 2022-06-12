@@ -4,13 +4,13 @@ import com.google.gson.internal.LinkedTreeMap;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
-import it.polimi.ingsw.model.beans.AdvancedGameBoardBean;
-import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
-import it.polimi.ingsw.model.beans.CloudBean;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.beans.*;
+import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,34 +44,200 @@ public class BeanTranslator {
         return new GameInitBean(chosenColors,chosenWizards);
     }
 
-    public static AdvancedGameBoardBean deserializeAdvancedGameBoardBean(LinkedTreeMap<String, Object> map){
-        List<Integer> idIslandGroups = (List<Integer>) map.get("idIslandGroups");
-        List<Integer> idAssistantsPlayed = (List<Integer>) map.get("idAssistantsPlayed");
-        List<Integer> idPlayers = (List<Integer>) map.get("idPlayers");
+    private static GameBoardBean deserializeGameBoardBean(LinkedTreeMap<String, Object> map) {
+        List<Integer> idIslandGroups = ApplicationHelper.getIntListFromBrokerField(map.get("idIslandGroups"));
+        List<Integer> idAssistantsPlayed = ApplicationHelper.getIntListFromBrokerField(map.get("idAssistantsPlayed"));
+        List<Integer> idPlayers = ApplicationHelper.getIntListFromBrokerField(map.get("idPlayers"));
         Integer currentPlayerId = ApplicationHelper.getIntFromBrokerField(map.get("currentPlayerId"));
         Integer turn = ApplicationHelper.getIntFromBrokerField(map.get("turn"));
-        String phase = (String) map.get("phase");
-        Integer numGameCoins = ApplicationHelper.getIntFromBrokerField(map.get("numGameCoins"));
-        List<Integer> idCharacterCards = (List<Integer>) map.get("idCharacterCards");
-        return new AdvancedGameBoardBean(idIslandGroups,idAssistantsPlayed, idPlayers, currentPlayerId, turn, phase, numGameCoins, idCharacterCards);
+        PhaseEnum phase = PhaseEnum.fromObjectToEnum(map.get("phase"));
+        return new GameBoardBean(idIslandGroups,idAssistantsPlayed,idPlayers,currentPlayerId,turn,phase);
     }
 
-    public static CloudBean deserializeCloudBean(LinkedTreeMap<String, Object> map){
-        int idCloud = (int) map.get("idCloud");
-        List<StudentEnum> readyPlayers = toListOfEnum(StudentEnum.class, (ArrayList<String>)map.get("students"));
-        return new CloudBean(idCloud, readyPlayers);
+    private static AdvancedGameBoardBean deserializeAdvancedGameBoardBean(LinkedTreeMap<String, Object> map){
+        GameBoardBean simpleGameBoardBean = deserializeGameBoardBean(map);
+        int numGameCoins = ApplicationHelper.getIntFromBrokerField(map.get("numGameCoins"));
+        List<Integer> idCharacterCards = ApplicationHelper.getIntListFromBrokerField(map.get("idCharacterCards"));
+        return new AdvancedGameBoardBean(
+                simpleGameBoardBean.getIdIslandGroups(),
+                simpleGameBoardBean.getIdAssistantsPlayed(),
+                simpleGameBoardBean.getIdPlayers(),
+                simpleGameBoardBean.getCurrentPlayerId(),
+                simpleGameBoardBean.getTurn(),
+                simpleGameBoardBean.getPhase(), numGameCoins, idCharacterCards);
     }
 
-    public static AdvancedIslandGroupBean deserializeAdvancedIslandGroupBean(LinkedTreeMap<String, Object> map){
-        //todo
-        return null;
+    private static CloudBean deserializeCloudBean(LinkedTreeMap<String, Object> map){
+        int idCloud = ApplicationHelper.getIntFromBrokerField(map.get("idCloud"));
+        List<StudentEnum> students = toListOfEnum(StudentEnum.class, (ArrayList<String>)map.get("students"));
+        return new CloudBean(idCloud, students);
     }
-    //todo gli altri traduttori
+
+    private static CharacterCardBean deserializeCharacterCardBean(LinkedTreeMap<String, Object> map) {
+        int id = ApplicationHelper.getIntFromBrokerField(map.get("id"));
+        String name = (String) map.get("name");
+        int cost = ApplicationHelper.getIntFromBrokerField(map.get("cost"));
+        String description = (String) map.get("name");
+        List<StudentEnum> students = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("students"));
+        return new CharacterCardBean(id,name, description, students, cost);
+    }
+
+    private static IslandGroupBean deserializeIslandGroupBean(LinkedTreeMap<String, Object> map) {
+        int idIslandGroup = ApplicationHelper.getIntFromBrokerField(map.get("idIslandGroup"));
+        List<Integer> idIslands = ApplicationHelper.getIntListFromBrokerField(map.get("idIslands"));
+        List<StudentEnum> studentsOnIsland = toListOfEnum(StudentEnum.class, (ArrayList<String>)map.get("studentsOnIsland"));
+        boolean isPresentMN = (boolean)map.get("isPresentMN");
+        TeamEnum towersColor = TeamEnum.fromObjectToEnum(map.get("towersColor"));
+        int idPrevIslandGroup = ApplicationHelper.getIntFromBrokerField(map.get("idPrevIslandGroup"));
+        int idNextIslandGroup = ApplicationHelper.getIntFromBrokerField(map.get("idNextIslandGroup"));
+        return new IslandGroupBean(idIslandGroup,idIslands,studentsOnIsland,isPresentMN,towersColor,idPrevIslandGroup,idNextIslandGroup);
+    }
+
+    private static AdvancedIslandGroupBean deserializeAdvancedIslandGroupBean(LinkedTreeMap<String, Object> map){
+        IslandGroupBean islandGroupBean = deserializeIslandGroupBean(map);
+        int numBlockTiles = ApplicationHelper.getIntFromBrokerField(map.get("numBlockTiles"));
+        return new AdvancedIslandGroupBean(
+                islandGroupBean.getIdIslandGroup(),
+                islandGroupBean.getIdIslands(),
+                islandGroupBean.getStudentsOnIsland(),
+                islandGroupBean.isPresentMN(),
+                islandGroupBean.getTowersColor(),
+                islandGroupBean.getIdPrevIslandGroup(),
+                islandGroupBean.getIdNextIslandGroup(),
+                numBlockTiles
+        );
+    }
+
+    private static ErrorBean deserializeErrorBean(LinkedTreeMap<String, Object> map) {
+        String error = (String) map.get("error");
+        return new ErrorBean(error);
+    }
+
+    private static AdvancedPlayerBean deserializeAdvancedPlayerBean(LinkedTreeMap<String, Object> map) {
+        PlayerBean playerBean = deserializePlayerBean(map);
+        int numCoins = ApplicationHelper.getIntFromBrokerField(map.get("numCoins"));
+
+        return new AdvancedPlayerBean(
+                playerBean.getNickname(),
+                playerBean.getPlayerId(),
+                playerBean.isLeader(),
+                playerBean.getTowerColor(),
+                playerBean.getNumTowers(),
+                playerBean.getStudentsAtEntrance(),
+                playerBean.getStudentsPerTable(),
+                playerBean.getProfessors(),
+                playerBean.getAssistants(),
+                numCoins,
+                playerBean.getAssistantPlayed()
+        );
+    }
+
+    private static PlayerBean deserializePlayerBean(LinkedTreeMap<String, Object> map) {
+        String nickname = (String) map.get("nickname");
+        PlayerEnum playerId = PlayerEnum.fromObjectToEnum(map.get("playerId"));
+        boolean leader = (boolean) map.get("leader");
+        TeamEnum towerColor = TeamEnum.fromObjectToEnum(map.get("towerColor"));
+        int numTowers = ApplicationHelper.getIntFromBrokerField(map.get("numTowers"));
+        List<StudentEnum> studentsAtEntrance = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("studentsAtEntrance"));
+        List<Integer> studentsPerTable = ApplicationHelper.getIntListFromBrokerField(map.get("studentsPerTable"));
+        List<Assistant> assistants = getListOfAssistantsFromObject((ArrayList<LinkedTreeMap<String, Object>>)map.get("assistants"));
+        List<StudentEnum> professors = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("professors"));
+        Assistant assistantPlayed = null;
+        //todo there might be problems with this null value
+        if(fieldPresent(map.get("assistantPlayed"))){
+            assistantPlayed = getAssistantFromObject((LinkedTreeMap<String, Object>) map.get("assistantPlayed"));
+        }
+        return new PlayerBean(nickname, playerId, leader, towerColor, numTowers, studentsAtEntrance, studentsPerTable, professors, assistants, assistantPlayed);
+    }
+
+    private static Assistant getAssistantFromObject(LinkedTreeMap<String, Object> map) {
+        int id = ApplicationHelper.getIntFromBrokerField(map.get("id"));
+        int motherNatureSteps = ApplicationHelper.getIntFromBrokerField(map.get("motherNatureSteps"));
+        int turnOrder = ApplicationHelper.getIntFromBrokerField(map.get("turnOrder"));
+        return new Assistant(id, motherNatureSteps, turnOrder);
+    }
+
+    private static List<Assistant> getListOfAssistantsFromObject(ArrayList<LinkedTreeMap<String, Object>> list) {
+        List<Assistant> assistants = new ArrayList<>();
+        for(LinkedTreeMap<String, Object> assistant : list){
+            assistants.add(getAssistantFromObject(assistant));
+        }
+        return assistants;
+    }
+
+    public static VirtualViewBean deserializeViewBean(LinkedTreeMap<String, Object> map) {
+        List<CloudBean> cloudBeans = new ArrayList<>();
+        List<CharacterCardBean> characterCardBeans = new ArrayList<>();
+        List<IslandGroupBean> islandGroupBeans = new ArrayList<>();
+        List<AdvancedIslandGroupBean> advancedIslandGroupBeans = new ArrayList<>();
+        List<PlayerBean> playerBeans = new ArrayList<>();
+        List<AdvancedPlayerBean> advancedPlayerBeans = new ArrayList<>();
+        List<ErrorBean> errorBeans = new ArrayList<>();
+        GameBoardBean gameBoardBean = null;
+        AdvancedGameBoardBean advancedGameBoardBean = null;
+
+        if(fieldPresent(map.get("cloudBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("cloudBeans")) {
+                cloudBeans.add(deserializeCloudBean(element));
+            }
+        }
+        if(fieldPresent(map.get("characterCardBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("characterCardBeans")) {
+                characterCardBeans.add(deserializeCharacterCardBean(element));
+            }
+        }
+        if(fieldPresent(map.get("islandGroupBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("islandGroupBeans")) {
+                islandGroupBeans.add(deserializeIslandGroupBean(element));
+            }
+        }
+        if(fieldPresent(map.get("advancedIslandGroupBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("advancedIslandGroupBeans")) {
+                advancedIslandGroupBeans.add(deserializeAdvancedIslandGroupBean(element));
+            }
+        }
+        if(fieldPresent(map.get("playerBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("playerBeans")) {
+                playerBeans.add(deserializePlayerBean(element));
+            }
+        }
+        if(fieldPresent(map.get("advancedPlayerBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("advancedPlayerBeans")) {
+                advancedPlayerBeans.add(deserializeAdvancedPlayerBean(element));
+            }
+        }
+        if(fieldPresent(map.get("errorBeans"))) {
+            for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("errorBeans")) {
+                errorBeans.add(deserializeErrorBean(element));
+            }
+        }
+        if(fieldPresent(map.get("gameBoardBean"))){
+            gameBoardBean = deserializeGameBoardBean( (LinkedTreeMap<String, Object>) map.get("gameBoardBean"));
+        }
+        if(fieldPresent(map.get("advancedGameBoardBean"))){
+            advancedGameBoardBean = deserializeAdvancedGameBoardBean((LinkedTreeMap<String, Object>) map.get("advancedGameBoardBean"));
+        }
+        return new VirtualViewBean(cloudBeans,characterCardBeans,islandGroupBeans,advancedIslandGroupBeans,
+                playerBeans, advancedPlayerBeans,errorBeans,gameBoardBean,advancedGameBoardBean);
+    }
+
+
+    /**
+     * Checks whether the field in the received message is meaningful
+     * This should account for the possibility that the field doesn't exist AND the case in which the
+     * field exists but the value is null
+     * @param field the field to check for nullity
+     * @return true if the field is not null
+     */
+    private static boolean fieldPresent(Object field) {
+        return field != null;
+    }
+
 
     /**
      * Translates the list from a gson map into a list of appropriate enums
      * @param enumClass the type of enum one wishes to translate to
-     * @param list the list (an ArrayList<String>) to get the data from
+     * @param list the list (an ArrayList< String >) to get the data from
      * @param <T> A generic enum
      * @return a list of enums of type T reflecting the list structure
      */
@@ -82,4 +248,5 @@ public class BeanTranslator {
         }
         return retList;
     }
+
 }

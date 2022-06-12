@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;

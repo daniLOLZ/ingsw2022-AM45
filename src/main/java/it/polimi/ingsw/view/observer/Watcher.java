@@ -29,4 +29,7 @@ public abstract class Watcher {
     public boolean isAlive() {
         return alive;
     }
+/*
+    public abstract GameElementBean getBean();
+ */
 }
