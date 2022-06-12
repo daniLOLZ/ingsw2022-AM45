@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.beans;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
+import it.polimi.ingsw.view.StaticColorCLI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,9 +91,19 @@ public class GameBoardBean extends GameElementBean{
             players.add(PlayerEnum.getPlayer(x).name);
         }
 
+        String Eryantis = StaticColorCLI.ANSI_RED + "E" +
+                StaticColorCLI.ANSI_YELLOW + "R" +
+                StaticColorCLI.ANSI_GREEN + "Y" +
+                StaticColorCLI.ANSI_BLUE + "A" +
+                StaticColorCLI.ANSI_CYAN + "N" +
+                StaticColorCLI.ANSI_PURPLE + "T"+
+                StaticColorCLI.ANSI_RED + "I"+
+                StaticColorCLI.ANSI_YELLOW + "S" +
+                StaticColorCLI.ANSI_RESET  ;
+
 
         toReturn.append("\t______________________________________________________\t\n");
-        toReturn.append("\t\t\t\t::ERYANTIS::").append("\n");
+        toReturn.append("\t\t\t\t::").append(Eryantis).append("::").append("\n");
         toReturn.append("\t\tTURN: ").append(turn).append("\n");
         toReturn.append("\t\tPHASE: ").append(phase).append("\n");
         toReturn.append("\t\tISLANDS: ").append(idIslandGroups).append("\n");

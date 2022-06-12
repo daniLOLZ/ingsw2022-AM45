@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdvancedGame extends SimpleGame {
-    private final List<CharacterCard> CharacterCards;
+    private List<CharacterCard> CharacterCards;
     private AdvancedParameterHandler advancedParameters;
 
 
@@ -402,6 +402,10 @@ public class AdvancedGame extends SimpleGame {
         super.initialiseSelection();
         List<Integer> emptyStudentsOnCard = new ArrayList<>();
         advancedParameters.setSelectedStudentsOnCard(emptyStudentsOnCard);
+    }
+
+    public void setCharacterCards(List<CharacterCard> characterCards) {
+        CharacterCards = characterCards;
     }
 }
 

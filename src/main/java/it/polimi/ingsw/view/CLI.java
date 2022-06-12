@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class CLI implements UserInterface {
     private StringBuilder View;
@@ -598,53 +599,75 @@ public class CLI implements UserInterface {
         List<IslandGroupBean> simpleIslands = view.getIslandGroupBeans();
         List<AdvancedIslandGroupBean> advancedIslands = view.getAdvancedIslandGroupBeans();
         List<CharacterCardBean> characterCardBeans = view.getCharacterCardBeans();
-
+        int done = 0;
         //Show gameBoardBean.
         if(simpleGame != null)
             System.out.println(simpleGame);
         else
             System.out.println(advancedGame);
 
-        //Show Character Cards
-        StringBuilder characterString = new StringBuilder();
-        int done= 0;
-        while (done < characterCardBeans.size()) {
-            characterString = new StringBuilder();
-            characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
-            characterString.append(characterCardBeans.get(done).getName());
-            if(characterCardBeans.get(done).getName().length() >= 8)
-                characterString.append("\t\t\t\t\t");
-            else
-                characterString.append("\t\t\t\t\t\t");
-            characterString.append(characterCardBeans.get(done + 1).getName());
-            if(characterCardBeans.get(done + 1).getName().length() >= 8)
-                characterString.append("\t\t\t\t\t");
-            else
-                characterString.append("\t\t\t\t\t\t");
-            characterString.append(characterCardBeans.get(done + 2).getName());
-            characterString.append("\nCost: ").append(characterCardBeans.get(done).getCost()).
-                    append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 1).getCost()).
-                    append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 2).getCost()).append("\n");
-            if(characterCardBeans.get(done).getStudents()!= null &&
-                    !characterCardBeans.get(done).getStudents().isEmpty())
-                characterString.append(characterCardBeans.get(done).getStudents());
-            else
-                characterString.append("\t\t\t\t\t\t\t");
+        if(advancedGame != null) {
+            //Show Character Cards
+            StringBuilder characterString = new StringBuilder();
+            done = 0;
+            while (done < characterCardBeans.size()) {
+                characterString = new StringBuilder();
+                characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
+                characterString.append(characterCardBeans.get(done).getName());
+                if (characterCardBeans.get(done).getName().length() >= 8)
+                    characterString.append("\t\t\t\t\t");
+                else
+                    characterString.append("\t\t\t\t\t\t");
+                characterString.append(characterCardBeans.get(done + 1).getName());
+                if (characterCardBeans.get(done + 1).getName().length() >= 8)
+                    characterString.append("\t\t\t\t\t");
+                else if (characterCardBeans.get(done + 1).getName().length() >= 12)
+                    characterString.append("\t\t\t\t");
+                else
+                    characterString.append("\t\t\t\t\t\t");
+                characterString.append(characterCardBeans.get(done + 2).getName());
+                characterString.append("\nCost: ").append(characterCardBeans.get(done).getCost()).
+                        append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 1).getCost()).
+                        append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 2).getCost()).append("\n");
+                if (characterCardBeans.get(done).getStudents() != null &&
+                        !characterCardBeans.get(done).getStudents().isEmpty())
+                    characterString.append(characterCardBeans.get(done).getStudents());
+                else
+                    characterString.append("\t\t\t\t\t\t\t");
 
-            if(characterCardBeans.get(done + 1).getStudents()!= null &&
-                    !characterCardBeans.get(done + 1).getStudents().isEmpty())
-                characterString.append("\t\t").append(characterCardBeans.get(done+1).getStudents());
-            else
-                characterString.append("\t\t\t\t\t\t\t");
+                if (characterCardBeans.get(done + 1).getStudents() != null &&
+                        !characterCardBeans.get(done + 1).getStudents().isEmpty()) {
+                    if (characterCardBeans.get(done).getStudents() != null &&
+                            characterCardBeans.get(done).getStudents().size() > 5)
+                        characterString.append("\t\t\t");
+                    else if (characterCardBeans.get(done).getStudents() != null &&
+                            characterCardBeans.get(done).getStudents().size() > 0)
+                        characterString.append("\t\t\t\t");
+                    else
+                        characterString.append("");
+                    characterString.append(characterCardBeans.get(done + 1).getStudents());
+                } else
+                    characterString.append("\t\t\t\t\t\t\t\t\t\t\t");
 
-            if(characterCardBeans.get(done + 2).getStudents()!= null &&
-                    !characterCardBeans.get(done + 2).getStudents().isEmpty())
-                characterString.append("\t\t").append(characterCardBeans.get(done+2).getStudents());
-            characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
+                if (characterCardBeans.get(done + 2).getStudents() != null &&
+                        !characterCardBeans.get(done + 2).getStudents().isEmpty()) {
+                    if (characterCardBeans.get(done + 1).getStudents() != null &&
+                            characterCardBeans.get(done + 1).getStudents().size() > 5)
+                        characterString.append("\t\t\t");
+                    else if (characterCardBeans.get(done + 1).getStudents() != null &&
+                            characterCardBeans.get(done + 1).getStudents().size() > 0)
+                        characterString.append("\t\t\t\t");
+                    else
+                        characterString.append("");
 
-            done+=3;
+                    characterString.append(characterCardBeans.get(done + 2).getStudents());
+                }
+                characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
+
+                done += 3;
+            }
+            System.out.println(characterString.toString());
         }
-        System.out.println(characterString.toString());
 
         //Show clouds
         if(clouds.size() == 2){
@@ -705,7 +728,7 @@ public class CLI implements UserInterface {
             while(done < numIslands){
 
 
-                if(done + 4 < numIslands){
+                if(done + 4 <= numIslands){
 
                     List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
                     List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
@@ -735,7 +758,7 @@ public class CLI implements UserInterface {
                 }
 
 
-                else if(done + 3 < numIslands){
+                else if(done + 3 <= numIslands){
 
                     List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
                     List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
@@ -760,7 +783,7 @@ public class CLI implements UserInterface {
 
                 }
 
-                else if(done + 2 < numIslands){
+                else if(done + 2 <= numIslands){
                     List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
                     List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
 
@@ -909,84 +932,283 @@ public class CLI implements UserInterface {
 
 
         //Show Players
+        //Simple Players
         if(simplePlayers != null){
+
+            //Border
             done = 1;
             StringBuilder playerString = new StringBuilder();
-            playerString.append("\n--------------------\t\t");
+            playerString.append("\n--------------------");
             while(done < simplePlayers.size()){
                 playerString.append("\t\t--------------------");
                 done++;
             }
 
+            playerString.append("\n");
+
+
+            //Player ID
             playerString.append(simplePlayers.get(0).getPlayerId());
             done=1;
             while (done < simplePlayers.size()){
-                playerString.append("\t\t\t\t").
+                playerString.append("\t\t\t\t\t\t").
                         append(simplePlayers.get(done).getPlayerId());
                 done++;
             }
+
+            //Nickname
 
             playerString.append("\n");
             playerString.append(simplePlayers.get(0).getNickname());
             done=1;
             while (done < simplePlayers.size()){
-                playerString.append("\t\t\t\t").
-                    append(simplePlayers.get(done).getNickname());
+                playerString.append("\t\t\t\t\t\t").
+                        append(simplePlayers.get(done).getNickname());
                 done++;
             }
             playerString.append("\n");
 
-            playerString.append("Color: ").
-                    append(simplePlayers.get(0).getTowerColor());
+            //Towers
+            playerString.append("Towers: ").
+                    append(simplePlayers.get(0).getTowerColor()).append(" [").
+                    append(simplePlayers.get(0).getNumTowers()).append("]");
             done=1;
             while (done < simplePlayers.size()){
-                playerString.append("\t\t\t\t").
-                        append("Color: ").
-                        append(simplePlayers.get(done).getTowerColor());
+                playerString.append("\t\t\t").
+                        append("Towers: ").
+                        append(simplePlayers.get(done).getTowerColor()).append(" [").
+                        append(simplePlayers.get(done).getNumTowers()).append("]");
                 done++;
             }
             playerString.append("\n");
 
 
-
+            //Entrance
             List<StudentEnum> list1 = new ArrayList<>();
             List<StudentEnum> list2 = new ArrayList<>();
 
-            for(int i=0; i < 4; i++ )
-                list1.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
+            if(!simplePlayers.get(0).getStudentsAtEntrance().isEmpty())
+                for(int i=0; i < 4 && i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                    list1.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
 
 
             playerString.append("Entrance: ").append(list1);
             done=1;
             while (done < simplePlayers.size()){
                 list1.clear();
-                for(int i=0; i < 4; i++ )
-                    list1.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
+                if(!simplePlayers.get(done).getStudentsAtEntrance().isEmpty())
+                    for(int i=0; i < 4 && i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                        list1.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
 
 
-                playerString.append("\t\t\t\t").
-                        append("Entrance: ").append(list1);
+                if(simplePlayers.get(done - 1 ).getStudentsAtEntrance().size() == 4)
+                    playerString.append("\t\t");
+                else if(simplePlayers.get(done - 1 ).getStudentsAtEntrance().size() > 0)
+                    playerString.append("\t\t\t");
+                else
+                    playerString.append("\t\t\t\t");
+                playerString.append("Entrance: ").append(list1);
                 done++;
             }
             playerString.append("\n");
 
+            if(!simplePlayers.get(0).getStudentsAtEntrance().isEmpty())
+                for(int i=4; i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                    list2.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
 
-            for(int i=4; i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
-                list2.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
 
+            if(!list2.isEmpty())
+                playerString.append(list2);
 
-            playerString.append(list2);
             done=1;
             while (done < simplePlayers.size()){
                 list2.clear();
-                for(int i=0; i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
-                    list2.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
+                if(!simplePlayers.get(done).getStudentsAtEntrance().isEmpty())
+                    for(int i=4; i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                        list2.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
 
-                playerString.append("\t\t\t\t").
-                        append(list2);
+
+                playerString.append("\t\t\t\t");
+                if(!list2.isEmpty())
+                    playerString.append(list2);
                 done++;
             }
             playerString.append("\n");
+
+
+            //Professors
+            playerString.append("Prof: ").
+                    append(simplePlayers.get(0).getProfessors());
+
+            done=1;
+            while (done < simplePlayers.size()){
+                if(simplePlayers.get(done - 1).getProfessors().size() > 1)
+                    playerString.append("\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t");
+                playerString.append("Prof: ").
+                        append(simplePlayers.get(done).getProfessors());
+                done++;
+            }
+
+            //Tables
+            playerString.append("\n");
+            playerString.append("Table:[");
+            for(int i=0; i < StudentEnum.getNumStudentTypes(); i++ )
+                playerString.append(StaticColorCLI.getColor(i)).
+                        append(simplePlayers.get(0).getStudentsPerTable().get(i)).append(" ");
+            playerString.append(StaticColorCLI.ANSI_RESET).append("]");
+            done=1;
+            while (done < simplePlayers.size()){
+                if(simplePlayers.get(done - 1).getStudentsPerTable().stream().filter(x -> x > 10).count() > 1)
+                    playerString.append("\t\t");
+                else
+                    playerString.append("\t\t\t");
+                playerString.append("Table:[");
+                for(int i=0; i < StudentEnum.getNumStudentTypes(); i++ )
+                    playerString.append(StaticColorCLI.getColor(i)).
+                            append(simplePlayers.get(done).getStudentsPerTable().get(i)).append(" ");
+                playerString.append(StaticColorCLI.ANSI_RESET).append("]");
+
+
+                done++;
+            }
+
+            //Assistants
+            playerString.append("\n");
+
+            List<Integer> listId1 = new ArrayList<>();
+            List<Integer> listId2 = new ArrayList<>();
+
+            if(!simplePlayers.get(0).getAssistants().isEmpty())
+                for(int i=0; i < 2; i++ )
+                    listId1.add(simplePlayers.get(0).getAssistants().get(i).id);
+            listId1 = listId1.stream().mapToInt(x -> {
+                int y = x % 10;
+                if(y == 0)
+                    y = 10;
+                return y;
+            }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+            playerString.append("Assistants: ").append(listId1);
+            done=1;
+            while (done < simplePlayers.size()){
+                if(listId1.size() > 0)
+                    playerString.append("\t\t\t");
+                else
+                    playerString.append("\t\t\t\t");
+
+                listId1.clear();
+                if(!simplePlayers.get(done).getAssistants().isEmpty())
+                    for(int i=0; i < 2; i++ )
+                        listId1.add(simplePlayers.get(done).getAssistants().get(i).id);
+
+                listId1 = listId1.stream().mapToInt(x -> {
+                    int y = x % 10;
+                    if(y == 0)
+                        y = 10;
+                    return y;
+                }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+
+                playerString.append("Assistants: ").append(listId1);
+                done++;
+            }
+            playerString.append("\n");
+
+
+            if(!simplePlayers.get(0).getAssistants().isEmpty())
+                for(int i=2; i < simplePlayers.get(0).getAssistants().size() && i < 6; i++ )
+                    listId2.add(simplePlayers.get(0).getAssistants().get(i).id);
+
+            listId2 = listId2.stream().mapToInt(x -> {
+                int y = x % 10;
+                if(y == 0)
+                    y = 10;
+                return y;
+            }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+            playerString.append(listId2);
+            done=1;
+            while (done < simplePlayers.size()){
+                if(listId2.size() > 3)
+                    playerString.append("\t\t\t\t");
+                else if(listId2.size() > 0)
+                    playerString.append("\t\t\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
+                listId2.clear();
+                if(!simplePlayers.get(done).getAssistants().isEmpty())
+                    for(int i=2; i < simplePlayers.get(done).getAssistants().size() && i < 6; i++ )
+                        listId2.add(simplePlayers.get(done).getAssistants().get(i).id);
+
+                listId2 = listId2.stream().mapToInt(x -> {
+                    int y = x % 10;
+                    if(y == 0)
+                        y = 10;
+                    return y;
+                }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+                playerString.append(listId2);
+                done++;
+            }
+
+            playerString.append("\n");
+            listId2.clear();
+
+            if(!simplePlayers.get(0).getAssistants().isEmpty())
+                for(int i=6; i < simplePlayers.get(0).getAssistants().size(); i++ )
+                    listId2.add(simplePlayers.get(0).getAssistants().get(i).id);
+
+            listId2 = listId2.stream().mapToInt(x -> {
+                int y = x % 10;
+                if(y == 0)
+                    y = 10;
+                return y;
+            }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+            playerString.append(listId2);
+            done=1;
+            while (done < simplePlayers.size()){
+
+                if(listId2.size() > 3)
+                    playerString.append("\t\t\t\t");
+                else if(listId2.size() > 0)
+                    playerString.append("\t\t\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
+
+                listId2.clear();
+                if(!simplePlayers.get(done).getAssistants().isEmpty())
+                    for(int i=6; i < simplePlayers.get(done).getAssistants().size(); i++ )
+                        listId2.add(simplePlayers.get(done).getAssistants().get(i).id);
+
+                listId2 = listId2.stream().mapToInt(x -> {
+                    int y = x % 10;
+                    if(y == 0)
+                        y = 10;
+                    return y;
+                }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+
+                playerString.append(listId2);
+                done++;
+            }
+
+
+            //End Border
+            done = 1;
+            playerString.append("\n--------------------");
+            while(done < simplePlayers.size()){
+                playerString.append("\t\t--------------------");
+                done++;
+            }
 
             System.out.println(playerString);
 
@@ -995,6 +1217,7 @@ public class CLI implements UserInterface {
         else if(advancedPlayers != null){
 
 
+            //Start Border
             done = 1;
             StringBuilder playerString = new StringBuilder();
             playerString.append("\n--------------------");
@@ -1006,6 +1229,7 @@ public class CLI implements UserInterface {
             playerString.append("\n");
 
 
+            //Player ID
             playerString.append(advancedPlayers.get(0).getPlayerId());
             done=1;
             while (done < advancedPlayers.size()){
@@ -1014,6 +1238,7 @@ public class CLI implements UserInterface {
                 done++;
             }
 
+            //Nickname
             playerString.append("\n");
             playerString.append(advancedPlayers.get(0).getNickname());
             done=1;
@@ -1024,17 +1249,21 @@ public class CLI implements UserInterface {
             }
             playerString.append("\n");
 
-            playerString.append("Color: ").
-                    append(advancedPlayers.get(0).getTowerColor());
+            //Towers
+            playerString.append("Towers: ").
+                    append(advancedPlayers.get(0).getTowerColor()).append(" [").
+                    append(advancedPlayers.get(0).getNumTowers()).append("]");
             done=1;
             while (done < advancedPlayers.size()){
-                playerString.append("\t\t\t\t").
-                        append("Color: ").
-                        append(advancedPlayers.get(done).getTowerColor());
+                playerString.append("\t\t\t").
+                        append("Towers: ").
+                        append(advancedPlayers.get(done).getTowerColor()).append(" [").
+                        append(advancedPlayers.get(done).getNumTowers()).append("]");
                 done++;
             }
             playerString.append("\n");
 
+            //Coins
             playerString.append("Coins: ").
                     append(advancedPlayers.get(0).getNumCoins());
             done=1;
@@ -1047,12 +1276,12 @@ public class CLI implements UserInterface {
             playerString.append("\n");
 
 
-
+            //Entrance
             List<StudentEnum> list1 = new ArrayList<>();
             List<StudentEnum> list2 = new ArrayList<>();
 
             if(!advancedPlayers.get(0).getStudentsAtEntrance().isEmpty())
-            for(int i=0; i < 4; i++ )
+            for(int i=0; i < 4 && i < advancedPlayers.get(0).getStudentsAtEntrance().size(); i++ )
                 list1.add(advancedPlayers.get(0).getStudentsAtEntrance().get(i));
 
 
@@ -1061,12 +1290,14 @@ public class CLI implements UserInterface {
             while (done < advancedPlayers.size()){
                 list1.clear();
                 if(!advancedPlayers.get(done).getStudentsAtEntrance().isEmpty())
-                    for(int i=0; i < 4; i++ )
+                    for(int i=0; i < 4 && i < advancedPlayers.get(done).getStudentsAtEntrance().size(); i++ )
                     list1.add(advancedPlayers.get(done).getStudentsAtEntrance().get(i));
 
 
-                if(advancedPlayers.get(done - 1 ).getStudentsAtEntrance().size() > 0)
+                if(advancedPlayers.get(done - 1 ).getStudentsAtEntrance().size() == 4)
                     playerString.append("\t\t");
+                else if(advancedPlayers.get(done - 1 ).getStudentsAtEntrance().size() > 1)
+                    playerString.append("\t\t\t");
                 else
                 playerString.append("\t\t\t\t");
                 playerString.append("Entrance: ").append(list1);
@@ -1096,6 +1327,24 @@ public class CLI implements UserInterface {
                 done++;
             }
             playerString.append("\n");
+
+            //Professors
+            playerString.append("Prof: ").
+                    append(advancedPlayers.get(0).getProfessors());
+
+            done=1;
+            while (done < advancedPlayers.size()){
+                if(advancedPlayers.get(done - 1).getProfessors().size() > 1)
+                    playerString.append("\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t");
+                playerString.append("Prof: ").
+                        append(advancedPlayers.get(done).getProfessors());
+                done++;
+            }
+
+            //Tables
+            playerString.append("\n");
             playerString.append("Table:[");
             for(int i=0; i < StudentEnum.getNumStudentTypes(); i++ )
                 playerString.append(StaticColorCLI.getColor(i)).
@@ -1103,8 +1352,11 @@ public class CLI implements UserInterface {
             playerString.append(StaticColorCLI.ANSI_RESET).append("]");
             done=1;
             while (done < advancedPlayers.size()){
+                if(advancedPlayers.get(done - 1).getStudentsPerTable().stream().filter(x -> x > 10).count() > 1)
+                    playerString.append("\t\t");
+                else
                 playerString.append("\t\t\t");
-                playerString.append("Table: [");
+                playerString.append("Table:[");
                 for(int i=0; i < StudentEnum.getNumStudentTypes(); i++ )
                     playerString.append(StaticColorCLI.getColor(i)).
                             append(advancedPlayers.get(done).getStudentsPerTable().get(i)).append(" ");
@@ -1115,6 +1367,140 @@ public class CLI implements UserInterface {
             }
 
             playerString.append("\n");
+
+            //Assistants
+            List<Integer> listId1 = new ArrayList<>();
+            List<Integer> listId2 = new ArrayList<>();
+
+            if(!advancedPlayers.get(0).getAssistants().isEmpty())
+                for(int i=0; i < 2; i++ )
+                    listId1.add(advancedPlayers.get(0).getAssistants().get(i).id);
+            listId1 = listId1.stream().mapToInt(x -> {
+                int y = x % 10;
+                if(y == 0)
+                    y = 10;
+                return y;
+            }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+            playerString.append("Assistants: ").append(listId1);
+            done=1;
+            while (done < advancedPlayers.size()){
+                if(listId1.size() > 0)
+                    playerString.append("\t\t\t");
+                else
+                    playerString.append("\t\t\t\t");
+
+                listId1.clear();
+                if(!advancedPlayers.get(done).getAssistants().isEmpty())
+                    for(int i=0; i < 2; i++ )
+                        listId1.add(advancedPlayers.get(done).getAssistants().get(i).id);
+
+                listId1 = listId1.stream().mapToInt(x -> {
+                    int y = x % 10;
+                    if(y == 0)
+                        y = 10;
+                    return y;
+                }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+
+                playerString.append("Assistants: ").append(listId1);
+                done++;
+            }
+            playerString.append("\n");
+
+
+            if(!advancedPlayers.get(0).getAssistants().isEmpty())
+                for(int i=2; i < advancedPlayers.get(0).getAssistants().size() && i < 6; i++ )
+                    listId2.add(advancedPlayers.get(0).getAssistants().get(i).id);
+
+            listId2 = listId2.stream().mapToInt(x -> {
+                int y = x % 10;
+                if(y == 0)
+                    y = 10;
+                return y;
+            }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+            playerString.append(listId2);
+            done=1;
+            while (done < advancedPlayers.size()){
+                if(listId2.size() > 3)
+                    playerString.append("\t\t\t\t");
+                else if(listId2.size() > 0)
+                    playerString.append("\t\t\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
+                listId2.clear();
+                if(!advancedPlayers.get(done).getAssistants().isEmpty())
+                    for(int i=2; i < advancedPlayers.get(done).getAssistants().size() && i < 6; i++ )
+                        listId2.add(advancedPlayers.get(done).getAssistants().get(i).id);
+
+                listId2 = listId2.stream().mapToInt(x -> {
+                    int y = x % 10;
+                    if(y == 0)
+                        y = 10;
+                    return y;
+                }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+                playerString.append(listId2);
+                done++;
+            }
+
+            playerString.append("\n");
+            listId2.clear();
+
+            if(!advancedPlayers.get(0).getAssistants().isEmpty())
+                for(int i=6; i < advancedPlayers.get(0).getAssistants().size(); i++ )
+                    listId2.add(advancedPlayers.get(0).getAssistants().get(i).id);
+
+            listId2 = listId2.stream().mapToInt(x -> {
+                int y = x % 10;
+                if(y == 0)
+                    y = 10;
+                return y;
+            }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+            playerString.append(listId2);
+            done=1;
+            while (done < advancedPlayers.size()){
+
+                if(listId2.size() > 3)
+                    playerString.append("\t\t\t\t");
+                else if(listId2.size() > 0)
+                    playerString.append("\t\t\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
+
+                listId2.clear();
+                if(!advancedPlayers.get(done).getAssistants().isEmpty())
+                    for(int i=6; i < advancedPlayers.get(done).getAssistants().size(); i++ )
+                        listId2.add(advancedPlayers.get(done).getAssistants().get(i).id);
+
+                listId2 = listId2.stream().mapToInt(x -> {
+                    int y = x % 10;
+                    if(y == 0)
+                        y = 10;
+                    return y;
+                }).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+
+                playerString.append(listId2);
+                done++;
+            }
+
+            //End Border
+
+            done = 1;
+            playerString.append("\n--------------------");
+            while(done < advancedPlayers.size()){
+                playerString.append("\t\t--------------------");
+                done++;
+            }
 
             System.out.println(playerString);
         }
