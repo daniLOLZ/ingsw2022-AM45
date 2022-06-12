@@ -50,10 +50,15 @@ public class CLITest {
         teamColors.add(TeamEnum.BLACK);
         //teamColors.add(TeamEnum.GREY);
         final List<String> nicknames = new ArrayList<>();
+        final List<String> nicknames2 = new ArrayList<>();
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
         nicknames.add("Ben");
+        nicknames2.add("Tizia");
+        nicknames2.add("Caia");
+        nicknames2.add("Sempronia");
+        nicknames2.add("Flavia");
         virtualView = new VirtualView();
         virtualViewSimple = new VirtualView();
 
@@ -61,7 +66,7 @@ public class CLITest {
         try {
             game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,
                     coins,CharacterCards, virtualView);
-            gameSimple = new SimpleGame(players,selectedWizards,teamColors,nicknames,virtualViewSimple);
+            gameSimple = new SimpleGame(players,selectedWizards,teamColors,nicknames2,virtualViewSimple);
             gameSimple.initializeGame();
             game.initializeGame();
         } catch (IncorrectPlayersException e) {

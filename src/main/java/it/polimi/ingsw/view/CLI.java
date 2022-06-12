@@ -962,8 +962,11 @@ public class CLI implements UserInterface {
             playerString.append(simplePlayers.get(0).getNickname());
             done=1;
             while (done < simplePlayers.size()){
-                playerString.append("\t\t\t\t\t\t").
-                        append(simplePlayers.get(done).getNickname());
+                if(simplePlayers.get(done - 1).getNickname().length() > 7)
+                playerString.append("\t\t\t\t\t");
+                else
+                playerString.append("\t\t\t\t\t\t");
+                playerString.append(simplePlayers.get(done).getNickname());
                 done++;
             }
             playerString.append("\n");
@@ -1243,8 +1246,11 @@ public class CLI implements UserInterface {
             playerString.append(advancedPlayers.get(0).getNickname());
             done=1;
             while (done < advancedPlayers.size()){
-                playerString.append("\t\t\t\t\t\t").
-                        append(advancedPlayers.get(done).getNickname());
+                if(advancedPlayers.get(done-1).getNickname().length() > 7)
+                playerString.append("\t\t\t\t\t");
+                else
+                playerString.append("\t\t\t\t\t\t");
+                playerString.append(advancedPlayers.get(done).getNickname());
                 done++;
             }
             playerString.append("\n");
