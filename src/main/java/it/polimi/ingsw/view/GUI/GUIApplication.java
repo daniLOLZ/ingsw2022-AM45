@@ -27,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
@@ -38,10 +39,10 @@ import java.util.List;
 import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 
 
-public class GUIApplication extends Application implements UserInterface{
+public class GUIApplication extends Application{
 
     public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
-    public final double cloudSize = 40, assistantWidth = 100, islandSize = 120, boardWidth = 505;
+    public static final double cloudSize = 40, assistantWidth = 100, islandSize = 120, boardWidth = 505;
 
     public static final double
             up      = 0,
@@ -71,19 +72,23 @@ public class GUIApplication extends Application implements UserInterface{
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
 
-    private String preselectedGameRule = availableGameRules.get(0);
-    private Integer preselectedNumPlayers = availablePlayerNumber.get(0);
-    private WizardEnum selectedWizard = WizardEnum.NO_WIZARD;
-    private TeamEnum selectedTowerColor = TeamEnum.NOTEAM;
-    private List<CloudBean> clouds;
-    private List<IslandGroupBean> islands;
+    private static String preselectedGameRule = availableGameRules.get(0);
+    private static Integer preselectedNumPlayers = availablePlayerNumber.get(0);
+    private static WizardEnum selectedWizard = WizardEnum.NO_WIZARD;
+    private static TeamEnum selectedTowerColor = TeamEnum.NOTEAM;
 
-    private Stage stage;
+    private static Stage stage;
+
+    private static boolean started = false;
+
+    public static boolean isStarted() {
+        return started;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        this.stage = primaryStage;
+        stage = new Stage();
 
         Image icon = new Image("assets/icon.png");
         stage.getIcons().add(icon);
@@ -129,9 +134,11 @@ public class GUIApplication extends Application implements UserInterface{
         stage.setScene(scene);
         stage.show();
 
+        started = true;
+
     }
 
-    public void showLoginScreen(boolean errorOccurred) {
+    public static void showLoginScreen(boolean errorOccurred) {
 
         //in case of logout I want to reset the action on close request
         //to not try and send a quit message
@@ -214,9 +221,9 @@ public class GUIApplication extends Application implements UserInterface{
         Button failure = new Button("Simulate failure");
         Button debugScene = new Button("Show debug scene");
 
-        success.setOnAction(event -> notifySuccessfulLogin());
-        failure.setOnAction(event -> notifyLoginFailure());
-        debugScene.setOnAction(event -> debug_showDebugScene());
+        success.setOnAction(event -> showSearchGameScreen(false));
+        failure.setOnAction(event -> showLoginScreen(true));
+        //debugScene.setOnAction(event -> debug_showDebugScene());
 
         login.getChildren().addAll(success, failure, debugScene);
 
@@ -293,15 +300,8 @@ public class GUIApplication extends Application implements UserInterface{
 
     //</editor-fold>
 
-    public void notifySuccessfulLogin(){
-        showSearchGameScreen(false);
-    }
 
-    public void notifyLoginFailure(){
-        showLoginScreen(true);
-    }
-
-    private void showSearchGameScreen(boolean errorOccurred){
+    public static void showSearchGameScreen(boolean errorOccurred){
 
         //user is logged in. If he quits, the server is notified
         stage.setOnCloseRequest(event -> ConnectionWithServerHandler.quit());
@@ -381,8 +381,23 @@ public class GUIApplication extends Application implements UserInterface{
         Label debugLabel = new Label("Debugging options");
         Button success = new Button("Simulate game lobby");
         Button failure = new Button("Simulate failure");
-        success.setOnAction(event -> notifyEnteredLobby());
-        failure.setOnAction(event -> notifyErrorInSearchGame());
+
+        List<String> mockPlayers = new ArrayList<>();
+        mockPlayers.add("mock1");
+        mockPlayers.add("mock2");
+        mockPlayers.add("mock3");
+        mockPlayers.add("mock69");
+
+        List<Boolean> mockReady = new ArrayList<>();
+        mockReady.add(true);
+        mockReady.add(false);
+        mockReady.add(false);
+        mockReady.add(true);
+
+        LobbyBean lobbyBean = new LobbyBean(mockPlayers, mockReady, false, 3);
+
+        success.setOnAction(event -> showLobbyScreen(lobbyBean,false));
+        failure.setOnAction(event -> showSearchGameScreen(true));
 
         HBox debug = new HBox(20);
         debug.setAlignment(Pos.CENTER);
@@ -396,24 +411,14 @@ public class GUIApplication extends Application implements UserInterface{
         stage.setScene(searchGame);
     }
 
-    private void sendSearchGameRequest(String gameRule, int numPlayers, Label outNotify){
+    private static void sendSearchGameRequest(String gameRule, int numPlayers, Label outNotify){
 
         outNotify.setText("Searching...");
         new Thread(() -> ConnectionWithServerHandler.searchGame(gameRule, numPlayers)).start();
 
     }
 
-    //will be called from above
-    public void notifyEnteredLobby(){
-        showLobbyScreen(false);
-    }
-
-    //will be called from above
-    public void notifyErrorInSearchGame(){
-        showSearchGameScreen(true);
-    }
-
-    private void showLobbyScreen(boolean errorOccured){
+    public static void showLobbyScreen(LobbyBean data, boolean errorOccurred){
 
         StackPane root = new StackPane();
 
@@ -438,6 +443,20 @@ public class GUIApplication extends Application implements UserInterface{
         Label gameDetails = new Label("Game rules: " + preselectedGameRule + "\nPlayers: " + preselectedNumPlayers);
         gameDetails.setFont(Font.font("Verdana", 25));
 
+        VBox players = new VBox(15);
+        players.setAlignment(Pos.CENTER);
+        for (String nickname:
+             data.getNicknames()) {
+
+            int playerIndex = data.getNicknames().indexOf(nickname);
+
+            Label player = new Label(
+                    nickname +
+                    (playerIndex == data.getHost() ? " [host]" :"") +
+                    (data.getReadyPlayers().get(playerIndex) ? "  Ready" : ""));
+            players.getChildren().add(player);
+        }
+
         HBox userActions = new HBox(35);
         userActions.setAlignment(Pos.CENTER);
 
@@ -450,7 +469,7 @@ public class GUIApplication extends Application implements UserInterface{
         userActions.getChildren().add(startGame);
         userActions.getChildren().add(leaveLobby);
 
-        if (errorOccured) {
+        if (errorOccurred) {
             notification.setText("Couldn't start game! Some players are not ready");
             ready.setSelected(true);
             startGame.setVisible(true);
@@ -480,33 +499,25 @@ public class GUIApplication extends Application implements UserInterface{
         Button failure = new Button("Simulate failure");
 
         success.setOnAction(event -> showWizardSelection(false));
-        failure.setOnAction(event -> showLobbyScreen(true));
+        //failure.setOnAction(event -> showLobbyScreen(true));
 
         layout.getChildren().addAll(success,failure);
 
         //</editor-fold>
 
-        layout.getChildren().addAll(gameDetails, userActions, notification);
+        layout.getChildren().addAll(gameDetails, players, userActions, notification);
         root.getChildren().add(layout);
 
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         stage.setScene(scene);
     }
 
-    private void readyHandle(boolean selected){
+    private static void readyHandle(boolean selected){
         if (selected) ConnectionWithServerHandler.ready();
         else ConnectionWithServerHandler.notReady();
     }
 
-    public void notifyStartingGame(){
-        startGame();
-    }
-
-    public void notifyPlayersNotReady(){
-        showLobbyScreen(true);
-    }
-
-    private void showWizardSelection(boolean errorOccurred){
+    public static void showWizardSelection(boolean errorOccurred){
         StackPane root = new StackPane();
 
         //<editor-fold desc="Decorations">
@@ -556,7 +567,7 @@ public class GUIApplication extends Application implements UserInterface{
         stage.setScene(scene);
     }
 
-    private void showTowerColorSelection(boolean errorOccurred){
+    public static void showTowerColorSelection(boolean errorOccurred){
         StackPane root = new StackPane();
 
         //<editor-fold desc="Decorations">
@@ -612,7 +623,7 @@ public class GUIApplication extends Application implements UserInterface{
         stage.setScene(scene);
     }
 
-    private void startGame(){
+    public static void startGame(){
         Group root = new Group();
 
         //List<Coord> useless = getIslandGroupSlots(12, 4, 1, upLeftCorner);
@@ -716,7 +727,11 @@ public class GUIApplication extends Application implements UserInterface{
         }
     }
 
-    private List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){
+    public static void showNetworkError(){
+        AlertBox.display("Error", "A network error occurred");
+    }
+
+    private static List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){
         if (amount < 3) return null;
 
         List<Coord> slots = new ArrayList<>();
@@ -743,12 +758,12 @@ public class GUIApplication extends Application implements UserInterface{
         return slots;
     }
 
-    private double getIslandGroupY(double x, double semiWidth, double semiHeight){
+    private static double getIslandGroupY(double x, double semiWidth, double semiHeight){
 
         return semiHeight * Math.sqrt(1 - Math.pow(x, 2) / Math.pow(semiWidth, 2));
     }
 
-    private List<Coord> getCloudsSlots(int amount, Coord center){
+    private static List<Coord> getCloudsSlots(int amount, Coord center){
 
         List<Coord> slots = new ArrayList<>();
 
@@ -763,203 +778,4 @@ public class GUIApplication extends Application implements UserInterface{
         return slots;
     }
 
-    @Override
-    public void addBean(GameElementBean bean) {
-
-    }
-
-    @Override
-    public GameElementBean removeBean(int index) {
-        return null;
-    }
-
-    @Override
-    public void clearBeans() {
-
-    }
-
-    @Override
-    public void addCommand(CommandEnum command) {
-
-    }
-
-    @Override
-    public CommandEnum removeCommand(int index) {
-        return null;
-    }
-
-    @Override
-    public void clearCommands() {
-
-    }
-
-    @Override
-    public void showWelcomeScreen() {
-
-    }
-
-    @Override
-    public void showLoginScreen() {
-        showLoginScreen(false);
-    }
-
-    @Override
-    public void showGameruleSelection() {
-
-    }
-
-    @Override
-    public void showLobby() {
-
-    }
-
-    @Override
-    public void showTowerAndWizardSelection() {
-
-    }
-
-    @Override
-    public void showGameInterface() {
-
-    }
-
-    @Override
-    public void startInterface() {
-
-    }
-
-    @Override
-    public void setSender(ClientSender sender) {
-
-    }
-
-    @Override
-    public void showLoginScreenFailure() {
-
-    }
-
-    @Override
-    public void showSuccessLoginScreen() {
-
-    }
-
-    @Override
-    public void showSuccessJoiningLobby() {
-
-    }
-
-    @Override
-    public void showErrorJoiningLobby() {
-
-    }
-
-    @Override
-    public void showSuccessReadyStatus(boolean status) {
-
-    }
-
-    @Override
-    public void showErrorReadyStatus(boolean status) {
-
-    }
-
-    @Override
-    public void showSuccessStartGame() {
-
-    }
-
-    @Override
-    public void showErrorStartGame() {
-
-    }
-
-    @Override
-    public void showSuccessLeaveLobby() {
-
-    }
-
-    @Override
-    public void showErrorLeaveLobby() {
-
-    }
-
-    @Override
-    public void showErrorSelectingColor(String color) {
-
-    }
-
-    @Override
-    public void showSuccessSelectingColor(String color) {
-
-    }
-
-    @Override
-    public void showErrorSelectingWizard(String wizard) {
-
-    }
-
-    @Override
-    public void showSuccessSelectingWizard(String wizard) {
-
-    }
-
-    @Override
-    public void showNetworkError() {
-
-    }
-
-    @Override
-    public void showUserDisconnected() {
-
-    }
-
-    @Override
-    public void printLobby(LobbyBean lobbyBean) {
-
-    }
-
-    @Override
-    public void printGameInitInfo(GameInitBean gameInitBean) {
-
-    }
-
-    @Override
-    public void setChosenNickname(String nickname) {
-
-    }
-
-    @Override
-    public void setNumberOfPlayers(int numberOfPlayers) {
-
-    }
-
-    @Override
-    public void setGameMode(String gameMode) {
-
-    }
-
-    @Override
-    public void setTeamColor(String teamColor) {
-
-    }
-
-    @Override
-    public void setWizard(String wizard) {
-
-    }
-
-    @Override
-    public void setInLobby(boolean inLobby) {
-
-    }
-
-    @Override
-    public void setLobbyStarting() {
-
-    }
-
-    @Override
-    public void setGameStarting() {
-
-    }
 }

@@ -144,8 +144,6 @@ public interface UserInterface {
 
     /**
      * Initializes and starts the application interface
-     * it will call showWelcomeScreen, showLoginScreen and start the message parser with
-     * initialConnector.startReceiving()
      */
     void startInterface();
 
