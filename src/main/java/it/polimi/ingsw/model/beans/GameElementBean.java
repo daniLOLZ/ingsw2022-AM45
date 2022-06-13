@@ -31,12 +31,18 @@ public abstract class GameElementBean implements Bean {
         scanner.useDelimiter("\n");
         StringBuilder builder = new StringBuilder();
 
+        boolean firstRow = true;
+
         while(scanner.hasNext()){
             String x = scanner.next();
-            while(x.length() < borderLength)
+            while(x.length() <= borderLength)
                 x = x + " ";
 
-            builder.append(x).append("\n");
+            if(!firstRow)
+                builder.append(x).append("\t\n");
+            else
+                builder.append(x).append("\t\n");
+            firstRow = false;
         }
         return  builder.toString();
     }

@@ -21,7 +21,6 @@ public class VirtualView {
     private List<IslandGroupWatcher> islandGroupWatchers;
     private List<AdvancedIslandGroupWatcher> advancedIslandGroupWatchers;
     private List<PlayerWatcher> playerWatchers;
-    //separate into player and board?
     private List<AdvancedPlayerWatcher> advancedPlayerWatchers;
     private List<ErrorWatcher> errorWatchers;
     private SimpleGameWatcher simpleGameWatcher;

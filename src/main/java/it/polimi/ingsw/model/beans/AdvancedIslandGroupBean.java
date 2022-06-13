@@ -44,6 +44,7 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
     public String toString() {
         StringBuilder toReturn = new StringBuilder();
         String Mn;
+        String colorOffset = "\t";
         if(isPresentMN)
             Mn = "YES";
         else
@@ -61,13 +62,16 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
         toReturn.append("\t|\tIslands: ").append(idIslands).append("\n");
         toReturn.append("\t|\tPrev-Island: ").append(idPrevIslandGroup).append("\n");
         toReturn.append("\t|\tNext-Island: ").append(idNextIslandGroup).append("\n");
-        toReturn.append("\t|\tStudents: ").append(studentsOnIsland).append("\n");
+        toReturn.append("\t|\tStudents: ").append(studentsOnIsland).append(colorOffset).
+                append("\n");
         toReturn.append("\t|\tIs present Mother Nature: ").append(Mn).append("\n");
         toReturn.append("\t|\tTower color: ").append(towersColor).append("\n");
         toReturn.append("\t|\tNumber of towers: ").append(towers).append("\n");
         toReturn.append("\t|\tNumber of BlockTiles: ").append(numBlockTiles).append("\n");
         toReturn.append("\t____________________________________\t\n");
 
-        return setTab(toReturn.toString());
+        String border= "____________________________________";
+
+        return setTab(toReturn.toString(),border.length());
     }
 }

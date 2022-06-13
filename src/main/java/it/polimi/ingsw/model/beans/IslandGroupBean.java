@@ -133,7 +133,9 @@ public class IslandGroupBean extends GameElementBean {
         toReturn.append("\t|\tNumber of towers: ").append(towers).append("\n");
         toReturn.append("\t____________________________________\t\n");
 
-         return setTab(toReturn.toString());
+        String border= "____________________________________";
+
+         return setTab(toReturn.toString(),border.length());
 
     }
 

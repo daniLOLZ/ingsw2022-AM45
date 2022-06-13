@@ -64,6 +64,9 @@ public class Player extends DrawableObject {
         this.leader = leader;
         this.board = createBoard(teamColor, parameters);
         this.parameters = parameters;
+
+        if(!leader)
+            board.updateTowers(-board.getNumberOfTowers());
     }
 
     /**
@@ -86,6 +89,9 @@ public class Player extends DrawableObject {
         this.leader = leader;
         this.board = createBoard(teamColor, parameters);
         this.parameters = parameters;
+
+        if(!leader)
+            board.updateTowers(-board.getNumberOfTowers());
 
         watcherList = new ArrayList<>();
         PlayerWatcher watcher = new PlayerWatcher(this, virtualView);

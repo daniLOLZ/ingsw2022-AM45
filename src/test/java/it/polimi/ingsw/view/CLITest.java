@@ -6,6 +6,9 @@ import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.characterCards.CharacterCard;
+import it.polimi.ingsw.model.characterCards.Dame;
+import it.polimi.ingsw.model.characterCards.Juggler;
+import it.polimi.ingsw.model.characterCards.Priest;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.ParameterHandler;
@@ -16,6 +19,7 @@ import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -24,74 +28,79 @@ import java.util.List;
 public class CLITest {
 
 
-    //todo update with new virtualView
-    @Test
-    public void simple(){
-        List<Integer> selectedWizards = new ArrayList<>();
+    AdvancedGame game;
+    SimpleGame gameSimple;
+    int players = 4;
+    int coins = 20;
+    int CharacterCards = 3;
+    VirtualView virtualView;
+    VirtualView virtualViewSimple;
+
+    @BeforeEach
+    public void initialize(){
+        final List<Integer> selectedWizards = new ArrayList<>();
         selectedWizards.add(0);
         selectedWizards.add(10);
         selectedWizards.add(20);
-        List<TeamEnum> teamColors = new ArrayList<>();
+        selectedWizards.add(30);
+        final List<TeamEnum> teamColors = new ArrayList<>();
+        teamColors.add(TeamEnum.WHITE);
         teamColors.add(TeamEnum.WHITE);
         teamColors.add(TeamEnum.BLACK);
-        teamColors.add(TeamEnum.GREY);
-        List<String> nicknames = new ArrayList<>();
+        teamColors.add(TeamEnum.BLACK);
+        //teamColors.add(TeamEnum.GREY);
+        final List<String> nicknames = new ArrayList<>();
+        final List<String> nicknames2 = new ArrayList<>();
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
+        nicknames.add("Ben");
+        nicknames2.add("Tizia");
+        nicknames2.add("Caia");
+        nicknames2.add("Sempronia");
+        nicknames2.add("Flavia");
+        virtualView = new VirtualView();
+        virtualViewSimple = new VirtualView();
+
 
         try {
-            SimpleGame game = new SimpleGame(3,selectedWizards,teamColors, nicknames);
+            game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,
+                    coins,CharacterCards, virtualView);
+            gameSimple = new SimpleGame(players,selectedWizards,teamColors,nicknames2,virtualViewSimple);
+            gameSimple.initializeGame();
             game.initializeGame();
-            game.setDrawables();
-            List<GameElementBean> beans = game.getElementView();
-            CLI cli = new CLI();
-            for(GameElementBean bean: beans){
-                cli.addBean(bean);
-
-            }
-            cli.show();
-        } catch (IncorrectPlayersException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    //todo update with new virtualView
-    @Test
-    public void advanced(){
-        List<Integer> selectedWizards = new ArrayList<>();
-        selectedWizards.add(0);
-        selectedWizards.add(10);
-        selectedWizards.add(20);
-        List<TeamEnum> teamColors = new ArrayList<>();
-        teamColors.add(TeamEnum.WHITE);
-        teamColors.add(TeamEnum.BLACK);
-        teamColors.add(TeamEnum.GREY);
-        List<String> nicknames = new ArrayList<>();
-        nicknames.add("Franco");
-        nicknames.add("Mario");
-        nicknames.add("Alice");
-        try {
-            AdvancedGame game = new AdvancedGame(3,selectedWizards,teamColors,nicknames,20,3);
-            game.initializeGame();
-            game.setDrawables();
-            List<GameElementBean> beans = game.getElementView();
-            game.getParameters().setErrorState("SET ME FREE HUMAN !");
-            ErrorBean errorBean = new ErrorBean(game.getParameters().getErrorState());
-
-            CLI cli = new CLI();
-            cli.addCommand(CommandEnum.CHOOSE_ASSISTANT);
-            cli.addCommand(CommandEnum.QUIT);
-            cli.addBean(errorBean);
-            for(GameElementBean bean: beans){
-                cli.addBean(bean);
-            }
-            cli.show();
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void test(){
+        CLI cli = new CLI();
+
+        game.fillClouds();
+        AdvancedPlayer player = (AdvancedPlayer)game.getPlayers().get(0);
+        Player player2 = game.getPlayers().get(2);
+        game.getFromCloud(player,0);
+        game.getFromCloud(player2,1);
+        player.addEntrance(StudentEnum.RED);
+        game.selectStudentAtEntrance(player,0);
+        game.moveFromEntranceToIsland(player,0);
+        game.selectStudentAtEntrance(player,0);
+        game.moveFromEntranceToHall(player);
+        game.selectStudentAtEntrance(player,0);
+        game.moveFromEntranceToHall(player);
+        game.playAssistant(player, 1);
+        game.playAssistant(player, 2);
+        game.playAssistant(player, 3);
+        game.playAssistant(player, 4);
+        cli.printGameInterface(virtualView.renderAdvancedView());
+
+        System.out.println("\n\n\n\n");
+        cli.printGameInterface(virtualViewSimple.renderSimpleView());
+
+    }
+
+
 
 }

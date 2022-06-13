@@ -181,6 +181,12 @@ public class SimpleGame extends DrawableObject {
         createPlayingSack();
 
         hasBeenInitialized = true;
+        for(IslandGroup islandGroup: islandGroups)
+            islandGroup.alert();
+        for(Player player: players)
+            player.alert();
+        for(Cloud cloud: clouds)
+            cloud.alert();
         alert();
     }
 
