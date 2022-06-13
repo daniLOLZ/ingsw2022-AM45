@@ -26,9 +26,15 @@ public class EndTurnHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        parameters.setConnectionState(new WaitingForControl());
+        if(parameters.getUserController().endTurn()){
+           parameters.setConnectionState(new WaitingForControl());
+           notifySuccessfulOperation(messageBroker);
+           return true;
+        }
+        else {
+            notifyError(messageBroker,"Couldn't end the turn");
+            return false;
+        }
 
-        //todo
-        return false;
     }
 }

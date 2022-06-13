@@ -11,6 +11,8 @@ public enum CommandEnum {
     QUIT("Quit",                                                new NetworkFieldEnum[] {ID_USER}),
     PING("Ping",                                                new NetworkFieldEnum[] {ID_USER, ID_PING_REQUEST}),
     PONG("Pong",                                                new NetworkFieldEnum[] {ID_USER, ID_PING_REQUEST}),
+
+    // Out of game commands
     CONNECTION_REQUEST("Connection Request",                    new NetworkFieldEnum[] {NICKNAME, ID_REQUEST}),
     PLAY_GAME("Play Game",                                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, GAME_RULE}),
     READY_TO_START("Ready to Start",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
@@ -19,12 +21,14 @@ public enum CommandEnum {
     START_GAME("Start Game",                                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     SELECT_WIZARD("Select Wizard",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_WIZARD}),
     SELECT_TOWER_COLOR("Select Tower Color",                    new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_TOWER_COLOR}),
+
+    // In game commands
     CHOOSE_ASSISTANT("Choose Assistant",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_ASSISTANT}),
     SELECT_STUDENT("Select Student",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     PUT_IN_HALL("Put in Hall",                                  new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     PUT_IN_ISLAND("Put in Island",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLAND}),
     DESELECT_STUDENT("Deselect Student",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
-    MOVE_MN_TO_ISLAND("Move MN to Island",                      new NetworkFieldEnum[] {ID_USER, ID_REQUEST, STEPS_MN}),
+    MOVE_MN("Move MN",                                          new NetworkFieldEnum[] {ID_USER, ID_REQUEST, STEPS_MN}),
     CHOOSE_CLOUD("Choose Cloud",                                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_CLOUD}),
     END_TURN("End of turn",                                     new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     SELECT_CHARACTER("Select Character",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION}),
@@ -75,12 +79,17 @@ public enum CommandEnum {
     }
 
     /**
-     * Gets and returns the fields required for this command
+     * Gets and returns the fields required for this command (excluding network ones) <br>
+     * Not included: ID_USER, ID_REQUEST, ID_PING_REQUEST
      * @param command the command chosen
      * @return a list of fields required to correctly form the message
      */
     public static List<NetworkFieldEnum> getFieldsNeeded(CommandEnum command){
-        return Arrays.stream(command.allowedFields).toList();
+        List<NetworkFieldEnum> retList = Arrays.stream(command.allowedFields).toList();
+        retList.remove(ID_USER);
+        retList.remove(ID_REQUEST);
+        retList.remove(ID_PING_REQUEST);
+        return retList;
     }
 
     public static CommandEnum fromObjectToEnum (Object command){

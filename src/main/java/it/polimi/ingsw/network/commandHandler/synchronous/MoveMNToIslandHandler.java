@@ -10,7 +10,7 @@ import it.polimi.ingsw.network.connectionState.CloudChoosing;
 public class MoveMNToIslandHandler extends CommandHandler{
 
     public MoveMNToIslandHandler(){
-        commandAccepted = CommandEnum.MOVE_MN_TO_ISLAND;
+        commandAccepted = CommandEnum.MOVE_MN;
     }
 
     /**

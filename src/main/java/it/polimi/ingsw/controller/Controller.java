@@ -445,6 +445,14 @@ public class Controller {
         if(!boardHandler.takeFromCloud(idCloud)){
             return false;
         }
+        return true;
+    }
+
+    /**
+     * By calling the appropriate handler, ends this player's action phase
+     * @return true if the action succeeded
+     */
+    public boolean endTurn(){
         turnHandler.endPlayerPhase();
         if(turnHandler.isPhaseOver()){
             turnHandler.nextPhase();

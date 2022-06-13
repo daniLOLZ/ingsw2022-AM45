@@ -28,4 +28,8 @@ public abstract class ConnectionState {
     public boolean isAllowed(CommandEnum command){
         return allowedCommands.contains(command);
     }
+
+    public List<CommandEnum> allowedFields(){
+        return allowedCommands;
+    }
 }

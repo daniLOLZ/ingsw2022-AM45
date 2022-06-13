@@ -9,7 +9,6 @@ import it.polimi.ingsw.view.UserInterface;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class receives messages from the server, whether synchronous (initiated by the client in the
@@ -97,7 +96,7 @@ public class ClientReceiver {
                 case PUT_IN_HALL -> clientController.validatePutInHall();
                 case PUT_IN_ISLAND -> clientController.validatePutInIsland();
                 case DESELECT_STUDENT -> clientController.validateDeselectStudent();
-                case MOVE_MN_TO_ISLAND -> clientController.validateMoveMN();
+                case MOVE_MN -> clientController.validateMoveMN();
                 case CHOOSE_CLOUD -> clientController.validateChooseCloud();
                 case END_TURN -> clientController.validateEndTurn();
                 case SELECT_CHARACTER -> clientController.validateSelectCharacter();

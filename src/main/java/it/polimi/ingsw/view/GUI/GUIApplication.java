@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
@@ -930,12 +931,7 @@ public class GUIApplication extends Application implements UserInterface{
     }
 
     @Override
-    public void setNumberOfPlayers(int numberOfPlayers) {
-
-    }
-
-    @Override
-    public void setGameMode(String gameMode) {
+    public void setGameMode(GameRuleEnum gameMode) {
 
     }
 
@@ -965,6 +961,21 @@ public class GUIApplication extends Application implements UserInterface{
     }
 
     @Override
+    public void setGameInterrupted(boolean alive) {
+
+    }
+
+    @Override
+    public void setUpdateAvailable(boolean available) {
+
+    }
+
+    @Override
+    public void setYourTurn(boolean isYourTurn) {
+
+    }
+
+    @Override
     public void showMainGameInterface() {
 
     }
@@ -974,4 +985,13 @@ public class GUIApplication extends Application implements UserInterface{
 
     }
 
+    @Override
+    public void showGameCommandError() {
+
+    }
+
+    @Override
+    public void showGameCommandSuccess() {
+
+    }
 }

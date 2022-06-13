@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.*;
+import it.polimi.ingsw.network.connectionState.*;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import it.polimi.ingsw.view.UserInterface;
@@ -16,7 +17,10 @@ public class ClientController {
     private UserInterface userInterface;
     private VirtualViewBean view;
     private MessageBroker broker;
-
+    private ConnectionState gameState;
+    private ConnectionState callBackGameState;
+    // todo? make it its own state instead of leeching off of
+    //  the connection states
 
     /*
        SYNCHRONOUS COMMANDS
@@ -28,6 +32,7 @@ public class ClientController {
     public void validateLogin(){
         if(!checkSuccessfulReply()){
             userInterface.showLoginScreenFailure();
+
             userInterface.showLoginScreen();
         }
         else{
@@ -44,10 +49,8 @@ public class ClientController {
         }
         else {
             GameRuleEnum chosenRule = GameRuleEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
-            userInterface.setNumberOfPlayers(GameRuleEnum.getNumPlayers(chosenRule.id));
 
-            if(GameRuleEnum.isAdvanced(chosenRule.id)) userInterface.setGameMode("Advanced");
-            else userInterface.setGameMode("Simple");
+            userInterface.setGameMode(chosenRule);
 
             userInterface.setInLobby(true);
             userInterface.showSuccessJoiningLobby();
@@ -93,8 +96,7 @@ public class ClientController {
             userInterface.showErrorLeaveLobby();
         }
         else {
-            userInterface.setGameMode("No game started yet");
-            userInterface.setNumberOfPlayers(0);
+            userInterface.setGameMode(GameRuleEnum.NO_RULE);
             userInterface.setInLobby(false);
             userInterface.showSuccessLeaveLobby();
         }
@@ -121,59 +123,217 @@ public class ClientController {
 
         if(!checkSuccessfulReply()){
             userInterface.showErrorSelectingWizard(wizard);
-            userInterface.showTowerAndWizardSelection();
-
         }
         else {
             userInterface.setWizard(wizard);
             userInterface.showSuccessSelectingWizard(wizard);
-            userInterface.showTowerAndWizardSelection();
-
         }
+        userInterface.showTowerAndWizardSelection();
     }
 
     public void validateChooseAssistant() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = new WaitingForControl();
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateSelectStudent() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = new StudentMoving();
+            allowStateCommands();
+
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validatePutInHall() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            boolean moreStudentsToMove = (boolean) broker.readField(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE);
+            if(moreStudentsToMove){
+                gameState = new StudentMoving();
+            }
+            else {
+                gameState = new MNMoving();
+            }
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validatePutInIsland() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            boolean moreStudentsToMove = (boolean) broker.readField(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE);
+            if(moreStudentsToMove){
+                gameState = new StudentMoving();
+            }
+            else {
+                gameState = new MNMoving();
+            }
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateDeselectStudent() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = new StudentChoosing();
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateMoveMN() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = new CloudChoosing();
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateChooseCloud() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = new EndTurn();
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateEndTurn() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = new WaitingForControl();
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateSelectCharacter() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            callBackGameState = gameState;
+            //todo get character required objects from the message
+            // and show them to the user
+
+            userInterface.clearCommands();
+            gameState = new CharacterCardActivation();
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateSelectStudentColor() {
+        // We might want to extract the info about the remaining selections to make
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateSelectEntranceStudents() {
+        // We might want to extract the info about the remaining selections to make
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateSelectIslandGroup() {
+        // We might want to extract the info about the remaining selections to make
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validateSelectStudentOnCard() {
+        // We might want to extract the info about the remaining selections to make
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
     public void validatePlayCharacter() {
+        if(!checkSuccessfulReply()){
+            userInterface.showGameCommandError();
+        }
+        else {
+            userInterface.clearCommands();
+            gameState = callBackGameState;
+            allowStateCommands();
+            userInterface.showGameCommandSuccess(); // can be omitted maybe
+        }
+        userInterface.showMainGameInterface();
     }
 
+    private void allowStateCommands(){
+        for(CommandEnum command : gameState.allowedFields()) {
+            userInterface.addCommand(command);
+        }
+    }
 
     /*
      * Asynchronous commands must not require the user to input anything
@@ -205,7 +365,7 @@ public class ClientController {
     public void handleGameStart(){
         userInterface.setGameStarting(); //This will make the other method, showTowerAndWizardSelection, return
                                         // after the atomic boolean has been set
-
+        userInterface.setGameInterrupted(true);
     }
 
     /**
@@ -213,17 +373,18 @@ public class ClientController {
      */
     public void handleTurnUpdate(){
         PhaseEnum phase = PhaseEnum.fromObjectToEnum(broker.readAsyncField(NetworkFieldEnum.ASYNC_GAME_PHASE));
-        allowBasicCommands();
 
+        userInterface.clearCommands();
         if(phase.equals(PhaseEnum.PLANNING)){
-            userInterface.addCommand(CommandEnum.CHOOSE_ASSISTANT);
+            gameState = new PlanningPhaseTurn();
         }
         else {
-            userInterface.addCommand(CommandEnum.SELECT_STUDENT);
+            gameState = new StudentChoosing();
         }
-        userInterface.showItsYourTurn(phase);
+        allowStateCommands();
+
+        userInterface.setYourTurn(true);
         //we now need to go in a situation where the game interface is shown and we allow user input
-        userInterface.showMainGameInterface();
     }
 
 
@@ -235,12 +396,14 @@ public class ClientController {
                 (LinkedTreeMap<String, Object>) broker.readAsyncField(NetworkFieldEnum.ASYNC_VIEW));
         this.view = receivedViewBean;
         userInterface.printGameInterface(view);
-        //either show or update(which would read the previously stored beans)
+        userInterface.setUpdateAvailable(true);
 
         //todo add the beans
     }
 
     public void handleUserDisconnection(){
+        userInterface.setGameInterrupted(true);
+        // We call this to wake up the main game interface
         userInterface.showUserDisconnected();
     }
 
@@ -280,15 +443,6 @@ public class ClientController {
             errorMes = (String) broker.readField(NetworkFieldEnum.ERROR_STATE);
 
         return errorMes;
-    }
-
-    /**
-     * Only allows the client to send basic commands
-     * clears the previous commands and only adds the Quit option
-     */
-    private void allowBasicCommands() {
-        userInterface.clearCommands();
-        userInterface.addCommand(CommandEnum.QUIT);
     }
 
     // </editor-fold>

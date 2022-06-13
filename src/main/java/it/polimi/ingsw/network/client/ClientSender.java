@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.client;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.network.CommandEnum;
@@ -9,6 +10,8 @@ import it.polimi.ingsw.network.NetworkFieldEnum;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -163,9 +166,148 @@ public class ClientSender {
         return true;
     }
 
-    /*
-        UTILITY METHODS
-                        */
+    public boolean sendAssistantChosen(int idAssistant) {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CHOOSE_ASSISTANT);
+        mainBroker.addToMessage(NetworkFieldEnum.ID_ASSISTANT, idAssistant);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendSelectedStudent(int chosenStudent) {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENT);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT, chosenStudent);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendPutInHall() {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PUT_IN_HALL);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendPutInIsland(int idIsland) {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PUT_IN_ISLAND);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ISLAND, idIsland);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendDeselectStudent() {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.DESELECT_STUDENT);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendMoveMN(int steps) {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.MOVE_MN);
+        mainBroker.addToMessage(NetworkFieldEnum.STEPS_MN, steps);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendChooseCloud(int cloudId) {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.CHOOSE_CLOUD);
+        mainBroker.addToMessage(NetworkFieldEnum.ID_CLOUD, cloudId);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendEndTurn() {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.END_TURN);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendSelectCharacter(int position) {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_CHARACTER);
+        mainBroker.addToMessage(NetworkFieldEnum.CHARACTER_CARD_POSITION, position);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendSelectStudentColor(StudentEnum color) {
+        if(!acquireSendingRights()) return false;
+
+        StudentEnum[] colors = {color} ;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENT_COLOR);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_STUDENT_COLORS, colors);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendSelectEntranceStudents(List<Integer> students) {
+        if(!acquireSendingRights()) return false;
+
+        Integer[] studentsArray = (Integer[]) students.toArray(); // todo to debug, there might be errors since the network field wants a int[]
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_ENTRANCE_STUDENTS);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS, studentsArray);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendSelectIslandGroup(int idIslandGroup) {
+        if(!acquireSendingRights()) return false;
+
+        int[] islandGroups = {idIslandGroup};
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_ISLAND_GROUP);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ISLANDS, islandGroups);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendSelectStudentOnCard(int selectedStudent) {
+        if(!acquireSendingRights()) return false;
+
+        int[] studentPositions = {selectedStudent};
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENT_ON_CARD);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_CARD_POSITIONS, studentPositions);
+
+        sendToServer();
+        return true;
+    }
+
+    public boolean sendPlayCharacter() {
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PLAY_CHARACTER);
+
+        sendToServer();
+        return true;
+    }
+
+    // <editor-fold desc="Utility methods">
 
     /**
      * This method, using the output stream of the server, adds the request ID
@@ -240,4 +382,8 @@ public class ClientSender {
     public void assignIdUser(int idUser) {
         this.idUser = idUser;
     }
+
+    // </editor-fold>
+
+
 }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.PhaseEnum;
@@ -142,6 +143,7 @@ public interface UserInterface {
 
     /**
      * This screen will be used to get commands from the client
+     * It will orchestrate when to show updates, polled with the updateAvailable flag
      */
     void showMainGameInterface();
 
@@ -150,6 +152,16 @@ public interface UserInterface {
      * @param phase the phase in which the game is currently in
      */
     void showItsYourTurn(PhaseEnum phase);
+
+    /**
+     * Shows that there has been an error with the command that was input
+     */
+    void showGameCommandError();
+
+    /**
+     * Shows that the command went through successfully
+     */
+    void showGameCommandSuccess();
 
     /**
      * Initializes and starts the application interface
@@ -182,9 +194,7 @@ public interface UserInterface {
 
     void setChosenNickname(String nickname);
 
-    void setNumberOfPlayers(int numberOfPlayers);
-
-    void setGameMode(String gameMode);
+    void setGameMode(GameRuleEnum gameMode);
 
     void setTeamColor(String teamColor);
 
@@ -203,4 +213,23 @@ public interface UserInterface {
      * should return (via the gameStarting flag which is set to true)
      */
     void setGameStarting();
+
+    /**
+     * Set to true in case something ends the game, this will interrupt the main game interface
+     * @param alive false if there has been a problem and the game ended
+     */
+    void setGameInterrupted(boolean alive);
+
+    /**
+     * Set to true whenever a view update is available (called via the asynchronous method)
+     * @param available true if an updated view has been received
+     */
+    void setUpdateAvailable(boolean available);
+
+    /**
+     * Set to true whenever it's this user's turn (called via the asynchronous method)
+     * @param isYourTurn true if it's this player's turn
+     */
+    void setYourTurn(boolean isYourTurn);
+
 }

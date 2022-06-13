@@ -7,7 +7,7 @@ public class MNMoving extends ActionPhaseTurn {
     public MNMoving() {
 
         super();
-        allow(CommandEnum.MOVE_MN_TO_ISLAND);
+        allow(CommandEnum.MOVE_MN);
 
     }
 }

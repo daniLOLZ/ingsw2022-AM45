@@ -27,9 +27,11 @@ public class PutInIslandHandler extends CommandHandler{
         if(parameters.getUserController().putInIsland(idIsland)){
             notifySuccessfulOperation(messageBroker);
             if(parameters.getUserController().allStudentsMoved()){
+                messageBroker.addToMessage(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE, false);
                 parameters.setConnectionState(new MNMoving());
             }
             else {
+                messageBroker.addToMessage(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE, true);
                 parameters.setConnectionState(new StudentChoosing());
             }
             return true;

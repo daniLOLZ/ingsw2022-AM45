@@ -1,24 +1,21 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.*;
-import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.client.InitialConnector;
-import org.junit.experimental.theories.DataPoint;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CLI implements UserInterface {
@@ -28,14 +25,21 @@ public class CLI implements UserInterface {
     private final int startPosition = 0;
     private final int centerPosition = 10;
     private List<GameElementBean> beans;
+    private VirtualViewBean viewBean; // todo see what needs to be kept
     private List<CommandEnum> availableCommands;
     AtomicBoolean lobbyStarting;
     AtomicBoolean gameStarting;
+    AtomicBoolean gameInterrupted;
+    AtomicBoolean updateAvailable;
+    AtomicBoolean yourTurn;
+    List<AtomicBoolean> interrupts; //There might be multiple "interrupts" that the main game interface should react to
 
     private String chosenNickname;
+    private GameRuleEnum gameMode;
     private int numberOfPlayers;
-    private String gameMode;
+    private String gameType;
     private boolean inLobby;
+    private boolean commandError;
     private String currentTeamColor = TeamEnum.NOTEAM.name;
     private String currentWizard = WizardEnum.NO_WIZARD.name;
 
@@ -56,12 +60,20 @@ public class CLI implements UserInterface {
         LastView = new StringBuilder();
         LastElement = new StringBuilder();
 
-        numberOfPlayers = 0;
-        gameMode = "No game started yet";
+        setGameMode(GameRuleEnum.NO_RULE);
 
         lobbyStarting = new AtomicBoolean(false);
         gameStarting = new AtomicBoolean(false);
+        gameInterrupted = new AtomicBoolean(false);
+        updateAvailable = new AtomicBoolean(false);
+        yourTurn = new AtomicBoolean(false);
+        commandError = false;
         this.initialConnector = initialConnector;
+
+        interrupts = new ArrayList<>();
+        interrupts.add(gameInterrupted);
+        interrupts.add(updateAvailable);
+        interrupts.add(yourTurn);
     }
 
 
@@ -202,6 +214,7 @@ public class CLI implements UserInterface {
 
         //OFFSET
         StringBuilder offsetBuilder = new StringBuilder();
+
         for(int i = 0; i < width * position; i++){
             offsetBuilder.append(tab);
         }
@@ -383,7 +396,7 @@ public class CLI implements UserInterface {
                 2 - Set yourself as not ready
                 S - Try to start the game
                 L - Leave the lobby, go back to selecting the game rules
-                """, this.numberOfPlayers, this.gameMode));
+                """, this.numberOfPlayers, this.gameType));
 
         do {
             selection = "";
@@ -467,7 +480,7 @@ public class CLI implements UserInterface {
 
             if(gameStarting.get()){
                 System.out.println("Everyone made their choice, the game is starting!");
-//              showGameInterface();
+                showMainGameInterface();
                 return;
             }
 
@@ -529,14 +542,119 @@ public class CLI implements UserInterface {
 
     @Override
     public void showMainGameInterface() {
-        requestCommand();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        boolean correctInput = false;
+        String input;
+        CommandEnum parsedInput;
+
+        // Show the current view
+        if(commandError){
+            // Print command error message
+            commandError = false;
+        }
+
+        // THERE ALWAYS NEEDS TO BE A WAY FOR THE USER TO INPUT ANYTHING
+        do {
+            System.out.println("Type your command (space separated values):\t");
+            input = getInputNonBlocking(reader, interrupts);
+            if(gameInterrupted.get()){ //The game was interrupted, show it to the client (might be removed as there are async handlers already
+                System.out.println("The game was interrupted :(");
+                return;
+            }
+            if(updateAvailable.get()){
+                if (yourTurn.get()){
+                    // Show the current view
+                    // Print your turn message
+                    // Print available commands
+                }
+                else {
+                    //Show the new current view
+                    // Print available commands
+                }
+            }
+            else if(yourTurn.get()){
+                // Show the current view
+                // Print your turn message
+                // Print available commands
+            }
+
+            if(isCorrectInput(input)){
+                correctInput = true;
+            }
+        } while (!correctInput);
+
+        // Handle the correct input.
+        // Input is already completely inserted and checked for both availability and syntax correctness
+
+        parsedInput = CommandEnum.valueOf(input.split(" ")[0]);
+        switch (parsedInput){
+            case CHOOSE_ASSISTANT -> {
+                int idAssistant = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendAssistantChosen(idAssistant);
+            }
+            case SELECT_STUDENT -> {
+                int chosenStudent = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendSelectedStudent(chosenStudent);
+            }
+            case PUT_IN_HALL -> {
+                sender.sendPutInHall();
+            }
+            case PUT_IN_ISLAND -> {
+                int idIsland = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendPutInIsland(idIsland);
+            }
+            case DESELECT_STUDENT -> {
+                sender.sendDeselectStudent();
+            }
+            case MOVE_MN -> {
+                int steps = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendMoveMN(steps);
+            }
+            case CHOOSE_CLOUD -> {
+                int cloudId = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendChooseCloud(cloudId);
+            }
+            case END_TURN -> {
+                sender.sendEndTurn();
+            }
+            case SELECT_CHARACTER -> {
+                int position = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendSelectCharacter(position);
+            }
+            case SELECT_STUDENT_COLOR -> {
+                StudentEnum color = ApplicationHelper.getStudentEnumFromString(input.split(" ")[1]);
+                sender.sendSelectStudentColor(color);
+            }
+            case SELECT_ENTRANCE_STUDENTS -> {
+                List<Integer> students = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
+                sender.sendSelectEntranceStudents(students);
+            }
+            case SELECT_ISLAND_GROUP -> {
+                int idIslandGroup = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendSelectIslandGroup(idIslandGroup);
+            }
+            case SELECT_STUDENT_ON_CARD -> {
+                int selectedStudent = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                sender.sendSelectStudentOnCard(selectedStudent);
+            }
+            case PLAY_CHARACTER -> {
+                sender.sendPlayCharacter();
+            }
+            default -> showMainGameInterface(); // todo handle this case
+        }
+
     }
 
-    private void requestCommand() {
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-//        System.out.println(getOptions());
-//        getInputNonBlocking(reader, lobbyStarting);
+    @Override
+    public void showGameCommandError() {
+        this.commandError = true;
     }
+
+    @Override
+    public void showGameCommandSuccess() {
+
+    }
+
 
     // </editor-fold>
 
@@ -587,8 +705,10 @@ public class CLI implements UserInterface {
 
     @Override
     public void printGameInterface(VirtualViewBean view) {
-        //todo stub
+        //todo get the beans from this method and store them. The main game interface
+        // will then use the beans to render the view
         System.out.println(view.toString());
+        this.viewBean = view;
     }
 
     @Override
@@ -627,6 +747,109 @@ public class CLI implements UserInterface {
         return selection;
     }
 
+    /**
+     * Gets user input from the stream in the reader, exiting and returning the empty string
+     * in case one of the interruptingConditions is true
+     * @param reader the BufferedReader to get input from
+     * @param interruptingConditions the conditions that make the method return, in case the input
+     *                              wasn't read already
+     * @return the string input by the user, or the empty string if one of the interruptingConditions
+     * was triggered
+     */
+    public String getInputNonBlocking(BufferedReader reader, List<AtomicBoolean> interruptingConditions){
+        String selection = "";
+        while(selection.equals("") && checkInterrupt(interruptingConditions)) {
+            try {
+                while (!reader.ready() && !checkInterrupt(interruptingConditions)) {
+                    Thread.sleep(200);
+                }
+                if(reader.ready()) selection = reader.readLine();
+                //If not, we exited because the game is starting
+            } catch (InterruptedException e) {
+                //Run the next loop
+                System.err.println("Interrupted before receiving input, continuing");
+            } catch (IOException e) {
+                System.err.println("I/O error, continuing");
+            }
+        }
+        return selection;
+    }
+
+    private boolean checkInterrupt(List<AtomicBoolean> interruptingConditions) {
+        for(AtomicBoolean condition : interruptingConditions){
+            if(condition.get()) return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Check all available commands with the respective parameters required and compare them to the input string
+     * The command must be in the same form as the enum (may be changed) and the parameters must be in the same number as those required
+     * @param input the string input by the user containing the command (and its parameters)
+     * @return true if the input matches with one of the commands' names and parameters
+     */
+    //todo can be changed to check for the positioning, for example,
+    // i.e. if there are 4 commands available here we check if the input is < 4
+    private boolean isCorrectInput(String input) {
+        List<String> splitInput = Arrays.stream(input.split(" ")).toList();
+        String inputCommand;
+        CommandEnum actualCommand;
+        List<NetworkFieldEnum> requiredFields;
+
+        if(splitInput.size() > 0){
+            inputCommand = splitInput.get(0);
+            splitInput.remove(0);
+        } else return false;
+
+        //Check if command available. Note that the command must match exactly
+        if (!availableCommands.contains(CommandEnum.valueOf(inputCommand))) return false;
+        else actualCommand = CommandEnum.valueOf(inputCommand);
+
+        //Check whether the input fields are same in number with the needed ones
+        requiredFields = CommandEnum.getFieldsNeeded(actualCommand);
+        if(requiredFields.size() != splitInput.size()) return false;
+
+        //Check the type of each field
+        for(int fieldPos = 0; fieldPos < requiredFields.size(); fieldPos++){
+            if(!isInputCompatible(splitInput.get(fieldPos) , requiredFields.get(fieldPos))) return false;
+        }
+
+        //All checks were passed
+        return true;
+    }
+
+    /**
+     * Tests whether the input string is compatible with the given network field's class
+     * @param inputString the string containing the input field
+     * @param networkFieldEnum the network field that the string needs to be compared to
+     * @return true if inputString can be converted to the type of the network field
+     */
+    private boolean isInputCompatible(String inputString, NetworkFieldEnum networkFieldEnum) {
+        //todo find a better way if possible instead of parsing all possible class types
+        // available to the user to input
+        // A switch isn't allowed here
+        if (String.class.equals(NetworkFieldEnum.getClass(networkFieldEnum))) {
+            return true;
+        } else if (int.class.equals(NetworkFieldEnum.getClass(networkFieldEnum))) {
+            return ApplicationHelper.isInt(inputString);
+        } else if (GameRuleEnum.class.equals(NetworkFieldEnum.getClass(networkFieldEnum))) {
+            return ApplicationHelper.isGameRuleEnum(inputString);
+        } else if (int[].class.equals(NetworkFieldEnum.getClass(networkFieldEnum))) {
+            return ApplicationHelper.isIntArray(inputString);
+        } else if (StudentEnum[].class.equals(NetworkFieldEnum.getClass(networkFieldEnum))) {
+            return ApplicationHelper.isStudentEnumArray(inputString);
+        }
+        return false;
+    }
+
+    //temp
+    private void requestCommand() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println(getOptions());
+        getInputNonBlocking(reader, gameInterrupted);
+    }
+
     // </editor-fold>
 
 
@@ -639,8 +862,10 @@ public class CLI implements UserInterface {
         this.numberOfPlayers = numberOfPlayers;
     }
 
-    public void setGameMode(String gameMode) {
+    public void setGameMode(GameRuleEnum gameMode) {
         this.gameMode = gameMode;
+        this.numberOfPlayers = GameRuleEnum.getNumPlayers(gameMode.id);
+        this.gameType = GameRuleEnum.isAdvanced(gameMode.id) ? "Advanced" : "Simple";
     }
 
     public void setChosenNickname(String chosenNickname) {
@@ -673,6 +898,21 @@ public class CLI implements UserInterface {
     }
 
     @Override
+    public void setGameInterrupted(boolean alive) {
+        gameInterrupted.set(alive);
+    }
+
+    @Override
+    public void setUpdateAvailable(boolean available) {
+        updateAvailable.set(available);
+    }
+
+    @Override
+    public void setYourTurn(boolean isYourTurn) {
+        yourTurn.set(isYourTurn);
+    }
+
+    @Override
     public void addBean(GameElementBean bean) {
         beans.add(bean);
     }
@@ -689,7 +929,7 @@ public class CLI implements UserInterface {
 
     @Override
     public void addCommand(CommandEnum command) {
-        availableCommands.add(command);
+        if(!availableCommands.contains(command)) availableCommands.add(command);
     }
 
     @Override

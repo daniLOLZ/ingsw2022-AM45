@@ -23,9 +23,6 @@ public class SelectCharacterHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        //Here we need to memorize what the previous state the user had to resume the turn
-        // after the character takes effect
-        parameters.setCallbackConnectionState(parameters.getConnectionState());
 
         Integer cardPosition = (Integer) messageBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
         if(!parameters.getUserController().selectCard(cardPosition)){
@@ -33,6 +30,10 @@ public class SelectCharacterHandler extends CommandHandler{
             return false;
         }
         else {
+            //Here we need to memorize what the previous state the user had to resume the turn
+            // after the character takes effect
+            parameters.setCallbackConnectionState(parameters.getConnectionState());
+
             notifySuccessfulOperation(messageBroker);
             Requirements requirements = parameters.getUserController().getAdvancedGame()
                     .getAdvancedParameters().getRequirementsForThisAction();
