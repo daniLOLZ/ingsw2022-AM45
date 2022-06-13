@@ -2,6 +2,8 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.VirtualViewBean;
+import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
@@ -186,11 +188,6 @@ public class GUI implements UserInterface {
     }
 
     @Override
-    public void showGameInterface() {
-
-    }
-
-    @Override
     public void startInterface() {
         Application.launch(GUIApplication.class);
     }
@@ -221,13 +218,8 @@ public class GUI implements UserInterface {
     }
 
     @Override
-    public void setNumberOfPlayers(int numberOfPlayers) {
-
-    }
-
-    @Override
-    public void setGameMode(String gameMode) {
-        this.gameRule = GameRuleEnum.fromObjectToEnum(gameMode);
+    public void setGameMode(GameRuleEnum gameMode) {
+        this.gameRule = gameMode;
     }
 
     @Override
@@ -252,6 +244,46 @@ public class GUI implements UserInterface {
 
     @Override
     public void setGameStarting() {
+
+    }
+
+    @Override
+    public void showMainGameInterface() {
+
+    }
+
+    @Override
+    public void showItsYourTurn(PhaseEnum phase) {
+
+    }
+
+    @Override
+    public void showGameCommandError() {
+
+    }
+
+    @Override
+    public void showGameCommandSuccess() {
+
+    }
+
+    @Override
+    public void printGameInterface(VirtualViewBean virtualView) {
+
+    }
+
+    @Override
+    public void setGameInterrupted(boolean alive) {
+
+    }
+
+    @Override
+    public void setUpdateAvailable(boolean available) {
+
+    }
+
+    @Override
+    public void setYourTurn(boolean isYourTurn) {
 
     }
 }
