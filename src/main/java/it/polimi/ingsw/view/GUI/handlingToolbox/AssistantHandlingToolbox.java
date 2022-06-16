@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -20,13 +20,14 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
     }
 
     @Override
-    public void allowCommand(CommandEnum command, ClientNetworkManager resourceProvider) {
+    public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.CHOOSE_ASSISTANT){
-            int index = 0;
+            int assistantIndex = 0;
             for (EventHandler<MouseEvent> ignored:
                  onAssistantClick) {
-                //onAssistantClick.set(index, resourceProvider.chooseAssistant());
-                index++;
+                int finalIndex = assistantIndex;
+                onAssistantClick.set(assistantIndex, event -> resourceProvider.sendAssistantChosen(finalIndex));
+                assistantIndex++;
             }
         }
     }

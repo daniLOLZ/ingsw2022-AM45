@@ -44,7 +44,7 @@ public class GUI implements UserInterface {
                 numTables);
     private CharacterCardHandlingToolbox characterCardHandlingToolbox = new CharacterCardHandlingToolbox(numCharacterCards);
     private CloudHandlingToolbox cloudHandlingToolbox = new CloudHandlingToolbox(GameRuleEnum.getNumPlayers(gameRule.id));
-    private IslandHandlingToolbox islandHandlingToolbox = new IslandHandlingToolbox(numIslands);
+    private IslandHandlingToolbox islandHandlingToolbox = new IslandHandlingToolbox();
 
     @Override
     public void addBean(GameElementBean bean) {
@@ -64,6 +64,11 @@ public class GUI implements UserInterface {
     @Override
     public void addCommand(CommandEnum command) {
 
+        assistantHandlingToolbox.    allowCommand(command, sender);
+        boardHandlingToolbox.        allowCommand(command, sender);
+        characterCardHandlingToolbox.allowCommand(command, sender);
+        cloudHandlingToolbox.        allowCommand(command, sender);
+        islandHandlingToolbox.       allowCommand(command, sender);
     }
 
     @Override
@@ -74,6 +79,15 @@ public class GUI implements UserInterface {
     @Override
     public void clearCommands() {
 
+        disableAllCommands(assistantHandlingToolbox);
+        disableAllCommands(boardHandlingToolbox);
+        disableAllCommands(cloudHandlingToolbox);
+        disableAllCommands(cloudHandlingToolbox);
+        disableAllCommands(islandHandlingToolbox);
+    }
+
+    private void disableAllCommands(HandlingToolbox toolbox){
+        for (CommandEnum command: CommandEnum.values()) toolbox.disableCommand(command);
     }
 
     @Override
@@ -194,7 +208,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showNetworkError() {
-
+        Platform.runLater(GUIApplication::showNetworkError);
     }
 
     @Override
@@ -269,7 +283,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void printGameInterface(VirtualViewBean virtualView) {
-
+        //Platform.runLater(() -> GUIApplication.startGame());
     }
 
     @Override

@@ -1,7 +1,8 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.network.CommandEnum;
-import it.polimi.ingsw.network.client.ClientNetworkManager;
+import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -30,39 +31,59 @@ public class BoardHandlingToolbox implements HandlingToolbox{
     }
 
     @Override
-    public void allowCommand(CommandEnum command, ClientNetworkManager resourceProvider) {
+    public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.SELECT_STUDENT){
-            AtomicInteger index = new AtomicInteger();
+            AtomicInteger studentIndex = new AtomicInteger();
             for (EventHandler<MouseEvent> ignored :
                  onEntranceStudentClick) {
-                if (onEntranceStudentClick.get(index.get()) == DISABLED) {
-                    onEntranceStudentClick.set(index.get(), event -> {
-                        //resourceProvider.selectStudent(index);
-                        onEntranceStudentClick.set(index.get(), NO_EFFECT);
-                        index.getAndIncrement();
+                if (onEntranceStudentClick.get(studentIndex.get()) == DISABLED) {
+                    onEntranceStudentClick.set(studentIndex.get(), event -> {
+                        resourceProvider.sendSelectedStudent(studentIndex.get());
+                        onEntranceStudentClick.set(studentIndex.get(), NO_EFFECT);
+                        studentIndex.getAndIncrement();
                     });
                 }
             }
         }
 
         if (command == CommandEnum.PUT_IN_HALL){
-            int index = 0;
+            int tableIndex = 0;
 
             for (EventHandler<MouseEvent> ignored : onTableClick) {
-                //onTableClick.set(index++, resourceProvider.putInHall());
-                index++;
+                onTableClick.set(tableIndex, event -> resourceProvider.sendPutInHall());
+                tableIndex++;
             }
         }
 
         if (command == CommandEnum.SELECT_STUDENT_COLOR) {
-            int index = 0;
+            int tableIndex = 0;
 
             for (EventHandler<MouseEvent> ignored : onTableClick){
-                //onTableClick.set(index, resourceProvider.selectStudentColor(StudentEnum.getColorById(index)));
-                index++;
+                int finalIndex = tableIndex;
+                onTableClick.set(tableIndex, event -> resourceProvider.sendSelectStudentColor(StudentEnum.getColorById(finalIndex)));
+                tableIndex++;
             }
         }
-        //TODO
+
+        if (command == CommandEnum.SELECT_ENTRANCE_STUDENTS){
+
+            //TODO might work in an odd way
+        }
+
+        if (command == CommandEnum.DESELECT_STUDENT){
+
+            for (EventHandler<MouseEvent> handler:
+                 onEntranceStudentClick) {
+
+                if (handler == NO_EFFECT)
+                    onEntranceStudentClick.set(
+                            onEntranceStudentClick.indexOf(handler),
+                            event -> {
+                                resourceProvider.sendDeselectStudent();
+                                onEntranceStudentClick.set(onEntranceStudentClick.indexOf(handler), DISABLED);
+                            });
+            }
+        }
     }
 
     @Override
@@ -74,10 +95,9 @@ public class BoardHandlingToolbox implements HandlingToolbox{
     /**
      * Returns the allowed action for the given entrance student
      * @param pos the position of the student at the entrance
-     * @param selected indicates if the student is the selected one
      * @return The EventHandler to assign to the Entrance student
      */
-    public EventHandler<MouseEvent> getOnEntranceStudentClick(int pos, boolean selected){
+    public EventHandler<MouseEvent> getOnEntranceStudentClick(int pos){
         return onEntranceStudentClick.get(pos);
     }
 

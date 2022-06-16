@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -23,17 +23,18 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     }
 
     @Override
-    public void allowCommand(CommandEnum command, ClientNetworkManager resourceProvider) {
+    public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         //TODO
 
         if (command == CommandEnum.SELECT_STUDENT_ON_CARD) {
 
-            int index = 0;
+            int studentIndex = 0;
 
             for (EventHandler<MouseEvent> ignored:
                  onStudentOnCardClick) {
-                //onStudentOnCardClick.set(index, resourceProvider.selectStudentOnCard(index));
-                index++;
+                int finalIndex = studentIndex;
+                onStudentOnCardClick.set(studentIndex, event -> resourceProvider.sendSelectStudentOnCard(finalIndex));
+                studentIndex++;
             }
         }
     }
