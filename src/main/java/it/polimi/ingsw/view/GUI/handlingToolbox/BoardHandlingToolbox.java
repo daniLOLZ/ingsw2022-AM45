@@ -37,11 +37,11 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             for (EventHandler<MouseEvent> ignored :
                  onEntranceStudentClick) {
                 if (onEntranceStudentClick.get(studentIndex.get()) == DISABLED) {
-                    onEntranceStudentClick.set(studentIndex.get(), event -> {
+                    onEntranceStudentClick.set(studentIndex.get(), event -> new Thread(() -> {
                         resourceProvider.sendSelectedStudent(studentIndex.get());
                         onEntranceStudentClick.set(studentIndex.get(), NO_EFFECT);
                         studentIndex.getAndIncrement();
-                    });
+                    }).start());
                 }
             }
         }
@@ -50,7 +50,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             int tableIndex = 0;
 
             for (EventHandler<MouseEvent> ignored : onTableClick) {
-                onTableClick.set(tableIndex, event -> resourceProvider.sendPutInHall());
+                onTableClick.set(tableIndex, event -> new Thread (resourceProvider::sendPutInHall).start());
                 tableIndex++;
             }
         }
@@ -60,7 +60,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
             for (EventHandler<MouseEvent> ignored : onTableClick){
                 int finalIndex = tableIndex;
-                onTableClick.set(tableIndex, event -> resourceProvider.sendSelectStudentColor(StudentEnum.getColorById(finalIndex)));
+                onTableClick.set(tableIndex, event -> new Thread (() -> resourceProvider.sendSelectStudentColor(StudentEnum.getColorById(finalIndex))).start());
                 tableIndex++;
             }
         }
@@ -78,10 +78,10 @@ public class BoardHandlingToolbox implements HandlingToolbox{
                 if (handler == NO_EFFECT)
                     onEntranceStudentClick.set(
                             onEntranceStudentClick.indexOf(handler),
-                            event -> {
+                            event -> new Thread(() -> {
                                 resourceProvider.sendDeselectStudent();
                                 onEntranceStudentClick.set(onEntranceStudentClick.indexOf(handler), DISABLED);
-                            });
+                            }).start());
             }
         }
     }

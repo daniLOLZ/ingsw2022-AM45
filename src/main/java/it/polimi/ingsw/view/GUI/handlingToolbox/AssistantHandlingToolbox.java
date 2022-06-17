@@ -26,7 +26,7 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
             for (EventHandler<MouseEvent> ignored:
                  onAssistantClick) {
                 int finalIndex = assistantIndex;
-                onAssistantClick.set(assistantIndex, event -> resourceProvider.sendAssistantChosen(finalIndex));
+                onAssistantClick.set(assistantIndex, event -> new Thread (() -> resourceProvider.sendAssistantChosen(finalIndex)).start());
                 assistantIndex++;
             }
         }

@@ -29,12 +29,11 @@ public class CloudHandlingToolbox implements HandlingToolbox{
             for (EventHandler<MouseEvent> ignored:
                  onCloudClick) {
                 if (onCloudClick.get(cloudIndex.get()) == DISABLED) {
-                    onCloudClick.set(cloudIndex.get(), event -> {
+                    onCloudClick.set(cloudIndex.get(), event -> new Thread(() -> {
                        resourceProvider.sendChooseCloud(cloudIndex.get());
                        onCloudClick.set(cloudIndex.get(), NO_EFFECT);
 
-                       if (allIneffective(onCloudClick)) reset();
-                    });
+                       if (allIneffective(onCloudClick)) reset();}).start());
                 }
             }
         }

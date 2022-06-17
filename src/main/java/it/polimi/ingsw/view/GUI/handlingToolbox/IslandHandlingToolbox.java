@@ -6,10 +6,7 @@ import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class IslandHandlingToolbox implements HandlingToolbox{
 
@@ -20,6 +17,10 @@ public class IslandHandlingToolbox implements HandlingToolbox{
     private int motherNaturePos;
 
     private int maxMNSteps;
+
+    //needed to re-allow all commands whenever the island group morphology changes
+    private EnumSet<CommandEnum> allowedCommands = EnumSet.noneOf(CommandEnum.class);
+    private ClientSender sender;
 
     /**
      * Provides the toolbox with the necessary information regarding the islands to keep providing the handling resources
@@ -41,6 +42,12 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
         onIslandClick = newOnIslandClick;
         indexToId = newIndexToId;
+
+        if (!allowedCommands.isEmpty()) {
+            for (CommandEnum command : allowedCommands) {
+                allowCommand(command, sender);
+            }
+        }
     }
 
     public void setMaxMNSteps(int steps){maxMNSteps = steps;}
@@ -48,12 +55,16 @@ public class IslandHandlingToolbox implements HandlingToolbox{
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
 
+        if (!sender.equals(resourceProvider)) sender = resourceProvider;
+
+        allowedCommands.add(command);
+
         if (command == CommandEnum.PUT_IN_ISLAND) {
             int islandIndex = 0;
 
             for (EventHandler<MouseEvent> ignored: onIslandClick) {
                 int finalIndex = islandIndex;
-                onIslandClick.set(islandIndex, event -> resourceProvider.sendPutInIsland(indexToId.get(finalIndex)));
+                onIslandClick.set(islandIndex, event -> new Thread(() -> resourceProvider.sendPutInIsland(indexToId.get(finalIndex))).start());
                 islandIndex++;
             }
         }
@@ -64,7 +75,7 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
             for (EventHandler<MouseEvent> ignored: onIslandClick) {
                 int finalIndex = islandIndex;
-                onIslandClick.set(islandIndex, event ->  resourceProvider.sendSelectIslandGroup(indexToId.get(finalIndex)));
+                onIslandClick.set(islandIndex, event -> new Thread(() -> resourceProvider.sendSelectIslandGroup(indexToId.get(finalIndex))).start());
                 islandIndex++;
             }
         }
@@ -74,7 +85,7 @@ public class IslandHandlingToolbox implements HandlingToolbox{
             for (int pos = motherNaturePos + 1; pos < motherNaturePos + maxMNSteps; pos++){
 
                 int finalPos = pos;
-                onIslandClick.set(pos % onIslandClick.size(), event -> resourceProvider.sendMoveMN(finalPos - motherNaturePos));
+                onIslandClick.set(pos % onIslandClick.size(), event -> new Thread(() ->  resourceProvider.sendMoveMN(finalPos - motherNaturePos)).start());
             }
         }
     }
@@ -82,6 +93,8 @@ public class IslandHandlingToolbox implements HandlingToolbox{
     @Override
     public void disableCommand(CommandEnum command) {
         //TODO MOVE_MOTHER_NATURE
+
+        allowedCommands.remove(command);
 
         if (command == CommandEnum.PUT_IN_ISLAND || command == CommandEnum.SELECT_ISLAND_GROUP){
 
