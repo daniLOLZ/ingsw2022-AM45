@@ -29,22 +29,17 @@ public class GUI implements UserInterface {
             entranceSlots2_4Players = 7,
             entranceSlots3Players = 9,
             numTables = 5,
-            numCharacterCards = 3,
-            numIslands = 12;
+            numCharacterCards = 3;
 
-    private GameRuleEnum gameRule = GameRuleEnum.NO_RULE;
+    private GameRuleEnum currentGameRule = GameRuleEnum.NO_RULE;
 
     private ClientSender sender;
 
-    private AssistantHandlingToolbox assistantHandlingToolbox = new AssistantHandlingToolbox(numAssistants);
-    private BoardHandlingToolbox boardHandlingToolbox =
-            new BoardHandlingToolbox(
-                GameRuleEnum.getNumPlayers(gameRule.id) == 3 ?
-                    entranceSlots2_4Players : entranceSlots3Players,
-                numTables);
-    private CharacterCardHandlingToolbox characterCardHandlingToolbox = new CharacterCardHandlingToolbox(numCharacterCards);
-    private CloudHandlingToolbox cloudHandlingToolbox = new CloudHandlingToolbox(GameRuleEnum.getNumPlayers(gameRule.id));
-    private IslandHandlingToolbox islandHandlingToolbox = new IslandHandlingToolbox(numIslands);
+    private GameToolBoxContainer gameToolBoxContainer;
+
+    private VirtualViewBean viewData;
+    private GameInitBean gameInitData;
+    private boolean selectedTowerColor = false;
 
     @Override
     public void addBean(GameElementBean bean) {
@@ -63,7 +58,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void addCommand(CommandEnum command) {
-
+        gameToolBoxContainer.allowCommand(command, sender);
     }
 
     @Override
@@ -73,8 +68,9 @@ public class GUI implements UserInterface {
 
     @Override
     public void clearCommands() {
-
+        gameToolBoxContainer.clearCommands();
     }
+
 
     @Override
     public void setSender(ClientSender sender) {
@@ -163,6 +159,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showTowerAndWizardSelection() {
+        selectedTowerColor = false;
         if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showWizardSelection(selectingWizardError));
     }
 
@@ -174,6 +171,8 @@ public class GUI implements UserInterface {
     @Override
     public void showSuccessSelectingColor(String color) {
         selectingColorError = false;
+        selectingWizardError = false;
+        selectedTowerColor = true;
     }
 
     @Override
@@ -184,7 +183,6 @@ public class GUI implements UserInterface {
     @Override
     public void showSuccessSelectingWizard(String wizard) {
         selectingWizardError = false;
-        selectingColorError = false;
     }
 
     @Override
@@ -194,7 +192,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showNetworkError() {
-
+       if (GUIApplication.isStarted()) Platform.runLater(GUIApplication::showNetworkError);
     }
 
     @Override
@@ -209,7 +207,12 @@ public class GUI implements UserInterface {
 
     @Override
     public void printGameInitInfo(GameInitBean gameInitBean) {
-
+        gameInitData = gameInitBean;
+        if (GUIApplication.isStarted()) {
+            if (selectedTowerColor) {
+                Platform.runLater(() -> GUIApplication.showWizardSelection(false));
+            } else Platform.runLater(() -> GUIApplication.showTowerColorSelection(false));
+        }
     }
 
     @Override
@@ -219,7 +222,13 @@ public class GUI implements UserInterface {
 
     @Override
     public void setGameMode(GameRuleEnum gameMode) {
-        this.gameRule = gameMode;
+        this.currentGameRule = gameMode;
+        gameToolBoxContainer = new GameToolBoxContainer(
+                numAssistants,
+                GameRuleEnum.getNumPlayers(gameMode.id) == 3 ? entranceSlots3Players : entranceSlots2_4Players,
+                numTables,
+                GameRuleEnum.getNumPlayers(gameMode.id),
+                GameRuleEnum.isAdvanced(gameMode.id) ? numCharacterCards : 0);
     }
 
     @Override
@@ -249,7 +258,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showMainGameInterface() {
-
+        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.startGame());
     }
 
     @Override
@@ -269,7 +278,21 @@ public class GUI implements UserInterface {
 
     @Override
     public void printGameInterface(VirtualViewBean virtualView) {
-
+        viewData = virtualView;
+        if (!gameToolBoxContainer.areCharactersInitialized()) {
+            for (int character = 0; character < numCharacterCards; character++) {
+                gameToolBoxContainer
+                        .setNumStudentsOnCharacterCard(
+                                character,
+                                virtualView
+                                        .getCharacterCardBeans()
+                                        .get(character)
+                                        .getStudents()
+                                        .size());
+            }
+        }
+        gameToolBoxContainer.updateIslandGroups(virtualView.getIslandGroupBeans());
+        showMainGameInterface();
     }
 
     @Override

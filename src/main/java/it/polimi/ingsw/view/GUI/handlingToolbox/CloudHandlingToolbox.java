@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import it.polimi.ingsw.network.client.ClientNetworkManager;
 import it.polimi.ingsw.network.CommandEnum;
+import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -23,18 +23,17 @@ public class CloudHandlingToolbox implements HandlingToolbox{
     }
 
     @Override
-    public void allowCommand(CommandEnum command, ClientNetworkManager resourceProvider) {
+    public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.CHOOSE_CLOUD) {
-            AtomicInteger index = new AtomicInteger();
+            AtomicInteger cloudIndex = new AtomicInteger();
             for (EventHandler<MouseEvent> ignored:
                  onCloudClick) {
-                if (onCloudClick.get(index.get()) == DISABLED) {
-                    onCloudClick.set(index.get(), event -> {
-                       //resourceProvider.chooseCloud();
-                       onCloudClick.set(index.get(), NO_EFFECT);
+                if (onCloudClick.get(cloudIndex.get()) == DISABLED) {
+                    onCloudClick.set(cloudIndex.get(), event -> new Thread(() -> {
+                       resourceProvider.sendChooseCloud(cloudIndex.get());
+                       onCloudClick.set(cloudIndex.get(), NO_EFFECT);
 
-                       if (allIneffective(onCloudClick)) reset();
-                    });
+                       if (allIneffective(onCloudClick)) reset();}).start());
                 }
             }
         }
