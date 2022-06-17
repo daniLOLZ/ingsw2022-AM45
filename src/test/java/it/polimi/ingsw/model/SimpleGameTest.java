@@ -77,15 +77,18 @@ public class SimpleGameTest {
         game.initializeGame();
         game.getPlayers().get(0).getBoard().addToHall(StudentEnum.PINK); // Add a pink student to PLAYER 1 board
         game.updateProfessor(StudentEnum.PINK); //The pink professor should now belong to PLAYER1
-        assertTrue(parameters.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(0).getPlayerId()));
+        assertEquals(parameters.getProfessors().get(StudentEnum.PINK.index),
+                game.getPlayers().get(0).getPlayerId());
 
         game.getPlayers().get(1).getBoard().addToHall(StudentEnum.PINK); // We give PLAYER 2 a pink student
         game.updateProfessor(StudentEnum.PINK); //The professor should still be PLAYER 1's
-        assertFalse(parameters.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(1).getPlayerId()));
+        assertNotEquals(parameters.getProfessors().get(StudentEnum.PINK.index),
+                game.getPlayers().get(1).getPlayerId());
 
         game.getPlayers().get(1).getBoard().addToHall(StudentEnum.PINK); // We give PLAYER 2 ANOTHER pink student
         game.updateProfessor(StudentEnum.PINK); //The professor should switch sides
-        assertTrue(parameters.getProfessors().get(StudentEnum.PINK.index).equals(game.getPlayers().get(1).getPlayerId()));
+        assertEquals(parameters.getProfessors().get(StudentEnum.PINK.index),
+                game.getPlayers().get(1).getPlayerId());
 
     }
 
@@ -97,8 +100,8 @@ public class SimpleGameTest {
     public void checkPlayerOrderAllDifferentCards() {
         if (game.getErrorState() == null) {
             GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).playAssistant(5); //Should have turn order 5
-            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(13); //Should have turn order 3
-            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(22); //Should have turn order 2
+            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(3); //Should have turn order 3
+            GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(2); //Should have turn order 2
             game.sortPlayers();
             //The order should be 3 > 2 > 1
             assertTrue(game.getPlayers().get(0).equals(GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3))
@@ -116,15 +119,15 @@ public class SimpleGameTest {
         if(game.getErrorState() == null){
         //We begin with the case of all different cards, to set the player array
         GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).playAssistant(5); //Should have turn order 5
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(13); //Should have turn order 3
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(22); //Should have turn order 2
+        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(3); //Should have turn order 3
+        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(2); //Should have turn order 2
         game.sortPlayers();
         // Now the order should be 3>2>1
 
         //Then we see what happens when two players play the same value card
         GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER1).playAssistant(8); //Should have turn order 8
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(14); //Should have turn order 4
-        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(28); //Should have turn order 8
+        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER2).playAssistant(4); //Should have turn order 4
+        GameHelper.getPlayerById(game.getPlayers(), PlayerEnum.PLAYER3).playAssistant(8); //Should have turn order 8
         // Now the order should be 2>3>1
         game.sortPlayers();
 
@@ -271,16 +274,21 @@ public class SimpleGameTest {
     }
 
     /**
-     *Test for correct behavior of moveFromEntrancceToHall.
+     *Test for correct behavior of moveFromEntranceToHall.
      * Professor update and students moved
      */
     @Test
     public void moveFromEntranceToHallTest(){
         Player player = game.getPlayers().get(0);
+
+        //Remove one student from the entrance to make room for the test student
+        player.getBoard().removeFromEntrance(8);
+
         int previousSize = player.getBoard().entranceSize();
         int previousTableStudents = player.getNumStudentAtTable(StudentEnum.GREEN);
+
         player.getBoard().addToEntrance(StudentEnum.GREEN);
-        game.selectStudentAtEntrance(player, 0);
+        game.selectStudentAtEntrance(player, 8);
         game.moveFromEntranceToHall(player);
 
         assertEquals(previousTableStudents + 1, player.getNumStudentAtTable(StudentEnum.GREEN));
@@ -296,9 +304,13 @@ public class SimpleGameTest {
     public void moveFromEntranceToIsland(){
         Player player = game.getPlayers().get(0);
         IslandGroup island = game.getIslandGroups().get(0);
+
+        //Remove one student from the entrance to make room for the test student
+        player.getBoard().removeFromEntrance(8);
+
         int entranceSize = player.getBoard().entranceSize();
         player.getBoard().addToEntrance(StudentEnum.BLUE);
-        game.selectEntranceStudent(0);
+        game.selectEntranceStudent(8);
         game.moveFromEntranceToIsland(player,island.getIdGroup());
         assertTrue(island.getStudents().contains(StudentEnum.BLUE));
         assertEquals(entranceSize, player.getBoard().entranceSize());
@@ -373,8 +385,12 @@ public class SimpleGameTest {
             game.moveMN(1);
 
         Player player = game.getPlayers().get(2);               //GREY
+
+        //Remove one student from the entrance to make room for the test student
+        player.getBoard().removeFromEntrance(8);
+
         player.getBoard().addToEntrance(StudentEnum.PINK);
-        game.selectEntranceStudent(0);
+        game.selectEntranceStudent(8);
         game.moveFromEntranceToHall(player);
         island.addStudent(StudentEnum.PINK);
 
@@ -390,7 +406,7 @@ public class SimpleGameTest {
         //MERGE 2 ISLANDS
         IslandGroup island2 = island.getNextIslandGroup();
         player.getBoard().addToEntrance(StudentEnum.PINK);
-        game.selectEntranceStudent(0);
+        game.selectEntranceStudent(8);
         game.moveFromEntranceToHall(player);
         island2.addStudent(StudentEnum.PINK);
 
@@ -457,7 +473,7 @@ public class SimpleGameTest {
     public void PlayAssistant(){
         Player player3 = game.getPlayers().get(2);
         int size = player3.getWizard().size();
-        game.playAssistant(player3, 21);
+        game.playAssistant(player3, 1);
         assertEquals(21,player3.getAssistantPlayed().id);
         assertEquals(size - 1,player3.getWizard().size());
     }
@@ -470,8 +486,8 @@ public class SimpleGameTest {
 
         //FIRST TIME OF PLANNING PHASE WHERE ASSISTANTS ARE PLAYED
         game.playAssistant(player1,1);
-        game.playAssistant(player2,11);
-        game.playAssistant(player3,21);
+        game.playAssistant(player2,1);
+        game.playAssistant(player3,1);
 
         List<Assistant> assistantsPlayed = game.playedAssistants();
         List<Integer> assistantPlayedId = assistantsPlayed.stream().
@@ -487,8 +503,8 @@ public class SimpleGameTest {
 
         //SECOND TIME OF PLANNING PHASE WHERE ASSISTANTS ARE PLAYED
         game.playAssistant(player1,2);
-        game.playAssistant(player2,12);
-        game.playAssistant(player3,22);
+        game.playAssistant(player2,2);
+        game.playAssistant(player3,2);
 
         assistantsPlayed = game.playedAssistants();
         assistantPlayedId = assistantsPlayed.stream().

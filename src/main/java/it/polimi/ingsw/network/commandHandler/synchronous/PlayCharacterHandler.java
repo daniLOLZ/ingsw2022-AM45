@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.commandHandler.synchronous;
 
+import it.polimi.ingsw.network.ApplicationHelper;
 import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
@@ -21,7 +22,7 @@ public class PlayCharacterHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        //        Integer cardPosition = (Integer)broker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION);
+        Integer cardPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION));
         if(parameters.getUserController().playCard()){
             super.notifySuccessfulOperation(messageBroker);
             parameters.setConnectionState(parameters.getCallbackConnectionState());

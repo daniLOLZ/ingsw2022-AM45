@@ -44,6 +44,7 @@ public class Eriantys {
             client.startApplication();
             return;
         }
+        //todo exit to close all threads?
     }
 
     private static void assignDefaultNetworkParameters() {

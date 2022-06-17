@@ -206,7 +206,9 @@ public class MessageBroker {
 
         }
         receivedMessage = tempString.toString();
-
+        if(receivedMessage.charAt(0) != '{') {
+            System.err.println("Bad message incoming");
+        }
         Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
 
         if (checkValidity(deserializedMessage)) {

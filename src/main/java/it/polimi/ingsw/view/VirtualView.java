@@ -16,13 +16,13 @@ public class VirtualView {
     //   }
     //  send();
     // }
-    private List<CloudWatcher> cloudWatchers;
-    private List<CharacterWatcher> characterWatchers;
-    private List<IslandGroupWatcher> islandGroupWatchers;
-    private List<AdvancedIslandGroupWatcher> advancedIslandGroupWatchers;
-    private List<PlayerWatcher> playerWatchers;
-    private List<AdvancedPlayerWatcher> advancedPlayerWatchers;
-    private List<ErrorWatcher> errorWatchers;
+    private final List<CloudWatcher> cloudWatchers;
+    private final List<CharacterWatcher> characterWatchers;
+    private final List<IslandGroupWatcher> islandGroupWatchers;
+    private final List<AdvancedIslandGroupWatcher> advancedIslandGroupWatchers;
+    private final List<PlayerWatcher> playerWatchers;
+    private final List<AdvancedPlayerWatcher> advancedPlayerWatchers;
+    private final List<ErrorWatcher> errorWatchers;
     private SimpleGameWatcher simpleGameWatcher;
     private AdvancedGameWatcher advancedGameWatcher;
 
@@ -75,49 +75,63 @@ public class VirtualView {
     public List<CloudBean> getCloudBean(){
         List<CloudBean> beans = new ArrayList<>();
         for(CloudWatcher watcher: cloudWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 
     public List<CharacterCardBean> getCharacterBean(){
         List<CharacterCardBean> beans = new ArrayList<>();
         for(CharacterWatcher watcher: characterWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 
     public List<IslandGroupBean> getIslandBean(){
         List<IslandGroupBean> beans = new ArrayList<>();
         for(IslandGroupWatcher watcher: islandGroupWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 
     public List<AdvancedIslandGroupBean> getAdvancedIslandBean(){
         List<AdvancedIslandGroupBean> beans = new ArrayList<>();
         for(AdvancedIslandGroupWatcher watcher: advancedIslandGroupWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 
     public List<PlayerBean> getPlayerBean(){
         List<PlayerBean> beans = new ArrayList<>();
         for(PlayerWatcher watcher: playerWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 
     public List<AdvancedPlayerBean> getAdvancedPlayerBean(){
         List<AdvancedPlayerBean> beans = new ArrayList<>();
         for(AdvancedPlayerWatcher watcher: advancedPlayerWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 
     public List<ErrorBean> getErrorBean(){
         List<ErrorBean> beans = new ArrayList<>();
         for(ErrorWatcher watcher: errorWatchers)
-            beans.add(watcher.getBean());
+            if(watcher.isAlive()){
+                beans.add(watcher.getBean());
+            }
         return  beans;
     }
 

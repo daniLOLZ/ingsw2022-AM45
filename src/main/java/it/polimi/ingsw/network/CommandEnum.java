@@ -27,7 +27,7 @@ public enum CommandEnum {
     SELECT_STUDENT("Select Student",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
     PUT_IN_HALL("Put in Hall",                                  new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     PUT_IN_ISLAND("Put in Island",                              new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLAND}),
-    DESELECT_STUDENT("Deselect Student",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_STUDENT}),
+    DESELECT_STUDENT("Deselect Student",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     MOVE_MN("Move MN",                                          new NetworkFieldEnum[] {ID_USER, ID_REQUEST, STEPS_MN}),
     CHOOSE_CLOUD("Choose Cloud",                                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_CLOUD}),
     END_TURN("End of turn",                                     new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
@@ -85,7 +85,7 @@ public enum CommandEnum {
      * @return a list of fields required to correctly form the message
      */
     public static List<NetworkFieldEnum> getFieldsNeeded(CommandEnum command){
-        List<NetworkFieldEnum> retList = Arrays.stream(command.allowedFields).toList();
+        List<NetworkFieldEnum> retList = Arrays.stream(command.allowedFields).collect(Collectors.toList());
         retList.remove(ID_USER);
         retList.remove(ID_REQUEST);
         retList.remove(ID_PING_REQUEST);

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.commandHandler.synchronous;
 
+import it.polimi.ingsw.network.ApplicationHelper;
 import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
@@ -22,7 +23,7 @@ public class DeselectStudentHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer studentPosition = (Integer)messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT);
+        Integer studentPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT));
         if(parameters.getUserController().deselectStudent(studentPosition)){
             notifySuccessfulOperation(messageBroker);
             parameters.setConnectionState(new StudentChoosing());

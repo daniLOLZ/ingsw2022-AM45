@@ -62,7 +62,7 @@ public class ParameterHandler extends DrawableObject {
 
         playersAllegiance = new HashMap<>();
         professors = new ArrayList<>();
-        for (StudentEnum studEnum : StudentEnum.values()){
+        for (StudentEnum studEnum : StudentEnum.getStudents()){
             professors.add(PlayerEnum.NOPLAYER);
         }
 
@@ -204,7 +204,7 @@ public class ParameterHandler extends DrawableObject {
     public void addProfessor(PlayerEnum player, StudentEnum color){
         if(color == StudentEnum.NOSTUDENT || player == PlayerEnum.NOPLAYER)
             return;
-        professors.add(color.index,player);
+        professors.set(color.index,player);
     }
 
     public void selectIsland(IslandGroup island){

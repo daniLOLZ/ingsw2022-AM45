@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.assistantCards;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Wizard {
     private final int idWizard;                 //ID    0  10  20  30
@@ -19,8 +20,7 @@ public class Wizard {
      * @exception NoSuchAssistantException The Assistant card is not in the deck
      */
     public Assistant playCard(int id) throws NoSuchAssistantException {
-        Assistant assistant = getAssistantByID(id);
-        assistants.remove(assistant);
+        Assistant assistant = getAndRemoveAssistantByID(id);
         return assistant;
     }
 
@@ -38,7 +38,16 @@ public class Wizard {
 
     public Assistant getAssistantByID(int id) throws NoSuchAssistantException{
         for (Assistant assistant : assistants) {
-            if (assistant.getId() == id){ //look for the Assistant card
+            if (assistant.getId() == id + getIdWizard()){ //look for the Assistant card
+                return assistant;
+            }
+        }
+        throw new NoSuchAssistantException();
+    }
+
+    public Assistant getAndRemoveAssistantByID(int id) throws NoSuchAssistantException{
+        for (Assistant assistant : assistants) {
+            if (assistant.getId() == id + getIdWizard()){ //look for the Assistant card
                 assistants.remove(assistant);
                 return assistant;
             }
@@ -50,11 +59,13 @@ public class Wizard {
 
     /**
      *
-     * @param id > 0
+     * @param id (1 <= id <= 10)
      * @return true <=> a Card with id == param is contained in this deck
      */
     public boolean contains(int id){
-        return assistants.stream().anyMatch(card -> card.id == id);
+        return assistants.stream()
+                        .filter(Objects::nonNull)
+                        .anyMatch(card -> card.id == (id + idWizard));
     }
 
     /**

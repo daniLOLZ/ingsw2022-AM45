@@ -94,11 +94,13 @@ public class ClientController {
     public void validateLobbyLeave() {
         if(!checkSuccessfulReply()){
             userInterface.showErrorLeaveLobby();
+            userInterface.showLobby();
         }
         else {
             userInterface.setGameMode(GameRuleEnum.NO_RULE);
             userInterface.setInLobby(false);
             userInterface.showSuccessLeaveLobby();
+            userInterface.showGameruleSelection();
         }
     }
 
@@ -167,7 +169,7 @@ public class ClientController {
             userInterface.clearCommands();
             boolean moreStudentsToMove = (boolean) broker.readField(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE);
             if(moreStudentsToMove){
-                gameState = new StudentMoving();
+                gameState = new StudentChoosing();
             }
             else {
                 gameState = new MNMoving();
@@ -187,7 +189,7 @@ public class ClientController {
             userInterface.clearCommands();
             boolean moreStudentsToMove = (boolean) broker.readField(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE);
             if(moreStudentsToMove){
-                gameState = new StudentMoving();
+                gameState = new StudentChoosing();
             }
             else {
                 gameState = new MNMoving();
@@ -365,7 +367,9 @@ public class ClientController {
     public void handleGameStart(){
         userInterface.setGameStarting(); //This will make the other method, showTowerAndWizardSelection, return
                                         // after the atomic boolean has been set
-        userInterface.setGameInterrupted(true);
+        userInterface.clearCommands();
+        gameState = new WaitingForControl();
+        allowStateCommands();
     }
 
     /**
@@ -384,6 +388,7 @@ public class ClientController {
         allowStateCommands();
 
         userInterface.setYourTurn(true);
+        userInterface.showItsYourTurn(phase);
         //we now need to go in a situation where the game interface is shown and we allow user input
     }
 
@@ -409,7 +414,6 @@ public class ClientController {
 
     public void connectionClose() {
         userInterface.showNetworkError();
-
     }
 
     //</editor-fold>

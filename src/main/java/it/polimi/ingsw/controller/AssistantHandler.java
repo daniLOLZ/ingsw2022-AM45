@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /*
  *ACTIONS:
@@ -32,12 +33,13 @@ public class AssistantHandler {
     /**
      * play an assistant card if the chosen card is valid.
      * Update the lists assistantPlayed and turnPlayer.
-     * @param id the id of the assistant to play ( > 0 )
+     * @param id the id of the assistant to play (1 <= id <= 10)
      * @return true if the assistant was played successfully
      */
     public boolean playCard(int id){
         assistantsPlayed = controller.simpleGame.playedAssistants();
         Player currentPlayer = controller.simpleGame.getParameters().getCurrentPlayer();
+
         if(checkValidAssistant(id)){
             controller.simpleGame.playAssistant(currentPlayer, id);
         }
@@ -53,7 +55,7 @@ public class AssistantHandler {
 
     /**
      * check if a played card is Valid
-     * @param id > 0
+     * @param id (1 <= id <= 10)
      * @return false if card is not present in Wizard
      * true if Current Player's cards are all equal to already played cards
      * false if Current Player has at least one different card from already played card but
@@ -62,7 +64,7 @@ public class AssistantHandler {
     public boolean checkValidAssistant(int id){
         Player currentPlayer = controller.simpleGame.getParameters().getCurrentPlayer();
         Wizard wizard = currentPlayer.getWizard();
-        boolean idInWizard = wizard.contains(id);
+        boolean idInWizard = wizard.contains(id); // todo i am going insane
 
         if(!idInWizard){
             return false;
@@ -82,7 +84,7 @@ public class AssistantHandler {
 
     /**
      *
-     * @param id > 0
+     * @param id (1 <= id <= 10)
      * @return Assistant corresponding with chosen id
      * set error state otherwise
      */
@@ -91,7 +93,8 @@ public class AssistantHandler {
         Wizard wizard = currentPlayer.getWizard();
         try {
             return wizard.getAssistantByID(id);
-        } catch (NoSuchAssistantException e) {
+        }
+        catch (NoSuchAssistantException e) {
             controller.simpleGame.getParameters().setErrorState("Assistant not in Wizard");
             return null;
         }
@@ -106,7 +109,9 @@ public class AssistantHandler {
         if(assistantsPlayed.isEmpty())
             return  false;
 
-        return assistantsPlayed.stream().anyMatch(card -> card.equals(assistant));
+        return assistantsPlayed.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(card -> card.equals(assistant));
     }
 
     /**

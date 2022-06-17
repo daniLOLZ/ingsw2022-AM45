@@ -38,6 +38,7 @@ public class Controller {
     public ReentrantLock startLock; // not the greatest to be put public but it's needed in the GameInitHandler
     private boolean gameStarted;
     private AtomicBoolean gameUpdated;
+    private AtomicBoolean newTurn;
 
     /**
      * Creates a new game controller
@@ -54,6 +55,7 @@ public class Controller {
         startLock = new ReentrantLock();
         gameStarted = false;
         gameUpdated = new AtomicBoolean(false);
+        newTurn = new AtomicBoolean(false);
         // Should we create it here or when the game starts?
         createView();
     }
@@ -195,6 +197,7 @@ public class Controller {
         simpleGame.initializeGame();
         this.gameStarted = true;
         this.gameUpdated.set(true);
+        this.newTurn.set(true);
 
         return true;
     }
@@ -259,6 +262,31 @@ public class Controller {
 
     public void setGameUpdated(boolean value){
         gameUpdated.set(value);
+    }
+
+    public boolean isNewTurn() {
+        return newTurn.get();
+    }
+
+    public void setNewTurn(boolean value) {
+        newTurn.set(value);
+    }
+
+    /**
+     * Returs true if the current player is the one whose id matches the input parameter
+     * @param idUser the user asking whether they're the current player
+     * @return true if it's this user's turn
+     */
+    public boolean isMyTurn(int idUser){
+        if( playerNumbers.indexOf(idUser) ==
+                simpleGame.getParameters().getCurrentPlayer().getPlayerId().index){
+            return true;
+        }
+        return false;
+    }
+
+    public PhaseEnum getGamePhase(){
+        return turnHandler.getCurrentPhase();
     }
 
     /**
@@ -357,6 +385,7 @@ public class Controller {
      * @param gamePhase the phase that the user is requesting control for
      * @return true if the user gained control
      */
+    @Deprecated
     public boolean askForControl(Integer idUser, PhaseEnum gamePhase) {
         return turnHandler.askForControl(idUser, gamePhase);
     }
@@ -365,7 +394,7 @@ public class Controller {
      * By calling the appropriate handler, the user plays an assistant card. idUser is not necessary
      * since only one player is the active player at this point of the game
      * If the planning phase is over, starts the action phase
-     * @param idAssistant the id of the assistant card to play
+     * @param idAssistant the id of the assistant card to play (1 <= id <= 10)
      * @return true if the action succeeded
      */
     public boolean playAssistant(Integer idAssistant) {
@@ -379,6 +408,8 @@ public class Controller {
             turnHandler.nextPhase();
             simpleGame.sortPlayers(); // move to turn handler?
         }
+        setGameUpdated(true);
+        setNewTurn(true);
         return true;
     }
 
@@ -390,7 +421,8 @@ public class Controller {
     public boolean selectStudent(Integer selectedStudent) {
         //needs to check that the player doesn't move more students than they're allowed
         if(boardHandler.allStudentsMoved()) return false;
-        selectionHandler.selectStudentAtEntrance(selectedStudent);
+        if(!selectionHandler.selectStudentAtEntrance(selectedStudent)) return false;
+        setGameUpdated(true);
         return true;
     }
 
@@ -400,6 +432,7 @@ public class Controller {
      */
     public boolean putInHall() {
         if(!boardHandler.moveFromEntranceToHall()) return false;
+        setGameUpdated(true);
         return true;
     }
 
@@ -410,6 +443,7 @@ public class Controller {
      */
     public boolean putInIsland(Integer idIsland) {
         if(!boardHandler.moveFromEntranceToIsland(idIsland)) return false;
+        setGameUpdated(true);
         return true;
     }
 
@@ -419,6 +453,7 @@ public class Controller {
      */
     public boolean deselectStudent(Integer position) {
         selectionHandler.deselectStudentAtEntrance(position);
+        setGameUpdated(true);
         return true;
     }
 
@@ -432,6 +467,7 @@ public class Controller {
         if(!islandHandler.moveMN(steps)){
             return false;
         }
+        setGameUpdated(true);
         return true;
     }
 
@@ -445,6 +481,7 @@ public class Controller {
         if(!boardHandler.takeFromCloud(idCloud)){
             return false;
         }
+        setGameUpdated(true);
         return true;
     }
 
@@ -457,6 +494,8 @@ public class Controller {
         if(turnHandler.isPhaseOver()){
             turnHandler.nextPhase();
         }
+        setNewTurn(true);
+        setGameUpdated(true);
         return true;
     }
 
@@ -471,10 +510,11 @@ public class Controller {
 
         int cardId = characterCardHandler.getIdFromPosition(cardPosition);
 
-        if(characterCardHandler.selectCard(cardId)) {
-            return true;
+        if(!characterCardHandler.selectCard(cardId)) {
+            return false;
         }
-        else return false;
+        setGameUpdated(true);
+        return true;
     }
 
     /**
@@ -484,8 +524,11 @@ public class Controller {
      */
     public boolean selectStudentColor(List<StudentEnum> colors) {
 
-        return selectionHandler.selectStudentType(colors);
-
+        if(!selectionHandler.selectStudentType(colors)){
+            return false;
+        }
+        setGameUpdated(true);
+        return true;
     }
 
     /**
@@ -495,7 +538,9 @@ public class Controller {
      */
     public boolean selectStudentOnCard(List<Integer> students) {
 
-        return selectionHandler.selectStudentAtEntrance(students);
+        if(!selectionHandler.selectStudentAtEntrance(students)) return false;
+        setGameUpdated(true);
+        return true;
 
     }
 
@@ -506,7 +551,9 @@ public class Controller {
      */
     public boolean selectEntranceStudents(List<Integer> students) {
 
-        return selectionHandler.selectStudentAtEntrance(students);
+        if(selectionHandler.selectStudentAtEntrance(students)) return false;
+        setGameUpdated(true);
+        return true;
     }
 
     /**
@@ -515,7 +562,9 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean selectIslandGroups(List<Integer> islandIds) {
-        return selectionHandler.selectIsland(islandIds);
+        if(selectionHandler.selectIsland(islandIds)) return false;
+        setGameUpdated(true);
+        return true;
     }
 
     /**
@@ -524,7 +573,9 @@ public class Controller {
      */
     public boolean playCard(){
 
-        return characterCardHandler.playCard();
+        if(characterCardHandler.playCard()) return false;
+        setGameUpdated(true);
+        return true;
 
     }
 

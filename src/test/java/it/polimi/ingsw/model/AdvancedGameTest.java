@@ -153,12 +153,14 @@ public class AdvancedGameTest {
         AdvancedPlayer player2 = (AdvancedPlayer) game.getPlayers().get(1);
 
         //WITH GLUTTON
+
+        //Adding an overflowing red player to test
         player1.getBoard().addToEntrance(StudentEnum.RED);
         player2.getBoard().addToEntrance(StudentEnum.RED);
 
         //Player1 move a red student into Hall and gain red professor
         game.getParameters().setCurrentPlayer(player1);
-        game.selectStudentAtEntrance(player1,0);
+        game.selectStudentAtEntrance(player1,9);
         game.moveFromEntranceToHall(player1);
         PlayerEnum hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player1.getPlayerId(), hasRedProf, "Error getting professor");
@@ -170,7 +172,7 @@ public class AdvancedGameTest {
 
         //Player2 move a red student into Hall and gain red professor cause glutton effect
         game.getParameters().setCurrentPlayer(player2);
-        game.selectStudentAtEntrance(player2,0);
+        game.selectStudentAtEntrance(player2,9);
         game.moveFromEntranceToHall(player2);
         hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player2.getPlayerId(), hasRedProf, "Error getting professor");
@@ -184,12 +186,14 @@ public class AdvancedGameTest {
 
 
         //WITHOUT GLUTTON
+
+        //Adding an overflowing red player to test
         player1.getBoard().addToEntrance(StudentEnum.RED);
         player2.getBoard().addToEntrance(StudentEnum.RED);
 
         //Player1 move a red student into Hall and gain red professor
         game.getParameters().setCurrentPlayer(player1);
-        game.selectStudentAtEntrance(player1,0);
+        game.selectStudentAtEntrance(player1,9);
         game.moveFromEntranceToHall(player1);
         hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player1.getPlayerId(), hasRedProf, "Error getting professor");
@@ -200,7 +204,7 @@ public class AdvancedGameTest {
         //Player2 move a red student into Hall, but he draws with player1 so player1 still
         //has red professor
         game.getParameters().setCurrentPlayer(player2);
-        game.selectStudentAtEntrance(player2,0);
+        game.selectStudentAtEntrance(player2,9);
         game.moveFromEntranceToHall(player2);
         hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player1.getPlayerId(), hasRedProf, "Error getting professor");

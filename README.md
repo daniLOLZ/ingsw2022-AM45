@@ -20,3 +20,7 @@
 🔴
 🟢
 🟡
+
+<H1> Requirements </H1>:
+<h3> CLI: </h3>
+To make sure that the screen is cleared properly when it needs to be, the terminal on which the application is launched must support ANSI escape codes

@@ -32,7 +32,7 @@ public class ClientSender {
 
     public ClientSender(InitialConnector initialConnector){
         this.initialConnector = initialConnector;
-        progressiveIdRequest = 1;
+        progressiveIdRequest = 0;
     }
 
     public void initialize(OutputStream outputStream, MessageBroker mainBroker, AtomicBoolean connected, AtomicBoolean isCommandScheduled) {
@@ -166,6 +166,15 @@ public class ClientSender {
         return true;
     }
 
+    public boolean sendQuit(){
+        if(!acquireSendingRights()) return false;
+
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.QUIT);
+
+        sendToServer();
+        return false;
+    }
+
     public boolean sendAssistantChosen(int idAssistant) {
         if(!acquireSendingRights()) return false;
 
@@ -268,7 +277,9 @@ public class ClientSender {
     public boolean sendSelectEntranceStudents(List<Integer> students) {
         if(!acquireSendingRights()) return false;
 
-        Integer[] studentsArray = (Integer[]) students.toArray(); // todo to debug, there might be errors since the network field wants a int[]
+        int[] studentsArray = students.stream()
+                                .mapToInt(Integer::intValue)
+                                .toArray();
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_ENTRANCE_STUDENTS);
         mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS, studentsArray);
 
@@ -323,7 +334,7 @@ public class ClientSender {
             mainBroker.send(outputStream);
         }
         catch (IOException e){
-            initialConnector.notifyNetworkError("Couldn't send the message to the serve, closing...");
+            initialConnector.notifyNetworkError("Couldn't send the message to the server, closing...");
             return false;
         }
         //todo add ack check basically

@@ -79,21 +79,21 @@ public class AdvancedPlayerBean extends PlayerBean{
 
         toReturn.append("    |    Assistant Played: ").append(assistantPlayed).append("\n");
 
-        if(Assistants.size() > 4){
+        if(assistants.size() > 4){
             List<Assistant> list1 = new ArrayList<>();
             for(int i=0; i<4; i++)
-                list1.add(Assistants.get(i));
+                list1.add(assistants.get(i));
 
             List<Assistant> list2 = new ArrayList<>();
-            for(int i=4; i< Assistants.size(); i++)
-                list2.add(Assistants.get(i));
+            for(int i = 4; i< assistants.size(); i++)
+                list2.add(assistants.get(i));
 
             toReturn.append("    |    Assistants: ").append(list1).append("\n");
             toReturn.append("    |    ").append(list2).append("\n");
 
         }
         else
-            toReturn.append("    |    Assistants: ").append(Assistants).append("\n");
+            toReturn.append("    |    Assistants: ").append(assistants).append("\n");
 
         toReturn.append("    ________________________________________________________    \n");
         String border = "    ________________________________________________________    ";
