@@ -15,6 +15,8 @@ public class BoardHandlingToolbox implements HandlingToolbox{
     private List<EventHandler<MouseEvent>> onEntranceStudentClick;
     private List<EventHandler<MouseEvent>> onTableClick;
 
+    public static final BoardHandlingToolbox NONINTERACTIVE = new BoardHandlingToolbox(9,5);
+
     public BoardHandlingToolbox(int entranceStudents, int numTables){
 
         onEntranceStudentClick = new ArrayList<>();

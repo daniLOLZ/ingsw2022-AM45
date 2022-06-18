@@ -54,7 +54,7 @@ public class IslandDrawer extends Drawer{
     private static final int firstIslandId = 1;
     private static final int differentIslandTiles = 3;
 
-    public static List<Node> drawIsland(int id, List<StudentEnum> students, TeamEnum towerColor, boolean isPresentMotherNature, int numBlockTile, Coord pos, double scale){
+    public static List<Node> drawIsland(int id, List<StudentEnum> students, TeamEnum towerColor, boolean isPresentMotherNature, int numBlockTile, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         List<Node> toDraw = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class IslandDrawer extends Drawer{
         List<EventHandler<MouseEvent>> exited = new ArrayList<>();
 
         //draw island
-        ImageView islandView = drawFromCenterInteractiveImage(islands.get((id - firstIslandId) % differentIslandTiles), pos, scale, HandlingToolbox.NO_EFFECT);
+        ImageView islandView = drawFromCenterInteractiveImage(islands.get((id - firstIslandId) % differentIslandTiles), pos, scale, onClick);
         toDraw.add(islandView);
 
         //draw students
@@ -75,11 +75,11 @@ public class IslandDrawer extends Drawer{
                 ImageView studentView = StudentDrawer.drawStudent(
                         student,
                         pos.pureSumX(studentsOnIslandSlots.get(studentIndex).x * scale).pureSumY(studentsOnIslandSlots.get(studentIndex).y * scale),
-                        defaultWoodenSize / StudentDrawer.getStudentSize() * scale);
+                        defaultWoodenSize / StudentDrawer.getStudentSize() * scale,
+                        onClick);
 
                 toDraw.add(studentView);
 
-                int finalStudentIndex = studentIndex;
                 entered.add(getChildrenEnteredZoom(studentView, studentsOnIslandSlots.get(studentIndex), scale, hoverZoom, islandView));
 
                 exited.add(getChildrenExitedZoom(studentView, studentsOnIslandSlots.get(studentIndex), scale, hoverZoom, islandView));
@@ -91,6 +91,8 @@ public class IslandDrawer extends Drawer{
         //draw tower
         ImageView towerView = TowerDrawer.drawTower(towerColor, pos.pureSumX(towerSlot.x * scale).pureSumY(towerSlot.y * scale), specialWoodenSize / TowerDrawer.getTowerSize() * scale);
         toDraw.add(towerView);
+
+        towerView.setOnMouseClicked(onClick);
 
         entered.add(getChildrenEnteredZoom(towerView, towerSlot, scale, hoverZoom, islandView));
         exited.add(getChildrenExitedZoom(towerView, towerSlot, scale, hoverZoom, islandView));
@@ -104,6 +106,8 @@ public class IslandDrawer extends Drawer{
             ImageView blockTileView = BlockTileDrawer.drawBlockTile(pos.pureSumX(blockTileSlot.x * scale).pureSumY(blockTileSlot.y * scale), specialWoodenSize / BlockTileDrawer.getBlockTileSize() * scale);
             toDraw.add(blockTileView);
 
+            blockTileView.setOnMouseClicked(onClick);
+
             entered.add(getChildrenEnteredZoom(blockTileView, blockTileSlot, scale, hoverZoom, islandView));
             exited.add(getChildrenExitedZoom(blockTileView, blockTileSlot, scale, hoverZoom, islandView));
         }
@@ -112,6 +116,9 @@ public class IslandDrawer extends Drawer{
         if (isPresentMotherNature) {
             ImageView motherNatureView = MotherNatureDrawer.drawMotherNature(pos.pureSumX(MNSlot.x * scale).pureSumY(MNSlot.y * scale), specialWoodenSize / MotherNatureDrawer.getMotherNatureSize() * scale);
             toDraw.add(motherNatureView);
+
+            motherNatureView.setOnMouseClicked(onClick);
+
             entered.add(getChildrenEnteredZoom(motherNatureView, MNSlot, scale, hoverZoom, islandView));
             exited.add(getChildrenExitedZoom(motherNatureView, MNSlot, scale, hoverZoom, islandView));
         }
@@ -137,8 +144,8 @@ public class IslandDrawer extends Drawer{
         return toDraw;
     }
 
-    public static List<Node> drawIsland(int id, List<StudentEnum> students, TeamEnum towerColor, boolean isPresentMotherNature, Coord pos, double scale){
-        return drawIsland(id, students, towerColor, isPresentMotherNature, 0, pos, scale);
+    public static List<Node> drawIsland(int id, List<StudentEnum> students, TeamEnum towerColor, boolean isPresentMotherNature, Coord pos, double scale, EventHandler<MouseEvent> onClick){
+        return drawIsland(id, students, towerColor, isPresentMotherNature, 0, pos, scale, onClick);
     }
 
     public static double getIslandSize() {

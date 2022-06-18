@@ -2,9 +2,11 @@ package it.polimi.ingsw.view.GUI.drawers;
 
 import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +33,12 @@ public class AssistantDrawer extends Drawer{
     private final static double hoverZoom = 1.7;
     private final static int firstAssistantId = 1;
 
-    public static ImageView drawAssistant(int id, Coord pos, double scale){
+    public static ImageView drawAssistant(int id, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
+        return drawFromCenterInteractiveImage(assistants.get(id - firstAssistantId), pos, scale, onClick);
+    }
+
+    public static ImageView drawAssistant(int id, Coord pos, double scale){
         return drawFromCenterInteractiveImage(assistants.get(id - firstAssistantId), pos, scale, HandlingToolbox.NO_EFFECT);
     }
 

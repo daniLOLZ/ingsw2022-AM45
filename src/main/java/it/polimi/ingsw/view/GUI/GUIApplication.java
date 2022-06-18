@@ -4,15 +4,10 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
-import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
-import it.polimi.ingsw.network.CommandEnum;
-import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.view.GUI.drawers.*;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
-import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
-import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,7 +23,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
@@ -600,7 +594,7 @@ public class GUIApplication extends Application{
         selectTower.setBackground(Background.EMPTY);
         selectTower.setFont(Font.font("Lucida Handwriting", 40));
         selectTower.setTextFill(Color.DARKRED);
-        selectTower.setOnAction(event -> startGame());
+        selectTower.setOnAction(event -> showGameInterface(null));
         layout.getChildren().add(selectTower);
 
 
@@ -624,7 +618,7 @@ public class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
-    public static void startGame(){
+    public static void showGameInterface(GameToolBoxContainer eventHandlerContainer){
         Group root = new Group();
 
         //List<Coord> useless = getIslandGroupSlots(12, 4, 1, upLeftCorner);
@@ -652,7 +646,7 @@ public class GUIApplication extends Application{
         AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,true, TeamEnum.WHITE, 4);
 
         for (Coord slot: getIslandGroupSlots(4, 380, 140, center.pureSumY(-50))) {
-            root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(bean, slot, islandSize / IslandDrawer.getIslandSize()));
+            root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(bean, slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(0/*temporary*/)));
         }
 
         //</editor-fold>
@@ -661,7 +655,7 @@ public class GUIApplication extends Application{
 
         for (Coord slot:
              getCloudsSlots(3, center.pureSumY(-50))) {
-            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize()));
+            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize(), eventHandlerContainer.getCloudHandlingToolbox().getOnCloudClick(cloudBean.getIdCloud() - 1)));
         }
 
         //<editor-fold desc="Game Boards">
@@ -689,7 +683,7 @@ public class GUIApplication extends Application{
 
         AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 12);
 
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, downCenter.pureSumY(-145), boardWidth / BoardDrawer.getBoardWidth()));
+        root.getChildren().addAll(BoardDrawer.drawBoard(board, downCenter.pureSumY(-145), boardWidth / BoardDrawer.getBoardWidth(), eventHandlerContainer.getBoardHandlingToolbox()));
         root.getChildren().addAll(BoardDrawer.drawBoard(board, upCenter.pureSumY(120), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.TOP));
         root.getChildren().addAll(BoardDrawer.drawBoard(board, centerLeft.pureSumX(100), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.RIGHT));
         root.getChildren().addAll(BoardDrawer.drawBoard(board, centerRight.pureSumX(-100), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.LEFT));
@@ -697,10 +691,11 @@ public class GUIApplication extends Application{
         int assistantIndex = 0;
 
         for (Integer assistant: board.getIdAssistants()) {
-            Coord slot = firstAssistantSlot.pureSumX(assistantIndex++ * assistantWidth * 0.28 * 10 / board.getIdAssistants().size());
-            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth());
+            Coord slot = firstAssistantSlot.pureSumX(assistantIndex * assistantWidth * 0.28 * 10 / board.getIdAssistants().size());
+            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth(), eventHandlerContainer.getAssistantHandlingToolbox().getOnAssistantClick(assistantIndex));
             addHoveringEffects(assistantView, slot, assistantWidth / AssistantDrawer.getAssistantWidth(), HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.7, false);
             root.getChildren().add(assistantView);
+            assistantIndex++;
         }
 
         //</editor-fold>
@@ -724,7 +719,8 @@ public class GUIApplication extends Application{
         for (CharacterCardBean character:
              characters) {
 
-            root.getChildren().addAll(CharacterCardDrawer.drawCharacterCard(character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter++),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth()));
+            root.getChildren().addAll(CharacterCardDrawer.drawCharacterCard(character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth(), eventHandlerContainer.getCharacterCardHandlingToolboxes().get(numCharacter)));
+            numCharacter++;
         }
     }
 

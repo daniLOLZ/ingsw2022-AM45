@@ -5,7 +5,10 @@ import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.view.GUI.Coord;
 
+import it.polimi.ingsw.view.GUI.handlingToolbox.IslandHandlingToolbox;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +22,7 @@ public class IslandGroupDrawer extends Drawer{
     private static final double islandHeight = Math.sqrt(3) * islandEdge;
 
 
-    public static List<Node> drawIslandGroup(AdvancedIslandGroupBean data, Coord pos, double scale){
+    public static List<Node> drawIslandGroup(AdvancedIslandGroupBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         List<Node> toDraw = new ArrayList<>();
 
@@ -57,7 +60,8 @@ public class IslandGroupDrawer extends Drawer{
                     drawMN,
                     blockTilesToDraw,
                     slot.next(),
-                    scale));
+                    scale,
+                    onClick));
 
             numBlockTiles -= blockTilesToDraw;
             index++;
@@ -66,12 +70,12 @@ public class IslandGroupDrawer extends Drawer{
         return toDraw;
     }
 
-    public static List<Node> drawIslandGroup(IslandGroupBean data, Coord pos, double scale){
+    public static List<Node> drawIslandGroup(IslandGroupBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         AdvancedIslandGroupBean adaptedData = (AdvancedIslandGroupBean) data;
         adaptedData.setNumBlockTiles(0);
 
-        return drawIslandGroup(adaptedData, pos, scale);
+        return drawIslandGroup(adaptedData, pos, scale, onClick);
     }
 
     private static List<Coord> getIslandSlots(int numIsland, Coord centerPos, double scale) {

@@ -4,9 +4,9 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.handlingToolbox.BoardHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
-import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,7 +18,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -112,7 +111,7 @@ public class BoardDrawer extends Drawer{
     private static final Coord firstCoinSlot = upLeftCorner.pureSumX(-boards.get(USER).getWidth() / 2 - playerBoxWidth / 2).pureSumY(-boards.get(USER).getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2);
 
 
-    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, int orientation){
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, int orientation, BoardHandlingToolbox eventHandlers){
 
         Image board = boards.get(orientation);
 
@@ -236,8 +235,7 @@ public class BoardDrawer extends Drawer{
         Coord assistantLocation = pos.pureSumX(assistantSlot.x * actualBoardScale.get()).pureSumY(assistantSlot.y * actualBoardScale.get());
         Coord assistantPos = assistantLocation.pureRotate(pos, rotation);
 
-        //TODO change id into last played assistant once the feature is available
-        ImageView assistantView = AssistantDrawer.drawAssistant(5, assistantPos, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
+        ImageView assistantView = AssistantDrawer.drawAssistant(data.getAssistantPlayed().id, assistantPos, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
         toDraw.add(assistantView);
 
         assistantView.getTransforms().add(new Rotate(90 * rotation, assistantView.getX() + assistantView.getFitWidth() / 2, assistantView.getY() + assistantView.getFitHeight() / 2));
@@ -269,7 +267,7 @@ public class BoardDrawer extends Drawer{
                     entranceStudent,
                     finalStudentPos,
                     woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get(),
-                    event -> System.out.println("Clicked on student #" + finalStudentIndex));
+                    event -> eventHandlers.getOnEntranceStudentClick(finalStudentIndex));
 
             toDraw.add(entranceStudentView);
             studentIndex++;
@@ -398,26 +396,48 @@ public class BoardDrawer extends Drawer{
         return toDraw;
     }
 
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, BoardHandlingToolbox eventHandlers){
+        return drawBoard(data, pos, scale, USER, eventHandlers);
+    }
+
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, BoardHandlingToolbox eventHandlers){
+        return drawBoard(data, pos, REAL_SIZE, eventHandlers);
+    }
+
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation, BoardHandlingToolbox eventHandlers){
+        AdvancedPlayerBean adaptedData = (AdvancedPlayerBean) data;
+        ((AdvancedPlayerBean) data).setNumCoins(0);
+        return drawBoard(adaptedData, pos, scale, rotation, eventHandlers);
+    }
+
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, BoardHandlingToolbox eventHandlers){
+        return drawBoard(data, pos, scale, USER, eventHandlers);
+    }
+
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, BoardHandlingToolbox eventHandlers){
+        return drawBoard(data, pos, REAL_SIZE, eventHandlers);
+    }
+
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale){
-        return drawBoard(data, pos, scale, USER);
+        return drawBoard(data, pos, scale, USER, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos){
-        return drawBoard(data, pos, REAL_SIZE);
+        return drawBoard(data, pos, REAL_SIZE, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
     public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation){
         AdvancedPlayerBean adaptedData = (AdvancedPlayerBean) data;
         ((AdvancedPlayerBean) data).setNumCoins(0);
-        return drawBoard(adaptedData, pos, scale, rotation);
+        return drawBoard(adaptedData, pos, scale, rotation, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
     public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale){
-        return drawBoard(data, pos, scale, USER);
+        return drawBoard(data, pos, scale, USER, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
     public static List<Node> drawBoard(PlayerBean data, Coord pos){
-        return drawBoard(data, pos, REAL_SIZE);
+        return drawBoard(data, pos, REAL_SIZE, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
     public static double getBoardWidth() {

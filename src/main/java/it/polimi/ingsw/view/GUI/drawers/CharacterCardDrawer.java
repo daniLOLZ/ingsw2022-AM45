@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.GUI.drawers;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.CharacterCardBean;
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.handlingToolbox.CharacterCardHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -57,11 +58,11 @@ public class CharacterCardDrawer extends Drawer{
         studentsSlots.add(upLeftCorner.pureSumY(characterCardHeight / 2));
     }
 
-    public static List<Node> drawCharacterCard(CharacterCardBean data, Coord pos, double scale){
+    public static List<Node> drawCharacterCard(CharacterCardBean data, Coord pos, double scale, CharacterCardHandlingToolbox eventHandlers){
 
         List<Node> toDraw = new ArrayList<>();
 
-        ImageView characterView = drawFromCenterInteractiveImage(characterCards.get(data.getId() - firstCharacterId), pos, scale, HandlingToolbox.NO_EFFECT);
+        ImageView characterView = drawFromCenterInteractiveImage(characterCards.get(data.getId() - firstCharacterId), pos, scale, eventHandlers.getOnCharacterCardClick());
 
         toDraw.add(characterView);
 
@@ -77,6 +78,8 @@ public class CharacterCardDrawer extends Drawer{
 
         descBox.setFill(Color.BURLYWOOD);
 
+        //draw students on card
+
         List<ImageView> studentViews = new ArrayList<>();
 
         int studentIndex = 0;
@@ -89,7 +92,8 @@ public class CharacterCardDrawer extends Drawer{
                     pos
                             .pureSumX(studentsSlots.get(studentIndex).x * scale)
                             .pureSumY(studentsSlots.get(studentIndex).y * scale),
-                    scale * childrenSize / StudentDrawer.getStudentSize()));
+                    scale * childrenSize / StudentDrawer.getStudentSize(),
+                    eventHandlers.getOnStudentOnCardClick(studentIndex)));
 
             studentIndex++;
         }

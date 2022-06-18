@@ -7,7 +7,6 @@ import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
-import it.polimi.ingsw.view.GUI.handlingToolbox.*;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import it.polimi.ingsw.view.UserInterface;
@@ -258,7 +257,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showMainGameInterface() {
-        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.startGame());
+        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showGameInterface(null));
     }
 
     @Override

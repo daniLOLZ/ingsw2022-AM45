@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.GUI.drawers;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.beans.CloudBean;
 import it.polimi.ingsw.view.GUI.Coord;
+import it.polimi.ingsw.view.GUI.handlingToolbox.CloudHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -31,7 +32,7 @@ public class CloudDrawer extends Drawer{
     private static final double cloudSize = clouds.get(0).getWidth();
     private static final double hoverZoom = 2.4;
 
-    public static List<Node> drawCloud(CloudBean data, Coord pos, double scale){
+    public static List<Node> drawCloud(CloudBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         List<Node> toDraw = new ArrayList<>();
 
@@ -43,7 +44,7 @@ public class CloudDrawer extends Drawer{
 
 
         //draw cloud
-        ImageView cloudView = drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, HandlingToolbox.NO_EFFECT);
+        ImageView cloudView = drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, onClick);
         toDraw.add(cloudView);
 
         int index = 0;
@@ -55,7 +56,8 @@ public class CloudDrawer extends Drawer{
             ImageView studentView = StudentDrawer.drawStudent(
                     student,
                     pos.pureSumX(studentSlot.x * scale).pureSumY(studentSlot.y * scale),
-                    studentSize / StudentDrawer.getStudentSize() * scale);
+                    studentSize / StudentDrawer.getStudentSize() * scale,
+                    onClick);
 
             toDraw.add(studentView);
 
