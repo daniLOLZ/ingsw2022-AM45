@@ -114,35 +114,33 @@ public class ClientHandler implements Runnable{
                 mainBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, "The command couldn't be handled");
             }
             else {
-                commandLock.lock();
-                try {
-
-                    handleCommand(mainBroker); // runs the appropriate routine depending on the command received
-                    System.out.println("---Command handled");
-
-                    // Sends a reply to the client
-                    mainBroker.send(clientOutput);
-
-                    mainBroker.flushFirstSyncMessage();
-
-                    //Here, we handle other asynchronous commands to all other players
-                    //todo if more than one command is sent per request, it could happen that two async
-                    // commands end up having the same async id
-                    tryAsyncCommandsForAll();
-
-                    clearAsyncConditions(); // here we clear the conditions for calling async methods
-                    // on this client handler only, whereas the actual sending of commands happens for
-                    // all of handlers
-
-                }
-                catch (IOException e){
-                    connectionLostAlert("Error while sending the reply to the client");
-                }
-                finally {
-                    commandLock.unlock();
-                }
+                handleCommand(mainBroker); // runs the appropriate routine depending on the command received
+                System.out.println("---Command handled");
             }
+            commandLock.lock();
+            try {
 
+                // Sends a reply to the client
+                mainBroker.send(clientOutput);
+
+                mainBroker.flushFirstSyncMessage();
+
+                //Here, we handle other asynchronous commands to all other players
+                //todo if more than one command is sent per request, it could happen that two async
+                // commands end up having the same async id
+                tryAsyncCommandsForAll();
+
+                clearAsyncConditions(); // here we clear the conditions for calling async methods
+                // on this client handler only, whereas the actual sending of commands happens for
+                // all of handlers
+
+            }
+            catch (IOException e){
+                connectionLostAlert("Error while sending the reply to the client");
+            }
+            finally {
+                commandLock.unlock();
+            }
         }
         // This point should never be reached in normal circumstances (unless the client disconnects)
     }

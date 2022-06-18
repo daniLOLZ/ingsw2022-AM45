@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.commandHandler.synchronous;
 
+import it.polimi.ingsw.network.ApplicationHelper;
 import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 import it.polimi.ingsw.network.connectionState.EndTurn;
 import it.polimi.ingsw.network.server.ClientHandlerParameters;
@@ -23,7 +24,7 @@ public class ChooseCloudHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer idCloud = (Integer) messageBroker.readField(NetworkFieldEnum.ID_CLOUD);
+        Integer idCloud = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.ID_CLOUD));
         if(parameters.getUserController().chooseCloud(idCloud)){
             parameters.setConnectionState(new EndTurn());
             notifySuccessfulOperation(messageBroker);

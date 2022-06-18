@@ -112,9 +112,9 @@ public class WatchersTest {
             assertEquals(0, id);
         }
 
-        game.playAssistant(player1, 2);                     //TURN VALUE: 2
-        game.playAssistant(player2, 14);                    //TURN VALUE: 4
-        game.playAssistant(player3, 21);                    //TURN VALUE: 1
+        game.playAssistant(player1, 2);                    //TURN VALUE: 2
+        game.playAssistant(player2, 4);                    //TURN VALUE: 4
+        game.playAssistant(player3, 1);                    //TURN VALUE: 1
 
         gameBean = virtualView.getAdvancedGameBean();
 
@@ -198,21 +198,24 @@ public class WatchersTest {
                 islandMN = isla;
 
 
+        //Remove one student from the entrance to make room for the test student
+        player1.getBoard().removeFromEntrance(8);
+
         //PLAYER 1 PLAY AN ASSISTANT, MOVE 3 STUDENTS AND MOVE MN
         player1.getBoard().addToEntrance(StudentEnum.RED);
-        game.selectStudentAtEntrance(player1,0);
+        game.selectStudentAtEntrance(player1,8);
         game.moveFromEntranceToIsland(player1,islandMN.
                 getNextIslandGroup().
                 getNextIslandGroup().getIdGroup());                 //Player moves 1 red students
                                                                     // into future MN island
 
         player1.getBoard().addToEntrance((StudentEnum.RED));
-        game.selectStudentAtEntrance(player1, 0);
+        game.selectStudentAtEntrance(player1, 8);
         game.moveFromEntranceToHall(player1);                       //Player moves 1 red students at table and
                                                                     //gains red professor
 
         player1.getBoard().addToEntrance((StudentEnum.RED));
-        game.selectStudentAtEntrance(player1, 0);
+        game.selectStudentAtEntrance(player1, 8);
         game.moveFromEntranceToHall(player1);                       //Player moves 1 red students at table
 
         IslandGroupBean islandBean = null;
@@ -270,7 +273,7 @@ public class WatchersTest {
         //PLAYER 1 PLAY AN ASSISTANT, PUT A RED STUDENT ON AN ISLAND AND MOVE MN ON THAT ISLAND
         game.playAssistant(player1, 1);                         //Assistant = (turn:1 , MN_steps: 1)
         player1.getBoard().addToEntrance(StudentEnum.RED);
-        game.selectStudentAtEntrance(player1,0);
+        game.selectStudentAtEntrance(player1,8);
         game.moveFromEntranceToIsland(player1,islandMN.getNextIslandGroup().getIdGroup());
         game.moveMN(1);
 

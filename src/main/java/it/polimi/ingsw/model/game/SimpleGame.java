@@ -180,6 +180,19 @@ public class SimpleGame extends DrawableObject {
         }
         createPlayingSack();
 
+        List<StudentEnum> studentsDrawn;
+
+        //Put students in clouds
+        fillClouds();
+
+        //Put students in players' entrances
+        for(Player player : players){
+            studentsDrawn = sack.drawNStudents(parameters.getMaxStudentsAtEntrance());
+            for(StudentEnum student : studentsDrawn){
+                player.addEntrance(student);
+            }
+        }
+
         hasBeenInitialized = true;
         for(IslandGroup islandGroup: islandGroups)
             islandGroup.alert();
@@ -677,7 +690,8 @@ public class SimpleGame extends DrawableObject {
         //todo move deselection logic to parameters
         if(parameters.getSelectedIslands().isEmpty()) return;
         else {
-            parameters.getSelectedIslands().get().remove((Integer) idIslandGroup);
+            parameters.getSelectedIslands().get()
+                    .removeIf(islandGroup -> islandGroup.getIdGroup() == idIslandGroup);
         }
     }
 
@@ -941,7 +955,7 @@ public class SimpleGame extends DrawableObject {
     /**
      * Play assistant card updating model with right playedAssistant
      * @param player != null
-     * @param id > 0
+     * @param id (1 <= id <= 10)
      */
     public void playAssistant(Player player, int id){
         player.playAssistant(id);

@@ -120,9 +120,9 @@ public class InitialConnector {
         try{
             mainSocket.close();
             pingSocket.close();
-            System.out.println("Sockets closed");
+            System.err.println("Sockets closed");
         }
-        catch (IOException e){
+        catch (IOException | NullPointerException e){
             e.printStackTrace();
         }
     }
@@ -150,5 +150,9 @@ public class InitialConnector {
         pingHandler.assignIdUser(idUser);
         pingHandler.startPinging();
 
+    }
+
+    public AtomicBoolean getConnected(){
+        return this.connected;
     }
 }

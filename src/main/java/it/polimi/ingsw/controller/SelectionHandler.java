@@ -65,13 +65,24 @@ public class SelectionHandler {
         return true;
     }
 
-    public void selectStudentAtEntrance(int position){
-        controller.simpleGame.selectEntranceStudent(position);
+    public boolean selectStudentAtEntrance(int position){
+        if(position < controller.simpleGame
+                .getParameters()
+                .getCurrentPlayer()
+                .getBoard()
+                .getStudentsAtEntrance()
+                .size()) {
+            controller.simpleGame.selectEntranceStudent(position);
+            return true;
+        }
+        else return false;
     }
 
     public boolean selectStudentAtEntrance(List<Integer> positions){
         for(Integer position: positions){
-            selectStudentAtEntrance(position);
+            if(!selectStudentAtEntrance(position)){
+                return false;
+            }
         }
         return true;
     }

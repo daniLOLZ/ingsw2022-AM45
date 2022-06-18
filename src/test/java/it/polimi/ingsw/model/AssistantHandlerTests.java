@@ -70,15 +70,15 @@ public class AssistantHandlerTests {
     @Test
     public void AllEquals(){
         //PLAYER2 PLAYED ALL CARDS EXCEPT THE 10
-        player2.playAssistant(1 + player2.getWizard().getIdWizard());
-        player2.playAssistant(2 + player2.getWizard().getIdWizard());
-        player2.playAssistant(3 + player2.getWizard().getIdWizard());
-        player2.playAssistant(4 + player2.getWizard().getIdWizard());
-        player2.playAssistant(5 + player2.getWizard().getIdWizard());
-        player2.playAssistant(6 + player2.getWizard().getIdWizard());
-        player2.playAssistant(7 + player2.getWizard().getIdWizard());
-        player2.playAssistant(8 + player2.getWizard().getIdWizard());
-        player2.playAssistant(9 + player2.getWizard().getIdWizard());
+        player2.playAssistant(1);
+        player2.playAssistant(2);
+        player2.playAssistant(3);
+        player2.playAssistant(4);
+        player2.playAssistant(5);
+        player2.playAssistant(6);
+        player2.playAssistant(7);
+        player2.playAssistant(8);
+        player2.playAssistant(9);
 
         //PLAYER1 PLAY HIS 10 CARD AS FIRST PLAYER
         playedCards.clear();
@@ -86,7 +86,7 @@ public class AssistantHandlerTests {
 
 
         //PLAYER2 PLAY HIS 10 CARD BUT THIS CARD IS VALID BECAUSE HE HAS NOT VALID CHOICE
-        assertTrue(assistantHandler.checkValidAssistant(10 + currentWizard.getIdWizard()),
+        assertTrue(assistantHandler.checkValidAssistant(10),
                 "All equals was not recognized");
 
     }

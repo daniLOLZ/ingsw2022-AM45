@@ -248,40 +248,43 @@ public class CharacterCardTest {
         minstrel.initialise(game);
         Player player = game.getPlayers().get(0);
 
+        //Remove one student from the entrance to make room for the test student
+        player.getBoard().removeFromEntrance(8);
+
         //FIRST TRADE
         player.getBoard().addToEntrance(StudentEnum.BLUE);
         player.getBoard().addToHall(StudentEnum.RED);
         game.getParameters().setCurrentPlayer(player);
-        minstrel.tradeStudents(0,StudentEnum.RED);
+        minstrel.tradeStudents(8,StudentEnum.RED);
 
         assertEquals(0, player.getNumStudentAtTable(StudentEnum.RED));
         assertEquals(1, player.getNumStudentAtTable(StudentEnum.BLUE));
-        assertEquals(StudentEnum.RED, player.getBoard().getAtEntrance(0));
+        assertEquals(StudentEnum.RED, player.getBoard().getAtEntrance(8));
 
-        player.getBoard().removeFromEntrance(0); //clean entrance
+        player.getBoard().removeFromEntrance(8); //clean entrance
 
         //SECOND TRADE
         player.getBoard().addToEntrance(StudentEnum.BLUE);
         player.getBoard().addToHall(StudentEnum.RED);
         game.getParameters().setCurrentPlayer(player);
-        minstrel.tradeStudents(0,StudentEnum.RED);
+        minstrel.tradeStudents(8,StudentEnum.RED);
 
         assertEquals(0, player.getNumStudentAtTable(StudentEnum.RED));
         assertEquals(2, player.getNumStudentAtTable(StudentEnum.BLUE));
-        assertEquals(StudentEnum.RED, player.getBoard().getAtEntrance(0));
+        assertEquals(StudentEnum.RED, player.getBoard().getAtEntrance(8));
 
-        player.getBoard().removeFromEntrance(0); //clean entrance
+        player.getBoard().removeFromEntrance(8); //clean entrance
 
 
         //THIRD TRADE (not available, so no change is applied)
         player.getBoard().addToEntrance(StudentEnum.BLUE);          //remain at entrance
         player.getBoard().addToHall(StudentEnum.RED);               //remain at hall
         game.getParameters().setCurrentPlayer(player);
-        minstrel.tradeStudents(0,StudentEnum.RED);
+        minstrel.tradeStudents(8,StudentEnum.RED);
 
         assertEquals(1, player.getNumStudentAtTable(StudentEnum.RED));
         assertEquals(2, player.getNumStudentAtTable(StudentEnum.BLUE));
-        assertEquals(StudentEnum.BLUE, player.getBoard().getAtEntrance(0));
+        assertEquals(StudentEnum.BLUE, player.getBoard().getAtEntrance(8));
     }
 
     /**
@@ -324,7 +327,7 @@ public class CharacterCardTest {
 
         //Gain red prof
         playerWhite.getBoard().addToEntrance(StudentEnum.RED);
-        game.selectStudentAtEntrance(playerWhite,0);
+        game.selectStudentAtEntrance(playerWhite,9);
         game.moveFromEntranceToHall(playerWhite);
 
         //1 red student on island

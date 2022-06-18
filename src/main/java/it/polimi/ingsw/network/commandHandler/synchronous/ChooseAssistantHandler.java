@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.commandHandler.synchronous;
 
+import it.polimi.ingsw.network.ApplicationHelper;
 import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 import it.polimi.ingsw.network.server.ClientHandlerParameters;
 import it.polimi.ingsw.network.CommandEnum;
@@ -23,7 +24,7 @@ public class ChooseAssistantHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer idAssistant = (Integer)messageBroker.readField(NetworkFieldEnum.ID_ASSISTANT);
+        Integer idAssistant = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.ID_ASSISTANT));
         if(parameters.getUserController().playAssistant(idAssistant)){
             notifySuccessfulOperation(messageBroker);
             parameters.setConnectionState(new WaitingForControl());

@@ -31,11 +31,15 @@ public class TurnHandler {
     }
 
     /**
-     * Reinitializes the board and all the users' selections for the next turn
+     * Takes all actions necessary to begin the next turn: <br>
+     * increments the turn counter, refills the clouds,
+     * reinitializes the board and all the users' selections
      */
     public void initializeNewTurn(){
-       controller.simpleGame.initialiseSelection();
-       controller.boardHandler.refillClouds();
+        currentTurn++;
+        controller.simpleGame.getParameters().setTurn(currentTurn);
+        controller.simpleGame.initialiseSelection();
+        controller.boardHandler.refillClouds();
     }
 
     /**
@@ -44,10 +48,12 @@ public class TurnHandler {
      * prepares the phase for the first player by calling startPlanningPhase or startActionPhase
      */
     public void nextPhase(){
+
         playersPlayedInThisTurn = 0;
+
+        // If the last action phase is ending, we need to take certain turn ending actions
         if (currentPhase.equals(PhaseEnum.ACTION)){
-            currentTurn++;
-            controller.simpleGame.getParameters().setTurn(currentTurn);
+            initializeNewTurn();
         }
         //Switches phase
         currentPhase = (currentPhase.equals(PhaseEnum.PLANNING)) ? PhaseEnum.ACTION : PhaseEnum.PLANNING;
@@ -59,32 +65,26 @@ public class TurnHandler {
         else startActionPhase();
     }
 
+
     /**
-     * a player ends his phases.
+     * a player ends his phase.
      * increment playersPlayedInThisTurn.
-     * This method will be called after getFromCloud
+     * This method will be called after endTurn or chooseAssistant
      */
     public void endPlayerPhase(){
         playersPlayedInThisTurn++;
+        if(playersPlayedInThisTurn != numPlayers) {
+            if (currentPhase.equals(PhaseEnum.PLANNING)) {
+                startPlanningPhase();
+            } else startActionPhase();
+        }
     }
-
-    /**
-     * Start a new player's turn, now player
-     * in position 'playersPlayedInThisTurn' can play
-     */
-    /*
-    public void startPlayerPhase(){
-        controller.simpleGame.startPhase(playersPlayedInThisTurn);
-    }
-    */
-    //There's no difference between planning and action? it looks like one must come after the
-    // other for the same player
 
     /**
      * Start a new player's phase, now player
      * in position 'playersPlayedInThisTurn' can play their planning phase
      */
-    public void startPlanningPhase(){
+    private void startPlanningPhase(){
         controller.simpleGame.startPlanningPhase(playersPlayedInThisTurn);
     }
 
@@ -92,7 +92,7 @@ public class TurnHandler {
      * The player in position 'playersPlayedInThisTurn' can now play
      * their action phase
      */
-    public void startActionPhase(){
+    private void startActionPhase(){
         controller.simpleGame.startActionPhase(playersPlayedInThisTurn);
         controller.boardHandler.resetStudentsMoved();
     }
@@ -103,6 +103,7 @@ public class TurnHandler {
      * @param gamePhase the phase of the game they're asking for
      * @return true if the user can play their round in the phase specified
      */
+    @Deprecated
     public boolean askForControl(Integer idUser, PhaseEnum gamePhase){
         if( controller.playerNumbers.indexOf(idUser) ==
                 controller.simpleGame.getParameters().getCurrentPlayer().getPlayerId().index &&
@@ -110,6 +111,10 @@ public class TurnHandler {
             return true;
         }
         return false;
+    }
+
+    public PhaseEnum getCurrentPhase(){
+        return controller.simpleGame.getParameters().getCurrentPhase();
     }
 
     /**
