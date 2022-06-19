@@ -791,6 +791,7 @@ public class CLI implements UserInterface {
             System.out.println(advancedGame);
 
         if(advancedGame != null) {
+
             //Show Character Cards
             StringBuilder characterString = new StringBuilder();
             done = 0;
@@ -813,39 +814,43 @@ public class CLI implements UserInterface {
                 characterString.append("\nCost: ").append(characterCardBeans.get(done).getCost()).
                         append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 1).getCost()).
                         append("\t\t\t\t\t\t").append("Cost: ").append(characterCardBeans.get(done + 2).getCost()).append("\n");
+
                 if (characterCardBeans.get(done).getStudents() != null &&
                         !characterCardBeans.get(done).getStudents().isEmpty())
                     characterString.append(characterCardBeans.get(done).getStudents());
                 else
                     characterString.append("\t\t\t\t\t\t\t");
 
+
+                if (characterCardBeans.get(done).getStudents() != null &&
+                        characterCardBeans.get(done).getStudents().size() > 5)
+                    characterString.append("\t\t\t");
+                else if (characterCardBeans.get(done).getStudents() != null &&
+                        characterCardBeans.get(done).getStudents().size() > 0)
+                    characterString.append("\t\t\t\t");
+                else
+                    characterString.append("");
+
                 if (characterCardBeans.get(done + 1).getStudents() != null &&
-                        !characterCardBeans.get(done + 1).getStudents().isEmpty()) {
-                    if (characterCardBeans.get(done).getStudents() != null &&
-                            characterCardBeans.get(done).getStudents().size() > 5)
-                        characterString.append("\t\t\t");
-                    else if (characterCardBeans.get(done).getStudents() != null &&
-                            characterCardBeans.get(done).getStudents().size() > 0)
-                        characterString.append("\t\t\t\t");
-                    else
-                        characterString.append("");
+                         !characterCardBeans.get(done + 1).getStudents().isEmpty())
                     characterString.append(characterCardBeans.get(done + 1).getStudents());
-                } else
-                    characterString.append("\t\t\t\t\t\t\t\t\t\t\t");
+                else
+                    characterString.append("\t\t\t\t\t\t\t");
+
+
+                if (characterCardBeans.get(done + 1).getStudents() != null &&
+                        characterCardBeans.get(done + 1).getStudents().size() > 5)
+                    characterString.append("\t\t\t");
+                else if (characterCardBeans.get(done + 1).getStudents() != null &&
+                        characterCardBeans.get(done + 1).getStudents().size() > 0)
+                    characterString.append("\t\t\t\t");
+                else
+                    characterString.append("");
 
                 if (characterCardBeans.get(done + 2).getStudents() != null &&
-                        !characterCardBeans.get(done + 2).getStudents().isEmpty()) {
-                    if (characterCardBeans.get(done + 1).getStudents() != null &&
-                            characterCardBeans.get(done + 1).getStudents().size() > 5)
-                        characterString.append("\t\t\t");
-                    else if (characterCardBeans.get(done + 1).getStudents() != null &&
-                            characterCardBeans.get(done + 1).getStudents().size() > 0)
-                        characterString.append("\t\t\t\t");
-                    else
-                        characterString.append("");
-
+                         !characterCardBeans.get(done + 2).getStudents().isEmpty())
                     characterString.append(characterCardBeans.get(done + 2).getStudents());
-                }
+
                 characterString.append("\n--------------------\t\t--------------------\t\t--------------------\n");
 
                 done += 3;

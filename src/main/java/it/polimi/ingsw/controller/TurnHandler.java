@@ -1,6 +1,7 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.game.PhaseEnum;
+import it.polimi.ingsw.model.player.Player;
 
 public class TurnHandler {
     protected Controller controller;
@@ -32,15 +33,15 @@ public class TurnHandler {
 
     /**
      * Takes all actions necessary to begin the next turn: <br>
-     * increments the turn counter, refills the clouds, sort players,
+     * increments the turn counter, refills the clouds,
      * reinitializes the board and all the users' selections
      */
     public void initializeNewTurn(){
         currentTurn++;
         controller.simpleGame.getParameters().setTurn(currentTurn);
         controller.simpleGame.initialiseSelection();
-        controller.simpleGame.sortPlayers();
         controller.boardHandler.refillClouds();
+        playersPlayedInThisTurn = 0;
     }
 
     /**
@@ -68,21 +69,22 @@ public class TurnHandler {
 
 
     /**
-     * a player ends his phase.
+     * a player ends his PlanningPhase.
      * increment playersPlayedInThisTurn.
-     * This method will be called after endTurn or chooseAssistant
+     * This method will be called after chooseAssistant
      */
     public void endPlayerPhase(){
         playersPlayedInThisTurn++;
         if(playersPlayedInThisTurn != numPlayers) {
             if (currentPhase.equals(PhaseEnum.PLANNING)) {
                 startPlanningPhase();
-            } else startActionPhase();
+            }
         }
+        else startActionPhase();
     }
 
     /**
-     * Start a new player's phase, now player
+     * Start a new player's PlanningPhase, now player
      * in position 'playersPlayedInThisTurn' can play their planning phase
      */
     private void startPlanningPhase(){
@@ -134,6 +136,27 @@ public class TurnHandler {
         boolean sackEmpty = controller.simpleGame.emptySack();
         boolean noAssistants = controller.simpleGame.noMoreAssistant();
         controller.simpleGame.setLastTurn(sackEmpty || noAssistants);
+    }
+
+    /**
+     * Update new current player following SimpleGame.players order.
+     * If all players have played their turn, change phase and if this was the planning
+     * phase then sort the players
+     */
+    public void nextCurrentPlayer(){
+        int current = controller.simpleGame.getParameters().getCurrentPlayer().getTurn() - 1; //PlayerTurn = Player position in players + 1
+        current++;
+
+        if(current == numPlayers){
+            if(controller.simpleGame.getParameters().getCurrentPhase() == PhaseEnum.PLANNING)
+                controller.simpleGame.sortPlayers();
+
+            nextPhase();
+            return;
+        }
+
+        Player player = controller.simpleGame.getPlayers().get(current);
+        controller.simpleGame.getParameters().setCurrentPlayer(player);
     }
 
 }
