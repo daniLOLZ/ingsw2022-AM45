@@ -128,7 +128,8 @@ public class BeanTranslator {
                 playerBean.getProfessors(),
                 playerBean.getAssistants(),
                 numCoins,
-                playerBean.getAssistantPlayed()
+                playerBean.getAssistantPlayed(),
+                playerBean.getTurn()
         );
     }
 
@@ -142,12 +143,14 @@ public class BeanTranslator {
         List<Integer> studentsPerTable = ApplicationHelper.getIntListFromBrokerField(map.get("studentsPerTable"));
         List<Assistant> assistants = getListOfAssistantsFromObject((ArrayList<LinkedTreeMap<String, Object>>)map.get("assistants"));
         List<StudentEnum> professors = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("professors"));
+        int turn = ApplicationHelper.getIntFromBrokerField(map.get("turn"));
+
         Assistant assistantPlayed = null;
         //todo there might be problems with this null value
         if(fieldPresent(map.get("assistantPlayed"))){
             assistantPlayed = getAssistantFromObject((LinkedTreeMap<String, Object>) map.get("assistantPlayed"));
         }
-        return new PlayerBean(nickname, playerId, leader, towerColor, numTowers, studentsAtEntrance, studentsPerTable, professors, assistants, assistantPlayed);
+        return new PlayerBean(nickname, playerId, leader, towerColor, numTowers, studentsAtEntrance, studentsPerTable, professors, assistants, assistantPlayed, turn);
     }
 
     private static Assistant getAssistantFromObject(LinkedTreeMap<String, Object> map) {

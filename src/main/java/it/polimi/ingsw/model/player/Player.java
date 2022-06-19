@@ -270,7 +270,7 @@ public class Player extends DrawableObject {
 
 
         PlayerBean bean = new PlayerBean(nickname, playerId, leader, teamColor, numTowers,
-                studAtEntrance,studPerTable,professors, Assistants,assistantPlayed);
+                studAtEntrance,studPerTable,professors, Assistants,assistantPlayed, turn);
 
         if(turn != 0)
             bean.setTurn(turn);

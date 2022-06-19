@@ -16,9 +16,9 @@ public class AdvancedPlayerBean extends PlayerBean{
     public AdvancedPlayerBean(String nickname, PlayerEnum playerId, boolean leader,
                               TeamEnum towerColor, int numTowers, List<StudentEnum> studentsAtEntrance,
                               List<Integer> studentsPerTable, List<StudentEnum> professors,
-                              List<Assistant> Assistants, int numCoins, Assistant assistantPlayed) {
+                              List<Assistant> Assistants, int numCoins, Assistant assistantPlayed, int turn) {
         super(nickname, playerId, leader, towerColor, numTowers, studentsAtEntrance,
-                studentsPerTable, professors, Assistants, assistantPlayed );
+                studentsPerTable, professors, Assistants, assistantPlayed, turn );
         this.numCoins = numCoins;
     }
 
@@ -26,9 +26,9 @@ public class AdvancedPlayerBean extends PlayerBean{
     public AdvancedPlayerBean(String nickname, PlayerEnum playerId, boolean leader,
                               TeamEnum towerColor, int numTowers, List<StudentEnum> studentsAtEntrance,
                               List<Integer> studentsPerTable, List<StudentEnum> professors,
-                              List<Integer> Assistants, int numCoins) {
+                              List<Integer> Assistants, int numCoins, int turn) {
         super(nickname, playerId, leader, towerColor, numTowers, studentsAtEntrance,
-                studentsPerTable, professors, Assistants);
+                studentsPerTable, professors, Assistants, turn);
         this.numCoins = numCoins;
     }
 

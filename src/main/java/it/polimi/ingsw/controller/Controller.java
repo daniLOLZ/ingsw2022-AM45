@@ -406,7 +406,6 @@ public class Controller {
         //If everyone played their assistants, go to the next phase
         if(turnHandler.isPhaseOver()) {
             turnHandler.nextPhase();
-            simpleGame.sortPlayers(); // move to turn handler?
         }
         setGameUpdated(true);
         setNewTurn(true);

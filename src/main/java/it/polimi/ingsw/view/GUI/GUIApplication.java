@@ -681,7 +681,7 @@ public class GUIApplication extends Application{
             assistants.add(assistant);
         }
 
-        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 12);
+        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 12, 1);
 
         root.getChildren().addAll(BoardDrawer.drawBoard(board, downCenter.pureSumY(-145), boardWidth / BoardDrawer.getBoardWidth(), eventHandlerContainer.getBoardHandlingToolbox()));
         root.getChildren().addAll(BoardDrawer.drawBoard(board, upCenter.pureSumY(120), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.TOP));

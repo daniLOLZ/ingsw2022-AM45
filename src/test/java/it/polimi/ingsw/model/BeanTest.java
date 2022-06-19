@@ -214,7 +214,7 @@ public class BeanTest {
         List<Integer> assistant = new ArrayList<>();
         assistant.add(22);
         PlayerBean bean = new PlayerBean("FRANCO", PlayerEnum.PLAYER1,false,
-                TeamEnum.WHITE,6,list2,table,prof,assistant);
+                TeamEnum.WHITE,6,list2,table,prof,assistant, 1);
 
         assertEquals(22,bean.getIdAssistants().get(0));
         assertEquals(6,bean.getNumTowers());
@@ -277,7 +277,7 @@ public class BeanTest {
         List<Integer> assistant = new ArrayList<>();
         assistant.add(22);
         AdvancedPlayerBean bean = new AdvancedPlayerBean("FRANCO", PlayerEnum.PLAYER1,false,
-                TeamEnum.WHITE,6,list2,table,prof,assistant,20);
+                TeamEnum.WHITE,6,list2,table,prof,assistant,20, 1);
 
         assertEquals(20, bean.getNumCoins());
 

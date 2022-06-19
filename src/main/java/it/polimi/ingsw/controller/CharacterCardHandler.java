@@ -69,7 +69,7 @@ public class CharacterCardHandler {
 
                 int idIsland = controller.simpleGame.getParameters().getSelectedIslands().get().get(0).getIdGroup();
                 FlagBearer flagBearer = (FlagBearer) usingCard;
-                flagBearer.evaluate(controller.advancedGame);
+                flagBearer.evaluate(controller.advancedGame); //todo possible duplicate evaluation
                 controller.islandHandler.evaluateIsland(idIsland);
             }
 
