@@ -29,7 +29,9 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 
@@ -57,6 +59,15 @@ public class GUIApplication extends Application{
             downLeftCorner  = new Coord(left,down),
             upRightCorner   = new Coord(right,up),
             upLeftCorner    = new Coord(left,up);
+
+    private static final double islandsSemiWidth = WINDOW_WIDTH/4, islandsSemiHeight = 7.0/39 * WINDOW_HEIGHT;
+    private static final Coord islandsPos = center.pureSumY(-5.0/78 * WINDOW_HEIGHT);
+    private static final Coord cloudCenterPos = center.pureSumY(-5.0/78 * WINDOW_HEIGHT);
+    private static final Coord
+            userBoardPos = downCenter.pureSumY(-145),
+            oppositeBoardPos = upCenter.pureSumY(120),
+            leftBoardPos = centerLeft.pureSumX(100),
+            rightBoardPos = centerRight.pureSumX(-100);
 
     private static final Coord firstAssistantSlot = downCenter.pureSumX(WINDOW_WIDTH * 0.28).pureSumY(-WINDOW_HEIGHT / 7);
 
@@ -594,7 +605,7 @@ public class GUIApplication extends Application{
         selectTower.setBackground(Background.EMPTY);
         selectTower.setFont(Font.font("Lucida Handwriting", 40));
         selectTower.setTextFill(Color.DARKRED);
-        selectTower.setOnAction(event -> showGameInterface(null));
+        selectTower.setOnAction(event -> showGameInterface(null,null,0));
         layout.getChildren().add(selectTower);
 
 
@@ -618,80 +629,101 @@ public class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
-    public static void showGameInterface(GameToolBoxContainer eventHandlerContainer){
+    public static void showGameInterface(VirtualViewBean data, GameToolBoxContainer eventHandlerContainer, int user){
         Group root = new Group();
-
-        //List<Coord> useless = getIslandGroupSlots(12, 4, 1, upLeftCorner);
 
         //<editor-fold desc="Islands">
 
-        List<Integer> ids = new ArrayList<>();
-        for (int i = 1; i <= 3; i++) {
-            ids.add(i);
+        List<AdvancedIslandGroupBean> advancedIslandsList = data.getAdvancedIslandGroupBeans();
+
+        int islandIndex = 0;
+
+        if (advancedIslandsList != null) {
+            Iterator<AdvancedIslandGroupBean> island = advancedIslandsList.iterator();
+
+            for (Coord slot: Objects.requireNonNull(getIslandGroupSlots(advancedIslandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos))) {
+                root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
+                islandIndex++;
+            }
+        }
+        else {
+            List<IslandGroupBean> islandsList = data.getIslandGroupBeans();
+            Iterator<IslandGroupBean> island = islandsList.iterator();
+
+            for (Coord slot: Objects.requireNonNull(getIslandGroupSlots(islandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos))) {
+                root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
+                islandIndex++;
+            }
         }
 
-        List<StudentEnum> students = new ArrayList<>();
-        students.add(StudentEnum.GREEN);
-        students.add(StudentEnum.GREEN);
-        students.add(StudentEnum.RED);
-        students.add(StudentEnum.YELLOW);
-        students.add(StudentEnum.BLUE);
-        students.add(StudentEnum.BLUE);
-        students.add(StudentEnum.YELLOW);
-        students.add(StudentEnum.YELLOW);
-        students.add(StudentEnum.GREEN);
-        students.add(StudentEnum.YELLOW);
-        students.add(StudentEnum.YELLOW);
 
-        AdvancedIslandGroupBean bean = new AdvancedIslandGroupBean(0, ids, students,true, TeamEnum.WHITE, 4);
 
-        for (Coord slot: getIslandGroupSlots(4, 380, 140, center.pureSumY(-50))) {
-            root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(bean, slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(0/*temporary*/)));
+
+        //</editor-fold>
+
+        //<editor-fold desc="Clouds">
+
+        List<CloudBean> cloudsList = data.getCloudBeans();
+        Iterator<CloudBean> cloud = cloudsList.iterator();
+
+        for (Coord slot:
+             getCloudsSlots(cloudsList.size(), cloudCenterPos)) {
+
+            CloudBean cloudBean = cloud.next();
+
+            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize(), eventHandlerContainer.getCloudHandlingToolbox().getOnCloudClick(cloudBean.getIdCloud() - 1)));
         }
 
         //</editor-fold>
 
-        CloudBean cloudBean = new CloudBean(1, students.subList(0,4));
-
-        for (Coord slot:
-             getCloudsSlots(3, center.pureSumY(-50))) {
-            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize(), eventHandlerContainer.getCloudHandlingToolbox().getOnCloudClick(cloudBean.getIdCloud() - 1)));
-        }
-
         //<editor-fold desc="Game Boards">
 
-        List<StudentEnum> atEntrance = new ArrayList<>();
-        atEntrance.add(StudentEnum.GREEN);
-        atEntrance.add(StudentEnum.YELLOW);
-        atEntrance.add(StudentEnum.RED);
+        PlayerBean userBean;
 
-        List<Integer> inHall = new ArrayList<>();
-        inHall.add(1);
-        inHall.add(4);
-        inHall.add(3);
-        inHall.add(1);
-        inHall.add(7);
+        List<AdvancedPlayerBean> advancedPlayers = data.getAdvancedPlayerBeans();
 
-        List<StudentEnum> professors = new ArrayList<>();
-        professors.add(StudentEnum.BLUE);
-        professors.add(StudentEnum.RED);
+        if (advancedPlayers != null){
 
-        List<Integer> assistants = new ArrayList<>();
-        for (int assistant = 1; assistant <= 10; assistant++) {
-            assistants.add(assistant);
+            userBean = advancedPlayers.get(user);
+
+            int numPlayers = advancedPlayers.size();
+
+            List<Coord> boardSlots = getBoardSlots(numPlayers);
+            List<Integer> boardRotations = getBoardRotation(numPlayers);
+
+            root.getChildren().addAll(BoardDrawer.drawBoard(advancedPlayers.get(user), userBoardPos, boardWidth / BoardDrawer.getBoardWidth(), eventHandlerContainer.getBoardHandlingToolbox()));
+
+            for (int board = 1; board < numPlayers; board++) {
+
+                int absIndex = (user + board) % boardSlots.size();
+                root.getChildren().addAll(BoardDrawer.drawBoard(advancedPlayers.get(absIndex), boardSlots.get(absIndex), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(absIndex)));
+            }
         }
 
-        AdvancedPlayerBean board = new AdvancedPlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.BLACK, 5, atEntrance, inHall, professors, assistants, 12, 1);
+        else {
 
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, downCenter.pureSumY(-145), boardWidth / BoardDrawer.getBoardWidth(), eventHandlerContainer.getBoardHandlingToolbox()));
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, upCenter.pureSumY(120), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.TOP));
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerLeft.pureSumX(100), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.RIGHT));
-        root.getChildren().addAll(BoardDrawer.drawBoard(board, centerRight.pureSumX(-100), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), BoardDrawer.LEFT));
+            List<PlayerBean> players = data.getPlayerBeans();
+
+            userBean = players.get(user);
+
+            int numPlayers = players.size();
+
+            List<Coord> boardSlots = getBoardSlots(numPlayers);
+            List<Integer> boardRotations = getBoardRotation(numPlayers);
+
+            root.getChildren().addAll(BoardDrawer.drawBoard(players.get(user), userBoardPos, boardWidth / BoardDrawer.getBoardWidth(), eventHandlerContainer.getBoardHandlingToolbox()));
+
+            for (int board = 1; board < numPlayers; board++) {
+
+                int absIndex = (user + board) % boardSlots.size();
+                root.getChildren().addAll(BoardDrawer.drawBoard(players.get(absIndex), boardSlots.get(absIndex), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(absIndex)));
+            }
+        }
 
         int assistantIndex = 0;
 
-        for (Integer assistant: board.getIdAssistants()) {
-            Coord slot = firstAssistantSlot.pureSumX(assistantIndex * assistantWidth * 0.28 * 10 / board.getIdAssistants().size());
+        for (Integer assistant: userBean.getIdAssistants()) {
+            Coord slot = firstAssistantSlot.pureSumX(assistantIndex * assistantWidth * 0.28 * 10 / userBean.getIdAssistants().size());
             ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth(), eventHandlerContainer.getAssistantHandlingToolbox().getOnAssistantClick(assistantIndex));
             addHoveringEffects(assistantView, slot, assistantWidth / AssistantDrawer.getAssistantWidth(), HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.7, false);
             root.getChildren().add(assistantView);
@@ -700,32 +732,51 @@ public class GUIApplication extends Application{
 
         //</editor-fold>
 
+        //<editor-fold desc="Character Cards">
+
+        List<CharacterCardBean> characters = data.getCharacterCardBeans();
+
+        if (characters != null && !characters.isEmpty()) {
+            int numCharacter = 0;
+
+            for (CharacterCardBean character:
+                 characters) {
+
+                root.getChildren().addAll(CharacterCardDrawer.drawCharacterCard(character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth(), eventHandlerContainer.getCharacterCardHandlingToolboxes().get(numCharacter)));
+                numCharacter++;
+            }
+        }
+
+        //</editor-fold>
+
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.STEELBLUE);
         stage.setScene(scene);
-
-        CharacterCardBean
-                priest = new CharacterCardBean(1, "Priest", "priest_description", students.subList(0,4), 1),
-                dame = new CharacterCardBean(11, "Dame", "dame_description", students.subList(0,4), 2),
-                herbalist = new CharacterCardBean(5, "Herbalist", "herbalist_description", new ArrayList<>(), 2);
-
-        List<CharacterCardBean> characters = new ArrayList<>();
-        characters.add(priest);
-        characters.add(dame);
-        characters.add(herbalist);
-
-        int numCharacter = 0;
-
-        for (CharacterCardBean character:
-             characters) {
-
-            root.getChildren().addAll(CharacterCardDrawer.drawCharacterCard(character, firstCharacterCardSlot.pureSumX(characterCardGap * numCharacter),characterCardWidth / CharacterCardDrawer.getCharacterCardWidth(), eventHandlerContainer.getCharacterCardHandlingToolboxes().get(numCharacter)));
-            numCharacter++;
-        }
     }
 
     public static void showNetworkError(){
         AlertBox.display("Error", "A network error occurred");
+    }
+
+    private static List<Coord> getBoardSlots(int amount){
+        List<Coord> slots = new ArrayList<>();
+
+        if (amount > 2) slots.add(rightBoardPos);
+        if (amount == 2 || amount == 4) slots.add(oppositeBoardPos);
+        if (amount > 2) slots.add(leftBoardPos);
+
+        return slots;
+    }
+
+    private static List<Integer> getBoardRotation(int total){
+
+        List<Integer> rotations = new ArrayList<>();
+
+        if (total > 2) rotations.add(BoardDrawer.RIGHT);
+        if (total == 2 || total == 4) rotations.add(BoardDrawer.TOP);
+        if (total > 2) rotations.add(BoardDrawer.LEFT);
+
+        return rotations;
     }
 
     private static List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){

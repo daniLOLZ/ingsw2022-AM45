@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
+import it.polimi.ingsw.model.beans.PlayerBean;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
@@ -13,6 +15,8 @@ import it.polimi.ingsw.view.UserInterface;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+
+import java.util.List;
 
 public class GUI implements UserInterface {
 
@@ -36,9 +40,12 @@ public class GUI implements UserInterface {
 
     private GameToolBoxContainer gameToolBoxContainer;
 
+    private LobbyBean lobbyBean;
     private VirtualViewBean viewData;
     private GameInitBean gameInitData;
     private boolean selectedTowerColor = false;
+
+    private String nickname;
 
     @Override
     public void addBean(GameElementBean bean) {
@@ -123,7 +130,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showLobby() {
-
+        printLobby(lobbyBean);
     }
 
     @Override
@@ -201,6 +208,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void printLobby(LobbyBean lobbyBean) {
+        if (!this.lobbyBean.equals(lobbyBean)) this.lobbyBean = lobbyBean;
         if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showLobbyScreen(lobbyBean, startingGameError));
     }
 
@@ -216,7 +224,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void setChosenNickname(String nickname) {
-
+        this.nickname = nickname;
     }
 
     @Override
@@ -257,7 +265,29 @@ public class GUI implements UserInterface {
 
     @Override
     public void showMainGameInterface() {
-        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showGameInterface(null));
+
+        int user = 0;
+
+        List<AdvancedPlayerBean> advancedPlayers = viewData.getAdvancedPlayerBeans();
+
+        if (advancedPlayers != null){
+            for (AdvancedPlayerBean advancedPlayer:
+                 advancedPlayers) {
+                if (advancedPlayer.getNickname().equals(nickname)) user = advancedPlayers.indexOf(advancedPlayer);
+            }
+        }
+        else {
+            List<PlayerBean> players = viewData.getPlayerBeans();
+            for (PlayerBean player :
+                players) {
+                if (player.getNickname().equals(nickname)) user = players.indexOf(player);
+            }
+        }
+
+        if (GUIApplication.isStarted()) {
+            int finalUser = user;
+            Platform.runLater(() -> GUIApplication.showGameInterface(viewData, gameToolBoxContainer, finalUser));
+        }
     }
 
     @Override
