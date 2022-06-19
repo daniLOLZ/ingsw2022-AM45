@@ -64,7 +64,7 @@ public class CLITest {
 
 
         try {
-            game = new AdvancedGame(players,selectedWizards,teamColors,nicknames,
+            game = new AdvancedGame(players ,selectedWizards,teamColors,nicknames,
                     coins,CharacterCards, virtualView);
             gameSimple = new SimpleGame(players,selectedWizards,teamColors,nicknames2,virtualViewSimple);
             gameSimple.initializeGame();
@@ -78,26 +78,32 @@ public class CLITest {
     public void test(){
         CLI cli = new CLI();
 
-        game.fillClouds();
-        AdvancedPlayer player = (AdvancedPlayer)game.getPlayers().get(0);
-        Player player2 = game.getPlayers().get(2);
-        game.getFromCloud(player,0);
-        game.getFromCloud(player2,1);
-        player.addEntrance(StudentEnum.RED);
-        game.selectStudentAtEntrance(player,0);
-        game.moveFromEntranceToIsland(player,0);
-        game.selectStudentAtEntrance(player,0);
-        game.moveFromEntranceToHall(player);
-        game.selectStudentAtEntrance(player,0);
-        game.moveFromEntranceToHall(player);
-        game.playAssistant(player, 1);
-        game.playAssistant(player, 2);
-        game.playAssistant(player, 3);
-        game.playAssistant(player, 4);
+        Player player1 = (Player)game.getPlayers().get(0);
+        Player player2 = (Player)game.getPlayers().get(1);
+        Player player3 = (Player)game.getPlayers().get(2);
+        Player player4 = (Player)game.getPlayers().get(3);
+
+
+        game.selectStudentAtEntrance(player1,0);
+        game.moveFromEntranceToHall(player1);
+
+
+
+        game.playAssistant(player1, 4);
+        game.playAssistant(player2, 3);
+        game.playAssistant(player3, 2);
+        game.playAssistant(player4, 1);
+
+        game.sortPlayers();
+
         cli.printGameInterface(virtualView.renderAdvancedView());
+        cli.printInterface();
 
         System.out.println("\n\n\n\n");
+
+
         cli.printGameInterface(virtualViewSimple.renderSimpleView());
+        cli.printInterface();
 
     }
 

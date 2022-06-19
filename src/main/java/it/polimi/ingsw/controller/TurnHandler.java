@@ -32,13 +32,14 @@ public class TurnHandler {
 
     /**
      * Takes all actions necessary to begin the next turn: <br>
-     * increments the turn counter, refills the clouds,
+     * increments the turn counter, refills the clouds, sort players,
      * reinitializes the board and all the users' selections
      */
     public void initializeNewTurn(){
         currentTurn++;
         controller.simpleGame.getParameters().setTurn(currentTurn);
         controller.simpleGame.initialiseSelection();
+        controller.simpleGame.sortPlayers();
         controller.boardHandler.refillClouds();
     }
 

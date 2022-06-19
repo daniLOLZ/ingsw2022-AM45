@@ -27,6 +27,7 @@ public class Player extends DrawableObject {
     protected boolean leader;
     protected Board board;
     protected Wizard wizard;
+    protected int turn;
 
     /**
      * ! This method doesn't allow for the choice of the wizard !
@@ -146,6 +147,7 @@ public class Player extends DrawableObject {
             setAssistantPlayed(tempAssistant);
         }
         catch (NoSuchAssistantException e){
+            e.printStackTrace();
             parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
         alert();
@@ -269,6 +271,10 @@ public class Player extends DrawableObject {
 
         PlayerBean bean = new PlayerBean(nickname, playerId, leader, teamColor, numTowers,
                 studAtEntrance,studPerTable,professors, Assistants,assistantPlayed);
+
+        if(turn != 0)
+            bean.setTurn(turn);
+
         return bean;
     }
 
@@ -277,5 +283,11 @@ public class Player extends DrawableObject {
         alert();
     }
 
+    public int getTurn() {
+        return turn;
+    }
 
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
 }

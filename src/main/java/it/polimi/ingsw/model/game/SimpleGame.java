@@ -193,6 +193,12 @@ public class SimpleGame extends DrawableObject {
             }
         }
 
+        //Set players' turn order
+        for(int i=0; i< players.size(); i++){
+            players.get(i).setTurn(i+1);
+            players.get(i).alert();
+        }
+
         hasBeenInitialized = true;
         for(IslandGroup islandGroup: islandGroups)
             islandGroup.alert();
@@ -386,6 +392,11 @@ public class SimpleGame extends DrawableObject {
     public void sortPlayers(){
         List<Player> newPlayerOrder = new ArrayList<>();
 
+        //Check if each player played an assistant. This check avoid null pointer exception
+        for(Player p: players)
+            if(p.getAssistantPlayed() == null)
+                return;
+
         // We need to account for the possibility of two (or more) players playing the same card
         // so we need to remember the previous turn order
         // we do this by using the player List, which will be kept in this order until
@@ -424,6 +435,12 @@ public class SimpleGame extends DrawableObject {
             }
         }
         this.players = newPlayerOrder;
+
+        for(int i=0; i< players.size(); i++){
+            players.get(i).setTurn(i+1);
+            players.get(i).alert();
+        }
+
         alert();
     }
 

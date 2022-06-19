@@ -13,6 +13,7 @@ import java.util.List;
 public class PlayerBean extends GameElementBean{
     protected String nickname;
     protected PlayerEnum playerId;
+    protected int turn;
     protected boolean leader;
     protected TeamEnum towerColor;
     protected int numTowers;
@@ -221,4 +222,11 @@ public class PlayerBean extends GameElementBean{
         return setTab(toReturn.toString(), border.length() );
     }
 
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
 }

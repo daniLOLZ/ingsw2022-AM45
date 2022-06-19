@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.game.PhaseEnum;
+import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.client.InitialConnector;
@@ -762,7 +763,7 @@ public class CLI implements UserInterface {
     /**
      * Actually prints the interface with the last saved view
      */
-    private void printInterface(){
+    public void printInterface(){
         VirtualViewBean view = this.viewBean;
         GameBoardBean simpleGame = view.getGameBoardBean();
         AdvancedGameBoardBean advancedGame = view.getAdvancedGameBoardBean();
@@ -772,6 +773,16 @@ public class CLI implements UserInterface {
         List<IslandGroupBean> simpleIslands = view.getIslandGroupBeans();
         List<AdvancedIslandGroupBean> advancedIslands = view.getAdvancedIslandGroupBeans();
         List<CharacterCardBean> characterCardBeans = view.getCharacterCardBeans();
+
+        if(simplePlayers != null){
+            simplePlayers.sort(Comparator.comparingInt(PlayerBean::getTurn));
+        }
+
+        else if(advancedPlayers != null){
+            advancedPlayers.sort(Comparator.comparingInt(AdvancedPlayerBean::getTurn));
+        }
+
+
         int done = 0;
         //Show gameBoardBean.
         if(simpleGame != null)
@@ -855,7 +866,7 @@ public class CLI implements UserInterface {
                     .append("\t\t\t\t\tCLOUD: ").append(cloudBean2.getIdCloud());
             cloudsString.append("\nStudents:").append(list);
             if(!list.isEmpty())
-                cloudsString.append(offsetStud);
+                cloudsString.append(offsetStud + "\t");
             else
                 cloudsString.append("\t\t\t\t");
             cloudsString.append("\tStudents:").append(list2);
@@ -863,7 +874,7 @@ public class CLI implements UserInterface {
             System.out.println(cloudsString);
         }
 
-        else{
+        else if(clouds.size() == 3){
             String offsetStud = "    ";
             CloudBean cloudBean = clouds.get(0);
             CloudBean cloudBean2 = clouds.get(1);
@@ -891,6 +902,42 @@ public class CLI implements UserInterface {
             System.out.println(cloudsString);
         }
 
+        else if(clouds.size() == 4){
+            String offsetStud = "    ";
+            CloudBean cloudBean = clouds.get(0);
+            CloudBean cloudBean2 = clouds.get(1);
+            CloudBean cloudBean3 = clouds.get(2);
+            CloudBean cloudBean4 = clouds.get(3);
+            List<StudentEnum> list = cloudBean.getStudents();
+            List<StudentEnum> list2 = cloudBean2.getStudents();
+            List<StudentEnum> list3 = cloudBean3.getStudents();
+            List<StudentEnum> list4 = cloudBean4.getStudents();
+            StringBuilder cloudsString = new StringBuilder();
+            cloudsString.append("---------------------\t\t---------------------\t\t---------------------\t\t---------------------\n");
+            cloudsString.append("CLOUD: ").append(cloudBean.getIdCloud())
+                    .append("\t\t\t\t\tCLOUD: ").append(cloudBean2.getIdCloud())
+                    .append("\t\t\t\t\tCLOUD: ").append(cloudBean3.getIdCloud())
+                    .append("\t\t\t\t\tCLOUD: ").append(cloudBean4.getIdCloud());
+            cloudsString.append("\nStudents:").append(list);
+            if(!list.isEmpty())
+                cloudsString.append(offsetStud + "\t");
+            else
+                cloudsString.append("\t\t\t\t");
+            cloudsString.append("\tStudents:").append(list2);
+            if(!list2.isEmpty())
+                cloudsString.append(offsetStud + "\t");
+            else
+                cloudsString.append("\t\t\t\t");
+            cloudsString.append("\tStudents:").append(list3);
+            if(!list3.isEmpty())
+                cloudsString.append(offsetStud + "\t");
+            else
+                cloudsString.append("\t\t\t\t");
+            cloudsString.append("\tStudents:").append(list4);
+            cloudsString.append("\n---------------------\t\t---------------------\t\t---------------------\t\t---------------------\n");
+            System.out.println(cloudsString);
+        }
+
         //ShowIslands
         if(simpleIslands != null){
             int MN = simpleIslands.stream().filter(x -> x.isPresentMN()).findFirst().get().getIdIslandGroup();
@@ -909,10 +956,19 @@ public class CLI implements UserInterface {
                     List<String> list4 = studentsToNumStud(simpleIslands.get(done + 3).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslands());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    if(simpleIslands.get(done).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                    if(simpleIslands.get(done + 1).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                    if(simpleIslands.get(done + 2).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 2).getTowersColor()).
@@ -938,9 +994,15 @@ public class CLI implements UserInterface {
                     List<String> list3 = studentsToNumStud(simpleIslands.get(done + 2).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslands());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    if(simpleIslands.get(done).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                    if(simpleIslands.get(done + 1).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 2).getTowersColor());
@@ -961,8 +1023,11 @@ public class CLI implements UserInterface {
                     List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslands());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    if(simpleIslands.get(done).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
@@ -978,7 +1043,7 @@ public class CLI implements UserInterface {
                     List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslands());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
 
@@ -1004,10 +1069,19 @@ public class CLI implements UserInterface {
                     List<String> list4 = studentsToNumStud(advancedIslands.get(done + 3).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslands());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    if(advancedIslands.get(done).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                    if(advancedIslands.get(done + 1).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                    if(advancedIslands.get(done + 2).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor()).
@@ -1038,9 +1112,15 @@ public class CLI implements UserInterface {
                     List<String> list3 = studentsToNumStud(advancedIslands.get(done + 2).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslands());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    if(advancedIslands.get(done).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                    if(advancedIslands.get(done + 1).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor());
@@ -1067,8 +1147,11 @@ public class CLI implements UserInterface {
                     List<String> list2 = studentsToNumStud(advancedIslands.get(done + 1).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands()).
-                            append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslands());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    if(advancedIslands.get(done).getIdIslandGroup() > 10)
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                    else
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
@@ -1088,7 +1171,7 @@ public class CLI implements UserInterface {
                     List<String> list1 = studentsToNumStud(advancedIslands.get(done).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslands());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
                     islandString.append("\nBlocks: ").append(advancedIslands.get(done).getNumBlockTiles());
@@ -1137,8 +1220,10 @@ public class CLI implements UserInterface {
             while (done < simplePlayers.size()){
                 if(simplePlayers.get(done - 1).getNickname().length() > 7)
                     playerString.append("\t\t\t\t\t");
-                else
+                else if(simplePlayers.get(done - 1).getNickname().length() > 3)
                     playerString.append("\t\t\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
                 playerString.append(simplePlayers.get(done).getNickname());
                 done++;
             }
@@ -1164,49 +1249,73 @@ public class CLI implements UserInterface {
             List<StudentEnum> list2 = new ArrayList<>();
 
             if(!simplePlayers.get(0).getStudentsAtEntrance().isEmpty())
-                for(int i=0; i < 4 && i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                for(int i=0; i < 3 && i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
                     list1.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
 
 
             playerString.append("Entrance: ").append(list1);
             done=1;
             while (done < simplePlayers.size()){
+
+                if(list1.size() > 1)
+                    playerString.append("\t\t\t");
+                else if(list1.size() == 1)
+                    playerString.append("\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t");
+
                 list1.clear();
                 if(!simplePlayers.get(done).getStudentsAtEntrance().isEmpty())
-                    for(int i=0; i < 4 && i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                    for(int i=0; i < 3 && i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
                         list1.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
 
 
-                if(simplePlayers.get(done - 1 ).getStudentsAtEntrance().size() == 4)
-                    playerString.append("\t\t");
-                else if(simplePlayers.get(done - 1 ).getStudentsAtEntrance().size() > 0)
-                    playerString.append("\t\t\t");
-                else
-                    playerString.append("\t\t\t\t");
+
                 playerString.append("Entrance: ").append(list1);
                 done++;
             }
             playerString.append("\n");
 
+            list2.clear();
+
             if(!simplePlayers.get(0).getStudentsAtEntrance().isEmpty())
-                for(int i=4; i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                for(int i=3; i < simplePlayers.get(0).getStudentsAtEntrance().size(); i++ )
                     list2.add(simplePlayers.get(0).getStudentsAtEntrance().get(i));
 
 
             if(!list2.isEmpty())
                 playerString.append(list2);
+            else
+                playerString.append("\t\t\t\t\t\t\t");
 
             done=1;
             while (done < simplePlayers.size()){
+
+                if(list2.size() > 5)
+                    playerString.append("\t\t\t");
+                else if(list2.size() > 3)
+                    playerString.append("\t\t\t\t");
+                else if(list2.size() > 2)
+                    playerString.append("\t\t\t\t\t");
+                else if(list2.size() > 1)
+                    playerString.append("\t\t\t\t\t\t");
+                else if(list2.size() == 1)
+                    playerString.append("\t\t\t\t\t\t\t");
+                else
+                    playerString.append("");
+
                 list2.clear();
                 if(!simplePlayers.get(done).getStudentsAtEntrance().isEmpty())
-                    for(int i=4; i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                    for(int i=3; i < simplePlayers.get(done).getStudentsAtEntrance().size(); i++ )
                         list2.add(simplePlayers.get(done).getStudentsAtEntrance().get(i));
 
 
-                playerString.append("\t\t\t\t");
+
                 if(!list2.isEmpty())
                     playerString.append(list2);
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
+
                 done++;
             }
             playerString.append("\n");
@@ -1218,7 +1327,11 @@ public class CLI implements UserInterface {
 
             done=1;
             while (done < simplePlayers.size()){
-                if(simplePlayers.get(done - 1).getProfessors().size() > 1)
+                if(simplePlayers.get(done - 1).getProfessors().size() > 4)
+                    playerString.append("\t\t");
+                else if(simplePlayers.get(done - 1).getProfessors().size() > 3)
+                    playerString.append("\t\t\t");
+                else if(simplePlayers.get(done - 1).getProfessors().size() > 1)
                     playerString.append("\t\t\t\t");
                 else
                     playerString.append("\t\t\t\t\t");
@@ -1257,7 +1370,7 @@ public class CLI implements UserInterface {
             List<Integer> listId2 = new ArrayList<>();
 
             if(!simplePlayers.get(0).getAssistants().isEmpty())
-                for(int i=0; i < 2; i++ )
+                for(int i=0; i < 2 && i < simplePlayers.get(0).getAssistants().size(); i++ )
                     listId1.add(simplePlayers.get(0).getAssistants().get(i).id);
             listId1 = listId1.stream().mapToInt(x -> {
                 int y = x % 10;
@@ -1270,14 +1383,16 @@ public class CLI implements UserInterface {
             playerString.append("Assistants: ").append(listId1);
             done=1;
             while (done < simplePlayers.size()){
-                if(listId1.size() > 0)
+                if(listId1.size() > 1)
                     playerString.append("\t\t\t");
+                else if(listId1.size() > 0)
+                    playerString.append("\t\t\t\t");
                 else
                     playerString.append("\t\t\t\t");
 
                 listId1.clear();
                 if(!simplePlayers.get(done).getAssistants().isEmpty())
-                    for(int i=0; i < 2; i++ )
+                    for(int i=0; i < 2 && i < simplePlayers.get(done).getAssistants().size(); i++ )
                         listId1.add(simplePlayers.get(done).getAssistants().get(i).id);
 
                 listId1 = listId1.stream().mapToInt(x -> {
@@ -1308,15 +1423,26 @@ public class CLI implements UserInterface {
 
 
             playerString.append(listId2);
+
             done=1;
             while (done < simplePlayers.size()){
-                if(listId2.size() > 3)
+
+
+                if(listId2.size() > 4)
+                    playerString.append("\t\t");
+                else if(listId2.size() > 3)
                     playerString.append("\t\t\t\t");
+                else if(listId2.size() > 2)
+                    playerString.append("\t\t\t\t\t");
+                else if(listId2.size() > 1)
+                    playerString.append("\t\t\t\t\t\t");
                 else if(listId2.size() > 0)
                     playerString.append("\t\t\t\t\t\t");
                 else
                     playerString.append("\t\t\t\t\t\t\t");
+
                 listId2.clear();
+
                 if(!simplePlayers.get(done).getAssistants().isEmpty())
                     for(int i=2; i < simplePlayers.get(done).getAssistants().size() && i < 6; i++ )
                         listId2.add(simplePlayers.get(done).getAssistants().get(i).id);
@@ -1330,6 +1456,7 @@ public class CLI implements UserInterface {
 
 
                 playerString.append(listId2);
+
                 done++;
             }
 
@@ -1352,8 +1479,14 @@ public class CLI implements UserInterface {
             done=1;
             while (done < simplePlayers.size()){
 
-                if(listId2.size() > 3)
+                if(listId2.size() > 4)
+                    playerString.append("\t\t");
+                else if(listId2.size() > 3)
                     playerString.append("\t\t\t\t");
+                else if(listId2.size() > 2)
+                    playerString.append("\t\t\t\t\t");
+                else if(listId2.size() > 1)
+                    playerString.append("\t\t\t\t\t\t");
                 else if(listId2.size() > 0)
                     playerString.append("\t\t\t\t\t\t");
                 else
@@ -1421,8 +1554,10 @@ public class CLI implements UserInterface {
             while (done < advancedPlayers.size()){
                 if(advancedPlayers.get(done-1).getNickname().length() > 7)
                     playerString.append("\t\t\t\t\t");
-                else
+                else if(advancedPlayers.get(done-1).getNickname().length() > 3)
                     playerString.append("\t\t\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
                 playerString.append(advancedPlayers.get(done).getNickname());
                 done++;
             }
@@ -1460,49 +1595,70 @@ public class CLI implements UserInterface {
             List<StudentEnum> list2 = new ArrayList<>();
 
             if(!advancedPlayers.get(0).getStudentsAtEntrance().isEmpty())
-                for(int i=0; i < 4 && i < advancedPlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                for(int i=0; i < 3 && i < advancedPlayers.get(0).getStudentsAtEntrance().size(); i++ )
                     list1.add(advancedPlayers.get(0).getStudentsAtEntrance().get(i));
 
 
             playerString.append("Entrance: ").append(list1);
             done=1;
             while (done < advancedPlayers.size()){
+
+                if(list1.size() > 1)
+                    playerString.append("\t\t\t");
+                else if(list1.size() == 1)
+                    playerString.append("\t\t\t\t");
+                else
+                    playerString.append("\t\t\t\t");
+
                 list1.clear();
                 if(!advancedPlayers.get(done).getStudentsAtEntrance().isEmpty())
-                    for(int i=0; i < 4 && i < advancedPlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                    for(int i=0; i < 3 && i < advancedPlayers.get(done).getStudentsAtEntrance().size(); i++ )
                         list1.add(advancedPlayers.get(done).getStudentsAtEntrance().get(i));
 
 
-                if(advancedPlayers.get(done - 1 ).getStudentsAtEntrance().size() == 4)
-                    playerString.append("\t\t");
-                else if(advancedPlayers.get(done - 1 ).getStudentsAtEntrance().size() > 1)
-                    playerString.append("\t\t\t");
-                else
-                    playerString.append("\t\t\t\t");
+
                 playerString.append("Entrance: ").append(list1);
                 done++;
             }
             playerString.append("\n");
 
             if(!advancedPlayers.get(0).getStudentsAtEntrance().isEmpty())
-                for(int i=4; i < advancedPlayers.get(0).getStudentsAtEntrance().size(); i++ )
+                for(int i=3; i < advancedPlayers.get(0).getStudentsAtEntrance().size(); i++ )
                     list2.add(advancedPlayers.get(0).getStudentsAtEntrance().get(i));
 
 
             if(!list2.isEmpty())
                 playerString.append(list2);
+            else
+                playerString.append("\t\t\t\t\t\t\t");
 
             done=1;
             while (done < advancedPlayers.size()){
+
+                if(list2.size() > 5)
+                    playerString.append("\t\t\t");
+                else if(list2.size() > 3)
+                    playerString.append("\t\t\t\t");
+                else if(list2.size() > 2)
+                    playerString.append("\t\t\t\t\t");
+                else if(list2.size() > 1)
+                    playerString.append("\t\t\t\t\t\t");
+                else if(list2.size() == 1)
+                    playerString.append("\t\t\t\t\t\t\t");
+                else
+                    playerString.append("");
+
                 list2.clear();
                 if(!advancedPlayers.get(done).getStudentsAtEntrance().isEmpty())
-                    for(int i=4; i < advancedPlayers.get(done).getStudentsAtEntrance().size(); i++ )
+                    for(int i=3; i < advancedPlayers.get(done).getStudentsAtEntrance().size(); i++ )
                         list2.add(advancedPlayers.get(done).getStudentsAtEntrance().get(i));
 
 
-                playerString.append("\t\t\t\t");
+
                 if(!list2.isEmpty())
                     playerString.append(list2);
+                else
+                    playerString.append("\t\t\t\t\t\t\t");
                 done++;
             }
             playerString.append("\n");
@@ -1513,7 +1669,11 @@ public class CLI implements UserInterface {
 
             done=1;
             while (done < advancedPlayers.size()){
-                if(advancedPlayers.get(done - 1).getProfessors().size() > 1)
+                if(advancedPlayers.get(done - 1).getProfessors().size() > 4)
+                    playerString.append("\t\t");
+                else if(advancedPlayers.get(done - 1).getProfessors().size() > 3)
+                    playerString.append("\t\t\t");
+                else if(advancedPlayers.get(done - 1).getProfessors().size() > 1)
                     playerString.append("\t\t\t\t");
                 else
                     playerString.append("\t\t\t\t\t");
@@ -1552,7 +1712,7 @@ public class CLI implements UserInterface {
             List<Integer> listId2 = new ArrayList<>();
 
             if(!advancedPlayers.get(0).getAssistants().isEmpty())
-                for(int i=0; i < 2; i++ )
+                for(int i=0; i < 2 && i < advancedPlayers.get(0).getAssistants().size(); i++ )
                     listId1.add(advancedPlayers.get(0).getAssistants().get(i).id);
             listId1 = listId1.stream().mapToInt(x -> {
                 int y = x % 10;
@@ -1565,14 +1725,16 @@ public class CLI implements UserInterface {
             playerString.append("Assistants: ").append(listId1);
             done=1;
             while (done < advancedPlayers.size()){
-                if(listId1.size() > 0)
+                if(listId1.size() > 1)
                     playerString.append("\t\t\t");
+                else if(listId1.size() > 0)
+                    playerString.append("\t\t\t\t");
                 else
                     playerString.append("\t\t\t\t");
 
                 listId1.clear();
                 if(!advancedPlayers.get(done).getAssistants().isEmpty())
-                    for(int i=0; i < 2; i++ )
+                    for(int i=0; i < 2 && i < advancedPlayers.get(done).getAssistants().size(); i++ )
                         listId1.add(advancedPlayers.get(done).getAssistants().get(i).id);
 
                 listId1 = listId1.stream().mapToInt(x -> {
@@ -1605,12 +1767,19 @@ public class CLI implements UserInterface {
             playerString.append(listId2);
             done=1;
             while (done < advancedPlayers.size()){
-                if(listId2.size() > 3)
+                if(listId2.size() > 4)
+                    playerString.append("\t\t");
+                else if(listId2.size() > 3)
                     playerString.append("\t\t\t\t");
+                else if(listId2.size() > 2)
+                    playerString.append("\t\t\t\t\t");
+                else if(listId2.size() > 1)
+                    playerString.append("\t\t\t\t\t\t");
                 else if(listId2.size() > 0)
                     playerString.append("\t\t\t\t\t\t");
                 else
                     playerString.append("\t\t\t\t\t\t\t");
+
                 listId2.clear();
                 if(!advancedPlayers.get(done).getAssistants().isEmpty())
                     for(int i=2; i < advancedPlayers.get(done).getAssistants().size() && i < 6; i++ )
@@ -1647,8 +1816,14 @@ public class CLI implements UserInterface {
             done=1;
             while (done < advancedPlayers.size()){
 
-                if(listId2.size() > 3)
+                if(listId2.size() > 4)
+                    playerString.append("\t\t");
+                else if(listId2.size() > 3)
                     playerString.append("\t\t\t\t");
+                else if(listId2.size() > 2)
+                    playerString.append("\t\t\t\t\t");
+                else if(listId2.size() > 1)
+                    playerString.append("\t\t\t\t\t\t");
                 else if(listId2.size() > 0)
                     playerString.append("\t\t\t\t\t\t");
                 else
