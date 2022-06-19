@@ -219,18 +219,26 @@ public class WatchersTest {
         game.moveFromEntranceToHall(player1);                       //Player moves 1 red students at table
 
         IslandGroupBean islandBean = null;
+
         for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())
             if(bean.getIdIslandGroup() == islandMN.getIdGroup())
                 islandBean = bean;
+
+
 
         CLI cli = new CLI();
         cli.addBean(islandBean);
         cli.addBean(playerBean);
 
-        cli.show();
+        cli.printGameInterface(virtualView.renderAdvancedView());
+        cli.printInterface();
+        //cli.show();
+        cli.clearBeans();
+
 
         game.playAssistant(player1, 3);                         //Assistant = (turn:3 , MN_steps: 2)
         game.moveMN(2);
+
 
         playerBean = virtualView.getAdvancedPlayerBean().get(0);            //Player have 9 assistants
         IslandGroupBean prevIslandBean = null;
@@ -238,9 +246,12 @@ public class WatchersTest {
             if(bean.getIdIslandGroup() == islandMN.getIdGroup())
                 prevIslandBean = bean;
 
+
+
         for(IslandGroup isla: game.getIslandGroups())               //Look for new position of MN
             if(isla.getIdGroup() == game.getIdIslandMN())
                 islandMN = isla;
+
 
         for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //new island has MN
             if(bean.getIdIslandGroup() == islandMN.getIdGroup())
@@ -250,7 +261,13 @@ public class WatchersTest {
         cli.addBean(prevIslandBean);
         cli.addBean(playerBean);
 
-        cli.show();
+        //cli.show();
+        cli.clearBeans();
+
+
+
+        cli.printGameInterface(virtualView.renderAdvancedView());
+        cli.printInterface();
 
         //PLAYER 1 BUILDS 1 TOWER ON MN ISLAND
         try {
@@ -260,6 +277,7 @@ public class WatchersTest {
             //nulla
         }
 
+
         playerBean = virtualView.getAdvancedPlayerBean().get(0);            //Player have 9 assistants
         for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //Now Mn island has towers
             if(bean.getIdIslandGroup() == islandMN.getIdGroup())
@@ -268,7 +286,13 @@ public class WatchersTest {
         cli.addBean(playerBean);
         cli.addBean(islandBean);
 
-        cli.show();
+        //cli.show();
+        cli.clearBeans();
+
+
+
+        cli.printGameInterface(virtualView.renderAdvancedView());
+        cli.printInterface();
 
         //PLAYER 1 PLAY AN ASSISTANT, PUT A RED STUDENT ON AN ISLAND AND MOVE MN ON THAT ISLAND
         game.playAssistant(player1, 1);                         //Assistant = (turn:1 , MN_steps: 1)
@@ -288,6 +312,7 @@ public class WatchersTest {
             if(isla.getIdGroup() == game.getIdIslandMN())
                 islandMN = isla;
 
+
         playerBean = virtualView.getAdvancedPlayerBean().get(0);            //Player have 8 assistants
         for(IslandGroupBean bean: virtualView.getAdvancedIslandBean())      //Now Mn island has towers
             if(bean.getIdIslandGroup() == islandMN.getIdGroup())
@@ -301,7 +326,13 @@ public class WatchersTest {
         cli.addBean(game.toBean());
         for(IslandGroup i : game.getIslandGroups())
             cli.addBean(i.toBean());
-        cli.show();
+        //cli.show();
+        cli.clearBeans();
+
+
+
+        cli.printGameInterface(virtualView.renderAdvancedView());
+        cli.printInterface();
 
     }
 
