@@ -911,6 +911,8 @@ public class SimpleGame extends DrawableObject {
             }
             finally {
                 alert();
+                for(IslandGroup isl: islandGroups)
+                    isl.alert();
             }
         }
 

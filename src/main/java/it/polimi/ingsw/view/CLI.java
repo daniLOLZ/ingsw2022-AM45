@@ -776,10 +776,26 @@ public class CLI implements UserInterface {
 
         if(simplePlayers != null){
             simplePlayers.sort(Comparator.comparingInt(PlayerBean::getTurn));
+            List<Integer> islandsOrder = simpleGame.getIdIslandGroups();
+            List<IslandGroupBean> sortedIslands = new ArrayList<>();
+            for(Integer x : islandsOrder){
+                for(IslandGroupBean bn : simpleIslands)
+                    if(bn.getIdIslandGroup() == x)
+                        sortedIslands.add(bn);
+            }
+            simpleIslands = sortedIslands;
         }
 
         else if(advancedPlayers != null){
             advancedPlayers.sort(Comparator.comparingInt(AdvancedPlayerBean::getTurn));
+            List<Integer> islandsOrder = advancedGame.getIdIslandGroups();
+            List<AdvancedIslandGroupBean> sortedIslands = new ArrayList<>();
+            for(Integer x : islandsOrder){
+                for(AdvancedIslandGroupBean bn : advancedIslands)
+                    if(bn.getIdIslandGroup() == x)
+                        sortedIslands.add(bn);
+            }
+            advancedIslands = sortedIslands;
         }
 
 
@@ -963,15 +979,15 @@ public class CLI implements UserInterface {
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
                     islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
                     if(simpleIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     if(simpleIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
                     if(simpleIslands.get(done + 2).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
@@ -1001,11 +1017,11 @@ public class CLI implements UserInterface {
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
                     islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
                     if(simpleIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     if(simpleIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
@@ -1030,7 +1046,7 @@ public class CLI implements UserInterface {
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
                     islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
                     if(simpleIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
@@ -1076,15 +1092,15 @@ public class CLI implements UserInterface {
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
                     islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
                     if(advancedIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     if(advancedIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
                     if(advancedIslands.get(done + 2).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
@@ -1119,11 +1135,11 @@ public class CLI implements UserInterface {
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
                     islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
                     if(advancedIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     if(advancedIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
@@ -1154,7 +1170,7 @@ public class CLI implements UserInterface {
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
                     islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
                     if(advancedIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     else
                         islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
