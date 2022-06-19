@@ -23,8 +23,8 @@ public class DeselectStudentHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer studentPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT));
-        if(parameters.getUserController().deselectStudent(studentPosition)){
+//        Integer studentPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT));
+        if(parameters.getUserController().deselectStudent()){
             notifySuccessfulOperation(messageBroker);
             parameters.setConnectionState(new StudentChoosing());
             return true;

@@ -71,7 +71,8 @@ public class SelectionHandler {
                 .getCurrentPlayer()
                 .getBoard()
                 .getStudentsAtEntrance()
-                .size()) {
+                .size()
+        && position >= 0) {
             controller.simpleGame.selectEntranceStudent(position);
             return true;
         }

@@ -450,8 +450,8 @@ public class Controller {
      * By calling the appropriate handler, deselects the currently selected student
      * @return true if the action succeeded
      */
-    public boolean deselectStudent(Integer position) {
-        selectionHandler.deselectStudentAtEntrance(position);
+    public boolean deselectStudent() {
+        selectionHandler.deselectStudentAtEntrance();
         setGameUpdated(true);
         return true;
     }

@@ -621,7 +621,9 @@ public class CLI implements UserInterface {
                 yourTurn.getInterrupt().set(false);
             }
 
-            System.out.println("Type your command (space separated values):\t");
+            if(!checkInterrupt(gameInterrupts)){
+                System.out.println("Type your command (space separated values):\t");
+            }
             input = getInputNonBlocking(reader, gameInterrupts);
 
             if(isCorrectInput(input)) {

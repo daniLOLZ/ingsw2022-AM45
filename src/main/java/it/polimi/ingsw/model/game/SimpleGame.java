@@ -373,6 +373,10 @@ public class SimpleGame extends DrawableObject {
             assignProfessor(professor, currentWinner);
         }
 
+        for (Player player : players){
+            player.alert();
+        }
+
         alert();
     }
 
@@ -691,10 +695,12 @@ public class SimpleGame extends DrawableObject {
      * to islandGroup with chosen idIslandGroup
      * Deselects the students positions
      * @param player != null
-     * @param idIslandGroup > 0 && < islandGroups.size()
+     * @param idIslandGroup the id of the island on which to put the student
      */
     public void moveFromEntranceToIsland(Player player, int idIslandGroup){
-        IslandGroup island = islandGroups.get(idIslandGroup);
+        IslandGroup island = islandGroups.stream()
+                .filter(islandGroup -> islandGroup.getIdGroup() == idIslandGroup)
+                .findFirst().get(); // Because of the check done before, this shouldn't be null
         player.moveFromEntranceToIsland(island);
         deselectAllEntranceStudents();
     }

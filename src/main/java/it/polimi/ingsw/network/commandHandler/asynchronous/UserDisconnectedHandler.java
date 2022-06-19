@@ -18,7 +18,7 @@ public class UserDisconnectedHandler extends AsyncCommandHandler {
         messageBroker.addToMessage(NetworkFieldEnum.COMMAND, commandHandled);
 
         //todo
-        return false; //change
+        return true; //change
     }
 
     @Override

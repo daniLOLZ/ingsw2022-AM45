@@ -161,8 +161,6 @@ public class MessageBroker {
      * Receives and stores the received message as an HashMap in the incoming message buffer
      * @param sourceInput the InputStream of the host to read the message from
      */
-    //todo make receive throw the exceptions instead of handling them, so the controller is able to notify via ErrorBean to all clients
-
     public void receive(InputStream sourceInput) throws IOException  //IOException includes SocketException
     {
         String receivedMessage;
