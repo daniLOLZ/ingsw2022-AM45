@@ -174,7 +174,11 @@ public interface UserInterface {
      */
     void showNetworkError();
 
-    void showUserDisconnected();
+    /**
+     * Shows that a user disconnected
+     * @param disconnectedUser the server side id of the user that disconnected
+     */
+    void showUserDisconnected(int disconnectedUser);
 
     // Asynchronous methods
 

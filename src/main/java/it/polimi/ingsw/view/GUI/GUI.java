@@ -202,7 +202,7 @@ public class GUI implements UserInterface {
     }
 
     @Override
-    public void showUserDisconnected() {
+    public void showUserDisconnected(int disconnectedUser) {
 
     }
 

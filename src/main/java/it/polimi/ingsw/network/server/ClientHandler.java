@@ -200,6 +200,7 @@ public class ClientHandler implements Runnable{
         }
         System.err.println(error);
         connected.set(false);
+        LoginHandler.removeNicknameFromId(parameters.getIdUser());
         closeConnection();
     }
 

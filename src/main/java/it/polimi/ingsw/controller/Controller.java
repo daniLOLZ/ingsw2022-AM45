@@ -17,19 +17,24 @@ import java.util.stream.Collectors;
 
 public class Controller {
 
-    protected PlayerCreation playerCreation;
-    protected GameRuleEnum gameRule;
     protected SimpleGame simpleGame;
     protected AdvancedGame advancedGame;
+
+    protected PlayerCreation playerCreation;
     protected CharacterCardHandler characterCardHandler;
     protected AssistantHandler assistantHandler;
     protected BoardHandler boardHandler;
     protected TurnHandler turnHandler;
     protected WinnerHandler winnerHandler;
     protected SelectionHandler selectionHandler;
-    protected final List<Integer> playerNumbers;
     protected IslandHandler islandHandler;
+
     protected VirtualView virtualView;
+
+    protected GameRuleEnum gameRule;
+
+    protected final List<Integer> playerNumbers;
+    int disconnectedUser;
 
     //these two might be redundant
     private ReentrantLock teamLock;
@@ -39,6 +44,8 @@ public class Controller {
     private boolean gameStarted;
     private AtomicBoolean gameUpdated;
     private AtomicBoolean newTurn;
+    private AtomicBoolean networkError;
+
 
     /**
      * Creates a new game controller
@@ -55,6 +62,7 @@ public class Controller {
         startLock = new ReentrantLock();
         gameStarted = false;
         gameUpdated = new AtomicBoolean(false);
+        networkError = new AtomicBoolean(false);
         newTurn = new AtomicBoolean(false);
         // Should we create it here or when the game starts?
         createView();
@@ -270,6 +278,18 @@ public class Controller {
 
     public void setNewTurn(boolean value) {
         newTurn.set(value);
+    }
+
+    public boolean isNetworkError(){
+        return networkError.get();
+    }
+
+    private void setNetworkError(boolean value){
+        networkError.set(value);
+    }
+
+    public int getDisconnectedUser(){
+        return this.disconnectedUser;
     }
 
     /**
@@ -596,11 +616,21 @@ public class Controller {
         }
     }
 
+    /**
+     * Sets the disconnected user as the parameter, then calls the parameter-less method
+     * @param idUser the user that caused the disconnection
+     */
+    public void lostConnectionHandle(int idUser){
+        this.disconnectedUser = idUser;
+        lostConnectionHandle();
+    }
+
     public void lostConnectionHandle(){
         /*TODO Aggiorna la view con il messaggio di errore settato dal ClientHandler
          * che ha perso la connessione (in teoria già fatto dal clientHandler)*/
         /*TODO invia la view a tutti gli user della lobby incriminata */
         //TODO chiudi le connessioni
+        setNetworkError(true);
     }
 
 

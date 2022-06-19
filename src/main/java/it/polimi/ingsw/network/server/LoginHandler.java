@@ -50,4 +50,8 @@ public class LoginHandler {
     public static String getNicknameFromId(Integer id){
         return idUserToNickname.get(id);
     }
+
+    public static void removeNicknameFromId(int idUser) {
+        idUserToNickname.remove(idUser);
+    }
 }

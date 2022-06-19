@@ -409,7 +409,8 @@ public class ClientController {
     public void handleUserDisconnection(){
         userInterface.setGameInterrupted(true);
         // We call this to wake up the main game interface
-        userInterface.showUserDisconnected();
+        int problemUser = ApplicationHelper.getIntFromBrokerField(broker.readAsyncField(NetworkFieldEnum.ASYNC_ID_USER));
+        userInterface.showUserDisconnected(problemUser);
     }
 
     public void connectionClose() {

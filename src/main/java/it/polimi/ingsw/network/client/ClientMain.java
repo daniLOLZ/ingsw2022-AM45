@@ -28,6 +28,7 @@ public class ClientMain {
 
         initialConnector = new InitialConnector(hostname, portNumber);
         receiver = new ClientReceiver(initialConnector);
+        sender = new ClientSender(initialConnector);
         if(guiMode) {
             //todo the GUI will need to get this connector at some point
 //            userInterface = new GUIApplication(initialConnector);
@@ -35,7 +36,7 @@ public class ClientMain {
         else {
             userInterface = new CLI(initialConnector);
         }
-        sender = new ClientSender(initialConnector);
+
     }
 
     public void startApplication(){

@@ -16,18 +16,23 @@ public class UserDisconnectedHandler extends AsyncCommandHandler {
         if(!triggerCondition(parameters)) return false;
 
         messageBroker.addToMessage(NetworkFieldEnum.COMMAND, commandHandled);
+        messageBroker.addToMessage(NetworkFieldEnum.ASYNC_ID_USER, parameters.getUserController().getDisconnectedUser());
 
         //todo
-        return true; //change
+        return true;
     }
 
     @Override
     public boolean triggerCondition(ClientHandlerParameters parameters) {
-        return false;
+        if(parameters.getUserController() == null) return false;
+        else {
+            return parameters.getUserController().isNetworkError();
+        }
     }
 
     @Override
     public void clearCondition(ClientHandlerParameters parameters) {
-
+        //If this catastrophic event happens, we don't want to clear the condition.
+        // Theoretically, the client handlers will stop and not query this again
     }
 }
