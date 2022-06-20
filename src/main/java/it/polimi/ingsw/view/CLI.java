@@ -28,12 +28,16 @@ public class CLI implements UserInterface {
     private final int centerPosition = 10;
     private List<GameElementBean> beans;
     private VirtualViewBean viewBean; // todo see what needs to be kept
+    private LobbyBean lobbyBean;
+    private GameInitBean gameInitBean;
     private List<CommandEnum> availableCommands;
     InterfaceInterrupt connected;
     InterfaceInterrupt lobbyStarting;
     InterfaceInterrupt gameStarting;
     InterfaceInterrupt gameInterrupted;
     InterfaceInterrupt updateAvailable;
+    InterfaceInterrupt lobbyUpdateAvailable;
+    InterfaceInterrupt gameInitUpdateAvailable;
     InterfaceInterrupt yourTurn;
     List<InterfaceInterrupt> gameInterrupts; //There might be multiple "interrupts" that the main game interface should react to
     List<InterfaceInterrupt> lobbyInterrupts;
@@ -65,15 +69,20 @@ public class CLI implements UserInterface {
         View = new StringBuilder();
         LastView = new StringBuilder();
         LastElement = new StringBuilder();
+        lobbyBean = null;
+        gameInitBean = null;
+
 
         setGameMode(GameRuleEnum.NO_RULE);
 
-        lobbyStarting       = new InterfaceInterrupt(true, new AtomicBoolean(false));
-        gameStarting        = new InterfaceInterrupt(true, new AtomicBoolean(false));
-        gameInterrupted     = new InterfaceInterrupt(true, new AtomicBoolean(false));
-        updateAvailable     = new InterfaceInterrupt(true, new AtomicBoolean(false));
-        yourTurn            = new InterfaceInterrupt(true, new AtomicBoolean(false));
-        connected           = new InterfaceInterrupt(false, initialConnector.getConnected());
+        lobbyStarting               = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        gameStarting                = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        gameInterrupted             = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        updateAvailable             = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        lobbyUpdateAvailable        = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        gameInitUpdateAvailable     = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        yourTurn                    = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        connected                   = new InterfaceInterrupt(false, initialConnector.getConnected());
         commandError = false;
         this.initialConnector = initialConnector;
 
@@ -85,10 +94,12 @@ public class CLI implements UserInterface {
 
         lobbyInterrupts = new ArrayList<>();
         lobbyInterrupts.add(connected);
+        lobbyInterrupts.add(lobbyUpdateAvailable);
         lobbyInterrupts.add(lobbyStarting);
 
         gameInitInterrupts = new ArrayList<>();
         gameInitInterrupts.add(connected);
+        gameInitInterrupts.add(gameInitUpdateAvailable);
         gameInitInterrupts.add(gameStarting);
     }
 
@@ -101,11 +112,11 @@ public class CLI implements UserInterface {
         availableCommands = new ArrayList<>();
         setGameMode(GameRuleEnum.NO_RULE);
 
-        lobbyStarting.getInterrupt().set(false);
-        gameStarting.getInterrupt().set(false);
-        gameInterrupted.getInterrupt().set(false);
-        updateAvailable.getInterrupt().set(false);
-        yourTurn.getInterrupt().set(false);
+        lobbyStarting.clearInterrupt();
+        gameStarting.clearInterrupt();
+        gameInterrupted.clearInterrupt();
+        updateAvailable.clearInterrupt();
+        yourTurn.clearInterrupt();
 
         commandError = false;
 
@@ -439,19 +450,11 @@ public class CLI implements UserInterface {
         boolean repeatSelection;
         String selection = "";
 
-        if(!lobbyStarting.isTriggered()) System.out.println(MessageFormat.format("""
-                Game type selected:
-                    Number of players : {0}
-                    Game type : {1}
-                
-                You are waiting for players to join a game with you...
-                1 - Set yourself as ready
-                2 - Set yourself as not ready
-                S - Try to start the game
-                L - Leave the lobby, go back to selecting the game rules
-                """, this.numberOfPlayers, this.gameType));
-
+        clearOldScreen();
+        if(!lobbyStarting.isTriggered()) printWaitingForPlayers();
+        if(lobbyBean != null) printLobbyBean();
         do {
+
             repeatSelection = false;
             selection = "";
             selection = getInputNonBlocking(reader, lobbyInterrupts);
@@ -459,6 +462,14 @@ public class CLI implements UserInterface {
             if (lobbyStarting.isTriggered()){
                 showTowerAndWizardSelection();
                 break;
+            }
+            else if(lobbyUpdateAvailable.isTriggered()){
+                clearOldScreen();
+                printWaitingForPlayers();
+                printLobbyBean();
+                lobbyUpdateAvailable.clearInterrupt();
+                repeatSelection = true;
+                continue;
             }
             else if(connected.isTriggered()){
                 //Error occured
@@ -478,6 +489,20 @@ public class CLI implements UserInterface {
                 repeatSelection = true;
             }
         } while (repeatSelection);
+    }
+
+    private void printWaitingForPlayers(){
+        System.out.println(MessageFormat.format("""
+                    Game type selected:
+                        Number of players : {0}
+                        Game type : {1}
+                    
+                    You are waiting for players to join a game with you...
+                    1 - Set yourself as ready
+                    2 - Set yourself as not ready
+                    S - Try to start the game
+                    L - Leave the lobby, go back to selecting the game rules
+                    """, this.numberOfPlayers, this.gameType));
     }
 
     @Override
@@ -521,15 +546,8 @@ public class CLI implements UserInterface {
         String colorList = numberOfPlayers == 3 ? colorList3Players : colorList2or4Players;
         boolean repeatSelection = false;
 
-        if(!gameStarting.isTriggered())System.out.println(MessageFormat.format("""
-            Select your team color ({2})
-            and wizard (1 - King, 2 - Pixie, 3 - Sorcerer, 4 - Wizard)
-            (one at a time):
-            
-            Your selection :
-                Team color : {0}
-                Wizard : {1}
-            """, currentTeamColor, currentWizard, colorList));
+        if(!gameStarting.isTriggered()) printChooseYourTowerWizard(colorList);
+        if(gameInitBean != null) printGameInitBean();
 
         do {
             selection = getInputNonBlocking(reader, gameInitInterrupts);
@@ -538,6 +556,14 @@ public class CLI implements UserInterface {
                 System.out.println("Everyone made their choice, the game is starting!");
                 showMainGameInterface();
                 return;
+            }
+            else if(gameInitUpdateAvailable.isTriggered()){
+                clearOldScreen();
+                printChooseYourTowerWizard(colorList);
+                printGameInitBean();
+                gameInitUpdateAvailable.clearInterrupt();
+                repeatSelection = true;
+                continue;
             }
             else if(connected.isTriggered()){
                 //Error occured, return
@@ -578,6 +604,18 @@ public class CLI implements UserInterface {
                     break;
             }
         } while(repeatSelection);
+    }
+
+    private void printChooseYourTowerWizard(String colorList){
+        System.out.println(MessageFormat.format("""
+            Select your team color ({2})
+            and wizard (1 - King, 2 - Pixie, 3 - Sorcerer, 4 - Wizard)
+            (one at a time):
+            
+            Your selection :
+                Team color : {0}
+                Wizard : {1}
+            """, currentTeamColor, currentWizard, colorList));
     }
 
     @Override
@@ -630,8 +668,8 @@ public class CLI implements UserInterface {
                     printYourTurn();
                     // Print available commands
                     printAvailableCommands();
-                    yourTurn.getInterrupt().set(false);
-                    updateAvailable.getInterrupt().set(false);
+                    yourTurn.clearInterrupt();
+                    updateAvailable.clearInterrupt();
                 }
                 else {
                     clearOldScreen();
@@ -639,7 +677,7 @@ public class CLI implements UserInterface {
                     printInterface();
                     // Print available commands
                     printAvailableCommands();
-                    updateAvailable.getInterrupt().set(false);
+                    updateAvailable.clearInterrupt();
                 }
             }
             else if(yourTurn.isTriggered()){
@@ -650,7 +688,7 @@ public class CLI implements UserInterface {
                 printYourTurn();
                 // Print available commands
                 printAvailableCommands();
-                yourTurn.getInterrupt().set(false);
+                yourTurn.clearInterrupt();
             }
 
             if(!checkInterrupt(gameInterrupts)){
@@ -780,6 +818,11 @@ public class CLI implements UserInterface {
 
     //todo don't print immediately, just save and coordinate later
     public void printLobby(LobbyBean lobbyBean) {
+        this.lobbyBean = lobbyBean;
+        lobbyUpdateAvailable.trigger();
+    }
+
+    private void printLobbyBean(){
         for(int index = 0; index < lobbyBean.getNicknames().size(); index++){
 
             String optionalNot = "";
@@ -796,6 +839,11 @@ public class CLI implements UserInterface {
 
     //todo don't print immediately, just save and coordinate later
     public void printGameInitInfo(GameInitBean gameInitBean){
+        this.gameInitBean = gameInitBean;
+        gameInitUpdateAvailable.trigger();
+    }
+
+    private void printGameInitBean(){
         System.out.println(gameInitBean.toString());
     }
 
@@ -2122,27 +2170,30 @@ public class CLI implements UserInterface {
 
     @Override
     public void setLobbyStarting() {
-        this.lobbyStarting.getInterrupt().set(true);
+        this.lobbyStarting.trigger();
     }
 
     @Override
     public void setGameStarting() {
-        this.gameStarting.getInterrupt().set(true);
+        this.gameStarting.trigger();
     }
 
     @Override
     public void setGameInterrupted(boolean alive) {
-        gameInterrupted.getInterrupt().set(alive);
+        if(alive) gameInterrupted.trigger();
+        else gameInterrupted.clearInterrupt();
     }
 
     @Override
     public void setUpdateAvailable(boolean available) {
-        updateAvailable.getInterrupt().set(available);
+        if(available) updateAvailable.trigger();
+        else updateAvailable.clearInterrupt();
     }
 
     @Override
     public void setYourTurn(boolean isYourTurn) {
-        yourTurn.getInterrupt().set(isYourTurn);
+        if(isYourTurn) yourTurn.trigger();
+        else yourTurn.clearInterrupt();
     }
 
     @Override
