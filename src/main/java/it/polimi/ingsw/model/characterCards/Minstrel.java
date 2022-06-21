@@ -8,6 +8,8 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,6 +54,14 @@ public class Minstrel extends CharacterCard {
         //GET AND CHECK IF LISTS OF CHOSEN STUDENTS ARE RIGHT
         indexEntrance = parameters.getSelectedEntranceStudents().get();
         indexHall = parameters.getSelectedStudentTypes().get();
+
+        Collections.sort(indexEntrance);
+        Collections.reverse(indexEntrance);
+
+        if(indexHall.size() == 1){
+            while(indexHall.size() != indexEntrance.size())
+                indexHall.add(StudentEnum.getColorById(indexHall.get(0).index));
+        }
         Iterator<Integer> iteratorEntrance = indexEntrance.iterator();
         Iterator<StudentEnum> iteratorHall = indexHall.iterator();
 

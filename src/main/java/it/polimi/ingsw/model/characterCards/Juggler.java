@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.view.VirtualView;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,6 +60,13 @@ public class Juggler extends InitialEffect{
         //GET SELECTIONS AND CHECK IF THEY HAVE THE RIGHT SIZE
         indexJuggler = advancedParameters.getSelectedStudentsOnCard().get();
         indexEntrance = parameters.getSelectedEntranceStudents().get();
+
+        Collections.sort(indexJuggler);
+        Collections.reverse(indexJuggler);
+
+        Collections.sort(indexEntrance);
+        Collections.reverse(indexEntrance);
+
         if(indexEntrance.size() != indexJuggler.size() && indexJuggler.size() > maxTradeableStudents){
             parameters.setErrorState("WRONG SIZE WITH CHOSEN STUDENTS");
             return;

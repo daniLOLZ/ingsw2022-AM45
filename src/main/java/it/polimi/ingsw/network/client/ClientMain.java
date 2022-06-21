@@ -5,6 +5,7 @@
 package it.polimi.ingsw.network.client;
 
 import it.polimi.ingsw.view.CLI;
+import it.polimi.ingsw.view.GUI.GUI;
 import it.polimi.ingsw.view.GUI.GUIApplication;
 import it.polimi.ingsw.view.UserInterface;
 
@@ -30,8 +31,7 @@ public class ClientMain {
         receiver = new ClientReceiver(initialConnector);
         sender = new ClientSender(initialConnector);
         if(guiMode) {
-            //todo the GUI will need to get this connector at some point
-//            userInterface = new GUIApplication(initialConnector);
+            userInterface = new GUI(initialConnector);
         }
         else {
             userInterface = new CLI(initialConnector);

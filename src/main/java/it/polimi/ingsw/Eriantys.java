@@ -35,8 +35,8 @@ public class Eriantys {
         }
         if(GUIMode){
             //todo re-add functionality
-            //ClientMain client = new ClientMain(hostname, portNumber, true);
-            //gui.startInterface();
+            ClientMain client = new ClientMain(hostname, portNumber, true);
+            client.startApplication();
             return;
         }
         if(CLIMode){

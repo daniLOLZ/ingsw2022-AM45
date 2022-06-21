@@ -118,7 +118,7 @@ public class SimpleGame extends DrawableObject {
         this.amountOfIslands = 12;
         this.numPlayers = numPlayers;
         this.maxStudentsByType = 130/StudentEnum.getNumStudentTypes();
-        //TODO add watchers to every model entity that requires watching
+
         createParameters();
         parameters.setVirtualView(virtualView);
         this.isLastTurn = false;
