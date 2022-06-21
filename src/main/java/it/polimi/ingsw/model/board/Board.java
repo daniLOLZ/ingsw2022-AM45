@@ -19,7 +19,6 @@ public class Board {
     private List<StudentEnum> studentsAtEntrance;
     private List<Integer> studentsPerTable;
     private ParameterHandler parameters;
-    private Optional<Integer> selectedEntranceStudentPos;
 
     public Board(TeamEnum teamColor, ParameterHandler parameters){
         numberOfTowers = parameters.getNumTowers();
@@ -30,7 +29,6 @@ public class Board {
         for(StudentEnum table : StudentEnum.getStudents()){
             studentsPerTable.add(0);
         }
-        selectedEntranceStudentPos = Optional.empty();
     }
 
 
@@ -45,11 +43,6 @@ public class Board {
         return numberOfTowers <= 0;
     }
 
-    //todo remove legacy selection, now in parameters
-    public void setSelectedEntranceStudentPos(int pos){
-        selectedEntranceStudentPos = Optional.of(pos);
-    }
-
     public int getNumberOfTowers() {return numberOfTowers;}
 
     public TeamEnum getTowerColor() {return towerColor;}
@@ -60,23 +53,21 @@ public class Board {
      * Resets selectedEntranceStudentPos.
      * @return moved student's type
      */
-    //todo remove legacy selection, now in parameters
     public StudentEnum moveFromEntranceToHall(){
 
         //no selected student
         if (studentsAtEntrance.isEmpty()) return StudentEnum.NOSTUDENT;
 
-
-        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos.get());
+        int studentPos = parameters.getSelectedEntranceStudents().get().stream().findFirst().get();
+        StudentEnum student = studentsAtEntrance.get(studentPos);
 
         //table is full
         if (studentsPerTable.get(student.ordinal()) >= tableSize) return StudentEnum.NOSTUDENT;
 
-        removeFromEntrance(selectedEntranceStudentPos.get());
+        removeFromEntrance(studentPos);
         addToHall(student);
 
-        selectedEntranceStudentPos = Optional.empty();
-
+        parameters.setSelectedEntranceStudents(new ArrayList<>());
         return student;
     }
 
@@ -87,21 +78,19 @@ public class Board {
      * Resets selectedEntranceStudentPos.
      * @param chosenIsland the IslandGroup selected by the current player
      */
-    //todo remove legacy selection, now in parameters
     public void moveFromEntranceToIsland(IslandGroup chosenIsland){
 
-
-
         //no selected student
-        if(selectedEntranceStudentPos.isEmpty()) return;
+        if(parameters.getSelectedEntranceStudents().isEmpty()
+        || parameters.getSelectedEntranceStudents().get().isEmpty()) return;
 
-        StudentEnum student = studentsAtEntrance.get(selectedEntranceStudentPos.get());
+        int studentPos = parameters.getSelectedEntranceStudents().get().stream().findFirst().get();
+        StudentEnum student = studentsAtEntrance.get(studentPos);
 
-        removeFromEntrance(selectedEntranceStudentPos.get());
+        removeFromEntrance(studentPos);
 
+        parameters.setSelectedEntranceStudents(new ArrayList<>());
         chosenIsland.addStudent(student);
-
-        selectedEntranceStudentPos = Optional.empty();
     }
 
     /**

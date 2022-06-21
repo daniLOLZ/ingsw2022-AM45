@@ -45,7 +45,7 @@ public class BoardTest {
     @Test
     public void moveFromEntranceToHallTest(){
         board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         assertEquals(board.moveFromEntranceToHall(),student,"Not corresponding Student types");
         assertEquals(board.entranceSize(),0,"Student is still at the Entrance");
         assertEquals(board.getStudentsAtTable(student),1,"Student was not moved to the correct table");
@@ -65,12 +65,12 @@ public class BoardTest {
     public void moveFromEntranceToHallFullTableTest(){
         for(int count = 0; count < 10; count++){
             board.addToEntrance(student);
-            board.setSelectedEntranceStudentPos(0);
+            parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
             board.moveFromEntranceToHall();
         }
 
         board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         assertEquals(board.moveFromEntranceToHall(),StudentEnum.NOSTUDENT,"Student table overflown");
     }
 
@@ -80,7 +80,7 @@ public class BoardTest {
     @Test
     public void moveFromEntranceToHallResetTest(){
         board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToHall();
 
         assertEquals(board.moveFromEntranceToHall(),StudentEnum.NOSTUDENT,"Selected student has not been reset");
@@ -91,7 +91,6 @@ public class BoardTest {
      */
     @Test
     public void moveFromEntranceToIslandTest(){
-        ParameterHandler parameters = new ParameterHandler(2);
         Island island = new Island(0);
         List<Island> islands = new ArrayList<>();
         islands.add(island);
@@ -99,7 +98,7 @@ public class BoardTest {
         IslandGroup islandGroup = new IslandGroup(0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM,parameters);
 
         board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToIsland(islandGroup);
 
         assertEquals(board.getStudentsAtEntrance().size(),0,"Student is still at the Entrance");
@@ -110,7 +109,6 @@ public class BoardTest {
      */
     @Test
     public void moveFromEntranceToIslandResetTest(){
-        ParameterHandler parameters = new ParameterHandler(2);
         Island island = new Island(0);
         List<Island> islands = new ArrayList<>();
         islands.add(island);
@@ -118,7 +116,7 @@ public class BoardTest {
         IslandGroup islandGroup = new IslandGroup(0,islands,null,null, new ArrayList<>(),TeamEnum.NOTEAM,parameters);
 
         board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToIsland(islandGroup);
         board.addToEntrance(student);
         board.moveFromEntranceToIsland(islandGroup);
@@ -148,7 +146,7 @@ public class BoardTest {
     @Test
     public void moveFromHallToEntranceTest(){
         board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToHall();
 
         try {
@@ -175,7 +173,7 @@ public class BoardTest {
     @Test
     public void moveFromHallToFullEntranceTest(){
         while (board.getStudentsAtEntrance().size() < parameters.getMaxStudentsAtEntrance()) board.addToEntrance(student);
-        board.setSelectedEntranceStudentPos(0);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToHall();
         board.addToEntrance(student);
         assertThrows(FullEntranceException.class, () -> board.moveFromHallToEntrance(student),"Method did not interrupt on faulty call");

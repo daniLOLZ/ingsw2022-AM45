@@ -685,8 +685,6 @@ public class SimpleGame extends DrawableObject {
      */
 
     public void selectStudentAtEntrance(Player player, int position){
-        //todo remove legacy selection, now in parameters
-        player.selectStudentAtEntrance(position);
         selectEntranceStudent(position);
     }
 

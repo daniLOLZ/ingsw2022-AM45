@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.player.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -92,7 +93,8 @@ public class Minstrel extends CharacterCard {
         Player player = parameters.getCurrentPlayer();
 
         Board board = player.getBoard();
-        board.setSelectedEntranceStudentPos(indexStudentEntrance);
+        parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(indexStudentEntrance);}});
+
         board.moveFromEntranceToHall();
         try {
             board.moveFromHallToEntrance(colorHall);

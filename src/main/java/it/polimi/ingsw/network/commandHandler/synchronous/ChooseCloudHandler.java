@@ -26,7 +26,7 @@ public class ChooseCloudHandler extends CommandHandler{
 
         Integer idCloud = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.ID_CLOUD));
         if(parameters.getUserController().chooseCloud(idCloud)){
-            parameters.setConnectionState(new EndTurn());
+            parameters.setConnectionState(new EndTurn(parameters.getUserController().getGameRule()));
             notifySuccessfulOperation(messageBroker);
             return true;
         }

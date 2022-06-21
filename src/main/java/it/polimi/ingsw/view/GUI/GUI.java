@@ -19,7 +19,6 @@ import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
 
-import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -210,7 +209,7 @@ public class GUI implements UserInterface {
     }
 
     //@Override
-    public void showUserDisconnected(int x) {
+    public void showUserDisconnected(String disconnectedUser) {
         //todo
     }
 
@@ -316,7 +315,17 @@ public class GUI implements UserInterface {
     }
 
     @Override
+    public void setCardRequirements(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired) {
+
+    }
+
+    @Override
     public void showGameCommandError() {
+
+    }
+
+    @Override
+    public void showGameCommandError(String error) {
 
     }
 
@@ -356,6 +365,11 @@ public class GUI implements UserInterface {
 
     @Override
     public void setYourTurn(boolean isYourTurn) {
+
+    }
+
+    @Override
+    public void setGameWon(TeamEnum winner) {
 
     }
 

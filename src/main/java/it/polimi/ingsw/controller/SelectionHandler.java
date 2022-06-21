@@ -80,10 +80,15 @@ public class SelectionHandler {
     }
 
     public boolean selectStudentAtEntrance(List<Integer> positions){
+        //Deselect all previously selected students
+        deselectStudentAtEntrance();
+
         for(Integer position: positions){
             if(!selectStudentAtEntrance(position)){
                 return false;
             }
+            //If even one failed, deselect everything
+            deselectStudentAtEntrance();
         }
         return true;
     }

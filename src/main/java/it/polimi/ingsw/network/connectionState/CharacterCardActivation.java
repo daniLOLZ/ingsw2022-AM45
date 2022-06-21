@@ -11,5 +11,6 @@ public class CharacterCardActivation extends ConnectionState{
         allow(CommandEnum.SELECT_STUDENT_COLOR);
         allow(CommandEnum.SELECT_ISLAND_GROUP);
         allow(CommandEnum.SELECT_STUDENT_ON_CARD);
+        allow(CommandEnum.PLAY_CHARACTER);
     }
 }

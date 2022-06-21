@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.commandHandler.synchronous;
 
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
+import it.polimi.ingsw.network.server.ActiveClients;
 import it.polimi.ingsw.network.server.ActiveGames;
 import it.polimi.ingsw.network.server.ClientHandlerParameters;
 
@@ -20,7 +21,6 @@ public class QuitGameHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        //TODO later, when all cases have been accounted for
         if(parameters.getUserController() == null){
             // The user decides to quit the game while still in the lobby, so the other users
             // shouldn't be kicked out automatically
@@ -30,8 +30,8 @@ public class QuitGameHandler extends CommandHandler{
             // The game is already starting or already started, so the game shall end for
             // every player
             parameters.getUserController().lostConnectionHandle(parameters.getIdUser());
-//            ActiveGames.endGame(parameters.getIdUser());
-            //closeConnection();//TODO how to communicate that the connection should be shut down?
+            //Awful way to do it
+            ActiveClients.getHandlerFromId(parameters.getIdUser()).connectionLostAlert("The user quit the application");//TODO how to communicate that the connection should be shut down?
         }
 
         return true;

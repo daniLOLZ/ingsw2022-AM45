@@ -77,8 +77,11 @@ public class BeanTranslator {
         int id = ApplicationHelper.getIntFromBrokerField(map.get("id"));
         String name = (String) map.get("name");
         int cost = ApplicationHelper.getIntFromBrokerField(map.get("cost"));
-        String description = (String) map.get("name");
-        List<StudentEnum> students = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("students"));
+        String description = (String) map.get("description");
+        List<StudentEnum> students = null;
+        if(fieldPresent(map.get("students"))) {
+            students = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("students"));
+        }
         return new CharacterCardBean(id,name, description, students, cost);
     }
 
@@ -169,47 +172,54 @@ public class BeanTranslator {
     }
 
     public static VirtualViewBean deserializeViewBean(LinkedTreeMap<String, Object> map) {
-        List<CloudBean> cloudBeans = new ArrayList<>();
-        List<CharacterCardBean> characterCardBeans = new ArrayList<>();
-        List<IslandGroupBean> islandGroupBeans = new ArrayList<>();
-        List<AdvancedIslandGroupBean> advancedIslandGroupBeans = new ArrayList<>();
-        List<PlayerBean> playerBeans = new ArrayList<>();
-        List<AdvancedPlayerBean> advancedPlayerBeans = new ArrayList<>();
-        List<ErrorBean> errorBeans = new ArrayList<>();
+        List<CloudBean> cloudBeans = null;
+        List<CharacterCardBean> characterCardBeans = null;
+        List<IslandGroupBean> islandGroupBeans = null;
+        List<AdvancedIslandGroupBean> advancedIslandGroupBeans = null;
+        List<PlayerBean> playerBeans = null;
+        List<AdvancedPlayerBean> advancedPlayerBeans = null;
+        List<ErrorBean> errorBeans = null;
         GameBoardBean gameBoardBean = null;
         AdvancedGameBoardBean advancedGameBoardBean = null;
 
         if(fieldPresent(map.get("cloudBeans"))) {
+            cloudBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("cloudBeans")) {
                 cloudBeans.add(deserializeCloudBean(element));
             }
         }
         if(fieldPresent(map.get("characterCardBeans"))) {
+            characterCardBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("characterCardBeans")) {
                 characterCardBeans.add(deserializeCharacterCardBean(element));
             }
         }
         if(fieldPresent(map.get("islandGroupBeans"))) {
+            islandGroupBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("islandGroupBeans")) {
                 islandGroupBeans.add(deserializeIslandGroupBean(element));
             }
         }
         if(fieldPresent(map.get("advancedIslandGroupBeans"))) {
+            advancedIslandGroupBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("advancedIslandGroupBeans")) {
                 advancedIslandGroupBeans.add(deserializeAdvancedIslandGroupBean(element));
             }
         }
         if(fieldPresent(map.get("playerBeans"))) {
+            playerBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("playerBeans")) {
                 playerBeans.add(deserializePlayerBean(element));
             }
         }
         if(fieldPresent(map.get("advancedPlayerBeans"))) {
+            advancedPlayerBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("advancedPlayerBeans")) {
                 advancedPlayerBeans.add(deserializeAdvancedPlayerBean(element));
             }
         }
         if(fieldPresent(map.get("errorBeans"))) {
+            errorBeans = new ArrayList<>();
             for (LinkedTreeMap<String, Object> element : (ArrayList<LinkedTreeMap<String, Object>>) map.get("errorBeans")) {
                 errorBeans.add(deserializeErrorBean(element));
             }

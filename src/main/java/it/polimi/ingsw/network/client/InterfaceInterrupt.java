@@ -15,15 +15,25 @@ public class InterfaceInterrupt {
         return activeWhenTrue;
     }
 
-    public AtomicBoolean getInterrupt() {
-        return interrupt;
-    }
-
     /**
      * Tells if the interrupt is currently triggered
      * @return true if the activeWhenTrue flag and the interrupt value are the same
      */
     public boolean isTriggered(){
         return activeWhenTrue == interrupt.get();
+    }
+
+    /**
+     * Triggers the interrupt, setting it in its active state
+     */
+    public void trigger(){
+        interrupt.set(activeWhenTrue);
+    }
+
+    /**
+     * Puts the interrupt in an untriggered state
+     */
+    public void clearInterrupt() {
+        interrupt.set(!activeWhenTrue);
     }
 }

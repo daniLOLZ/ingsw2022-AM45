@@ -34,7 +34,7 @@ public abstract class CharacterCard extends DrawableObject {
         this.advancedParameters = advancedParameters;
         this.name = name;
         this.description = description;
-
+        this.requirements = new Requirements(0,0,0,0);
     }
 
 

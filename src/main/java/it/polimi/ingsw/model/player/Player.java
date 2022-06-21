@@ -205,7 +205,6 @@ public class Player extends DrawableObject {
      * @return the moved student's color
      */
     public StudentEnum moveFromEntranceToHall(){
-        selectStudentAtEntrance(parameters.getSelectedEntranceStudents().get().get(0));
         StudentEnum color= board.moveFromEntranceToHall();
         alert();
         return  color;
@@ -216,7 +215,6 @@ public class Player extends DrawableObject {
      * @param island != null
      */
     public void moveFromEntranceToIsland(IslandGroup island){
-        selectStudentAtEntrance(parameters.getSelectedEntranceStudents().get().get(0));
         board.moveFromEntranceToIsland(island);
         alert();
     }
@@ -240,14 +238,6 @@ public class Player extends DrawableObject {
     }
 
     /**
-     * select a student at Entrance
-     * @param position >= 0
-     */
-    public void selectStudentAtEntrance(int position){
-        board.setSelectedEntranceStudentPos(position);
-    }
-
-    /**
      *
      * @return a bean with all information about this player,
      *      * his nickname, color team, student at tables and at entrance,
@@ -255,7 +245,7 @@ public class Player extends DrawableObject {
      */
     @Override
     public GameElementBean toBean(){
-        int numTowers =getNumTowers();                                      //Get remaining towers
+        int numTowers = getNumTowers();                                      //Get remaining towers
         List<StudentEnum> studAtEntrance = board.getStudentsAtEntrance();   //Get students at entrance
         List<Integer> studPerTable = new ArrayList<>();
         List<StudentEnum> professors;

@@ -29,7 +29,7 @@ public class SelectEntranceStudentHandler extends CommandHandler{
         Integer selectedStudent = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT));
         if(parameters.getUserController().selectStudent(selectedStudent)){
             notifySuccessfulOperation(messageBroker);
-            parameters.setConnectionState(new StudentMoving());
+            parameters.setConnectionState(new StudentMoving(parameters.getUserController().getGameRule()));
             return true;
         }
         else {

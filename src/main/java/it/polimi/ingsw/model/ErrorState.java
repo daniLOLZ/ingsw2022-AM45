@@ -6,4 +6,8 @@ public class ErrorState {
     public ErrorState(String message){
         errorMessage = message;
     }
+
+    public String getErrorMessage(){
+        return errorMessage;
+    }
 }

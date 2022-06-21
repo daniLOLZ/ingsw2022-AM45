@@ -27,7 +27,7 @@ public class AskForControlHandler extends CommandHandler{
                 parameters.setConnectionState(new PlanningPhaseTurn());
             }
             else if(gamePhase.equals(PhaseEnum.ACTION)){
-                parameters.setConnectionState(new StudentChoosing());
+                parameters.setConnectionState(new StudentChoosing(parameters.getUserController().getGameRule()));
             }
             notifySuccessfulOperation(messageBroker);
         }

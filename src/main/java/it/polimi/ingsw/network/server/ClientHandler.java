@@ -27,6 +27,7 @@ public class ClientHandler implements Runnable{
     private AtomicBoolean connected;
     private final ReentrantLock commandLock;
     private int asyncIdRequest;
+    private boolean alreadyAlerted;
 
     private ClientHandlerParameters parameters;
 
@@ -41,6 +42,7 @@ public class ClientHandler implements Runnable{
         this.parameters = new ClientHandlerParameters();
         this.connected = new AtomicBoolean(true);
         this.commandLock = new ReentrantLock();
+        alreadyAlerted = false;
     }
 
     /**
@@ -90,7 +92,9 @@ public class ClientHandler implements Runnable{
         while(connected.get()){ // Message listener loop
 
             try {
-                mainBroker.waitSyncMessage();
+                while(!mainBroker.waitSyncMessage(2000)){
+                    if(!connected.get()) return;
+                };
             } catch (InterruptedException e) {
                 System.err.println("Interrupted while waiting for message");
                 e.printStackTrace();
@@ -107,7 +111,7 @@ public class ClientHandler implements Runnable{
             if(!parameters.getConnectionState().isAllowed(command)){ // Trashes a command given at the wrong time
                 System.err.println("-+-Command not allowed");
                 //We also need to send an error to the client, not leaving it hanging
-                //todo duplicate code
+                // duplicate code
                 mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
                 mainBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
                 mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, mainBroker.readField(NetworkFieldEnum.ID_REQUEST));
@@ -189,17 +193,26 @@ public class ClientHandler implements Runnable{
 
     /**
      * Handle the exceptions thrown by losing connection.
+     * This method is called by any class that has a way of intercepting a connection loss
      * Set error state in order to show the error to the other players in future view.
-     * Set isConnected to false.
-     * Close connection.
+     * Closes connection.
      */
     public void connectionLostAlert(String error){
+        if(alreadyAlerted) return;
+        alreadyAlerted = true;
+
         if(parameters.getUserController() != null) {
-            parameters.getUserController().setError("Connection Lost With " + parameters.getIdUser());
-            parameters.getUserController().lostConnectionHandle();
+            parameters.getUserController().setError("Connection lost with " + LoginHandler.getNicknameFromId(parameters.getIdUser()));
+            parameters.getUserController().lostConnectionHandle(parameters.getIdUser());
+            for(Integer idUser : parameters.getUserLobby().getPlayers()){
+                if(idUser != parameters.getIdUser()){
+                    //We prematurely send async commands to make sure the players now someone disconnected right away
+                    ActiveClients.getHandlerFromId(idUser).sendAsynchronousCommands();
+                }
+            }
         }
         System.err.println(error);
-        connected.set(false);
+        ActiveClients.removeUserIdToClientHandlerAssociation(parameters.getIdUser());
         LoginHandler.removeNicknameFromId(parameters.getIdUser());
         closeConnection();
     }
@@ -208,12 +221,14 @@ public class ClientHandler implements Runnable{
 
     /**
      * Closes the current connection
+     * Sets isConnected to false.
      */
     private void closeConnection() {
+        connected.set(false);
         try{
             mainSocket.close();
             pingSocket.close();
-            System.out.println("Sockets closed");
+            System.out.println("[user " + parameters.getIdUser() + " ] Sockets closed");
         }
         catch (IOException e){
             e.printStackTrace();
@@ -243,7 +258,6 @@ public class ClientHandler implements Runnable{
             messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
             messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
             messageBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, messageBroker.readField(NetworkFieldEnum.ID_REQUEST));
-            messageBroker.addToMessage(NetworkFieldEnum.ERROR_STATE, "The command couldn't be handled");
         } //TODO close connection?
     }
 

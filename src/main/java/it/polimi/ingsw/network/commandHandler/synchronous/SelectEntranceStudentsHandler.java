@@ -7,7 +7,9 @@ import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Card requirements method.
@@ -29,11 +31,12 @@ public class SelectEntranceStudentsHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Object[] objectArray = (Object[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
-        List<Integer> students = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
-            students.add((Integer)o);
-        }
+        double[] readStudents = (double[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS);
+        List<Integer> students = Arrays.stream(readStudents)
+                .mapToInt(d -> (int) d)
+                .boxed()
+                .collect(Collectors.toList());
+
         if(parameters.getUserController().selectEntranceStudents(students)){
             notifySuccessfulOperation(messageBroker);
             return true;

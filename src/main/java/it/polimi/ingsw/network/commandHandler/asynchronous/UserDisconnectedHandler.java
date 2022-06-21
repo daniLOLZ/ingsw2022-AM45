@@ -16,7 +16,8 @@ public class UserDisconnectedHandler extends AsyncCommandHandler {
         if(!triggerCondition(parameters)) return false;
 
         messageBroker.addToMessage(NetworkFieldEnum.COMMAND, commandHandled);
-        messageBroker.addToMessage(NetworkFieldEnum.ASYNC_ID_USER, parameters.getUserController().getDisconnectedUser());
+        messageBroker.addToMessage(NetworkFieldEnum.ASYNC_ID_USER, parameters.getUserController().getDisconnectedUserId());
+        messageBroker.addToMessage(NetworkFieldEnum.ASYNC_USER_NICKNAME, parameters.getUserController().getDisconnectedUserNickname());
 
         //todo
         return true;

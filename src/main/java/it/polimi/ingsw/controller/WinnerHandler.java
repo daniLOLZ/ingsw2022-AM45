@@ -6,9 +6,15 @@ import java.util.Map;
 
 public class WinnerHandler {
     private Controller controller;
+    private TeamEnum winnerTeam;
 
     public WinnerHandler(Controller controller){
         this.controller = controller;
+        winnerTeam = TeamEnum.NOTEAM;
+    }
+
+    public TeamEnum getWinnerTeam() {
+        return winnerTeam;
     }
 
     /**
@@ -24,8 +30,10 @@ public class WinnerHandler {
         TeamEnum winnerTeam = TeamEnum.NOTEAM;
         winnerTeam = controller.simpleGame.noMoreTowers();
 
-        if(winnerTeam != TeamEnum.NOTEAM)
-            return  winnerTeam;
+        if(winnerTeam != TeamEnum.NOTEAM){
+            this.winnerTeam = winnerTeam;
+            return winnerTeam;
+        }
 
         if(controller.simpleGame.islandShortage() || controller.simpleGame.isLastTurn()){
             winnerTeam = morePlacedTowers();
@@ -34,6 +42,7 @@ public class WinnerHandler {
             }
         }
 
+        this.winnerTeam = winnerTeam;
         return winnerTeam;
     }
 

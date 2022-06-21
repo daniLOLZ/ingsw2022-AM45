@@ -2,6 +2,7 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.PhaseEnum;
 
@@ -50,7 +51,9 @@ public enum NetworkFieldEnum {
     ASYNC_ID_REQUEST("asyncIdRequest", int.class),
     ASYNC_ID_USER("asyncIdUser", int.class),
     ASYNC_GAME_PHASE("asyncGamePhase", PhaseEnum.class),
-    ASYNC_VIEW("asyncView", VirtualViewBean.class);
+    ASYNC_VIEW("asyncView", VirtualViewBean.class),
+    ASYNC_WINNER("asyncWinner",TeamEnum.class),
+    ASYNC_USER_NICKNAME("asyncUserNickname", String.class);
 
     private final String fieldName;
     private final Class fieldClass;

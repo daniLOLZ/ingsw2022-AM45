@@ -221,7 +221,7 @@ public class ParameterHandler extends DrawableObject {
     }
 
     public void setSelectedEntranceStudents(List<Integer> studentsPos){
-        selectedEntranceStudents= Optional.of(new ArrayList<>());
+        selectedEntranceStudents = Optional.of(new ArrayList<>());
         for (Integer studentPos : studentsPos) selectEntranceStudent(studentPos);
     }
 

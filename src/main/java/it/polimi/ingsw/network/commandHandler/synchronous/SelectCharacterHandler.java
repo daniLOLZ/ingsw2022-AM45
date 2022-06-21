@@ -27,7 +27,7 @@ public class SelectCharacterHandler extends CommandHandler{
 
         Integer cardPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION));
         if(!parameters.getUserController().selectCard(cardPosition)){
-            notifyError(messageBroker,"Couldn't play the card, not enough coins");
+            notifyError(messageBroker,parameters.getUserController().getSimpleGame().getErrorState().getErrorMessage());
             return false;
         }
         else {

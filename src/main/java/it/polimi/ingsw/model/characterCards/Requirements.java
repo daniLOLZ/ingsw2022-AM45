@@ -18,6 +18,7 @@ public class Requirements {
         this.studentAtEntrance = studentAtEntrance;
         this.studentType = studentType;
         this.studentOnCard = studentOnCard;
+        satisfied = false;
     }
 
     public void setSatisfied() {

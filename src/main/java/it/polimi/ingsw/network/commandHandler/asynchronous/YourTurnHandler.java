@@ -26,7 +26,7 @@ public class YourTurnHandler extends AsyncCommandHandler{
             parameters.setConnectionState(new PlanningPhaseTurn());
         }
         else if(currentPhase.equals(PhaseEnum.ACTION)){
-            parameters.setConnectionState(new StudentChoosing());
+            parameters.setConnectionState(new StudentChoosing(parameters.getUserController().getGameRule()));
         }
         return true;
     }

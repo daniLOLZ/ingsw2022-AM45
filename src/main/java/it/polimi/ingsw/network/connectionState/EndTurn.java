@@ -1,12 +1,13 @@
 package it.polimi.ingsw.network.connectionState;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.network.CommandEnum;
 
 public class EndTurn extends ActionPhaseTurn{
 
-    public EndTurn(){
+    public EndTurn(GameRuleEnum rule){
 
-        super();
+        super(rule);
         allow(CommandEnum.END_TURN);
 
     }

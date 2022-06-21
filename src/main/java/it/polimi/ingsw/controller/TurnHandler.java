@@ -74,6 +74,7 @@ public class TurnHandler {
     /**
      * a player ends his phase.
      * increment playersPlayedInThisTurn.
+     * Starts the next user's phase unless there should be a phase change
      * This method will be called after endTurn or chooseAssistant
      */
     public void endPlayerPhase(){

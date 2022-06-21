@@ -27,7 +27,7 @@ public class AdvancedGame extends SimpleGame {
     private List<CharacterCard> CharacterCards;
     private AdvancedParameterHandler advancedParameters;
 
-
+    @Deprecated
     public AdvancedGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> selectedColors, List<String> nicknames, int numCoins, int numCharacterCards) throws  IncorrectPlayersException{
         super(numPlayers, selectedWizards, selectedColors, nicknames);
         advancedParameters.setNumCoins(numCoins); // number of coins in the parameters is added at a later

@@ -20,17 +20,81 @@ public class ApplicationHelper {
         return dRead.intValue();
     }
 
+    public static int[] getIntArrayFromBrokerField(Object readField){
+        List<Integer> integerList = getIntListFromBrokerField(readField);
+        return integerList.stream()
+                .mapToInt(Integer::intValue)
+                .toArray();
+    }
+
+    /**
+     * Gets a list of integers from the read field.<br>
+     * The field must be an Object that already contains a list of integers in some form
+     * @param readField the read Object
+     * @return the int list parsed from the object, or an empty list if the parsing was unsuccessful
+     */
+    public static List<Integer> getIntListFromBrokerField(Object readField) {
+        try{
+            List<Object> readList = (List<Object>) readField;
+            return getIntListFromBrokerField(readList);
+        } catch (ClassCastException e){}  // I didn't think gson would make me do this
+
+        try{
+            Object[] readList2 = (Object[]) readField;
+            return getIntListFromBrokerField(readList2);
+        } catch (ClassCastException e){}
+
+        try{
+            double[] readList3 = (double[]) readField;
+            return getIntListFromBrokerField(readList3);
+        } catch (ClassCastException e){}
+
+        return new ArrayList<Integer>();
+    }
+
     /**
      * Gets a list of integers from the read field.<br>
      * The field must be an Object that already contains a list of integers
-     * @param readField the read Object
+     * @param readField the read array of doubles
      * @return the int list parsed from the object
      */
-    public static List<Integer> getIntListFromBrokerField(Object readField) {
-        List<Object> readList = (List<Object>) readField;
+    public static List<Integer> getIntListFromBrokerField(double[] readField) {
         List<Integer> retList = new ArrayList<>();
         Double dRead;
-        for(Object o : readList){
+        for(double d : readField){
+            dRead = (Double) d;
+            retList.add(dRead.intValue());
+        }
+        return retList;
+    }
+
+    /**
+     * Gets a list of integers from the read field.<br>
+     * The field must be an Object that already contains a list of integers
+     * @param readField the read array of objects
+     * @return the int list parsed from the object
+     */
+    public static List<Integer> getIntListFromBrokerField(Object[] readField) {
+        List<Integer> retList = new ArrayList<>();
+        Double dRead;
+        for(Object d : readField){
+            dRead = (Double) d;
+            retList.add(dRead.intValue());
+        }
+        return retList;
+    }
+
+    /**
+     * Gets a list of integers from the read field.<br>
+     * The field must be an Object that already contains a list of integers
+     * @param readField the read list of objects
+     * @return the int list parsed from the object
+     */
+    public static List<Integer> getIntListFromBrokerField(List<Object> readField) {
+
+        List<Integer> retList = new ArrayList<>();
+        Double dRead;
+        for(Object o : readField){
             dRead = (Double) o;
             retList.add(dRead.intValue());
         }

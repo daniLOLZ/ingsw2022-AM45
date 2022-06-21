@@ -26,7 +26,7 @@ public class MoveMNToIslandHandler extends CommandHandler{
         Integer steps = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.STEPS_MN));
         if(parameters.getUserController().moveMNToIsland(steps)){
             notifySuccessfulOperation(messageBroker);
-            parameters.setConnectionState(new CloudChoosing());
+            parameters.setConnectionState(new CloudChoosing(parameters.getUserController().getGameRule()));
             return true;
         }
         else {

@@ -22,7 +22,6 @@ public class PlayCharacterHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Integer cardPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION));
         if(parameters.getUserController().playCard()){
             super.notifySuccessfulOperation(messageBroker);
             parameters.setConnectionState(parameters.getCallbackConnectionState());
