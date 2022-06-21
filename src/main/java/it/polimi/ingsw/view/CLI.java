@@ -1020,19 +1020,26 @@ public class CLI implements UserInterface {
                     List<String> list4 = studentsToNumStud(simpleIslands.get(done + 3).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(simpleIslands.get(done).getIdIslands().size()).append("]");
                     if(simpleIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+1).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+1).getIdIslands().size()).append("]");
                     if(simpleIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup()).append("[").
+                                append(simpleIslands.get(done+2).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+2).getIdIslands().size()).append("]");
                     if(simpleIslands.get(done + 2).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+3).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 3).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+3).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 2).getTowersColor()).
@@ -1058,15 +1065,20 @@ public class CLI implements UserInterface {
                     List<String> list3 = studentsToNumStud(simpleIslands.get(done + 2).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(simpleIslands.get(done).getIdIslands().size()).append("]");
                     if(simpleIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+1).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+1).getIdIslands().size()).append("]");
                     if(simpleIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup()).append("[").
+                                append(simpleIslands.get(done+2).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 2).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+2).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 2).getTowersColor());
@@ -1087,11 +1099,14 @@ public class CLI implements UserInterface {
                     List<String> list2 = studentsToNumStud(simpleIslands.get(done + 1).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(simpleIslands.get(done).getIdIslands().size()).append("]");
                     if(simpleIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+1).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(simpleIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(simpleIslands.get(done+1).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(simpleIslands.get(done + 1).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
@@ -1107,7 +1122,8 @@ public class CLI implements UserInterface {
                     List<String> list1 = studentsToNumStud(simpleIslands.get(done).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(simpleIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(simpleIslands.get(done).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(simpleIslands.get(done).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
 
@@ -1133,19 +1149,26 @@ public class CLI implements UserInterface {
                     List<String> list4 = studentsToNumStud(advancedIslands.get(done + 3).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(advancedIslands.get(done).getIdIslands().size()).append("]");
                     if(advancedIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+1).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+1).getIdIslands().size()).append("]");
                     if(advancedIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+2).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+2).getIdIslands().size()).append("]");
                     if(advancedIslands.get(done + 2).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+3).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+3).getIdIslands().size()).append("]");;
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor()).
@@ -1176,15 +1199,20 @@ public class CLI implements UserInterface {
                     List<String> list3 = studentsToNumStud(advancedIslands.get(done + 2).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(advancedIslands.get(done).getIdIslands().size()).append("]");
                     if(advancedIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+1).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+1).getIdIslands().size()).append("]");
                     if(advancedIslands.get(done + 1).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+2).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 2).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+2).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor());
@@ -1211,11 +1239,14 @@ public class CLI implements UserInterface {
                     List<String> list2 = studentsToNumStud(advancedIslands.get(done + 1).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\t\t>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(advancedIslands.get(done).getIdIslands().size()).append("]");
                     if(advancedIslands.get(done).getIdIslandGroup() > 10)
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+1).getIdIslands().size()).append("]");
                     else
-                        islandString.append("\t\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup());
+                        islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 1).getIdIslandGroup()).append(" [").
+                                append(advancedIslands.get(done+1).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
@@ -1235,7 +1266,8 @@ public class CLI implements UserInterface {
                     List<String> list1 = studentsToNumStud(advancedIslands.get(done).getStudentsOnIsland());
 
                     islandString.append("\n>---------------------------=>\n");
-                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup());
+                    islandString.append("ISLAND: ").append(advancedIslands.get(done).getIdIslandGroup()).append(" [").
+                            append(advancedIslands.get(done).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor());
                     islandString.append("\nStudents: ").append(list1);
                     islandString.append("\nBlocks: ").append(advancedIslands.get(done).getNumBlockTiles());

@@ -205,8 +205,8 @@ public class GUI implements UserInterface {
        if (GUIApplication.isStarted()) Platform.runLater(GUIApplication::showNetworkError);
     }
 
-    @Override
-    public void showUserDisconnected() {
+    //@Override
+    public void showUserDisconnected(int x) {
         //todo
     }
 
