@@ -15,4 +15,6 @@ public class EriantysTest {
     public void parametersCongruence(){
         assertEquals(Eriantys.allowedParameters.size(), Eriantys.parameterRequiresInput.size());
     }
+
+
 }

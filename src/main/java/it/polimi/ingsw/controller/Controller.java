@@ -426,6 +426,7 @@ public class Controller {
         //If everyone played their assistants, go to the next phase
         if(turnHandler.isPhaseOver()) {
             turnHandler.nextPhase();
+            assistantHandler.assistantsPlayed.clear();      //clear the played assistant list in order to let play an assistant, played in this turn, in next turn
         }
         setGameUpdated(true);
         setNewTurn(true);

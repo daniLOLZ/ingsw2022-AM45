@@ -1,6 +1,7 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
 import it.polimi.ingsw.model.assistantCards.NoSuchAssistantException;
 import it.polimi.ingsw.model.assistantCards.Wizard;
 import it.polimi.ingsw.model.player.Player;
@@ -17,7 +18,7 @@ import java.util.Objects;
 
 public class AssistantHandler {
     private final Controller controller;
-    private List<Assistant> assistantsPlayed;
+    protected List<Assistant> assistantsPlayed;
 
 
     public AssistantHandler(Controller controller){
@@ -37,11 +38,15 @@ public class AssistantHandler {
      * @return true if the assistant was played successfully
      */
     public boolean playCard(int id){
-        assistantsPlayed = controller.simpleGame.playedAssistants();
+
         Player currentPlayer = controller.simpleGame.getParameters().getCurrentPlayer();
+        if(currentPlayer.getTurn() == 1)
+            assistantsPlayed.clear();
+
 
         if(checkValidAssistant(id)){
             controller.simpleGame.playAssistant(currentPlayer, id);
+            assistantsPlayed.add(FactoryAssistant.getAssistant(id));
         }
         else{
             controller.simpleGame.getParameters().setErrorState("INVALID ASSISTANT");
