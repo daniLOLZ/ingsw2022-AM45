@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
 import it.polimi.ingsw.model.game.PhaseEnum;
@@ -155,6 +156,12 @@ public interface UserInterface {
 
     /**
      * Shows that there has been an error with the command that was input
+     * @param error the error message
+     */
+    void showGameCommandError(String error);
+
+    /**
+     * Shows that there has been an error with the command that was input
      */
     void showGameCommandError();
 
@@ -176,9 +183,9 @@ public interface UserInterface {
 
     /**
      * Shows that a user disconnected
-     * @param disconnectedUser the server side id of the user that disconnected
+     * @param disconnectedUser the nickname of the user that disconnected
      */
-    void showUserDisconnected(int disconnectedUser);
+    void showUserDisconnected(String disconnectedUser);
 
     // Asynchronous methods
 
@@ -233,5 +240,17 @@ public interface UserInterface {
      * @param isYourTurn true if it's this player's turn
      */
     void setYourTurn(boolean isYourTurn);
+
+    void setGameWon (TeamEnum winner);
+
+    /**
+     * Sets the amount of game elements of various types that need to be selected to activate this card
+     * @param islandsRequired
+     * @param studentsOnCardRequired
+     * @param studentsAtEntranceRequired
+     * @param colorsRequired
+     */
+    void setCardRequirements(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired);
+
 
 }

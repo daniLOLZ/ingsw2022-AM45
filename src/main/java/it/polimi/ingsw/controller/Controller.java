@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.game.SimpleGame;
+import it.polimi.ingsw.network.server.LoginHandler;
 import it.polimi.ingsw.view.VirtualView;
 
 import java.util.List;
@@ -34,7 +35,8 @@ public class Controller {
     protected GameRuleEnum gameRule;
 
     protected final List<Integer> playerNumbers;
-    int disconnectedUser;
+    int disconnectedUserId;
+    String disconnectedUserNickname;
 
     //these two might be redundant
     private ReentrantLock teamLock;
@@ -45,6 +47,7 @@ public class Controller {
     private AtomicBoolean gameUpdated;
     private AtomicBoolean newTurn;
     private AtomicBoolean networkError;
+    private AtomicBoolean gameWon;
 
 
     /**
@@ -64,6 +67,7 @@ public class Controller {
         gameUpdated = new AtomicBoolean(false);
         networkError = new AtomicBoolean(false);
         newTurn = new AtomicBoolean(false);
+        gameWon = new AtomicBoolean(false);
         // Should we create it here or when the game starts?
         createView();
     }
@@ -107,7 +111,8 @@ public class Controller {
                     playerCreation.getTeamColors(),
                     playerCreation.getNicknames(),
                     numCoins,
-                    numCharacterCards);
+                    numCharacterCards,
+                    virtualView);
         } catch (IncorrectPlayersException e) {
             System.err.println("Error creating the game!");
             return false;
@@ -200,6 +205,12 @@ public class Controller {
         else if(GameRuleEnum.isAdvanced(gameRule.id)){
             if(!createAdvancedGame()) return false;
         }
+
+        //Necessary to make the activities related to the simple game work as if this game
+        // was a simple game
+        if(GameRuleEnum.isAdvanced(gameRule.id)){
+            simpleGame = advancedGame;
+        }
         createBasicHandlers(GameRuleEnum.isAdvanced(gameRule.id));
 
         simpleGame.initializeGame();
@@ -211,22 +222,10 @@ public class Controller {
     }
 
 
-    /**
-     * Checks whether all wizards and towers have been chosen for this game
-     * @return true if all selections were made and the game started
-     */
-    public synchronized boolean isGameStarted(){
-        return this.gameStarted;
+    private void gameWon() {
+        this.gameWon.set(true);
     }
 
-    /**
-     * Sets the flag used for detecting whether the game started to true
-     */
-    //todo maybe instead of unsetting this flag, make the clientHandler remember whether the user
-    // already joined the game
-    public void unsetGameStarted(){
-        this.gameStarted = false;
-    }
 
     /**
      * By calling the appropriate handler, checks whether all students have moved for this turn
@@ -254,6 +253,23 @@ public class Controller {
         return  WizardEnum.getWizards().stream()
                 .filter(x -> playerCreation.isWizardAvailable(x.index*10)) // todo wizard refactoring here too
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks whether all wizards and towers have been chosen for this game
+     * @return true if all selections were made and the game started
+     */
+    public synchronized boolean isGameStarted(){
+        return this.gameStarted;
+    }
+
+    /**
+     * Sets the flag used for detecting whether the game started to true
+     */
+    //todo maybe instead of unsetting this flag, make the clientHandler remember whether the user
+    // already joined the game
+    public void unsetGameStarted(){
+        this.gameStarted = false;
     }
 
     public boolean isPlayerCreationModified() {
@@ -288,8 +304,24 @@ public class Controller {
         networkError.set(value);
     }
 
-    public int getDisconnectedUser(){
-        return this.disconnectedUser;
+    public boolean isGameWon() {
+        return gameWon.get();
+    }
+
+    public TeamEnum getWinnerTeam() {
+        return winnerHandler.getWinnerTeam();
+    }
+
+    public int getDisconnectedUserId(){
+        return this.disconnectedUserId;
+    }
+
+    public String getDisconnectedUserNickname(){
+        return this.disconnectedUserNickname;
+    }
+
+    public GameRuleEnum getGameRule() {
+        return gameRule;
     }
 
     /**
@@ -486,6 +518,10 @@ public class Controller {
         if(!islandHandler.moveMN(steps)){
             return false;
         }
+        TeamEnum winner = winnerHandler.checkWinner();
+        if(!winner.equals(TeamEnum.NOTEAM)){
+            gameWon();
+        }
         setGameUpdated(true);
         return true;
     }
@@ -513,7 +549,13 @@ public class Controller {
         if(turnHandler.isPhaseOver()){
             turnHandler.nextPhase();
         }
-        setNewTurn(true);
+        TeamEnum winner = winnerHandler.checkWinner();
+        if (!winner.equals(TeamEnum.NOTEAM)){
+            gameWon();
+        }
+        else{
+            setNewTurn(true);
+        }
         setGameUpdated(true);
         return true;
     }
@@ -592,7 +634,7 @@ public class Controller {
      */
     public boolean playCard(){
 
-        if(characterCardHandler.playCard()) return false;
+        if(!characterCardHandler.playCard()) return false;
         setGameUpdated(true);
         return true;
 
@@ -621,7 +663,8 @@ public class Controller {
      * @param idUser the user that caused the disconnection
      */
     public void lostConnectionHandle(int idUser){
-        this.disconnectedUser = idUser;
+        this.disconnectedUserId = idUser;
+        this.disconnectedUserNickname = LoginHandler.getNicknameFromId(idUser);
         lostConnectionHandle();
     }
 

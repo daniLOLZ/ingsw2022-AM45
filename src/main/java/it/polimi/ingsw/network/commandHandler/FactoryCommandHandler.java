@@ -42,12 +42,13 @@ public class FactoryCommandHandler {
         List<AsyncCommandHandler> asyncHandlers = new ArrayList<>();
         //LobbyStart must come before GameInitUpdate!
         // Do not change!
+        asyncHandlers.add(new UserDisconnectedHandler());
         asyncHandlers.add(new LobbyStartHandler());
         asyncHandlers.add(new GameInitUpdateHandler());
         asyncHandlers.add(new GameStartHandler());
         asyncHandlers.add(new GameUpdateHandler());
+        asyncHandlers.add(new GameWonHandler());
         asyncHandlers.add(new LobbyUpdateHandler());
-        asyncHandlers.add(new UserDisconnectedHandler());
         asyncHandlers.add(new YourTurnHandler());
 
         return asyncHandlers;

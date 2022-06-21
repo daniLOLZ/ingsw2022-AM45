@@ -61,32 +61,22 @@ public class ActiveGames {
         return userToGameAssociation.get(idUser);
     }
 
-    /**
-     * Ends the game of the user given as a parameter and notifies every
-     * other user in the game
-     * @param idUser the user whose game will end
-     */
-    @Deprecated // maybe
-    public static void endGame(Integer idUser){
 
-        Controller gameToEnd = getGameFromUserId(idUser);
-        //I don't really care what the game state is or will be, i just need to inform the users
-        // and destroy the current game
-        //TODO handle way to signal end of the game to all users
-        deleteUsersAssociation(gameToEnd);
+    /**
+     * Deletes this player's association with its current game controller
+     * @param idUser the user to remove from the association map
+     */
+    public static void deleteUserAssociation(Integer idUser) {
+        userToGameAssociation.remove(idUser);
     }
 
     /**
-     * Deletes all user associations with the game given
-     * @param gameToEnd the game for which the users need to be removed
+     * Looks at all the currently present games and deletes the ones that are no longer active
+     * (either won or stopped due to an error)
      */
-    private static void deleteUsersAssociation(Controller gameToEnd) {
-
-        for(Integer user : userToGameAssociation.keySet()){
-            if(userToGameAssociation.get(user).equals(gameToEnd)){
-                userToGameAssociation.remove(user);
-            }
-        }
+    public static void removeEndedGames() {
+        //todo Call some method in the controller first?
+        gameControllers.removeIf(Controller::isGameWon);
+        gameControllers.removeIf(Controller::isNetworkError);
     }
-
 }

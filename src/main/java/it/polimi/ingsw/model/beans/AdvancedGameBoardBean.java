@@ -54,11 +54,11 @@ public class AdvancedGameBoardBean extends GameBoardBean{
 
         String Eryantis = StaticColorCLI.ANSI_RED + "E" +
                           StaticColorCLI.ANSI_YELLOW + "R" +
-                          StaticColorCLI.ANSI_GREEN + "Y" +
+                          StaticColorCLI.ANSI_GREEN + "I" +
                           StaticColorCLI.ANSI_BLUE + "A" +
                           StaticColorCLI.ANSI_CYAN + "N" +
                           StaticColorCLI.ANSI_PURPLE + "T"+
-                          StaticColorCLI.ANSI_RED + "I"+
+                          StaticColorCLI.ANSI_RED + "Y"+
                           StaticColorCLI.ANSI_YELLOW + "S" +
                           StaticColorCLI.ANSI_RESET  ;
 

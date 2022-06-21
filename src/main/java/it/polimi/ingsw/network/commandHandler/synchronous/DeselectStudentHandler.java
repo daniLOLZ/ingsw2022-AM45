@@ -26,7 +26,7 @@ public class DeselectStudentHandler extends CommandHandler{
 //        Integer studentPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHOSEN_ENTRANCE_STUDENT));
         if(parameters.getUserController().deselectStudent()){
             notifySuccessfulOperation(messageBroker);
-            parameters.setConnectionState(new StudentChoosing());
+            parameters.setConnectionState(new StudentChoosing(parameters.getUserController().getGameRule()));
             return true;
         }
         else {

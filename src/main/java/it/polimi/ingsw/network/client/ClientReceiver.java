@@ -138,6 +138,7 @@ public class ClientReceiver {
                     case SERVER_GAME_START ->                       clientController.handleGameStart();
                     case SERVER_YOUR_TURN ->                        clientController.handleTurnUpdate();
                     case SERVER_GAME_UPDATE ->                      clientController.handleGameUpdate();
+                    case SERVER_GAME_WON ->                         clientController.handleGameWon();
                     case SERVER_USER_DISCONNECTED ->                {
                         clientController.handleUserDisconnection();
                         closeConnection();

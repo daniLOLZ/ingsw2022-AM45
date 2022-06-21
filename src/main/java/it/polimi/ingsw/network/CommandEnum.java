@@ -46,7 +46,8 @@ public enum CommandEnum {
     SERVER_GAME_START("Game starting",                       new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
     SERVER_YOUR_TURN("Your turn to move",                       new NetworkFieldEnum[] {ASYNC_ID_REQUEST, ASYNC_GAME_PHASE}),
     SERVER_GAME_UPDATE("Game model update",                     new NetworkFieldEnum[] {ASYNC_ID_REQUEST, ASYNC_VIEW}),
-    SERVER_USER_DISCONNECTED("User disconnected",               new NetworkFieldEnum[] {ASYNC_ID_REQUEST});
+    SERVER_USER_DISCONNECTED("User disconnected",               new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
+    SERVER_GAME_WON("Game won",                                 new NetworkFieldEnum[]{ASYNC_ID_REQUEST, ASYNC_WINNER});
 
 
     public final String command;

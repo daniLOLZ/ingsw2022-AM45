@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.game.PhaseEnum;
 
 import java.io.*;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class MessageBroker {
 
@@ -62,7 +64,6 @@ public class MessageBroker {
      * @param messageObject The object to be sent
      */
     public void addToMessage(NetworkFieldEnum fieldName, Object messageObject){
-
         outgoingMessage.put(fieldName, messageObject);
     }
 
@@ -99,6 +100,25 @@ public class MessageBroker {
      */
     public void waitSyncMessage() throws InterruptedException{
         currentIncomingSyncMessage = incomingSyncMessages.take();
+    }
+
+    /**
+     * Waits for a new message on the synchronous message buffer
+     * Acts as a buffer between the queue and the list of messages received.
+     * Puts the first message from the Queue into the current incoming synchronous message,
+     * waiting for at most waitTimeMillis milliseconds before returning
+     * To be called before any readField() is called
+     * @param waitTimeMillis the maximum amount of time in milliseconds to wait before this method returns
+     * @return true if the polling was successful, false if the timer expired before a message was available
+     * @throws InterruptedException if the thread is interrupted before a message was available
+     */
+    public boolean waitSyncMessage(Integer waitTimeMillis) throws InterruptedException{
+        Map<NetworkFieldEnum, Object> message = incomingSyncMessages.poll(waitTimeMillis, TimeUnit.MILLISECONDS);
+        if(message != null){
+            currentIncomingSyncMessage = message;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -205,9 +225,12 @@ public class MessageBroker {
         }
         receivedMessage = tempString.toString();
         if(receivedMessage.charAt(0) != '{') {
-            System.err.println("Bad message incoming");
+            System.err.println("Bad message incoming, dropping");
+            return;
         }
         Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
+
+        convertListsToArrays(deserializedMessage);
 
         if (checkValidity(deserializedMessage)) {
             if(isAsynchronous(deserializedMessage)){
@@ -219,6 +242,30 @@ public class MessageBroker {
                 if (!incomingSyncMessages.offer(deserializedMessage)) {
                     System.err.println("ERROR: Message buffer full, the message was dropped");
                 }
+            }
+        }
+    }
+
+    private void convertListsToArrays(Map<NetworkFieldEnum, Object> deserializedMessage) {
+        //extremely crude, change if possible
+
+        for (NetworkFieldEnum field : deserializedMessage.keySet()){
+            if(field.equals(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS) ||
+                field.equals(NetworkFieldEnum.CHOSEN_CARD_POSITIONS) ||
+                field.equals(NetworkFieldEnum.CHOSEN_ISLANDS)){
+                ArrayList<Double> values = (ArrayList<Double>) deserializedMessage.get(field);
+                deserializedMessage.put(field,
+                        (double[])(values.stream()
+                                .mapToDouble(Double::doubleValue)
+                                .toArray()));
+            }
+            else if(field.equals(NetworkFieldEnum.CHOSEN_STUDENT_COLORS)){
+                ArrayList<String> colors = (ArrayList<String>) deserializedMessage.get(field);
+                deserializedMessage.put(field,
+                                 colors.stream()
+                                .map(StudentEnum::fromObjectToEnum)
+                                .toArray(StudentEnum[]::new)
+                );
             }
         }
     }
@@ -280,6 +327,8 @@ public class MessageBroker {
                 case CHOSEN_ISLAND:
                 case STEPS_MN:
                 case CHARACTER_CARD_POSITION:
+                case ASYNC_ID_REQUEST:
+                case ASYNC_ID_USER:
                     // The json reads these parameters as doubles, where they should be ints,
                     // in case they actually are doubles, "cast" to integer
                     if(objClass.equals(Double.class)) objClass = Integer.class;
@@ -303,20 +352,18 @@ public class MessageBroker {
                 case CHOSEN_ENTRANCE_POSITIONS:
                 case CHOSEN_ISLANDS:
                 case CHOSEN_CARD_POSITIONS:
-                    neededClass = Double[].class;
+                    // The json reads these parameters as doubles, where they should be ints,
+                    // in case they actually are doubles, "cast" to integer
+                    if(objClass.equals(double[].class)) objClass = int[].class;
+                    neededClass = int[].class;
                     break;
                 case CHOSEN_STUDENT_COLORS:
                     // This would be read as a String, but we need to make sure it's
                     // actually a StudentEnum
-                    try{
-                        StudentEnum.fromObjectToEnum(object);
-                    } catch (IllegalArgumentException e){
-                        objClass = Void.class;
-                    }
-                    objClass = StudentEnum.class;
-                    neededClass = StudentEnum.class;
+                    neededClass = StudentEnum[].class;
                     break;
                 case GAME_PHASE:
+                case ASYNC_GAME_PHASE:
                     // This would be read as a String, but we need to make sure it's
                     // actually a PhaseEnum
                     try{
@@ -327,6 +374,19 @@ public class MessageBroker {
                     objClass = PhaseEnum.class;
                     neededClass = PhaseEnum.class;
                     break;
+                case ASYNC_WINNER:
+                    // This would be read as a String, but we need to make sure it's
+                    // actually a TeamEnum
+                    try{
+                        TeamEnum.fromObjectToEnum(object);
+                    } catch (IllegalArgumentException e){
+                        objClass = Void.class;
+                    }
+                    objClass = TeamEnum.class;
+                    neededClass = TeamEnum.class;
+                    break;
+                    //todo case for async_view
+
                 default:
                     // If an unrecognized field is encountered, it's implicitly accepted
                     neededClass = objClass;

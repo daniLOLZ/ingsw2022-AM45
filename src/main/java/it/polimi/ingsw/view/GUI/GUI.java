@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
@@ -202,7 +203,7 @@ public class GUI implements UserInterface {
     }
 
     @Override
-    public void showUserDisconnected(int disconnectedUser) {
+    public void showUserDisconnected(String disconnectedUser) {
 
     }
 
@@ -296,7 +297,17 @@ public class GUI implements UserInterface {
     }
 
     @Override
+    public void setCardRequirements(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired) {
+
+    }
+
+    @Override
     public void showGameCommandError() {
+
+    }
+
+    @Override
+    public void showGameCommandError(String error) {
 
     }
 
@@ -336,6 +347,11 @@ public class GUI implements UserInterface {
 
     @Override
     public void setYourTurn(boolean isYourTurn) {
+
+    }
+
+    @Override
+    public void setGameWon(TeamEnum winner) {
 
     }
 }

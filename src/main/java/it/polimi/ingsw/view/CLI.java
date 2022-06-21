@@ -30,6 +30,7 @@ public class CLI implements UserInterface {
     private VirtualViewBean viewBean; // todo see what needs to be kept
     private LobbyBean lobbyBean;
     private GameInitBean gameInitBean;
+    private TeamEnum winnerTeam;
     private List<CommandEnum> availableCommands;
     InterfaceInterrupt connected;
     InterfaceInterrupt lobbyStarting;
@@ -39,6 +40,7 @@ public class CLI implements UserInterface {
     InterfaceInterrupt lobbyUpdateAvailable;
     InterfaceInterrupt gameInitUpdateAvailable;
     InterfaceInterrupt yourTurn;
+    InterfaceInterrupt gameWon;
     List<InterfaceInterrupt> gameInterrupts; //There might be multiple "interrupts" that the main game interface should react to
     List<InterfaceInterrupt> lobbyInterrupts;
     List<InterfaceInterrupt> gameInitInterrupts;
@@ -47,11 +49,15 @@ public class CLI implements UserInterface {
     private GameRuleEnum gameMode;
     private int numberOfPlayers;
     private String gameType;
-    private boolean inLobby;
     private PhaseEnum phase;
     private boolean commandError;
+    private String commandErrorMessage;
     private String currentTeamColor = TeamEnum.NOTEAM.name;
     private String currentWizard = WizardEnum.NO_WIZARD.name;
+    int islandsRequired;
+    int studentsOnCardRequired;
+    int studentsAtEntranceRequired;
+    int colorsRequired;
 
     private final String colorList3Players = "B - Black, G - Grey, W - White";
     private final String colorList2or4Players = "B - Black, W - White";
@@ -82,6 +88,7 @@ public class CLI implements UserInterface {
         lobbyUpdateAvailable        = new InterfaceInterrupt(true, new AtomicBoolean(false));
         gameInitUpdateAvailable     = new InterfaceInterrupt(true, new AtomicBoolean(false));
         yourTurn                    = new InterfaceInterrupt(true, new AtomicBoolean(false));
+        gameWon                     = new InterfaceInterrupt(true, new AtomicBoolean(false));
         connected                   = new InterfaceInterrupt(false, initialConnector.getConnected());
         commandError = false;
         this.initialConnector = initialConnector;
@@ -91,6 +98,7 @@ public class CLI implements UserInterface {
         gameInterrupts.add(gameInterrupted);
         gameInterrupts.add(updateAvailable);
         gameInterrupts.add(yourTurn);
+        gameInterrupts.add(gameWon);
 
         lobbyInterrupts = new ArrayList<>();
         lobbyInterrupts.add(connected);
@@ -117,6 +125,7 @@ public class CLI implements UserInterface {
         gameInterrupted.clearInterrupt();
         updateAvailable.clearInterrupt();
         yourTurn.clearInterrupt();
+        gameWon.clearInterrupt();
 
         commandError = false;
 
@@ -133,6 +142,8 @@ public class CLI implements UserInterface {
         gameInitInterrupts = new ArrayList<>();
         gameInitInterrupts.add(connected);
         gameInitInterrupts.add(gameStarting);
+
+        resetGameInfo();
     }
 
     /**
@@ -159,8 +170,7 @@ public class CLI implements UserInterface {
         return command;
     }
 
-    //change in a more descriptive name
-    //actually parse the beans instead of letting them draw themselves
+    @Deprecated
     public void show(){
         final int highestPriority = 1;
         final int lowestPriority = 10;
@@ -213,6 +223,7 @@ public class CLI implements UserInterface {
         System.out.println(View.toString());
     }
 
+    @Deprecated
     private void draw(int position, String elementToDraw){
         final int width = 4;
         final String tab = "    ";
@@ -304,6 +315,7 @@ public class CLI implements UserInterface {
      * Append to View (String builder) the available command string
      * in order to show in the CLI
      */
+    @Deprecated
     public void drawOption(){
         View.append("\n\t\t\t\t::CHOICES::\n");
         for(int index=0;index<availableCommands.size();index++){
@@ -529,7 +541,6 @@ public class CLI implements UserInterface {
     @Override
     public void showSuccessLeaveLobby() {
         System.out.println("Leaving the current lobby...");
-        this.inLobby = false;
     }
 
     @Override
@@ -648,8 +659,9 @@ public class CLI implements UserInterface {
         // Show the current view
         if(commandError){
             // Print command error message
-            System.out.println("Your command was incorrect");
+            System.out.println("Your command was incorrect! " + commandErrorMessage);
             commandError = false;
+            commandErrorMessage = "";
         }
 
         // THERE ALWAYS NEEDS TO BE A WAY FOR THE USER TO INPUT ANYTHING
@@ -659,6 +671,7 @@ public class CLI implements UserInterface {
                 System.out.println("The game was interrupted :(");
                 return;
             }
+
             if(updateAvailable.isTriggered()){
                 if (yourTurn.isTriggered()){
                     clearOldScreen();
@@ -689,6 +702,11 @@ public class CLI implements UserInterface {
                 // Print available commands
                 printAvailableCommands();
                 yourTurn.clearInterrupt();
+            }
+            if(gameWon.isTriggered()){
+                //The game is over, show the winner and exit from this method
+                gameWon.clearInterrupt();
+                showGameOverScreen();
             }
 
             if(!checkInterrupt(gameInterrupts)){
@@ -771,13 +789,55 @@ public class CLI implements UserInterface {
     }
 
     @Override
-    public void showGameCommandError() {
+    public void showGameCommandError(String errorMessage) {
         this.commandError = true;
+        this.commandErrorMessage = errorMessage;
+    }
+
+    @Override
+    public void showGameCommandError() {
+        showGameCommandError("");
     }
 
     @Override
     public void showGameCommandSuccess() {
 
+    }
+
+    private void showGameOverScreen() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(MessageFormat.format("""
+                
+                The game is over! {0} won!
+                Press enter to go back to the game selection screen.
+                
+                """, this.winnerTeam.name));
+        scanner.nextLine();
+
+        resetGameInfo();
+
+        showGameruleSelection();
+    }
+
+    /**
+     * Resets the ui variables related to a game, keeping intact
+     * the ones relative to the connection
+     */
+    private void resetGameInfo() {
+        lobbyBean = null;
+        gameInitBean = null;
+        winnerTeam = TeamEnum.NOTEAM;
+        gameMode = GameRuleEnum.NO_RULE;
+        numberOfPlayers = 0;
+        gameType = "No game";
+        commandError = false;
+        commandErrorMessage = "";
+        currentTeamColor = TeamEnum.NOTEAM.name;
+        currentWizard = WizardEnum.NO_WIZARD.name;
+        islandsRequired = 0;
+        studentsAtEntranceRequired = 0;
+        studentsOnCardRequired = 0;
+        colorsRequired = 0;
     }
 
     // </editor-fold>
@@ -791,8 +851,8 @@ public class CLI implements UserInterface {
     }
 
     @Override
-    public void showUserDisconnected(int user) {
-        System.out.println("The user with id " + String.valueOf(user) + " disconnected.");
+    public void showUserDisconnected(String user) {
+        System.out.println("The user "+user+ " disconnected.");
     }
 
     // </editor-fold>
@@ -811,7 +871,7 @@ public class CLI implements UserInterface {
         initialConnector.startReceiving();
         //If the communication is cut short, then this routine will reset it and try again
         initialConnector.reset();
-        reset();
+        this.reset();
     }
 
     //<editor-fold desc="Asynchronous methods">
@@ -2155,7 +2215,6 @@ public class CLI implements UserInterface {
 
     @Override
     public void setInLobby(boolean inLobby) {
-        this.inLobby = inLobby;
     }
 
     @Override
@@ -2194,6 +2253,20 @@ public class CLI implements UserInterface {
     public void setYourTurn(boolean isYourTurn) {
         if(isYourTurn) yourTurn.trigger();
         else yourTurn.clearInterrupt();
+    }
+
+    @Override
+    public void setGameWon(TeamEnum winner) {
+        gameWon.trigger();
+        this.winnerTeam = winner;
+    }
+
+    @Override
+    public void setCardRequirements(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired) {
+        this.islandsRequired = islandsRequired;
+        this.studentsOnCardRequired = studentsOnCardRequired;
+        this.studentsAtEntranceRequired = studentsAtEntranceRequired;
+        this.colorsRequired = colorsRequired;
     }
 
     @Override

@@ -18,6 +18,7 @@ public class ClientController {
     private VirtualViewBean view;
     private MessageBroker broker;
     private ConnectionState gameState;
+    private GameRuleEnum chosenRule;
     private ConnectionState callBackGameState;
     // todo? make it its own state instead of leeching off of
     //  the connection states
@@ -48,7 +49,7 @@ public class ClientController {
             userInterface.showGameruleSelection();
         }
         else {
-            GameRuleEnum chosenRule = GameRuleEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
+            chosenRule = GameRuleEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.GAME_RULE));
 
             userInterface.setGameMode(chosenRule);
 
@@ -153,7 +154,7 @@ public class ClientController {
         }
         else {
             userInterface.clearCommands();
-            gameState = new StudentMoving();
+            gameState = new StudentMoving(chosenRule);
             allowStateCommands();
 
             userInterface.showGameCommandSuccess(); // can be omitted maybe
@@ -169,10 +170,10 @@ public class ClientController {
             userInterface.clearCommands();
             boolean moreStudentsToMove = (boolean) broker.readField(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE);
             if(moreStudentsToMove){
-                gameState = new StudentChoosing();
+                gameState = new StudentChoosing(chosenRule);
             }
             else {
-                gameState = new MNMoving();
+                gameState = new MNMoving(chosenRule);
             }
             allowStateCommands();
             userInterface.showGameCommandSuccess(); // can be omitted maybe
@@ -189,10 +190,10 @@ public class ClientController {
             userInterface.clearCommands();
             boolean moreStudentsToMove = (boolean) broker.readField(NetworkFieldEnum.MORE_STUDENTS_TO_MOVE);
             if(moreStudentsToMove){
-                gameState = new StudentChoosing();
+                gameState = new StudentChoosing(chosenRule);
             }
             else {
-                gameState = new MNMoving();
+                gameState = new MNMoving(chosenRule);
             }
             allowStateCommands();
             userInterface.showGameCommandSuccess(); // can be omitted maybe
@@ -207,7 +208,7 @@ public class ClientController {
         }
         else {
             userInterface.clearCommands();
-            gameState = new StudentChoosing();
+            gameState = new StudentChoosing(chosenRule);
             allowStateCommands();
             userInterface.showGameCommandSuccess(); // can be omitted maybe
         }
@@ -220,7 +221,7 @@ public class ClientController {
         }
         else {
             userInterface.clearCommands();
-            gameState = new CloudChoosing();
+            gameState = new CloudChoosing(chosenRule);
             allowStateCommands();
             userInterface.showGameCommandSuccess(); // can be omitted maybe
 
@@ -234,7 +235,7 @@ public class ClientController {
         }
         else {
             userInterface.clearCommands();
-            gameState = new EndTurn();
+            gameState = new EndTurn(chosenRule);
             allowStateCommands();
             userInterface.showGameCommandSuccess(); // can be omitted maybe
 
@@ -258,16 +259,20 @@ public class ClientController {
 
     public void validateSelectCharacter() {
         if(!checkSuccessfulReply()){
-            userInterface.showGameCommandError();
+            userInterface.showGameCommandError( (String) broker.readField(NetworkFieldEnum.ERROR_STATE) );
         }
         else {
             callBackGameState = gameState;
-            //todo get character required objects from the message
-            // and show them to the user
+
+            int islandsRequired = ApplicationHelper.getIntFromBrokerField(broker.readField(NetworkFieldEnum.ISLANDS_REQUIRED));
+            int studentsOnCardRequired = ApplicationHelper.getIntFromBrokerField(broker.readField(NetworkFieldEnum.ON_CARD_REQUIRED));
+            int studentsAtEntranceRequired = ApplicationHelper.getIntFromBrokerField(broker.readField(NetworkFieldEnum.ENTRANCE_REQUIRED));
+            int colorsRequired = ApplicationHelper.getIntFromBrokerField(broker.readField(NetworkFieldEnum.COLORS_REQUIRED));
 
             userInterface.clearCommands();
             gameState = new CharacterCardActivation();
             allowStateCommands();
+            userInterface.setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
             userInterface.showGameCommandSuccess(); // can be omitted maybe
 
         }
@@ -320,7 +325,7 @@ public class ClientController {
 
     public void validatePlayCharacter() {
         if(!checkSuccessfulReply()){
-            userInterface.showGameCommandError();
+            userInterface.showGameCommandError((String)broker.readField(NetworkFieldEnum.ERROR_STATE));
         }
         else {
             userInterface.clearCommands();
@@ -383,7 +388,7 @@ public class ClientController {
             gameState = new PlanningPhaseTurn();
         }
         else {
-            gameState = new StudentChoosing();
+            gameState = new StudentChoosing(chosenRule);
         }
         allowStateCommands();
 
@@ -403,13 +408,17 @@ public class ClientController {
         userInterface.printGameInterface(view);
         userInterface.setUpdateAvailable(true);
 
-        //todo add the beans
+    }
+
+    public void handleGameWon(){
+        TeamEnum winner = TeamEnum.fromObjectToEnum(broker.readAsyncField(NetworkFieldEnum.ASYNC_WINNER));
+        userInterface.setGameWon(winner);
     }
 
     public void handleUserDisconnection(){
         userInterface.setGameInterrupted(true);
         // We call this to wake up the main game interface
-        int problemUser = ApplicationHelper.getIntFromBrokerField(broker.readAsyncField(NetworkFieldEnum.ASYNC_ID_USER));
+        String problemUser = (String)(broker.readAsyncField(NetworkFieldEnum.ASYNC_USER_NICKNAME));
         userInterface.showUserDisconnected(problemUser);
     }
 
