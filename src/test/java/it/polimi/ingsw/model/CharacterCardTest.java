@@ -287,6 +287,35 @@ public class CharacterCardTest {
         assertEquals(StudentEnum.BLUE, player.getBoard().getAtEntrance(8));
     }
 
+    @Test
+    public void MinstrelTest1Color(){
+        Minstrel minstrel = new Minstrel(parameter,advancedParameter);
+        minstrel.initialise(game);
+        Player player = game.getPlayers().get(0);
+        game.getParameters().setCurrentPlayer(player);
+
+        player.getBoard().addToHall(StudentEnum.RED);
+        player.getBoard().addToHall(StudentEnum.RED);
+
+        while(player.getBoard().entranceSize() > 0)
+            player.getBoard().removeFromEntrance(0);
+
+        player.addEntrance(StudentEnum.BLUE);
+        player.addEntrance(StudentEnum.BLUE);
+
+
+        game.selectStudentAtEntrance(player,0);
+        game.selectStudentAtEntrance(player,1);
+        game.selectStudentType(StudentEnum.RED);
+        minstrel.getRequirements().setSatisfied();
+        minstrel.activateEffect();
+
+        assertEquals(0, player.getBoard().getStudentsAtTable(StudentEnum.RED));
+        assertEquals(2, player.getBoard().getStudentsAtTable(StudentEnum.BLUE));
+        assertEquals(StudentEnum.RED, player.getStudentFromEntrance(0));
+        assertEquals(StudentEnum.RED, player.getStudentFromEntrance(1));
+    }
+
     /**
      * Test loanshark effect and if player with no enough student at hall loses all his students
      */
