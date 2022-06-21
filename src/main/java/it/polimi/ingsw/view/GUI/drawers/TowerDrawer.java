@@ -25,6 +25,8 @@ public class TowerDrawer extends Drawer{
 
     public static ImageView drawTower(TeamEnum color, Coord pos, double scale){
 
+        if (color.equals(TeamEnum.NOTEAM)) return new ImageView();
+
         return drawFromCenterInteractiveImage(towers.get(color.index), pos, scale, null);
         //TODO drawing from the exact center messes up rotation handling. needs fixing
     }

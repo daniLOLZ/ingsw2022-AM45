@@ -100,4 +100,21 @@ public class AdvancedPlayerBean extends PlayerBean{
 
         return setTab(toReturn.toString(), border.length() );
     }
+
+    public static AdvancedPlayerBean getPromotedBean(PlayerBean playerBean){
+        return new AdvancedPlayerBean(
+                playerBean.getNickname(),
+                playerBean.getPlayerId(),
+                playerBean.isLeader(),
+                playerBean.getTowerColor(),
+                playerBean.getNumTowers(),
+                playerBean.getStudentsAtEntrance(),
+                playerBean.getStudentsPerTable(),
+                playerBean.getProfessors(),
+                playerBean.getAssistants(),
+                0,
+                playerBean.getAssistantPlayed(),
+                playerBean.getTurn()
+        );
+    }
 }

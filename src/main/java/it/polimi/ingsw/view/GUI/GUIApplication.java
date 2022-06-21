@@ -436,7 +436,7 @@ public class GUIApplication extends Application{
     private static void sendSearchGameRequest(String gameRule, int numPlayers, Label outNotify){
 
         outNotify.setText("Searching...");
-        new Thread(() -> defaultSender.sendGameModePreference(availableGameRules.indexOf(gameRule), numPlayers)).start();
+        new Thread(() -> defaultSender.sendGameModePreference(availableGameRules.indexOf(gameRule) + 1, numPlayers)).start();
 
     }
 
@@ -462,7 +462,7 @@ public class GUIApplication extends Application{
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(100,0,0,0));
 
-        Label gameDetails = new Label("Game rules: " + preselectedGameRule + "\nPlayers: " + preselectedNumPlayers);
+        Label gameDetails = new Label("Game rules: " + "\nPlayers: " + preselectedNumPlayers);
         gameDetails.setFont(Font.font("Verdana", 25));
 
         VBox players = new VBox(15);
@@ -504,7 +504,7 @@ public class GUIApplication extends Application{
             startGame.setVisible(false);
         }
 
-        else startGame.setVisible(false);
+        else startGame.setVisible(ready.isSelected() && data.getHost() == userSlot);
 
         ready.setOnAction(event -> {
             readyHandle(ready.isSelected());
@@ -578,6 +578,9 @@ public class GUIApplication extends Application{
         selectTower.setOnAction(event -> new Thread(() -> defaultSender.sendTeamColorChoice(selectedTowerColor)).start());
         layout.getChildren().add(selectTower);
 
+        Label errorMessage = new Label("Error! This color has already been selected");
+        errorMessage.setVisible(colorSelectionError);
+        layout.getChildren().add(errorMessage);
 
         for (int index = 0; index < numTeams; index++) {
 
@@ -585,23 +588,15 @@ public class GUIApplication extends Application{
 
             ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
 
-            if (data.getChosenColors().contains(tower)){
-                ColorAdjust monochrome = new ColorAdjust();
-                monochrome.setSaturation(-1.0);
+            if (!data.getChosenColors().contains(tower)){
+                Lighting lighting = new Lighting();
+                lighting.setDiffuseConstant(1.0);
+                lighting.setSpecularConstant(0.0);
+                lighting.setSpecularExponent(0.0);
+                lighting.setSurfaceScale(0.0);
+                lighting.setLight(new Light.Distant(45, 45, Color.GREY));
 
-                Blend grey = new Blend(
-                        BlendMode.MULTIPLY,
-                        monochrome,
-                        new ColorInput(
-                                0,
-                                0,
-                                towerView.getImage().getWidth(),
-                                towerView.getImage().getHeight(),
-                                Color.GREY
-                        )
-                );
-
-                towerView.effectProperty().bind(Bindings.when(towerView.visibleProperty()).then(grey).otherwise((ObservableObjectValue<Blend>) null));
+                towerView.setEffect(lighting);
             }
 
             else {
@@ -621,7 +616,7 @@ public class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
-    public static void showWizardSelection(boolean errorOccurred){
+    public static void showWizardSelection(GameInitBean data, boolean errorOccurred){
         StackPane root = new StackPane();
 
         //<editor-fold desc="Decorations">
@@ -650,18 +645,35 @@ public class GUIApplication extends Application{
         selectWizard.setBackground(Background.EMPTY);
         selectWizard.setFont(Font.font("Lucida Handwriting", 40));
         selectWizard.setTextFill(Color.DARKRED);
-        selectWizard.setOnAction(event -> new Thread(() -> defaultSender.sendWizardChoice(selectedWizard)));
+        selectWizard.setOnAction(event -> new Thread(() -> defaultSender.sendWizardChoice(selectedWizard)).start());
         layout.getChildren().add(selectWizard);
 
         for (WizardEnum wizard:
                 WizardEnum.getWizards()) {
             ImageView wizardView = WizardDrawer.drawWizard(wizard, center, 0.5);
-            wizardView.setOnMouseClicked(event -> {
-                selectedWizard = wizard;
-                selectWizard.setText("Select " + wizard.name);
-                selectWizard.setVisible(true);
-            });
-            addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+
+            if (!data.getChosenWizards().contains(wizard)){
+
+                Lighting lighting = new Lighting();
+                lighting.setDiffuseConstant(1.0);
+                lighting.setSpecularConstant(0.0);
+                lighting.setSpecularExponent(0.0);
+                lighting.setSurfaceScale(0.0);
+                lighting.setLight(new Light.Distant(45, 45, Color.GREY));
+
+                wizardView.setEffect(lighting);
+            }
+
+            else {
+                wizardView.setOnMouseClicked(event -> {
+                    selectedWizard = wizard;
+                    selectWizard.setText("Select " + wizard.name);
+                    selectWizard.setVisible(true);
+                });
+                addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+
+            }
+
             wizards.getChildren().add(wizardView);
         }
 
@@ -680,15 +692,7 @@ public class GUIApplication extends Application{
 
         int islandIndex = 0;
 
-        if (advancedIslandsList != null) {
-            Iterator<AdvancedIslandGroupBean> island = advancedIslandsList.iterator();
-
-            for (Coord slot: Objects.requireNonNull(getIslandGroupSlots(advancedIslandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos))) {
-                root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
-                islandIndex++;
-            }
-        }
-        else {
+        if (advancedIslandsList == null) {
             List<IslandGroupBean> islandsList = data.getIslandGroupBeans();
             Iterator<IslandGroupBean> island = islandsList.iterator();
 
@@ -696,9 +700,14 @@ public class GUIApplication extends Application{
                 root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
                 islandIndex++;
             }
+        } else {
+            Iterator<AdvancedIslandGroupBean> island = advancedIslandsList.iterator();
+
+            for (Coord slot: Objects.requireNonNull(getIslandGroupSlots(advancedIslandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos))) {
+                root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
+                islandIndex++;
+            }
         }
-
-
 
 
         //</editor-fold>

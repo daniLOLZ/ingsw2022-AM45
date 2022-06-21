@@ -72,7 +72,7 @@ public class IslandGroupDrawer extends Drawer{
 
     public static List<Node> drawIslandGroup(IslandGroupBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
-        AdvancedIslandGroupBean adaptedData = (AdvancedIslandGroupBean) data;
+        AdvancedIslandGroupBean adaptedData = AdvancedIslandGroupBean.getPromotedBean(data);
         adaptedData.setNumBlockTiles(0);
 
         return drawIslandGroup(adaptedData, pos, scale, onClick);

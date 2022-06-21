@@ -1,6 +1,8 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
@@ -17,6 +19,7 @@ import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
 
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -135,7 +138,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showLobby() {
-        printLobby(Optional.ofNullable(lobbyBean).orElse(new LobbyBean(new ArrayList<>(), new ArrayList<>(), false, 0)));
+        printLobby(lobbyBean);
     }
 
     @Override
@@ -170,8 +173,8 @@ public class GUI implements UserInterface {
 
     @Override
     public void showTowerAndWizardSelection() {
-        selectedTowerColor = false;
-        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showWizardSelection(selectingWizardError));
+        if (GUIApplication.isStarted()) printGameInitInfo(gameInitData);
+
     }
 
     @Override
@@ -188,11 +191,12 @@ public class GUI implements UserInterface {
     @Override
     public void showErrorSelectingWizard(String wizard) {
         selectingWizardError = true;
+        printGameInitInfo(gameInitData);
     }
 
     @Override
     public void showSuccessSelectingWizard(String wizard) {
-        selectingWizardError = false;
+        resetErrors();
     }
 
     @Override
@@ -212,6 +216,9 @@ public class GUI implements UserInterface {
 
     @Override
     public void printLobby(LobbyBean lobbyBean) {
+
+        if (lobbyBean == null) return;
+
         if (!lobbyBean.equals(this.lobbyBean)) this.lobbyBean = lobbyBean;
 
         int yourSlot = lobbyBean.getNicknames().indexOf(nickname);
@@ -221,11 +228,14 @@ public class GUI implements UserInterface {
 
     @Override
     public void printGameInitInfo(GameInitBean gameInitBean) {
-        gameInitData = gameInitBean;
+
+        if (gameInitBean == null) gameInitData = new GameInitBean(TeamEnum.getTeams(), WizardEnum.getWizards());
+        else gameInitData = gameInitBean;
+
         if (GUIApplication.isStarted()) {
             if (selectedTowerColor) {
-                Platform.runLater(() -> GUIApplication.showWizardSelection(false));
-            } else Platform.runLater(() -> GUIApplication.showTowerColorSelection(gameInitData,false));
+                Platform.runLater(() -> GUIApplication.showWizardSelection(gameInitData, selectingWizardError));
+            } else Platform.runLater(() -> GUIApplication.showTowerColorSelection(gameInitData, selectingColorError));
         }
     }
 
@@ -262,12 +272,12 @@ public class GUI implements UserInterface {
 
     @Override
     public void setLobbyStarting() {
-        //todo show lobby starting
+        showTowerAndWizardSelection();
     }
 
     @Override
     public void setGameStarting() {
-
+        showMainGameInterface();
     }
 
     @Override
@@ -275,19 +285,22 @@ public class GUI implements UserInterface {
 
         int user = 0;
 
-        List<AdvancedPlayerBean> advancedPlayers = viewData.getAdvancedPlayerBeans();
+        if (viewData == null) viewData = VirtualViewBean.getMockBean();
 
-        if (advancedPlayers != null){
-            for (AdvancedPlayerBean advancedPlayer:
-                 advancedPlayers) {
-                if (advancedPlayer.getNickname().equals(nickname)) user = advancedPlayers.indexOf(advancedPlayer);
-            }
-        }
         else {
-            List<PlayerBean> players = viewData.getPlayerBeans();
-            for (PlayerBean player :
-                players) {
-                if (player.getNickname().equals(nickname)) user = players.indexOf(player);
+            List<AdvancedPlayerBean> advancedPlayers = viewData.getAdvancedPlayerBeans();
+
+            if (advancedPlayers != null) {
+                for (AdvancedPlayerBean advancedPlayer :
+                        advancedPlayers) {
+                    if (advancedPlayer.getNickname().equals(nickname)) user = advancedPlayers.indexOf(advancedPlayer);
+                }
+            } else {
+                List<PlayerBean> players = viewData.getPlayerBeans();
+                for (PlayerBean player :
+                        players) {
+                    if (player.getNickname().equals(nickname)) user = players.indexOf(player);
+                }
             }
         }
 

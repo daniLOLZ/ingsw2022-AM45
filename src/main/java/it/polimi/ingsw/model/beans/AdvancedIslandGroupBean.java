@@ -74,4 +74,16 @@ public class AdvancedIslandGroupBean extends IslandGroupBean{
 
         return setTab(toReturn.toString(),border.length());
     }
+
+    public static AdvancedIslandGroupBean getPromotedBean(IslandGroupBean islandGroupBean){
+        return new AdvancedIslandGroupBean(
+                islandGroupBean.getIdIslandGroup(),
+                islandGroupBean.getIdIslands(),
+                islandGroupBean.getStudentsOnIsland(),
+                islandGroupBean.isPresentMN(),
+                islandGroupBean.getTowersColor(),
+                0,
+                islandGroupBean.getIdPrevIslandGroup(),
+                islandGroupBean.getIdNextIslandGroup());
+    }
 }

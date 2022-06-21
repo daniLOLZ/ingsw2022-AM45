@@ -1,7 +1,13 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.TeamEnum;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.game.PhaseEnum;
+import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualViewBean extends GameElementBean{
@@ -87,4 +93,23 @@ public class VirtualViewBean extends GameElementBean{
         return BeanEnum.VIRTUAL_VIEW_BEAN;
     }
 
+    public static VirtualViewBean getMockBean(){
+
+        CloudBean cloud = new CloudBean(1, new ArrayList<>());
+        IslandGroupBean island = new IslandGroupBean(0, List.of(1), new ArrayList<>(), false, TeamEnum.NOTEAM, 0, 0);
+        PlayerBean player = new PlayerBean("mock", PlayerEnum.PLAYER1, true, TeamEnum.WHITE, 8, new ArrayList<>(), List.of(0,0,0,0,0), new ArrayList<>(), new ArrayList<>(), null, 0);
+        ErrorBean errorBean = new ErrorBean("No Information received from the server!!!");
+        GameBoardBean gameBoard = new GameBoardBean(List.of(0), new ArrayList<>(), List.of(0), 0, 0, PhaseEnum.PLANNING);
+
+        return new VirtualViewBean(
+                List.of(cloud, cloud),
+                null,
+                List.of(island, island, island, island), //required at least 4 island so the game state is somewhat valid
+                null,
+                List.of(player, player),
+                null,
+                List.of(errorBean),
+                gameBoard,
+                null);
+    }
 }
