@@ -96,7 +96,7 @@ public class AdvancedPlayer extends Player {
 
         professors = parameters.getProfessorsByPlayer(playerId);
         AdvancedPlayerBean bean = new AdvancedPlayerBean(nickname,playerId,leader,teamColor,numTowers,
-                studentsAtEntrance, studPerTable, professors, Assistants, numCoins, assistantPlayed);
+                studentsAtEntrance, studPerTable, professors, Assistants, numCoins, assistantPlayed, turn);
 
         if(turn != 0)
             bean.setTurn(turn);

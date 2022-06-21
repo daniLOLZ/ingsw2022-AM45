@@ -22,13 +22,15 @@ public class ClientReceiver {
     private boolean receiverStarted, parseAsyncStarted;
     private MessageBroker mainBroker;
     private AtomicBoolean connected;
+    private boolean hasBeenClosedAlready;
 
     private AtomicBoolean isCommandScheduled;
     private final InitialConnector initialConnector; //Used only to communicate network error to the sender
-    private final ClientController clientController;
+    private ClientController clientController;
 
     public ClientReceiver(InitialConnector initialConnector){
         receiverStarted = false;
+        hasBeenClosedAlready = false;
         this.initialConnector = initialConnector;
         this.clientController = new ClientController();
     }
@@ -41,6 +43,11 @@ public class ClientReceiver {
         this.isCommandScheduled = isCommandScheduled;
         receiveMessages();
         parseAsyncMessages();
+    }
+
+    public void reset() {
+        receiverStarted = false;
+        hasBeenClosedAlready = false;
     }
 
     /**
@@ -131,10 +138,15 @@ public class ClientReceiver {
                     case SERVER_GAME_START ->                       clientController.handleGameStart();
                     case SERVER_YOUR_TURN ->                        clientController.handleTurnUpdate();
                     case SERVER_GAME_UPDATE ->                      clientController.handleGameUpdate();
-                    case SERVER_USER_DISCONNECTED ->                clientController.handleUserDisconnection();
+                    case SERVER_USER_DISCONNECTED ->                {
+                        clientController.handleUserDisconnection();
+                        closeConnection();
+                    }
                     default -> closeConnection();
                 }
-                sendAsynchronousACK();
+                if(connected.get()){
+                    sendAsynchronousACK();
+                }
                 mainBroker.flushFirstAsyncMessage();
             }
 
@@ -171,10 +183,12 @@ public class ClientReceiver {
      * Notifies the initial connector (and in turn the sender) that a problem occurred
      * then, it calls the appropriate ui screen
      */
-    private void closeConnection() {
+    private synchronized void closeConnection() {
+        if(hasBeenClosedAlready) return;
         initialConnector.notifyNetworkError("The server closed the connection");
         clientController.connectionClose();
         connected.set(false);
+        hasBeenClosedAlready = true;
     }
 
 

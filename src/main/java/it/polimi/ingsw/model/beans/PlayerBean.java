@@ -27,7 +27,7 @@ public class PlayerBean extends GameElementBean{
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
                       int numTowers, List<StudentEnum> studentsAtEntrance,
                       List<Integer> studentsPerTable, List<StudentEnum> professors,
-                      List<Assistant> Assistants, Assistant assistantPlayed){
+                      List<Assistant> Assistants, Assistant assistantPlayed, int turn){
         final int lowPriority = 5;
         priority = lowPriority;
         this.nickname = nickname;
@@ -40,6 +40,7 @@ public class PlayerBean extends GameElementBean{
         this.professors = professors;
         this.assistants = Assistants;
         this.assistantPlayed = assistantPlayed;
+        this.turn = turn;
 
     }
 
@@ -47,7 +48,7 @@ public class PlayerBean extends GameElementBean{
     public PlayerBean(String nickname, PlayerEnum playerId, boolean leader, TeamEnum towerColor,
                       int numTowers, List<StudentEnum> studentsAtEntrance,
                       List<Integer> studentsPerTable, List<StudentEnum> professors,
-                      List<Integer> idAssistants){
+                      List<Integer> idAssistants, int turn){
         final int lowPriority = 5;
         priority = lowPriority;
         this.nickname = nickname;
@@ -62,7 +63,7 @@ public class PlayerBean extends GameElementBean{
         for(Integer x: idAssistants){
             assistants.add(FactoryAssistant.getAssistant(x));
         }
-
+        this.turn = turn;
 
     }
 

@@ -294,6 +294,10 @@ public class AdvancedGame extends SimpleGame {
 
             parameters.addProfessor(challenger.getPlayerId(), professor);
         }
+        for (Player player : this.players){
+            player.alert();
+        }
+
         alert();
     }
 

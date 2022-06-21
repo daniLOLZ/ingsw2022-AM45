@@ -35,6 +35,24 @@ public class InitialConnector {
     }
 
     /**
+     * After a network error, this method resets the network components of the client to get
+     * ready for a new connection
+     */
+    public void reset() {
+
+        this.mainBroker = new MessageBroker();
+        this.pingBroker = new MessageBroker();
+        this.connected = new AtomicBoolean(true);
+        this.isCommandScheduled = new AtomicBoolean(false);
+
+        //Reset receiver
+        receiver.reset();
+        //Reset sender
+        sender.reset();
+
+    }
+
+    /**
      * Connects to a Server with the already present hostname and port,
      * and sends the user nickname via private methods
      * @param nickname a nickname chosen by the user to be used during the game
@@ -71,7 +89,7 @@ public class InitialConnector {
 
         sender.sendNickname(nickname);
 
-        //todo adjust ping to this new system
+
         //start the user's ping routine in a new thread, this will send messages
         // through the sender and receive them through the receiver
 
@@ -111,7 +129,7 @@ public class InitialConnector {
     /**
      * This will be called by either the sender, the receiver or the initial connector itself
      * and will cause this class to notify both of them to let
-     * them know the connection was lost
+     * them know the connection was lost <br>
      * It closes all open sockets
      */
     public void notifyNetworkError(String error){
@@ -155,4 +173,6 @@ public class InitialConnector {
     public AtomicBoolean getConnected(){
         return this.connected;
     }
+
+
 }

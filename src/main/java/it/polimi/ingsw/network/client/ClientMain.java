@@ -29,13 +29,14 @@ public class ClientMain {
 
         initialConnector = new InitialConnector(hostname, portNumber);
         receiver = new ClientReceiver(initialConnector);
+        sender = new ClientSender(initialConnector);
         if(guiMode) {
             userInterface = new GUI(initialConnector);
         }
         else {
             userInterface = new CLI(initialConnector);
         }
-        sender = new ClientSender(initialConnector);
+
     }
 
     public void startApplication(){

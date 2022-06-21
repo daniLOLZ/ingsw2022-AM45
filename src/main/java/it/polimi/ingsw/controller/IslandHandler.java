@@ -64,7 +64,7 @@ public class IslandHandler {
      * Zero or a number greater than played Assistant card's  steps.
      */
     protected boolean checkCorrectSteps(int steps){
-        if(steps == 0)
+        if(steps <= 0)
             return  false;
 
         Player currentPlayer = controller.simpleGame.getParameters().getCurrentPlayer();

@@ -42,6 +42,10 @@ public class ClientSender {
         this.isCommandScheduled = isCommandScheduled;
     }
 
+    public void reset() {
+        progressiveIdRequest = 0;
+    }
+
     /*
             METHODS THAT REFLECT THE INTERFACE
                                                  */
@@ -393,6 +397,7 @@ public class ClientSender {
     public void assignIdUser(int idUser) {
         this.idUser = idUser;
     }
+
 
     // </editor-fold>
 

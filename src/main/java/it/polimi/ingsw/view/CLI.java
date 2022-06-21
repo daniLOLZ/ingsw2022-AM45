@@ -92,6 +92,37 @@ public class CLI implements UserInterface {
         gameInitInterrupts.add(gameStarting);
     }
 
+    /**
+     * Resets the CLI after a severe network error
+     */
+    public void reset(){
+        connected = new InterfaceInterrupt(false, initialConnector.getConnected());
+        beans = new ArrayList<>();
+        availableCommands = new ArrayList<>();
+        setGameMode(GameRuleEnum.NO_RULE);
+
+        lobbyStarting.getInterrupt().set(false);
+        gameStarting.getInterrupt().set(false);
+        gameInterrupted.getInterrupt().set(false);
+        updateAvailable.getInterrupt().set(false);
+        yourTurn.getInterrupt().set(false);
+
+        commandError = false;
+
+        gameInterrupts = new ArrayList<>();
+        gameInterrupts.add(connected);
+        gameInterrupts.add(gameInterrupted);
+        gameInterrupts.add(updateAvailable);
+        gameInterrupts.add(yourTurn);
+
+        lobbyInterrupts = new ArrayList<>();
+        lobbyInterrupts.add(connected);
+        lobbyInterrupts.add(lobbyStarting);
+
+        gameInitInterrupts = new ArrayList<>();
+        gameInitInterrupts.add(connected);
+        gameInitInterrupts.add(gameStarting);
+    }
 
     /**
      * Network-less constructor, used for testing
@@ -405,7 +436,7 @@ public class CLI implements UserInterface {
     @Override
     public void showLobby() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        boolean repeatSelection = false;
+        boolean repeatSelection;
         String selection = "";
 
         if(!lobbyStarting.isTriggered()) System.out.println(MessageFormat.format("""
@@ -421,6 +452,7 @@ public class CLI implements UserInterface {
                 """, this.numberOfPlayers, this.gameType));
 
         do {
+            repeatSelection = false;
             selection = "";
             selection = getInputNonBlocking(reader, lobbyInterrupts);
 
@@ -621,7 +653,9 @@ public class CLI implements UserInterface {
                 yourTurn.getInterrupt().set(false);
             }
 
-            System.out.println("Type your command (space separated values):\t");
+            if(!checkInterrupt(gameInterrupts)){
+                System.out.println("Type your command (space separated values):\t");
+            }
             input = getInputNonBlocking(reader, gameInterrupts);
 
             if(isCorrectInput(input)) {
@@ -715,12 +749,12 @@ public class CLI implements UserInterface {
 
     @Override
     public void showNetworkError() {
-        System.out.println("Connection with Server lost");
+        System.out.println("Connection with Server lost, you will now return to the login screen");
     }
 
     @Override
-    public void showUserDisconnected() {
-        System.out.println("TODO");
+    public void showUserDisconnected(int user) {
+        System.out.println("The user with id " + String.valueOf(user) + " disconnected.");
     }
 
     // </editor-fold>
@@ -728,9 +762,18 @@ public class CLI implements UserInterface {
     @Override
     public void startInterface() {
         showWelcomeScreen();
+        while(true){
+            communicationEntryPoint();
+        }
+        //This ends here basically, everything else derives from the receiver
+    }
+
+    private void communicationEntryPoint() {
         showLoginScreen();
         initialConnector.startReceiving();
-        //This ends here basically, everything else derives from the receiver
+        //If the communication is cut short, then this routine will reset it and try again
+        initialConnector.reset();
+        reset();
     }
 
     //<editor-fold desc="Asynchronous methods">
