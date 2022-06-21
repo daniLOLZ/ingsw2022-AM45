@@ -41,6 +41,7 @@ public class TurnHandler {
         controller.simpleGame.getParameters().setTurn(currentTurn);
         controller.simpleGame.initialiseSelection();
         controller.boardHandler.refillClouds();
+        controller.assistantHandler.clearAssistantsPlayed();
     }
 
     /**

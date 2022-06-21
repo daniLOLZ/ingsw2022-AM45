@@ -997,6 +997,16 @@ public class SimpleGame extends DrawableObject {
     }
 
     /**
+     * Called to clear the assistants played, to allow for a new turn's selection
+     */
+    public void clearAssistants(){
+        for(Player player : players){
+            player.clearAssistantPlayed();
+        }
+        alert();
+    }
+
+    /**
      *
      * @return the list with all beans useful for UserInterface
      */

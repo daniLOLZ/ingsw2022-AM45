@@ -143,6 +143,11 @@ public class AssistantHandler {
 
     }
 
-
-
+    /**
+     * Clears the assistants played on the last turn
+     */
+    public void clearAssistantsPlayed() {
+        assistantsPlayed = new ArrayList<>();
+        controller.simpleGame.clearAssistants();
+    }
 }

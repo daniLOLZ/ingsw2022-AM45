@@ -71,13 +71,14 @@ public class Player extends DrawableObject {
     }
 
     /**
-     * version with observer pattern
-     * @param playerId
-     * @param nickname
-     * @param teamColor
-     * @param wizard
-     * @param leader
-     * @param parameters
+     * Player constructor which features all choices made by the user: nickname, tower color and wizard <br>
+     * Version with observer pattern
+     * @param playerId id given by SimpleGame on initialization
+     * @param nickname nickname chosen by the user
+     * @param teamColor this player's team's color
+     * @param leader true if the player is the leader of their team (has the towers on their board)
+     * @param parameters parameters of the game creating this player
+     * @param wizard the wizard chosen by the user
      * @param virtualView
      */
     public Player(PlayerEnum playerId, String nickname, TeamEnum teamColor,
@@ -150,6 +151,11 @@ public class Player extends DrawableObject {
             e.printStackTrace();
             parameters.setErrorState("INCORRECT ASSISTANT ID");
         }
+        alert();
+    }
+
+    public void clearAssistantPlayed() {
+        setAssistantPlayed(null);
         alert();
     }
 
@@ -280,4 +286,5 @@ public class Player extends DrawableObject {
     public void setTurn(int turn) {
         this.turn = turn;
     }
+
 }

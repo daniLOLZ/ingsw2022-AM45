@@ -22,6 +22,7 @@ public class AdvancedPlayer extends Player {
     /**
      * Basic constructor, doesn't allow for the choice of a wizard
      */
+    @Deprecated
     public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor,
                           boolean leader, ParameterHandler parameters){
         super(playerId, nickname, teamColor, leader, parameters);
