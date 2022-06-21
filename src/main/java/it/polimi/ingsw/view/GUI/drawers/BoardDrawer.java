@@ -405,8 +405,7 @@ public class BoardDrawer extends Drawer{
     }
 
     public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation, BoardHandlingToolbox eventHandlers){
-        AdvancedPlayerBean adaptedData = (AdvancedPlayerBean) data;
-        ((AdvancedPlayerBean) data).setNumCoins(0);
+        AdvancedPlayerBean adaptedData = AdvancedPlayerBean.getPromotedBean(data);
         return drawBoard(adaptedData, pos, scale, rotation, eventHandlers);
     }
 
@@ -427,8 +426,7 @@ public class BoardDrawer extends Drawer{
     }
 
     public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation){
-        AdvancedPlayerBean adaptedData = (AdvancedPlayerBean) data;
-        ((AdvancedPlayerBean) data).setNumCoins(0);
+        AdvancedPlayerBean adaptedData = AdvancedPlayerBean.getPromotedBean(data);
         return drawBoard(adaptedData, pos, scale, rotation, BoardHandlingToolbox.NONINTERACTIVE);
     }
 

@@ -55,7 +55,7 @@ public class IslandHandlingToolbox implements HandlingToolbox{
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
 
-        if (!sender.equals(resourceProvider)) sender = resourceProvider;
+        if (!resourceProvider.equals(sender)) sender = resourceProvider;
 
         allowedCommands.add(command);
 
@@ -100,7 +100,9 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
             int index = 0;
 
-            for (EventHandler<MouseEvent> ignored: onIslandClick) onIslandClick.set(index++, DISABLED);
+            if (onIslandClick != null){
+                for (EventHandler<MouseEvent> ignored : onIslandClick) onIslandClick.set(index++, DISABLED);
+            }
         }
 
     }
