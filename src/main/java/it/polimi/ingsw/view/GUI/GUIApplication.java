@@ -1,14 +1,21 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.player.PlayerEnum;
+import it.polimi.ingsw.network.client.ClientSender;
+import it.polimi.ingsw.network.client.InitialConnector;
 import it.polimi.ingsw.view.GUI.drawers.*;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
+import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -19,6 +26,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -84,6 +92,8 @@ public class GUIApplication extends Application{
     private static TeamEnum selectedTowerColor = TeamEnum.NOTEAM;
 
     private static Stage stage;
+    private static InitialConnector initialConnector;
+    private static ClientSender defaultSender;
 
     private static boolean started = false;
 
@@ -144,12 +154,12 @@ public class GUIApplication extends Application{
 
     }
 
-    public static void showLoginScreen(boolean errorOccurred) {
+    public static void showLoginScreen(boolean loginError) {
 
         //in case of logout I want to reset the action on close request
         //to not try and send a quit message
         //through a non-existent socket
-        stage.setOnCloseRequest(null);
+        stage.setOnCloseRequest(event -> {});
 
         StackPane root = new StackPane();
 
@@ -207,11 +217,14 @@ public class GUIApplication extends Application{
         Label errorMessage = new Label("Invalid nickname! Please try again");
         errorMessage.setTextFill(Color.RED);
 
-        errorMessage.setVisible(errorOccurred);
+        errorMessage.setVisible(loginError);
 
-        //calls external class to check input validity
+        //sends the request to the network
         loginButton.setOnAction(event -> {
-            ConnectionWithServerHandler.login(inputNickname.getText());
+            new Thread(() -> {
+                initialConnector.login(inputNickname.getText());
+                initialConnector.startReceiving();
+            }).start();
             loginButton.setDisable(true);
         });
 
@@ -222,6 +235,7 @@ public class GUIApplication extends Application{
         login.getChildren().addAll(nicknameSelection, loginButton, errorMessage);
 
         //<editor-fold desc="Debug">
+/*
 
         Button success = new Button("Simulate success");
         Button failure = new Button("Simulate failure");
@@ -232,6 +246,7 @@ public class GUIApplication extends Application{
         //debugScene.setOnAction(event -> debug_showDebugScene());
 
         login.getChildren().addAll(success, failure, debugScene);
+*/
 
         //</editor-fold>
 
@@ -307,10 +322,10 @@ public class GUIApplication extends Application{
     //</editor-fold>
 
 
-    public static void showSearchGameScreen(boolean errorOccurred){
+    public static void showSearchGameScreen(boolean searchGameError){
 
         //user is logged in. If he quits, the server is notified
-        stage.setOnCloseRequest(event -> ConnectionWithServerHandler.quit());
+        stage.setOnCloseRequest(event -> defaultSender.sendQuit());
 
         StackPane root = new StackPane();
 
@@ -361,7 +376,7 @@ public class GUIApplication extends Application{
         HBox bottomBar = new HBox(13);
         bottomBar.setAlignment(Pos.CENTER);
         Label searching = new Label();
-        if (errorOccurred) searching.setText("Error! Couldn't find your game");
+        if (searchGameError) searching.setText("Error! Couldn't find your game");
         else searching.setText("Click here to search a game");
         Button searchGameButton = new Button("Search Game");
         searchGameButton.setOnAction(event -> {
@@ -384,7 +399,7 @@ public class GUIApplication extends Application{
 
         //<editor-fold desc="Debug">
 
-        Label debugLabel = new Label("Debugging options");
+        /*Label debugLabel = new Label("Debugging options");
         Button success = new Button("Simulate game lobby");
         Button failure = new Button("Simulate failure");
 
@@ -410,6 +425,7 @@ public class GUIApplication extends Application{
         debug.getChildren().addAll(success, failure);
 
         lookingForLobby.getChildren().addAll(debugLabel, debug);
+*/
 
         //</editor-fold>
 
@@ -420,11 +436,11 @@ public class GUIApplication extends Application{
     private static void sendSearchGameRequest(String gameRule, int numPlayers, Label outNotify){
 
         outNotify.setText("Searching...");
-        new Thread(() -> ConnectionWithServerHandler.searchGame(gameRule, numPlayers)).start();
+        new Thread(() -> defaultSender.sendGameModePreference(availableGameRules.indexOf(gameRule), numPlayers)).start();
 
     }
 
-    public static void showLobbyScreen(LobbyBean data, boolean errorOccurred){
+    public static void showLobbyScreen(LobbyBean data, int userSlot, boolean startGameError, boolean leavingLobbyError){
 
         StackPane root = new StackPane();
 
@@ -467,6 +483,7 @@ public class GUIApplication extends Application{
         userActions.setAlignment(Pos.CENTER);
 
         CheckBox ready = new CheckBox("Ready");
+        ready.setSelected(data.getReadyPlayers().get(userSlot));
         Button startGame = new Button("Start game");
         Button leaveLobby = new Button("Leave lobby");
         Label notification = new Label();
@@ -475,40 +492,44 @@ public class GUIApplication extends Application{
         userActions.getChildren().add(startGame);
         userActions.getChildren().add(leaveLobby);
 
-        if (errorOccurred) {
+        if (startGameError) {
             notification.setText("Couldn't start game! Some players are not ready");
-            ready.setSelected(true);
+            ready.setSelected(data.getReadyPlayers().get(userSlot));
             startGame.setVisible(true);
         }
+
+        else if (leavingLobbyError){
+            notification.setText("Couldn't leave lobby! Try again");
+            ready.setSelected(false);
+            startGame.setVisible(false);
+        }
+
         else startGame.setVisible(false);
 
         ready.setOnAction(event -> {
             readyHandle(ready.isSelected());
-            startGame.setVisible(ready.isSelected() && ConnectionWithServerHandler.isHost());
+            startGame.setVisible(ready.isSelected() && data.getHost() == userSlot);
         });
 
         startGame.setOnAction(event -> {
             startGame.setDisable(true);
             ready.setDisable(true);
             leaveLobby.setDisable(true);
-            ConnectionWithServerHandler.startGame();
+            defaultSender.startGame();
         });
 
-        leaveLobby.setOnAction(event -> {
-            ConnectionWithServerHandler.leaveLobby();
-            showSearchGameScreen(false);
-        });
+        leaveLobby.setOnAction(event -> defaultSender.leaveLobby());
 
         //<editor-fold desc="Debug">
 
-        Button success = new Button("Simulate start game");
+        /*Button success = new Button("Simulate start game");
         Button failure = new Button("Simulate failure");
 
         success.setOnAction(event -> showWizardSelection(false));
         //failure.setOnAction(event -> showLobbyScreen(true));
 
         layout.getChildren().addAll(success,failure);
-
+        */
         //</editor-fold>
 
         layout.getChildren().addAll(gameDetails, players, userActions, notification);
@@ -519,8 +540,85 @@ public class GUIApplication extends Application{
     }
 
     private static void readyHandle(boolean selected){
-        if (selected) ConnectionWithServerHandler.ready();
-        else ConnectionWithServerHandler.notReady();
+        new Thread(() -> defaultSender.sendReadyStatus(selected)).start();
+    }
+
+    public static void showTowerColorSelection(GameInitBean data, boolean colorSelectionError){
+        StackPane root = new StackPane();
+
+        //<editor-fold desc="Decorations">
+
+        DecorationsDrawer.showMenuBackground(root);
+
+        //</editor-fold>
+
+        VBox layout = new VBox(35);
+        layout.setAlignment(Pos.CENTER);
+        root.getChildren().add(layout);
+
+        Label title = new Label("Select your Tower color!");
+        title.setAlignment(Pos.CENTER);
+        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setTextFill(Color.DARKRED);
+        layout.getChildren().add(title);
+
+        int numTeams = TeamEnum.getNumTeams() - 1;
+        if(preselectedNumPlayers == 3) numTeams = TeamEnum.getNumTeams();
+
+        HBox towers = new HBox(20.0 * TeamEnum.getNumTeams() / numTeams);
+        towers.setAlignment(Pos.CENTER);
+        towers.setMinHeight(TowerDrawer.getTowerSize() * 0.6);
+        layout.getChildren().add(towers);
+
+        Button selectTower = new Button("These words shall not be gazed upon by thy mortals!");
+        selectTower.setVisible(false);
+        selectTower.setBackground(Background.EMPTY);
+        selectTower.setFont(Font.font("Lucida Handwriting", 40));
+        selectTower.setTextFill(Color.DARKRED);
+        selectTower.setOnAction(event -> new Thread(() -> defaultSender.sendTeamColorChoice(selectedTowerColor)).start());
+        layout.getChildren().add(selectTower);
+
+
+        for (int index = 0; index < numTeams; index++) {
+
+            TeamEnum tower = TeamEnum.getTeamFromId(index);
+
+            ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
+
+            if (data.getChosenColors().contains(tower)){
+                ColorAdjust monochrome = new ColorAdjust();
+                monochrome.setSaturation(-1.0);
+
+                Blend grey = new Blend(
+                        BlendMode.MULTIPLY,
+                        monochrome,
+                        new ColorInput(
+                                0,
+                                0,
+                                towerView.getImage().getWidth(),
+                                towerView.getImage().getHeight(),
+                                Color.GREY
+                        )
+                );
+
+                towerView.effectProperty().bind(Bindings.when(towerView.visibleProperty()).then(grey).otherwise((ObservableObjectValue<Blend>) null));
+            }
+
+            else {
+                towerView.setOnMouseClicked(event -> {
+                    selectedTowerColor = tower;
+                    selectTower.setText("Select " + tower.name);
+                    selectTower.setVisible(true);
+                });
+                addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+            }
+            towers.getChildren().add(towerView);
+        }
+
+
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setScene(scene);
     }
 
     public static void showWizardSelection(boolean errorOccurred){
@@ -552,11 +650,11 @@ public class GUIApplication extends Application{
         selectWizard.setBackground(Background.EMPTY);
         selectWizard.setFont(Font.font("Lucida Handwriting", 40));
         selectWizard.setTextFill(Color.DARKRED);
-        selectWizard.setOnAction(event -> showTowerColorSelection(false));
+        selectWizard.setOnAction(event -> new Thread(() -> defaultSender.sendWizardChoice(selectedWizard)));
         layout.getChildren().add(selectWizard);
 
         for (WizardEnum wizard:
-             WizardEnum.getWizards()) {
+                WizardEnum.getWizards()) {
             ImageView wizardView = WizardDrawer.drawWizard(wizard, center, 0.5);
             wizardView.setOnMouseClicked(event -> {
                 selectedWizard = wizard;
@@ -565,62 +663,6 @@ public class GUIApplication extends Application{
             });
             addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
             wizards.getChildren().add(wizardView);
-        }
-
-
-
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-        stage.setScene(scene);
-    }
-
-    public static void showTowerColorSelection(boolean errorOccurred){
-        StackPane root = new StackPane();
-
-        //<editor-fold desc="Decorations">
-
-        DecorationsDrawer.showMenuBackground(root);
-
-        //</editor-fold>
-
-        VBox layout = new VBox(35);
-        layout.setAlignment(Pos.CENTER);
-        root.getChildren().add(layout);
-
-        Label title = new Label("Select your Tower color!");
-        title.setAlignment(Pos.CENTER);
-        title.setFont(Font.font("Lucida Handwriting", 40));
-        title.setTextFill(Color.DARKRED);
-        layout.getChildren().add(title);
-
-        int numTeams = TeamEnum.getNumTeams() - 1;
-        if(preselectedNumPlayers == 3) numTeams = TeamEnum.getNumTeams();
-
-        HBox towers = new HBox(20.0 * TeamEnum.getNumTeams() / numTeams);
-        towers.setAlignment(Pos.CENTER);
-        towers.setMinHeight(TowerDrawer.getTowerSize() * 0.5 * 1.2);
-        layout.getChildren().add(towers);
-
-        Button selectTower = new Button("vgnkdhdrnhs");
-        selectTower.setVisible(false);
-        selectTower.setBackground(Background.EMPTY);
-        selectTower.setFont(Font.font("Lucida Handwriting", 40));
-        selectTower.setTextFill(Color.DARKRED);
-        selectTower.setOnAction(event -> showGameInterface(null,null,0));
-        layout.getChildren().add(selectTower);
-
-
-        for (int index = 0; index < numTeams; index++) {
-
-            TeamEnum tower = TeamEnum.getTeamFromId(index);
-
-            ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
-            towerView.setOnMouseClicked(event -> {
-                selectedTowerColor = tower;
-                selectTower.setText("Select " + tower.name);
-                selectTower.setVisible(true);
-            });
-            addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
-            towers.getChildren().add(towerView);
         }
 
 
@@ -826,4 +868,11 @@ public class GUIApplication extends Application{
         return slots;
     }
 
+    public static void setInitialConnector(InitialConnector initialConnector){
+        GUIApplication.initialConnector = initialConnector;
+    }
+
+    public static void setDefaultSender(ClientSender defaultSender) {
+        GUIApplication.defaultSender = defaultSender;
+    }
 }

@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
+import it.polimi.ingsw.network.client.InitialConnector;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import it.polimi.ingsw.view.UserInterface;
@@ -16,16 +17,11 @@ import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GUI implements UserInterface {
-
-    private boolean
-            loginError           = false,
-            searchGameError      = false,
-            startingGameError    = false,
-            selectingWizardError = false,
-            selectingColorError  = false;
 
     private static final int
             numAssistants = 10,
@@ -34,8 +30,18 @@ public class GUI implements UserInterface {
             numTables = 5,
             numCharacterCards = 3;
 
+    private boolean
+            loginError           = false,
+            searchGameError      = false,
+            startingGameError    = false,
+            leavingLobbyError    = false,
+            readyError           = false,
+            selectingWizardError = false,
+            selectingColorError  = false;
+
     private GameRuleEnum currentGameRule = GameRuleEnum.NO_RULE;
 
+    private InitialConnector initialConnector;
     private ClientSender sender;
 
     private GameToolBoxContainer gameToolBoxContainer;
@@ -46,6 +52,13 @@ public class GUI implements UserInterface {
     private boolean selectedTowerColor = false;
 
     private String nickname;
+
+    public GUI(InitialConnector initialConnector){
+
+        this.initialConnector = initialConnector;
+
+        GUIApplication.setInitialConnector(initialConnector);
+    }
 
     @Override
     public void addBean(GameElementBean bean) {
@@ -81,6 +94,7 @@ public class GUI implements UserInterface {
     @Override
     public void setSender(ClientSender sender) {
         this.sender = sender;
+        GUIApplication.setDefaultSender(sender);
     }
 
     @Override
@@ -94,13 +108,6 @@ public class GUI implements UserInterface {
         if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showLoginScreen(loginError));
     }
 
-    public static void main(String[] args) {
-
-        UserInterface Gui = new GUI();
-
-        new Thread(Gui::startInterface).start();
-    }
-
     @Override
     public void showLoginScreenFailure() {
         loginError = true;
@@ -108,8 +115,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showSuccessLoginScreen() {
-        loginError = false;
-        searchGameError = false;
+        resetErrors();
     }
 
     @Override
@@ -119,8 +125,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showSuccessJoiningLobby() {
-        searchGameError = false;
-        startingGameError = false;
+        resetErrors();
     }
 
     @Override
@@ -130,22 +135,22 @@ public class GUI implements UserInterface {
 
     @Override
     public void showLobby() {
-        printLobby(lobbyBean);
+        printLobby(Optional.ofNullable(lobbyBean).orElse(new LobbyBean(new ArrayList<>(), new ArrayList<>(), false, 0)));
     }
 
     @Override
     public void showSuccessReadyStatus(boolean status) {
-
+        resetErrors();
     }
 
     @Override
     public void showErrorReadyStatus(boolean status) {
-
+        readyError = true;
     }
 
     @Override
     public void showSuccessStartGame() {
-        startingGameError = false;
+        resetErrors();
     }
 
     @Override
@@ -155,12 +160,12 @@ public class GUI implements UserInterface {
 
     @Override
     public void showSuccessLeaveLobby() {
-
+        resetErrors();
     }
 
     @Override
     public void showErrorLeaveLobby() {
-
+        leavingLobbyError = true;
     }
 
     @Override
@@ -176,8 +181,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showSuccessSelectingColor(String color) {
-        selectingColorError = false;
-        selectingWizardError = false;
+        resetErrors();
         selectedTowerColor = true;
     }
 
@@ -193,7 +197,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void startInterface() {
-        Application.launch(GUIApplication.class);
+        new Thread(() -> Application.launch(GUIApplication.class)).start();
     }
 
     @Override
@@ -203,13 +207,16 @@ public class GUI implements UserInterface {
 
     @Override
     public void showUserDisconnected() {
-
+        //todo
     }
 
     @Override
     public void printLobby(LobbyBean lobbyBean) {
-        if (!this.lobbyBean.equals(lobbyBean)) this.lobbyBean = lobbyBean;
-        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showLobbyScreen(lobbyBean, startingGameError));
+        if (!lobbyBean.equals(this.lobbyBean)) this.lobbyBean = lobbyBean;
+
+        int yourSlot = lobbyBean.getNicknames().indexOf(nickname);
+
+        if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showLobbyScreen(lobbyBean, yourSlot, startingGameError, leavingLobbyError));
     }
 
     @Override
@@ -218,7 +225,7 @@ public class GUI implements UserInterface {
         if (GUIApplication.isStarted()) {
             if (selectedTowerColor) {
                 Platform.runLater(() -> GUIApplication.showWizardSelection(false));
-            } else Platform.runLater(() -> GUIApplication.showTowerColorSelection(false));
+            } else Platform.runLater(() -> GUIApplication.showTowerColorSelection(gameInitData,false));
         }
     }
 
@@ -255,7 +262,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void setLobbyStarting() {
-
+        //todo show lobby starting
     }
 
     @Override
@@ -337,5 +344,15 @@ public class GUI implements UserInterface {
     @Override
     public void setYourTurn(boolean isYourTurn) {
 
+    }
+
+    private void resetErrors(){
+        loginError           = false;
+        searchGameError      = false;
+        startingGameError    = false;
+        leavingLobbyError    = false;
+        readyError           = false;
+        selectingWizardError = false;
+        selectingColorError  = false;
     }
 }
