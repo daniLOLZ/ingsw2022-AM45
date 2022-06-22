@@ -115,10 +115,9 @@ public class ClientReceiver {
                 continue;
             }
 
-            //This locking/unlocking across different classes might lead to some errors, be careful
-            // are we sure it's the same thread that's requesting and releasing the lock?
-            // After the first command, theoretically yes
             isCommandScheduled.set(false);
+
+            if(!checkCorrectIdRequest()) continue;
 
             switch (CommandEnum.fromObjectToEnum(mainBroker.readField(NetworkFieldEnum.COMMAND))) {
                 //Synchronous commands
@@ -152,6 +151,16 @@ public class ClientReceiver {
             mainBroker.flushFirstSyncMessage();
         }
 
+    }
+
+    private boolean checkCorrectIdRequest() {
+        if(initialConnector.getCurrentIdRequest() !=
+        ApplicationHelper.getIntFromBrokerField(mainBroker.readField(NetworkFieldEnum.ID_REQUEST))) {
+            //Wrong id received, akin to a network error, close the connection
+            initialConnector.notifyNetworkError("The id for the last request doesn't match the expected one");
+            return false;
+        }
+        return true;
     }
 
     public Thread parseAsyncMessages(){
@@ -223,7 +232,6 @@ public class ClientReceiver {
         if(hasBeenClosedAlready) return;
         initialConnector.notifyNetworkError("The server closed the connection");
         clientController.connectionClose();
-        connected.set(false);
         hasBeenClosedAlready = true;
     }
 

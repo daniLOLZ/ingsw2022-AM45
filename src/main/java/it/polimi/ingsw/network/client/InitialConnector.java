@@ -25,6 +25,7 @@ public class InitialConnector {
     private AtomicBoolean connected;
     private AtomicBoolean isCommandScheduled; //Related to the main broker
 
+    private int currentIdRequest;
 
     public InitialConnector(String hostname, int portNumber){
         this.hostname = hostname;
@@ -208,4 +209,11 @@ public class InitialConnector {
         return this.connected;
     }
 
+    public int getCurrentIdRequest() {
+        return currentIdRequest;
+    }
+
+    public void setCurrentIdRequest(int currentIdRequest) {
+        this.currentIdRequest = currentIdRequest;
+    }
 }

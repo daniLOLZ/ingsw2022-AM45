@@ -164,10 +164,6 @@ public class Controller {
         return advancedGame;
     }
 
-    // Lucario : questi javadoc parlano del caso in cui il controller faccia da proxy, in caso così non fosse basta
-    // togliere a tutti il "By calling the appropriate handler," iniziale e hai i javadoc "pronti" per i vari handler
-
-
 
     /**
      * Gets the position from the associative array playerNumbers

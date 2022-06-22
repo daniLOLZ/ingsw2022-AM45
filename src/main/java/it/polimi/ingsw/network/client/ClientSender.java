@@ -368,6 +368,7 @@ public class ClientSender {
      */
     private int addIdRequest(){
         int idReq = increaseAndGetRequestId();
+        initialConnector.setCurrentIdRequest(idReq);
         mainBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, idReq);
         return idReq;
     }

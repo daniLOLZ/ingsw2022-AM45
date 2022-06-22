@@ -272,7 +272,6 @@ public class SimpleGame extends DrawableObject {
         // leaders -> is it always the first in order?
         // playerIds -> is it always the same as the order of the players?
 
-        //TODO Lucario : Possibile necessità di unificare questo controllo di leader con quello in PlayerCreation.isLeader
         boolean isLeader;
         for(int player = 0; player < numPlayers; player++){
             TeamEnum currentColor = selectedColors.get(player);
@@ -319,7 +318,6 @@ public class SimpleGame extends DrawableObject {
         // leaders -> is it always the first in order?
         // playerIds -> is it always the same as the order of the players?
 
-        //TODO Lucario : Possibile necessità di unificare questo controllo di leader con quello in PlayerCreation.isLeader
         boolean isLeader;
         for(int playerPos = 0; playerPos < numPlayers; playerPos++){
             TeamEnum currentColor = selectedColors.get(playerPos);
