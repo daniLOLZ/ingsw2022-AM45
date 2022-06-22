@@ -51,7 +51,7 @@ public class IslandDrawer extends Drawer{
 
     private static final double hoverZoom = 1.8;
 
-    private static final int firstIslandId = 1;
+    private static final int firstIslandId = 0;//todo check if this is correct
     private static final int differentIslandTiles = 3;
 
     public static List<Node> drawIsland(int id, List<StudentEnum> students, TeamEnum towerColor, boolean isPresentMotherNature, int numBlockTile, Coord pos, double scale, EventHandler<MouseEvent> onClick){

@@ -41,7 +41,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
                 if (onEntranceStudentClick.get(studentIndex.get()) == DISABLED) {
                     onEntranceStudentClick.set(studentIndex.get(), event -> new Thread(() -> {
                         resourceProvider.sendSelectedStudent(studentIndex.get());
-                        onEntranceStudentClick.set(studentIndex.get(), NO_EFFECT);
+                        onEntranceStudentClick.set(studentIndex.get(), DISABLED);
                         studentIndex.getAndIncrement();
                     }).start());
                 }
@@ -77,7 +77,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             for (EventHandler<MouseEvent> handler:
                  onEntranceStudentClick) {
 
-                if (handler == NO_EFFECT)
+                if (handler == DISABLED)
                     onEntranceStudentClick.set(
                             onEntranceStudentClick.indexOf(handler),
                             event -> new Thread(() -> {

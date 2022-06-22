@@ -18,14 +18,12 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     private EnumSet<CommandEnum> allowedCommands = EnumSet.noneOf(CommandEnum.class);
     private ClientSender sender;
 
-    private boolean initialized = false;
-
     public CharacterCardHandlingToolbox(){
         onCharacterCardClick = HandlingToolbox.NO_EFFECT;
+        onStudentOnCardClick = new ArrayList<>();
     }
 
     public void setNumStudents(int numStudents){
-        initialized = true;
         for (int student = 0; student < numStudents; student++) {
             onStudentOnCardClick.add(NO_EFFECT);
         }
@@ -82,9 +80,5 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
     public EventHandler<MouseEvent> getOnStudentOnCardClick(int pos) {
         return onStudentOnCardClick.get(pos);
-    }
-
-    public boolean isInitialized() {
-        return initialized;
     }
 }

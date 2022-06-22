@@ -22,11 +22,11 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.CHOOSE_ASSISTANT){
-            int assistantIndex = 0;
+            int assistantIndex = 1;
             for (EventHandler<MouseEvent> ignored:
                  onAssistantClick) {
                 int finalIndex = assistantIndex;
-                onAssistantClick.set(assistantIndex, event -> new Thread (() -> resourceProvider.sendAssistantChosen(finalIndex)).start());
+                onAssistantClick.set(assistantIndex - 1, event -> new Thread (() -> resourceProvider.sendAssistantChosen(finalIndex)).start());
                 assistantIndex++;
             }
         }

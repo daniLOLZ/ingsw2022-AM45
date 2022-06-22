@@ -235,16 +235,21 @@ public class BoardDrawer extends Drawer{
         Coord assistantLocation = pos.pureSumX(assistantSlot.x * actualBoardScale.get()).pureSumY(assistantSlot.y * actualBoardScale.get());
         Coord assistantPos = assistantLocation.pureRotate(pos, rotation);
 
-        ImageView assistantView = AssistantDrawer.drawAssistant(data.getAssistantPlayed().id, assistantPos, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
-        toDraw.add(assistantView);
 
-        assistantView.getTransforms().add(new Rotate(90 * rotation, assistantView.getX() + assistantView.getFitWidth() / 2, assistantView.getY() + assistantView.getFitHeight() / 2));
+        if (data.getAssistantPlayed() != null) {
+            ImageView assistantView = AssistantDrawer.drawAssistant(data.getAssistantPlayed().id, assistantPos, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
+            toDraw.add(assistantView);
 
-        Coord finalAssistantSlot = assistantSlot.pureSumY(0);
+            assistantView.getTransforms().add(new Rotate(90 * rotation, assistantView.getX() + assistantView.getFitWidth() / 2, assistantView.getY() + assistantView.getFitHeight() / 2));
 
-        entered.add(getChildrenEnteredZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+            Coord finalAssistantSlot = assistantSlot.pureSumY(0);
 
-        exited.add(getChildrenExitedZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+            entered.add(getChildrenEnteredZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+
+            exited.add(getChildrenExitedZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+        }
+
+
 
         //draw students at entrance
         Iterator<Coord> entranceSlot = atEntranceSlots.iterator();
@@ -267,7 +272,7 @@ public class BoardDrawer extends Drawer{
                     entranceStudent,
                     finalStudentPos,
                     woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get(),
-                    event -> eventHandlers.getOnEntranceStudentClick(finalStudentIndex));
+                    eventHandlers.getOnEntranceStudentClick(finalStudentIndex));
 
             toDraw.add(entranceStudentView);
             studentIndex++;
