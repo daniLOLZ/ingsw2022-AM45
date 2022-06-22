@@ -60,16 +60,6 @@ public class GameToolBoxContainer {
         }
     }
 
-    public boolean areCharactersInitialized(){
-
-        for (CharacterCardHandlingToolbox toolbox : characterCardHandlingToolboxes) {
-
-            if (!toolbox.isInitialized()) return false;
-        }
-
-        return true;
-    }
-
 
     public AssistantHandlingToolbox getAssistantHandlingToolbox() {
         return assistantHandlingToolbox;

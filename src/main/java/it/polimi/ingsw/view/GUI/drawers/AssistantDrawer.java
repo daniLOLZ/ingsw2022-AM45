@@ -35,11 +35,13 @@ public class AssistantDrawer extends Drawer{
 
     public static ImageView drawAssistant(int id, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
-        return drawFromCenterInteractiveImage(assistants.get(id - firstAssistantId), pos, scale, onClick);
+        id = (id - firstAssistantId) % assistants.size();
+
+        return drawFromCenterInteractiveImage(assistants.get(id), pos, scale, onClick);
     }
 
     public static ImageView drawAssistant(int id, Coord pos, double scale){
-        return drawFromCenterInteractiveImage(assistants.get(id - firstAssistantId), pos, scale, HandlingToolbox.NO_EFFECT);
+        return drawAssistant(id, pos, scale, HandlingToolbox.NO_EFFECT);
     }
 
     public static double getAssistantWidth(){

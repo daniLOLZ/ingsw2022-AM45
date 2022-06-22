@@ -342,7 +342,7 @@ public class GUI implements UserInterface {
     @Override
     public void printGameInterface(VirtualViewBean virtualView) {
         viewData = virtualView;
-        if (!gameToolBoxContainer.areCharactersInitialized()) {
+        if (virtualView.getCharacterCardBeans() != null) {
             for (int character = 0; character < numCharacterCards; character++) {
                 gameToolBoxContainer
                         .setNumStudentsOnCharacterCard(
@@ -355,7 +355,6 @@ public class GUI implements UserInterface {
             }
         }
         gameToolBoxContainer.updateIslandGroups(virtualView.getIslandGroupBeans());
-        showMainGameInterface();
     }
 
     @Override
@@ -365,7 +364,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void setUpdateAvailable(boolean available) {
-
+        if (available && viewData != null) showMainGameInterface();
     }
 
     @Override

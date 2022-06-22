@@ -696,14 +696,14 @@ public class GUIApplication extends Application{
             List<IslandGroupBean> islandsList = data.getIslandGroupBeans();
             Iterator<IslandGroupBean> island = islandsList.iterator();
 
-            for (Coord slot: Objects.requireNonNull(getIslandGroupSlots(islandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos))) {
+            for (Coord slot: getIslandGroupSlots(islandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos)) {
                 root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
                 islandIndex++;
             }
         } else {
             Iterator<AdvancedIslandGroupBean> island = advancedIslandsList.iterator();
 
-            for (Coord slot: Objects.requireNonNull(getIslandGroupSlots(advancedIslandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos))) {
+            for (Coord slot: getIslandGroupSlots(advancedIslandsList.size(), islandsSemiWidth, islandsSemiHeight, islandsPos)) {
                 root.getChildren().addAll(IslandGroupDrawer.drawIslandGroup(island.next(), slot, islandSize / IslandDrawer.getIslandSize(), eventHandlerContainer.getIslandHandlingToolbox().getOnIslandClick(islandIndex)));
                 islandIndex++;
             }
@@ -722,7 +722,7 @@ public class GUIApplication extends Application{
 
             CloudBean cloudBean = cloud.next();
 
-            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize(), eventHandlerContainer.getCloudHandlingToolbox().getOnCloudClick(cloudBean.getIdCloud() - 1)));
+            root.getChildren().addAll(CloudDrawer.drawCloud(cloudBean, slot, cloudSize / CloudDrawer.getCloudSize(), eventHandlerContainer.getCloudHandlingToolbox().getOnCloudClick(cloudBean.getIdCloud())));
         }
 
         //</editor-fold>
@@ -831,7 +831,7 @@ public class GUIApplication extends Application{
     }
 
     private static List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){
-        if (amount < 3) return null;
+        if (amount < 3) return new ArrayList<>();
 
         List<Coord> slots = new ArrayList<>();
         List<Coord> toAddLater = new ArrayList<>();
