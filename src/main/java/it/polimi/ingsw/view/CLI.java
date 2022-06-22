@@ -42,6 +42,7 @@ public class CLI implements UserInterface {
     List<InterfaceInterrupt> gameInterrupts; //There might be multiple "interrupts" that the main game interface should react to
     List<InterfaceInterrupt> lobbyInterrupts;
     List<InterfaceInterrupt> gameInitInterrupts;
+    boolean errorLogin;
     boolean userQuit;
 
     private String chosenNickname;
@@ -382,7 +383,7 @@ public class CLI implements UserInterface {
     public void showLoginScreen() {
         Scanner scanner = new Scanner(System.in);
         String inputNickname;
-        boolean errorLogin = false;
+        errorLogin = false;
 
         do{
             System.out.println("Insert your username: ");
@@ -390,6 +391,7 @@ public class CLI implements UserInterface {
             if(!initialConnector.login(inputNickname)){
                 errorLogin = true;
                 System.out.println("There was a problem connecting to the server, try again");
+                return;
             }
             else errorLogin = false;
 
@@ -900,7 +902,7 @@ public class CLI implements UserInterface {
 
     private void communicationEntryPoint() {
         showLoginScreen();
-        initialConnector.startReceiving();
+        if(!errorLogin) initialConnector.startReceiving();
         //If the communication is cut short, then this routine will reset it and try again
         initialConnector.reset();
         this.reset();

@@ -57,14 +57,23 @@ public class ClientReceiver {
         receiverStarted = false;
         hasBeenClosedAlready = false;
         parseAsyncStarted = false;
-        parseAsyncThread.interrupt();
-        receiveMessagesThread.interrupt();
-        try{
-            parseAsyncThread.join();
-            receiveMessagesThread.join();
-        } catch (InterruptedException e) {
-            System.err.println("This is quite a conundrum 2");
-            e.printStackTrace();
+        if(parseAsyncThread != null) {
+            parseAsyncThread.interrupt();
+            try {
+                parseAsyncThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("This is quite a conundrum 2");
+                e.printStackTrace();
+            }
+        }
+        if(receiveMessagesThread != null) {
+            receiveMessagesThread.interrupt();
+            try {
+                receiveMessagesThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("This is quite a conundrum 2");
+                e.printStackTrace();
+            }
         }
     }
 

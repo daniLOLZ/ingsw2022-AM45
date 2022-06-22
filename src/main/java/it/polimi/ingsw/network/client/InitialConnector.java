@@ -66,7 +66,7 @@ public class InitialConnector {
 
         this.connected = new AtomicBoolean(true);
         this.isCommandScheduled = new AtomicBoolean(false);
-        alreadyNotified.set(false);
+        this.alreadyNotified = new AtomicBoolean(false);
 
     }
 
@@ -151,8 +151,8 @@ public class InitialConnector {
         System.err.println(error);
         connected.set(false);
         try{
-            mainSocket.close();
-            pingSocket.close();
+            if(mainSocket != null) mainSocket.close();
+            if(pingSocket != null) pingSocket.close();
             System.err.println("Sockets closed");
         }
         catch (IOException | NullPointerException e){
