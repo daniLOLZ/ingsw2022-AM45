@@ -10,6 +10,7 @@ import it.polimi.ingsw.network.commandHandler.UnexecutableCommandException;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -121,9 +122,12 @@ public class ClientHandler implements Runnable{
                 handleCommand(mainBroker); // runs the appropriate routine depending on the command received
                 System.out.println("---Command handled");
             }
+            // This line is necessary for the quit command, we stop before trying to send
+            // a message which would result in failure anyways since the user disconnected
+            if(!connected.get()) continue;
+
             commandLock.lock();
             try {
-
                 // Sends a reply to the client
                 mainBroker.send(clientOutput);
 
@@ -201,12 +205,28 @@ public class ClientHandler implements Runnable{
         if(alreadyAlerted) return;
         alreadyAlerted = true;
 
-        if(parameters.getUserController() != null) {
-            parameters.getUserController().setError("Connection lost with " + LoginHandler.getNicknameFromId(parameters.getIdUser()));
-            parameters.getUserController().lostConnectionHandle(parameters.getIdUser());
+        if(parameters.getUserLobby() != null){
+            parameters.getUserLobby().removePlayer(parameters.getIdUser());
             for(Integer idUser : parameters.getUserLobby().getPlayers()){
                 if(idUser != parameters.getIdUser()){
-                    //We prematurely send async commands to make sure the players now someone disconnected right away
+                    //We prematurely send async commands to make sure the players know someone disconnected right away
+                    ActiveClients.getHandlerFromId(idUser).sendAsynchronousCommands();
+                }
+            }
+        }
+        if(parameters.getUserController() != null) {
+            //Save the players that will need to be notified after the lobby is cleared
+            List<Integer> playersToSignal = new ArrayList<>(parameters.getUserLobby().getPlayers());
+
+            //Clear the lobby
+            parameters.getUserLobby().destroyLobby(true);
+
+            //Handle the controller
+            parameters.getUserController().setError("Connection lost with " + LoginHandler.getNicknameFromId(parameters.getIdUser()));
+            parameters.getUserController().lostConnectionHandle(parameters.getIdUser());
+            for(Integer idUser : playersToSignal){
+                if(idUser != parameters.getIdUser()){
+                    //We prematurely send async commands to make sure the players know someone disconnected right away
                     ActiveClients.getHandlerFromId(idUser).sendAsynchronousCommands();
                 }
             }
@@ -228,7 +248,7 @@ public class ClientHandler implements Runnable{
         try{
             mainSocket.close();
             pingSocket.close();
-            System.out.println("[user " + parameters.getIdUser() + " ] Sockets closed");
+            System.out.println("[ user " + parameters.getIdUser() + " ] Sockets closed");
         }
         catch (IOException e){
             e.printStackTrace();

@@ -106,6 +106,11 @@ public class GUI implements UserInterface {
     }
 
     @Override
+    public void showGoodbyeScreen() {
+
+    }
+
+    @Override
     public void showLoginScreen() {
         if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showLoginScreen(loginError));
     }
@@ -354,7 +359,7 @@ public class GUI implements UserInterface {
     }
 
     @Override
-    public void setGameInterrupted(boolean alive) {
+    public void setGameInterrupted(boolean interrupted) {
 
     }
 

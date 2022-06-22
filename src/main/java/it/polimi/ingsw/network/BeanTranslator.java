@@ -27,20 +27,39 @@ public class BeanTranslator {
      * Takes a map from the gson serialization and returns a LobbyBean
      * @param map A gson map containing the mapping String -> Object, where the string is the name of
      *            a parameter in the bean
-     * @return A new lobbyBean containing the information that the map had
+     * @return The translated LobbyBean, or null if some fields were null during the translating process
      */
     public static LobbyBean deserializeLobbyBean(LinkedTreeMap<String, Object> map){
-        List<String> nicknames = (List<String>) map.get("nicknames");
-        List<Boolean> readyPlayers = (List<Boolean>) map.get("readyPlayers");
-        boolean gameStarted = (boolean) map.get("gameStarted");
-
-        Integer host = ApplicationHelper.getIntFromBrokerField( map.get("host"));
+        List<String> nicknames;
+        List<Boolean> readyPlayers;
+        boolean gameStarted;
+        int host;
+        try {
+            nicknames = (List<String>) map.get("nicknames");
+            readyPlayers = (List<Boolean>) map.get("readyPlayers");
+            gameStarted = (boolean) map.get("gameStarted");
+            host = ApplicationHelper.getIntFromBrokerField( map.get("host"));
+        } catch (NullPointerException e){
+            return null;
+        }
         return new LobbyBean(nicknames, readyPlayers, gameStarted, host);
     }
 
+    /**
+     * Takes a map from the gson serialization and returns a GameInitBean
+     * @param map A gson map containing the mapping String -> Object, where the string is the name of
+     *            a parameter in the bean
+     * @return The translated GameInitBean, or null if some fields were null during the translating process
+     */
     public static GameInitBean deserializeGameInitBean(LinkedTreeMap<String, Object> map){
-        List<TeamEnum> chosenColors = toListOfEnum(TeamEnum.class, (ArrayList<String>) map.get("availableColors"));
-        List<WizardEnum> chosenWizards = toListOfEnum(WizardEnum.class, (ArrayList<String>) map.get("availableWizards"));
+        List<TeamEnum> chosenColors;
+        List<WizardEnum> chosenWizards;
+        try{
+            chosenColors = toListOfEnum(TeamEnum.class, (ArrayList<String>) map.get("availableColors"));
+            chosenWizards = toListOfEnum(WizardEnum.class, (ArrayList<String>) map.get("availableWizards"));
+        } catch (NullPointerException e){
+            return null;
+        }
         return new GameInitBean(chosenColors,chosenWizards);
     }
 

@@ -33,102 +33,110 @@ public class PingHandler {
      * connection is no longer stable
      * This routine is entirely contained in the initial connector class as it doesn't need the usual type of
      * communication with the server, and thus won't use the Sender/Receiver classes
+     * @return the thread running the ping routine
      */
-    public void startPinging() {
+    public Thread startPinging() {
 
-        new Thread(() -> {
+        Thread pingThread = new Thread( new Runnable() {
+            public void run() {
 
-            OutputStream outStream;
-            InputStream inStream;
-
-
-            try {
-                inStream = pingSocket.getInputStream();
-                outStream = pingSocket.getOutputStream();
-            } catch (IOException e){
-                initialConnector.notifyNetworkError("Couldn't get input/output streams");
-                return;
-            }
-
-            new Thread( () -> {
-                while (initialConnector.isConnected()) {
-                    try {
-                        pingBroker.receive(inStream);
-                    } catch (IOException e) {
-                        initialConnector.notifyNetworkError("Ping routine couldn't receive message");
-                    }
-                }
-            }).start();
-
-            ExecutorService pingExecutor = Executors.newSingleThreadExecutor();
-
-            Future<Void> handler;
-
-            do{
-
-                handler = pingExecutor.submit(() -> {
-
-                    pingBroker.waitSyncMessage(); //operation to execute with timeout
-
-                    return null; //no need for a return value
-                });
+                OutputStream outStream;
+                InputStream inStream;
 
 
-                pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
-                pingBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PING);
-                pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
-
-                try{
-                    pingBroker.send(outStream);
-                }
-                catch (IOException e){
-                    initialConnector.notifyNetworkError("Ping routine couldn't send message");
+                try {
+                    inStream = pingSocket.getInputStream();
+                    outStream = pingSocket.getOutputStream();
+                } catch (IOException e) {
+                    initialConnector.notifyNetworkError("Couldn't get input/output streams");
                     return;
                 }
 
-                //receive pong message
-                try {
-                    handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
-                } catch (TimeoutException e) {
-                    handler.cancel(true);
-                    initialConnector.notifyNetworkError("Connection timed out");
+                Thread receiverThread = new Thread( new Runnable() {
+                    public void run() {
+                        while (initialConnector.isConnected()) {
+                            try {
+                                pingBroker.receive(inStream);
+                            } catch (IOException e) {
+                                initialConnector.notifyNetworkError("Ping routine couldn't receive message");
+                            }
+                        }
+                    }
+                });
+                receiverThread.setName("receiverThread");
+                receiverThread.start();
+
+                ExecutorService pingExecutor = Executors.newSingleThreadExecutor();
+
+                Future<Void> handler;
+
+                do {
+
+                    handler = pingExecutor.submit(() -> {
+
+                        pingBroker.waitSyncMessage(); //operation to execute with timeout
+
+                        return null; //no need for a return value
+                    });
+
+
+                    pingBroker.addToMessage(NetworkFieldEnum.ID_USER, idUser);
+                    pingBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.PING);
+                    pingBroker.addToMessage(NetworkFieldEnum.ID_PING_REQUEST, increaseAndGetPingRequestId());
+
+                    try {
+                        pingBroker.send(outStream);
+                    } catch (IOException e) {
+                        initialConnector.notifyNetworkError("Ping routine couldn't send message");
+                        return;
+                    }
+
+                    //receive pong message
+                    try {
+                        handler.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                    } catch (TimeoutException e) {
+                        handler.cancel(true);
+                        initialConnector.notifyNetworkError("Connection timed out");
+                        pingBroker.flushFirstSyncMessage();
+                        break;
+                    } catch (InterruptedException | ExecutionException e) {
+                        handler.cancel(true);
+                        initialConnector.notifyNetworkError("Ping routine interrupted");
+                        pingBroker.flushFirstSyncMessage();
+                        receiverThread.interrupt(); // This might do nothing
+                        break;
+                    }
+
+                    //maybe encapsulate operations below
+
+                    int receivedIdUser = ApplicationHelper.getIntFromBrokerField(pingBroker.readField(NetworkFieldEnum.ID_USER));
+                    int receivedIdPingRequest = ApplicationHelper.getIntFromBrokerField(pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST));
+
+                    if (!CommandEnum.PONG
+                            .equals(CommandEnum.fromObjectToEnum(pingBroker.readField(NetworkFieldEnum.COMMAND)))) {
+                        initialConnector.notifyNetworkError("ERROR: socket was not dedicated for ping routine");
+                    } else if (receivedIdUser != idUser) {
+                        initialConnector.notifyNetworkError("Server Error: identification failed");
+                    } else if (receivedIdPingRequest != progressiveIdPingRequest) {
+                        initialConnector.notifyNetworkError("Wrong Request Id. Expected: " + progressiveIdPingRequest + ". Received: " + receivedIdPingRequest);
+                    }
+
                     pingBroker.flushFirstSyncMessage();
-                    break;
-                } catch (InterruptedException | ExecutionException e) {
-                    handler.cancel(true);
-                    initialConnector.notifyNetworkError("Ping routine interrupted");
-                    pingBroker.flushFirstSyncMessage();
-                    break;
-                }
 
-                //maybe encapsulate operations below
+                    //Ping only every 2 seconds
+                    try {
+                        Thread.sleep(waitBetweenPingsMilliseconds);
+                    } catch (InterruptedException e) {
+                        System.err.println("Ping: Interrupted");
+                        receiverThread.interrupt(); // This might do nothing
+                    }
+                } while (initialConnector.isConnected());
 
-                int receivedIdUser = ApplicationHelper.getIntFromBrokerField(pingBroker.readField(NetworkFieldEnum.ID_USER));
-                int receivedIdPingRequest = ApplicationHelper.getIntFromBrokerField(pingBroker.readField(NetworkFieldEnum.ID_PING_REQUEST));
-
-                if(!CommandEnum.PONG
-                        .equals(CommandEnum.fromObjectToEnum(pingBroker.readField(NetworkFieldEnum.COMMAND)))){
-                    initialConnector.notifyNetworkError("ERROR: socket was not dedicated for ping routine");
-                }
-                else if (receivedIdUser != idUser){
-                    initialConnector.notifyNetworkError("Server Error: identification failed");
-                }
-                else if (receivedIdPingRequest != progressiveIdPingRequest){
-                    initialConnector.notifyNetworkError("Wrong Request Id. Expected: " + progressiveIdPingRequest + ". Received: " + receivedIdPingRequest);
-                }
-
-                pingBroker.flushFirstSyncMessage();
-
-                //Ping only every 2 seconds
-                try {
-                    Thread.sleep(waitBetweenPingsMilliseconds);
-                } catch (InterruptedException e) {
-                    System.err.println("Ping: Interrupted, starting new ping request immediately");
-                }
-            } while (initialConnector.isConnected());
-
-        }).start();
-
+            }
+        });
+        pingThread.setName("PingThread");
+        pingThread.start();
+        return pingThread;
     }
 
     /**

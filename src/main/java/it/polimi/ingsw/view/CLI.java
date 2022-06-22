@@ -6,7 +6,6 @@ import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.game.PhaseEnum;
-import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.network.*;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.client.InitialConnector;
@@ -30,7 +29,6 @@ public class CLI implements UserInterface {
     private VirtualViewBean viewBean; // todo see what needs to be kept
     private LobbyBean lobbyBean;
     private GameInitBean gameInitBean;
-    private TeamEnum winnerTeam;
     private List<CommandEnum> availableCommands;
     InterfaceInterrupt connected;
     InterfaceInterrupt lobbyStarting;
@@ -44,6 +42,7 @@ public class CLI implements UserInterface {
     List<InterfaceInterrupt> gameInterrupts; //There might be multiple "interrupts" that the main game interface should react to
     List<InterfaceInterrupt> lobbyInterrupts;
     List<InterfaceInterrupt> gameInitInterrupts;
+    boolean userQuit;
 
     private String chosenNickname;
     private GameRuleEnum gameMode;
@@ -58,6 +57,7 @@ public class CLI implements UserInterface {
     int studentsOnCardRequired;
     int studentsAtEntranceRequired;
     int colorsRequired;
+    private TeamEnum winnerTeam;
 
     private final String colorList3Players = "B - Black, G - Grey, W - White";
     private final String colorList2or4Players = "B - Black, W - White";
@@ -77,7 +77,7 @@ public class CLI implements UserInterface {
         LastElement = new StringBuilder();
         lobbyBean = null;
         gameInitBean = null;
-
+        userQuit = false;
 
         setGameMode(GameRuleEnum.NO_RULE);
 
@@ -109,39 +109,41 @@ public class CLI implements UserInterface {
         gameInitInterrupts.add(connected);
         gameInitInterrupts.add(gameInitUpdateAvailable);
         gameInitInterrupts.add(gameStarting);
+        gameInitInterrupts.add(gameInterrupted);
     }
 
     /**
      * Resets the CLI after a severe network error
      */
     public void reset(){
-        connected = new InterfaceInterrupt(false, initialConnector.getConnected());
+
+        resetInterrupts(gameInterrupts);
+        resetInterrupts(lobbyInterrupts);
+        resetInterrupts(gameInitInterrupts);
+
         beans = new ArrayList<>();
         availableCommands = new ArrayList<>();
-        setGameMode(GameRuleEnum.NO_RULE);
 
-        lobbyStarting.clearInterrupt();
-        gameStarting.clearInterrupt();
-        gameInterrupted.clearInterrupt();
-        updateAvailable.clearInterrupt();
-        yourTurn.clearInterrupt();
-        gameWon.clearInterrupt();
-
-        commandError = false;
+        connected = new InterfaceInterrupt(false, initialConnector.getConnected());
 
         gameInterrupts = new ArrayList<>();
         gameInterrupts.add(connected);
         gameInterrupts.add(gameInterrupted);
         gameInterrupts.add(updateAvailable);
         gameInterrupts.add(yourTurn);
+        gameInterrupts.add(gameWon);
 
         lobbyInterrupts = new ArrayList<>();
         lobbyInterrupts.add(connected);
+        lobbyInterrupts.add(lobbyUpdateAvailable);
         lobbyInterrupts.add(lobbyStarting);
 
         gameInitInterrupts = new ArrayList<>();
         gameInitInterrupts.add(connected);
+        gameInitInterrupts.add(gameInitUpdateAvailable);
         gameInitInterrupts.add(gameStarting);
+        gameInitInterrupts.add(gameInterrupted);
+
 
         resetGameInfo();
     }
@@ -367,6 +369,13 @@ public class CLI implements UserInterface {
 
     }
 
+    @Override
+    public void showGoodbyeScreen() {
+        System.out.println("""
+                 ~~~ See you soon! ~~~
+                """);
+    }
+
     //<editor-fold desc="Synchronous methods">
 
     @Override
@@ -418,6 +427,9 @@ public class CLI implements UserInterface {
                 2 - Advanced game: Character cards allowed""");
         do {
             gameMode = getInputNonBlocking(reader, connected);
+            if(connected.isTriggered()){
+                return;
+            }
             if (!(gameMode.equals("1") ||
                     gameMode.equals("2"))) {
                 errorChoice = true;
@@ -580,6 +592,15 @@ public class CLI implements UserInterface {
                 //Error occured, return
                 return;
             }
+            else if(gameInterrupted.isTriggered()){
+                // Go back to the login screen
+                gameInterrupted.clearInterrupt();
+                resetInterrupts(lobbyInterrupts);
+                resetInterrupts(gameInitInterrupts);
+                resetGameInfo();
+                showGameruleSelection();
+                return;
+            }
 
             repeatSelection = false;
             switch (selection) {
@@ -666,9 +687,15 @@ public class CLI implements UserInterface {
 
         // THERE ALWAYS NEEDS TO BE A WAY FOR THE USER TO INPUT ANYTHING
         do {
-
-            if(gameInterrupted.isTriggered()){ //The game was interrupted, show it to the client (might be removed as there are async handlers already
-                System.out.println("The game was interrupted :(");
+            //The game was interrupted, show it to the client (might be removed as there are async handlers already)
+            if(gameInterrupted.isTriggered()){
+                System.out.println("The game was interrupted :(\n");
+                gameInterrupted.clearInterrupt();
+                resetInterrupts(lobbyInterrupts);
+                resetInterrupts(gameInitInterrupts);
+                resetInterrupts(gameInterrupts);
+                resetGameInfo();
+                showGameruleSelection();
                 return;
             }
 
@@ -730,6 +757,7 @@ public class CLI implements UserInterface {
         switch (parsedInput){
             case QUIT -> {
                 sender.sendQuit();
+                userQuit = true;
             }
             case CHOOSE_ASSISTANT -> {
                 int idAssistant = ApplicationHelper.getIntFromString(input.split(" ")[1]);
@@ -838,6 +866,7 @@ public class CLI implements UserInterface {
         studentsAtEntranceRequired = 0;
         studentsOnCardRequired = 0;
         colorsRequired = 0;
+
     }
 
     // </editor-fold>
@@ -847,7 +876,8 @@ public class CLI implements UserInterface {
 
     @Override
     public void showNetworkError() {
-        System.out.println("Connection with Server lost, you will now return to the login screen");
+        //If the network error was intended (i.e. due to the user quitting)
+        if(!userQuit) System.out.println("Connection with Server lost, you will now return to the login screen");
     }
 
     @Override
@@ -860,11 +890,13 @@ public class CLI implements UserInterface {
     @Override
     public void startInterface() {
         showWelcomeScreen();
-        while(true){
+        while(!userQuit){
+            //This method ends here basically, everything else derives from the receiver
             communicationEntryPoint();
         }
-        //This ends here basically, everything else derives from the receiver
+        showGoodbyeScreen();
     }
+
 
     private void communicationEntryPoint() {
         showLoginScreen();
@@ -876,7 +908,6 @@ public class CLI implements UserInterface {
 
     //<editor-fold desc="Asynchronous methods">
 
-    //todo don't print immediately, just save and coordinate later
     public void printLobby(LobbyBean lobbyBean) {
         this.lobbyBean = lobbyBean;
         lobbyUpdateAvailable.trigger();
@@ -2223,6 +2254,16 @@ public class CLI implements UserInterface {
         return false;
     }
 
+    /**
+     * Resets the interrupts in the given list
+     * @param interrupts the list of interrupts to reset
+     */
+    private void resetInterrupts(List<InterfaceInterrupt> interrupts){
+        for(InterfaceInterrupt interfaceInterrupt : interrupts){
+            interfaceInterrupt.clearInterrupt();
+        }
+    }
+
     // </editor-fold>
 
 
@@ -2270,8 +2311,8 @@ public class CLI implements UserInterface {
     }
 
     @Override
-    public void setGameInterrupted(boolean alive) {
-        if(alive) gameInterrupted.trigger();
+    public void setGameInterrupted(boolean interrupted) {
+        if(interrupted) gameInterrupted.trigger();
         else gameInterrupted.clearInterrupt();
     }
 

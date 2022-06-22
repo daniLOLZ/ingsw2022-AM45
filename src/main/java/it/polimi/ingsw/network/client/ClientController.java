@@ -355,6 +355,7 @@ public class ClientController {
     public void handleLobbyUpdate(){
         LobbyBean lobbyBean = BeanTranslator.deserializeLobbyBean
                 ((LinkedTreeMap<String, Object>) broker.readAsyncField(NetworkFieldEnum.BEAN));
+        if(lobbyBean == null) return;
         userInterface.printLobby(lobbyBean);
     }
 
@@ -366,6 +367,7 @@ public class ClientController {
     public void handleGameInitUpdate(){
         GameInitBean gameInitBean = BeanTranslator.deserializeGameInitBean
                 ((LinkedTreeMap<String, Object>) broker.readAsyncField(NetworkFieldEnum.BEAN));
+        if(gameInitBean == null) return;
         userInterface.printGameInitInfo(gameInitBean);
     }
 
@@ -420,6 +422,8 @@ public class ClientController {
         // We call this to wake up the main game interface
         String problemUser = (String)(broker.readAsyncField(NetworkFieldEnum.ASYNC_USER_NICKNAME));
         userInterface.showUserDisconnected(problemUser);
+        this.gameState = new LookingForLobby();
+        allowStateCommands();
     }
 
     public void connectionClose() {
@@ -439,24 +443,6 @@ public class ClientController {
     private boolean checkSuccessfulReply(){
         return "OK".equals(
                 (String) broker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE));
-    }
-
-    /**
-     * Useful for tests
-     * @return the error message string sent by Server if this is present
-     */
-    public String getErrorMessage(){
-        String errorMes = "NO ERROR";
-        String replyMessage;
-
-        if(!broker.messagePresent())
-            return  errorMes;
-
-        replyMessage = (String) broker.readField(NetworkFieldEnum.SERVER_REPLY_MESSAGE);
-        if(replyMessage.equals("ERR"))
-            errorMes = (String) broker.readField(NetworkFieldEnum.ERROR_STATE);
-
-        return errorMes;
     }
 
     // </editor-fold>

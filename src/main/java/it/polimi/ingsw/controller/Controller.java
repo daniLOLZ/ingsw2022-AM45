@@ -646,7 +646,7 @@ public class Controller {
      * @param error the error message to show
      */
     public void setError(String error){
-        simpleGame.getParameters().setErrorState(error);
+        if(simpleGame != null) simpleGame.getParameters().setErrorState(error);
     }
 
     //What is this for?  Maybe for test when there was the deprecated one

@@ -31,20 +31,16 @@ public class Eriantys {
         if(serverMode){
             Server server = new Server(portNumber);
             server.startServer();
-            return;
         }
         if(GUIMode){
             //todo re-add functionality
             ClientMain client = new ClientMain(hostname, portNumber, true);
             client.startApplication();
-            return;
         }
         if(CLIMode){
             ClientMain client = new ClientMain(hostname, portNumber, false);
             client.startApplication();
-            return;
         }
-        //todo exit to close all threads?
     }
 
     private static void assignDefaultNetworkParameters() {

@@ -70,7 +70,8 @@ public class Lobby {
 
     /**
      * Removes a player from the Lobby.
-     * If he was the host, the role is reassigned.
+     * If they were the host, the role is reassigned. <br>
+     * If the last player is removed, the lobby is destroyed
      * @param idUser The idUser of the player to remove (must be in the lobby)
      */
     public synchronized void removePlayer(int idUser){
@@ -128,8 +129,23 @@ public class Lobby {
      * Removes the lobby from the global active lobbies' list
      */
     public void destroyLobby(){
-
         ActiveLobbies.removeLobby(this);
+    }
+
+    /**
+     * Destroys the lobby, removing it from the active lobbies list <br>
+     * If there are players still in the lobby, remove them first <br>
+     * If the parameter is set to false, then the method will only destroy the lobby if there are no players
+     * @param kickPlayers true if the lobby should be deleted and the players kicked
+     */
+    public void destroyLobby(boolean kickPlayers){
+        if (players.size() != 0 && !kickPlayers) return;
+        List<Integer> beforePlayers = new ArrayList<>(players);
+
+        for (Integer player : beforePlayers){
+            removePlayer(player);
+        }
+
     }
 
     /**

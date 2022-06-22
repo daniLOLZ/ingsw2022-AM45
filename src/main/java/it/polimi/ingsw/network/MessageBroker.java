@@ -185,6 +185,7 @@ public class MessageBroker {
     {
         String receivedMessage;
         StringBuilder tempString = new StringBuilder();
+        Map<NetworkFieldEnum, Object> deserializedMessage;
         int rawReadInt;
         char rawChar;
         boolean endOfMessage = false;
@@ -224,11 +225,13 @@ public class MessageBroker {
 
         }
         receivedMessage = tempString.toString();
-        if(receivedMessage.charAt(0) != '{') {
-            System.err.println("Bad message incoming, dropping");
-            return;
+
+        try{
+            deserializedMessage = deserialize(receivedMessage);
+        } catch (JsonSyntaxException e){
+            System.err.println("Bad message read");
+            throw new IOException();
         }
-        Map<NetworkFieldEnum, Object> deserializedMessage = deserialize(receivedMessage);
 
         convertListsToArrays(deserializedMessage);
 
@@ -343,10 +346,11 @@ public class MessageBroker {
                     // actually a GameRuleEnum
                     try{
                         GameRuleEnum.fromObjectToEnum(object);
+                        objClass = GameRuleEnum.class;
                     } catch (IllegalArgumentException e){
                         objClass = Void.class;
                     }
-                    objClass = GameRuleEnum.class;
+
                     neededClass = GameRuleEnum.class;
                     break;
                 case CHOSEN_ENTRANCE_POSITIONS:
@@ -368,10 +372,11 @@ public class MessageBroker {
                     // actually a PhaseEnum
                     try{
                         PhaseEnum.fromObjectToEnum(object);
+                        objClass = PhaseEnum.class;
                     } catch (IllegalArgumentException e){
                         objClass = Void.class;
                     }
-                    objClass = PhaseEnum.class;
+
                     neededClass = PhaseEnum.class;
                     break;
                 case ASYNC_WINNER:
@@ -379,10 +384,10 @@ public class MessageBroker {
                     // actually a TeamEnum
                     try{
                         TeamEnum.fromObjectToEnum(object);
+                        objClass = TeamEnum.class;
                     } catch (IllegalArgumentException e){
                         objClass = Void.class;
                     }
-                    objClass = TeamEnum.class;
                     neededClass = TeamEnum.class;
                     break;
                     //todo case for async_view

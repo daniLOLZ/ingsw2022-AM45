@@ -19,6 +19,8 @@ public class InitialConnector {
     private Socket mainSocket, pingSocket;
     private MessageBroker mainBroker, pingBroker;
     private PingHandler pingHandler;
+    private Thread pingThread;
+    private AtomicBoolean alreadyNotified;
 
     private AtomicBoolean connected;
     private AtomicBoolean isCommandScheduled; //Related to the main broker
@@ -32,6 +34,8 @@ public class InitialConnector {
         this.pingBroker = new MessageBroker();
         this.connected = new AtomicBoolean(true); //the ping routine will start before this field has been checked
         this.isCommandScheduled = new AtomicBoolean(false);
+        alreadyNotified = new AtomicBoolean(false);
+        pingThread = null;
     }
 
     /**
@@ -40,15 +44,29 @@ public class InitialConnector {
      */
     public void reset() {
 
-        this.mainBroker = new MessageBroker();
-        this.pingBroker = new MessageBroker();
-        this.connected = new AtomicBoolean(true);
-        this.isCommandScheduled = new AtomicBoolean(false);
+        // It's necessary to interrupt the ping when restarting the network, otherwise it will immediately
+        // set the newly connected boolean to false
+        if(pingThread != null){
+            pingThread.interrupt();
+            try {
+                pingThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("This is quite a conundrum");
+                e.printStackTrace();
+            }
+        }
 
         //Reset receiver
         receiver.reset();
         //Reset sender
         sender.reset();
+
+        this.mainBroker = new MessageBroker();
+        this.pingBroker = new MessageBroker();
+
+        this.connected = new AtomicBoolean(true);
+        this.isCommandScheduled = new AtomicBoolean(false);
+        alreadyNotified.set(false);
 
     }
 
@@ -78,7 +96,6 @@ public class InitialConnector {
             return false;
         }
 
-
         this.pingHandler = new PingHandler(this, pingBroker, pingSocket);
 
         //Start the sender
@@ -88,10 +105,6 @@ public class InitialConnector {
         receiver.initialize(inputStream, mainBroker, connected, isCommandScheduled);
 
         sender.sendNickname(nickname);
-
-
-        //start the user's ping routine in a new thread, this will send messages
-        // through the sender and receive them through the receiver
 
         return true;
     }
@@ -129,10 +142,12 @@ public class InitialConnector {
     /**
      * This will be called by either the sender, the receiver or the initial connector itself
      * and will cause this class to notify both of them to let
-     * them know the connection was lost <br>
+     * them know the connection was lost in an unexpected manner <br>
      * It closes all open sockets
      */
     public void notifyNetworkError(String error){
+        if(alreadyNotified.get()) return;
+        alreadyNotified.set(true);
         System.err.println(error);
         connected.set(false);
         try{
@@ -143,6 +158,38 @@ public class InitialConnector {
         catch (IOException | NullPointerException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Called by the sender, this method notifies all parts of the client application
+     * that the user wants to quit. <br>
+     * It closes all connections and quits the application
+     */
+    public void notifyApplicationQuit() {
+        connected.set(false);
+        try{
+            mainSocket.close();
+            pingSocket.close();
+            System.err.println("Sockets closed");
+        }
+        catch (IOException | NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Actions to take once the connection is established
+     * - Starts the ping routine
+     * - Sets the user id for all the network components that require it
+     */
+    public void loginSuccessful(int idUser) {
+
+        sender.assignIdUser(idUser);
+        pingHandler.assignIdUser(idUser);
+        this.pingThread = pingHandler.startPinging();
+        //start the user's ping routine in a new thread, this will send messages
+        // through the sender and receive them through the receiver as normal
+
     }
 
     public void setSender(ClientSender sender) {
@@ -157,22 +204,8 @@ public class InitialConnector {
         return connected.get();
     }
 
-    /**
-     * Actions to take once the connection is established
-     * - Starts the ping routine
-     * - Sets the user id for all the network components that require it
-     */
-    public void loginSuccessful(int idUser) {
-
-        sender.assignIdUser(idUser);
-        pingHandler.assignIdUser(idUser);
-        pingHandler.startPinging();
-
-    }
-
     public AtomicBoolean getConnected(){
         return this.connected;
     }
-
 
 }

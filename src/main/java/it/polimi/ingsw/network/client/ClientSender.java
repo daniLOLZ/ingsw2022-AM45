@@ -176,7 +176,10 @@ public class ClientSender {
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.QUIT);
 
         sendToServer();
-        return false;
+
+        initialConnector.notifyApplicationQuit();
+
+        return true;
     }
 
     public boolean sendAssistantChosen(int idAssistant) {

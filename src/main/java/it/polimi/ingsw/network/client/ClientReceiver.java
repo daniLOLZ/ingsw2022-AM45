@@ -15,14 +15,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Sender) or asynchronous (receieved from the server as a result of another user's command)
  * This class doesn't deal with the ping routine
  */
-//TODO: implemente failure and closing of receiver and sender
 public class ClientReceiver {
 
     private InputStream inputStream;
-    private boolean receiverStarted, parseAsyncStarted;
+    private boolean receiverStarted;
+    private boolean parseAsyncStarted;
+    private boolean hasBeenClosedAlready;
     private MessageBroker mainBroker;
     private AtomicBoolean connected;
-    private boolean hasBeenClosedAlready;
+    private Thread parseAsyncThread;
+    private Thread receiveMessagesThread;
 
     private AtomicBoolean isCommandScheduled;
     private final InitialConnector initialConnector; //Used only to communicate network error to the sender
@@ -41,33 +43,54 @@ public class ClientReceiver {
         clientController.setBroker(mainBroker);
         this.connected = connected;
         this.isCommandScheduled = isCommandScheduled;
-        receiveMessages();
-        parseAsyncMessages();
+        Thread receiveMessages = receiveMessages();
+        Thread parseAsync = parseAsyncMessages();
+        if(receiveMessages != null){
+            this.receiveMessagesThread = receiveMessages;
+        }
+        if(parseAsync != null){
+            this.parseAsyncThread = parseAsync;
+        }
     }
 
     public void reset() {
         receiverStarted = false;
         hasBeenClosedAlready = false;
+        parseAsyncStarted = false;
+        parseAsyncThread.interrupt();
+        receiveMessagesThread.interrupt();
+        try{
+            parseAsyncThread.join();
+            receiveMessagesThread.join();
+        } catch (InterruptedException e) {
+            System.err.println("This is quite a conundrum 2");
+            e.printStackTrace();
+        }
     }
 
     /**
      * Starts the listening procedure on a new thread and returns
      */
-    public void receiveMessages() {
+    public Thread receiveMessages() {
 
-        if (receiverStarted) return;
+        if (receiverStarted) return null;
 
-        new Thread(() -> {
-            while (connected.get()) {
-                try {
-                    mainBroker.receive(inputStream);
-                } catch (IOException e) {
-                    closeConnection();
+        Thread receiveMessages = new Thread(new Runnable() {
+            public void run() {
+                while (connected.get()) {
+                    try {
+                        mainBroker.receive(inputStream);
+                    } catch (IOException e) {
+                        closeConnection();
+                    }
                 }
             }
-        }).start();
+        });
+        receiveMessages.setName("receiveMessages");
+        receiveMessages.start();
 
         receiverStarted = true;
+        return receiveMessages;
     }
 
     //todo a method to check and compare id requests between the received one and the
@@ -79,7 +102,7 @@ public class ClientReceiver {
             try {
                 mainBroker.waitSyncMessage();
             } catch (InterruptedException e) {
-                System.err.println("Interrupted while waiting for async message, continuing...");
+                System.err.println("Interrupted while waiting for sync message, continuing...");
                 continue;
             }
 
@@ -112,7 +135,9 @@ public class ClientReceiver {
                 case SELECT_ISLAND_GROUP -> clientController.validateSelectIslandGroup();
                 case SELECT_STUDENT_ON_CARD -> clientController.validateSelectStudentOnCard();
                 case PLAY_CHARACTER -> clientController.validatePlayCharacter();
-                case QUIT -> closeConnection(); //todo make the response to QUIT its own method, right now it's the same as if a network error occurred
+//              case QUIT -> closeConnection();
+//              it doesn't make sense that the client waits for confirmation to quit from the server,
+//              it should be the sender that triggers the application quitting process when it sees "QUIT"
                 default -> closeConnection();
             }
             mainBroker.flushFirstSyncMessage();
@@ -120,40 +145,41 @@ public class ClientReceiver {
 
     }
 
-    public void parseAsyncMessages(){
-        if(parseAsyncStarted) return;
+    public Thread parseAsyncMessages(){
+        if(parseAsyncStarted) return null;
 
-        new Thread( () -> {
-            while (connected.get()) {
-                try {
-                    mainBroker.waitAsyncMessage();
-                } catch (InterruptedException e) {
-                    System.err.println("Interrupted while waiting for async message, continuing...");
-                }
-
-                switch (CommandEnum.fromObjectToEnum(mainBroker.readAsyncField(NetworkFieldEnum.COMMAND))) {
-                    case SERVER_LOBBY_STATUS ->                     clientController.handleLobbyUpdate();
-                    case SERVER_LOBBY_START ->                      clientController.handleLobbyStart();
-                    case SERVER_GAME_INITIALIZATION_STATUS ->       clientController.handleGameInitUpdate();
-                    case SERVER_GAME_START ->                       clientController.handleGameStart();
-                    case SERVER_YOUR_TURN ->                        clientController.handleTurnUpdate();
-                    case SERVER_GAME_UPDATE ->                      clientController.handleGameUpdate();
-                    case SERVER_GAME_WON ->                         clientController.handleGameWon();
-                    case SERVER_USER_DISCONNECTED ->                {
-                        clientController.handleUserDisconnection();
-                        closeConnection();
+        Thread parseAsyncThread = new Thread( new Runnable()  {
+            public void run() {
+                while (connected.get()) {
+                    try {
+                        mainBroker.waitAsyncMessage();
+                    } catch (InterruptedException e) {
+                        System.err.println("Interrupted while waiting for async message, continuing...");
+                        continue;
                     }
-                    default -> closeConnection();
+
+                    switch (CommandEnum.fromObjectToEnum(mainBroker.readAsyncField(NetworkFieldEnum.COMMAND))) {
+                        case SERVER_LOBBY_STATUS -> clientController.handleLobbyUpdate();
+                        case SERVER_LOBBY_START -> clientController.handleLobbyStart();
+                        case SERVER_GAME_INITIALIZATION_STATUS -> clientController.handleGameInitUpdate();
+                        case SERVER_GAME_START -> clientController.handleGameStart();
+                        case SERVER_YOUR_TURN -> clientController.handleTurnUpdate();
+                        case SERVER_GAME_UPDATE -> clientController.handleGameUpdate();
+                        case SERVER_GAME_WON -> clientController.handleGameWon();
+                        case SERVER_USER_DISCONNECTED -> clientController.handleUserDisconnection();
+                        default -> closeConnection();
+                    }
+                    if (connected.get()) {
+                        sendAsynchronousACK();
+                    }
+                    mainBroker.flushFirstAsyncMessage();
                 }
-                if(connected.get()){
-                    sendAsynchronousACK();
-                }
-                mainBroker.flushFirstAsyncMessage();
             }
-
-        }).start();
-
+        });
+        parseAsyncThread.setName("parseAsyncThread");
+        parseAsyncThread.start();
         parseAsyncStarted = true;
+        return parseAsyncThread;
     }
 
     /**

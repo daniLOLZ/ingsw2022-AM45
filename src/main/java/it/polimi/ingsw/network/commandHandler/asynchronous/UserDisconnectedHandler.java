@@ -3,6 +3,7 @@ package it.polimi.ingsw.network.commandHandler.asynchronous;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
+import it.polimi.ingsw.network.connectionState.LookingForLobby;
 import it.polimi.ingsw.network.server.ClientHandlerParameters;
 
 public class UserDisconnectedHandler extends AsyncCommandHandler {
@@ -19,7 +20,12 @@ public class UserDisconnectedHandler extends AsyncCommandHandler {
         messageBroker.addToMessage(NetworkFieldEnum.ASYNC_ID_USER, parameters.getUserController().getDisconnectedUserId());
         messageBroker.addToMessage(NetworkFieldEnum.ASYNC_USER_NICKNAME, parameters.getUserController().getDisconnectedUserNickname());
 
-        //todo
+        //We go back to the lobby
+        parameters.setConnectionState(new LookingForLobby());
+
+        parameters.setUserLobby(null);
+        parameters.setUserController(null);
+
         return true;
     }
 

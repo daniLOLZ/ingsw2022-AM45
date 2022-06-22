@@ -40,6 +40,11 @@ public interface UserInterface {
     void showWelcomeScreen();
 
     /**
+     * Shows a goodbye screen for the game
+     */
+    void showGoodbyeScreen();
+
+    /**
      * Shows the login screen;
      * This screen should allow the player to enter their desired username
      */
@@ -225,9 +230,9 @@ public interface UserInterface {
 
     /**
      * Set to true in case something ends the game, this will interrupt the main game interface
-     * @param alive false if there has been a problem and the game ended
+     * @param interrupted true if there has been a problem and the game ended
      */
-    void setGameInterrupted(boolean alive);
+    void setGameInterrupted(boolean interrupted);
 
     /**
      * Set to true whenever a view update is available (called via the asynchronous method)
@@ -244,11 +249,8 @@ public interface UserInterface {
     void setGameWon (TeamEnum winner);
 
     /**
-     * Sets the amount of game elements of various types that need to be selected to activate this card
-     * @param islandsRequired
-     * @param studentsOnCardRequired
-     * @param studentsAtEntranceRequired
-     * @param colorsRequired
+     * Sets the amount of game elements of various types that need to be selected
+     * to activate the previously selected card
      */
     void setCardRequirements(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired);
 
