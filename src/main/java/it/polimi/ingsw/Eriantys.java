@@ -32,12 +32,12 @@ public class Eriantys {
             Server server = new Server(portNumber);
             server.startServer();
         }
-        if(GUIMode){
+        else if(GUIMode){
             //todo re-add functionality
             ClientMain client = new ClientMain(hostname, portNumber, true);
             client.startApplication();
         }
-        if(CLIMode){
+        else if(CLIMode){
             ClientMain client = new ClientMain(hostname, portNumber, false);
             client.startApplication();
         }

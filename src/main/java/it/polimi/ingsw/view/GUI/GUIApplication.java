@@ -152,6 +152,8 @@ public class GUIApplication extends Application{
 
         started = true;
 
+        stage.setOnCloseRequest(event -> System.exit(0));
+
     }
 
     public static void showLoginScreen(boolean loginError) {
@@ -159,7 +161,7 @@ public class GUIApplication extends Application{
         //in case of logout I want to reset the action on close request
         //to not try and send a quit message
         //through a non-existent socket
-        stage.setOnCloseRequest(event -> {});
+        stage.setOnCloseRequest(event -> System.exit(0));
 
         StackPane root = new StackPane();
 
@@ -325,7 +327,10 @@ public class GUIApplication extends Application{
     public static void showSearchGameScreen(boolean searchGameError){
 
         //user is logged in. If he quits, the server is notified
-        stage.setOnCloseRequest(event -> defaultSender.sendQuit());
+        stage.setOnCloseRequest(event -> {
+            defaultSender.sendQuit();
+            System.exit(0);
+        });
 
         StackPane root = new StackPane();
 
