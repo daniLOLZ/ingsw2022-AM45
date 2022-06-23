@@ -297,8 +297,10 @@ public class CharacterCardTest {
         player.getBoard().addToHall(StudentEnum.RED);
         player.getBoard().addToHall(StudentEnum.RED);
 
+        int position = 0;
+
         while(player.getBoard().entranceSize() > 0)
-            player.getBoard().removeFromEntrance(0);
+            player.getBoard().removeFromEntrance(position++);
 
         player.addEntrance(StudentEnum.BLUE);
         player.addEntrance(StudentEnum.BLUE);
@@ -355,8 +357,9 @@ public class CharacterCardTest {
         Player playerWhite = game.getPlayers().get(0);
 
         //Gain red prof
+        playerWhite.getBoard().removeFromEntrance(playerWhite.getBoard().entranceSize() - 1);
         playerWhite.getBoard().addToEntrance(StudentEnum.RED);
-        game.selectStudentAtEntrance(playerWhite,9);
+        game.selectStudentAtEntrance(playerWhite,playerWhite.getBoard().entranceSize() - 1);
         game.moveFromEntranceToHall(playerWhite);
 
         //1 red student on island

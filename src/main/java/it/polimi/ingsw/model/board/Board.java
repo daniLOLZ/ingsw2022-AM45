@@ -24,6 +24,12 @@ public class Board {
         numberOfTowers = parameters.getNumTowers();
         towerColor = teamColor;
         studentsAtEntrance = new ArrayList<>();
+
+        //initialise each entrance student with an empty student
+        for (int studentAtEntrance = 0; studentAtEntrance < parameters.getMaxStudentsAtEntrance(); studentAtEntrance++){
+            studentsAtEntrance.add(StudentEnum.NOSTUDENT);
+        }
+
         studentsPerTable = new ArrayList<>();
         this.parameters = parameters;
         for(StudentEnum table : StudentEnum.getStudents()){
@@ -55,8 +61,11 @@ public class Board {
      */
     public StudentEnum moveFromEntranceToHall(){
 
+        //entrance is empty
+        if (entranceSize() == 0) return StudentEnum.NOSTUDENT;
+
         //no selected student
-        if (studentsAtEntrance.isEmpty()) return StudentEnum.NOSTUDENT;
+        if (parameters.getSelectedEntranceStudents().isEmpty()) return StudentEnum.NOSTUDENT;
 
         int studentPos = parameters.getSelectedEntranceStudents().get().stream().findFirst().get();
         StudentEnum student = studentsAtEntrance.get(studentPos);
@@ -104,7 +113,7 @@ public class Board {
         Collection<StudentEnum> students = chosenCloud.empty();
 
         //adds the returned students to the Entrance
-        studentsAtEntrance.addAll(students);
+        for (StudentEnum student : students) addToEntrance(student);
     }
 
     public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException {
@@ -139,7 +148,10 @@ public class Board {
     }
 
     public void addToEntrance(StudentEnum studentToAdd){
-        studentsAtEntrance.add(studentToAdd);
+
+        int freeSlot = studentsAtEntrance.indexOf(StudentEnum.NOSTUDENT);
+
+        if (freeSlot >= 0) studentsAtEntrance.set(freeSlot, studentToAdd);
     }
 
     /**
@@ -150,9 +162,13 @@ public class Board {
     public StudentEnum removeFromEntrance(int position){
 
         //position out of bounds
-        if(position >= studentsAtEntrance.size()) return StudentEnum.NOSTUDENT;
+        if(position >= parameters.getMaxStudentsAtEntrance()) return StudentEnum.NOSTUDENT;
 
-        return studentsAtEntrance.remove(position);
+        StudentEnum removedStudent = studentsAtEntrance.get(position);
+
+        studentsAtEntrance.set(position, StudentEnum.NOSTUDENT);
+
+        return removedStudent;
     }
 
     public void addToHall(StudentEnum student){
@@ -186,7 +202,13 @@ public class Board {
     }
 
     public int entranceSize(){
-        return studentsAtEntrance.size();
+
+        int size = 0;
+
+        //count every studentEnum who is a representation of an actual student
+        for (StudentEnum student : studentsAtEntrance) size += student != StudentEnum.NOSTUDENT? 1 : 0;
+
+        return size;
     }
 
     public Integer getStudentsAtTable(StudentEnum color) {

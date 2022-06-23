@@ -94,8 +94,8 @@ public class Juggler extends InitialEffect{
         if(numTrades > maxTradeableStudents)
             return;
 
-        player.getBoard().addToEntrance(removeStudent(index));
         addStudent(player.getBoard().removeFromEntrance(studentToJuggler));
+        player.getBoard().addToEntrance(removeStudent(index));
         numTrades++;
     }
 

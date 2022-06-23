@@ -752,7 +752,7 @@ public class GUIApplication extends Application{
             for (int board = 1; board < numPlayers; board++) {
 
                 int absIndex = (user + board) % boardSlots.size();
-                root.getChildren().addAll(BoardDrawer.drawBoard(advancedPlayers.get(absIndex), boardSlots.get(absIndex), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(absIndex)));
+                root.getChildren().addAll(BoardDrawer.drawBoard(advancedPlayers.get(absIndex), boardSlots.get(absIndex), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(board - 1)));
             }
         }
 
@@ -771,8 +771,8 @@ public class GUIApplication extends Application{
 
             for (int board = 1; board < numPlayers; board++) {
 
-                int absIndex = (user + board) % boardSlots.size();
-                root.getChildren().addAll(BoardDrawer.drawBoard(players.get(absIndex), boardSlots.get(absIndex), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(absIndex)));
+                int absIndex = (user + board) % (boardSlots.size() + 1);
+                root.getChildren().addAll(BoardDrawer.drawBoard(players.get(absIndex), boardSlots.get(board - 1), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(board - 1)));
             }
         }
 

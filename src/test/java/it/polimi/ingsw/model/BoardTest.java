@@ -101,7 +101,7 @@ public class BoardTest {
         parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToIsland(islandGroup);
 
-        assertEquals(board.getStudentsAtEntrance().size(),0,"Student is still at the Entrance");
+        assertEquals(board.entranceSize(),0,"Student is still at the Entrance");
     }
 
     /**
@@ -121,7 +121,7 @@ public class BoardTest {
         board.addToEntrance(student);
         board.moveFromEntranceToIsland(islandGroup);
 
-        assertEquals(board.getStudentsAtEntrance().size(),1,"Selected student has not been reset");
+        assertEquals(board.entranceSize(),1,"Selected student has not been reset");
     }
 
     /**
@@ -136,7 +136,7 @@ public class BoardTest {
         cloud.fill(students);
         board.moveFromCloud(cloud);
 
-        assertEquals(board.getStudentsAtEntrance().size(),3,"Moved wrong number of students");
+        assertEquals(board.entranceSize(),3,"Moved wrong number of students");
         for (int count = 0; count < 3; count++) assertEquals(board.getStudentsAtEntrance().get(count),student,"There's an impostor among us");
     }
 
@@ -156,7 +156,7 @@ public class BoardTest {
         }
 
         assertEquals(board.getAtEntrance(0),student,"Wrong student type at Entrance");
-        assertEquals(board.getStudentsAtEntrance().size(),1,"There is not exactly 1 student at the Entrance");
+        assertEquals(board.entranceSize(),1,"There is not exactly 1 student at the Entrance");
         assertEquals(board.getStudentsAtTable(student),0,"Student is still in the Hall");
 
         for (StudentEnum studentEnum : StudentEnum.values()){
@@ -172,7 +172,7 @@ public class BoardTest {
      */
     @Test
     public void moveFromHallToFullEntranceTest(){
-        while (board.getStudentsAtEntrance().size() < parameters.getMaxStudentsAtEntrance()) board.addToEntrance(student);
+        while (board.entranceSize() < parameters.getMaxStudentsAtEntrance()) board.addToEntrance(student);
         parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(0);}});
         board.moveFromEntranceToHall();
         board.addToEntrance(student);
