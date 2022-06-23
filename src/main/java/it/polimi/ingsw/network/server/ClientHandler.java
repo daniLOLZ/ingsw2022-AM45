@@ -95,7 +95,7 @@ public class ClientHandler implements Runnable{
             try {
                 while(!mainBroker.waitSyncMessage(2000)){
                     if(!connected.get()) return;
-                };
+                }
             } catch (InterruptedException e) {
                 System.err.println("Interrupted while waiting for message");
                 e.printStackTrace();
@@ -248,7 +248,7 @@ public class ClientHandler implements Runnable{
         try{
             mainSocket.close();
             pingSocket.close();
-            System.out.println("[ user " + parameters.getIdUser() + " ] Sockets closed");
+            System.out.println("[ user " + parameters.getIdUser() + " ] Connection closed");
         }
         catch (IOException e){
             e.printStackTrace();

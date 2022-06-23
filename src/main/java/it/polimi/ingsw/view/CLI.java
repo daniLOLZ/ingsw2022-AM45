@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class CLI implements UserInterface {
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;
+
     private final int startPosition = 0;
     private final int centerPosition = 10;
     private List<GameElementBean> beans;
@@ -381,13 +383,18 @@ public class CLI implements UserInterface {
 
     @Override
     public void showLoginScreen() {
-        Scanner scanner = new Scanner(System.in);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String inputNickname;
-        errorLogin = false;
 
         do{
+            errorLogin = false;
             System.out.println("Insert your username: ");
-            inputNickname = scanner.nextLine();
+            try {
+                inputNickname = reader.readLine();
+            } catch (IOException e) {
+                errorLogin = true;
+                continue;
+            }
             if(!initialConnector.login(inputNickname)){
                 errorLogin = true;
                 System.out.println("There was a problem connecting to the server, try again");
@@ -416,19 +423,21 @@ public class CLI implements UserInterface {
 
     @Override
     public void showGameruleSelection() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
         String gameMode;
         String numPlayers;
         boolean errorChoice;
 
         errorChoice = false;
 
+        clearOldScreen();
+
         System.out.println("""
                 Which type of game would you like to play? (Type in the corresponding number)
                 1 - Simple game: No character cards
                 2 - Advanced game: Character cards allowed""");
         do {
-            gameMode = getInputNonBlocking(reader, connected);
+            gameMode = getInputNonBlocking(connected);
             if(connected.isTriggered()){
                 return;
             }
@@ -447,7 +456,7 @@ public class CLI implements UserInterface {
                 4 - 4 Players
                 """);
         do {
-            numPlayers = getInputNonBlocking(reader,connected);
+            numPlayers = getInputNonBlocking(connected);
             if (!(numPlayers.equals("2") ||
                     numPlayers.equals("3") ||
                     numPlayers.equals("4"))) {
@@ -472,7 +481,6 @@ public class CLI implements UserInterface {
 
     @Override
     public void showLobby() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         boolean repeatSelection;
         String selection = "";
 
@@ -483,7 +491,7 @@ public class CLI implements UserInterface {
 
             repeatSelection = false;
             selection = "";
-            selection = getInputNonBlocking(reader, lobbyInterrupts);
+            selection = getInputNonBlocking(lobbyInterrupts);
 
             if (lobbyStarting.isTriggered()){
                 showTowerAndWizardSelection();
@@ -566,16 +574,17 @@ public class CLI implements UserInterface {
     @Override
     public void showTowerAndWizardSelection() {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String selection = null;
         String colorList = numberOfPlayers == 3 ? colorList3Players : colorList2or4Players;
         boolean repeatSelection = false;
+
+        clearOldScreen();
 
         if(!gameStarting.isTriggered()) printChooseYourTowerWizard(colorList);
         if(gameInitBean != null) printGameInitBean();
 
         do {
-            selection = getInputNonBlocking(reader, gameInitInterrupts);
+            selection = getInputNonBlocking(gameInitInterrupts);
 
             if(gameStarting.isTriggered()){
                 System.out.println("Everyone made their choice, the game is starting!");
@@ -605,7 +614,7 @@ public class CLI implements UserInterface {
             }
 
             repeatSelection = false;
-            switch (selection) {
+            switch (selection.toUpperCase(Locale.ROOT)) {
                 //Team color
                 case "B":
                     sender.sendTeamColorChoice(TeamEnum.BLACK);
@@ -674,7 +683,6 @@ public class CLI implements UserInterface {
 
     @Override
     public void showMainGameInterface() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         boolean correctInput = false;
         String input = "";
         CommandEnum parsedInput;
@@ -741,7 +749,7 @@ public class CLI implements UserInterface {
             if(!checkInterrupt(gameInterrupts)){
                 System.out.println("Type your command (space separated values):\t");
             }
-            input = getInputNonBlocking(reader, gameInterrupts);
+            input = getInputNonBlocking(gameInterrupts);
 
             if(isCorrectInput(input)) {
                 correctInput = true;
@@ -1309,7 +1317,7 @@ public class CLI implements UserInterface {
                                 append(advancedIslands.get(done+3).getIdIslands().size()).append("]");
                     else
                         islandString.append("\t\t\t\t\t\tISLAND: ").append(advancedIslands.get(done + 3).getIdIslandGroup()).append(" [").
-                                append(advancedIslands.get(done+3).getIdIslands().size()).append("]");;
+                                append(advancedIslands.get(done+3).getIdIslands().size()).append("]");
                     islandString.append("\nTowers: ").append(advancedIslands.get(done).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 1).getTowersColor()).
                             append("\t\t\t\t\t\tTowers: ").append(advancedIslands.get(done + 2).getTowersColor()).
@@ -2131,55 +2139,58 @@ public class CLI implements UserInterface {
     /**
      * Gets user input from the stream in the reader, exiting and returning the empty string
      * in case the interruptingCondition is true
-     * @param reader the BufferedReader to get input from
      * @param interruptingCondition the condition that exits the method, in case the input wasn't
      *                              read
      * @return the string input by the user, or the empty string if the interruptingCondition was triggered
      */
-    public String getInputNonBlocking(BufferedReader reader, InterfaceInterrupt interruptingCondition){
-        String selection = "";
-        while(selection.equals("") && !interruptingCondition.isTriggered()) {
-            try {
-                while (!reader.ready() && !interruptingCondition.isTriggered()) {
-                    Thread.sleep(200);
-                }
-                if(reader.ready()) selection = reader.readLine();
-                //If not, we exited because the game is starting
-            } catch (InterruptedException e) {
-                //Run the next loop
-                System.err.println("Interrupted before receiving input, continuing");
-            } catch (IOException e) {
-                System.err.println("I/O error, continuing");
-            }
-        }
-        return selection;
+    public String getInputNonBlocking(InterfaceInterrupt interruptingCondition){
+
+        List<InterfaceInterrupt> interrupts = new ArrayList<>();
+        interrupts.add(interruptingCondition);
+        return getInputNonBlocking(interrupts);
+
     }
 
     /**
      * Gets user input from the stream in the reader, exiting and returning the empty string
      * in case one of the interruptingConditions is true
-     * @param reader the BufferedReader to get input from
      * @param interruptingConditions the conditions that make the method return, in case the input
      *                              wasn't read already
      * @return the string input by the user, or the empty string if one of the interruptingConditions
      * was triggered
      */
-    public String getInputNonBlocking(BufferedReader reader, List<InterfaceInterrupt> interruptingConditions){
+    public String getInputNonBlocking(List<InterfaceInterrupt> interruptingConditions){
+
         String selection = "";
+        ExecutorService readerExecutor = Executors.newSingleThreadExecutor();
+        Future<String> handler;
+        Callable<String> readCallable = () -> {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            return reader.readLine();
+        };
+
+        handler = readerExecutor.submit(readCallable);
+
         while(selection.equals("") && !checkInterrupt(interruptingConditions)) {
             try {
-                while (!reader.ready() && !checkInterrupt(interruptingConditions)) {
-                    Thread.sleep(200);
+                selection = handler.get(200, TimeUnit.MILLISECONDS);
+                if(selection.equals("")){
+                    //Reset the handler
+                    handler = readerExecutor.submit(readCallable);
                 }
-                if(reader.ready()) selection = reader.readLine();
-                //If not, we exited because the game is starting
             } catch (InterruptedException e) {
                 //Run the next loop
-                System.err.println("Interrupted before receiving input, continuing");
-            } catch (IOException e) {
-                System.err.println("I/O error, continuing");
+                System.err.println("I got interrupted");
+                continue;
+            } catch (ExecutionException e) {
+                System.err.println("Exception in thread: " + e.getCause());
+            } catch (TimeoutException e) {
+                //Do another round
+                continue;
             }
         }
+        handler.cancel(true);
+        readerExecutor.shutdown();
         return selection;
     }
 
