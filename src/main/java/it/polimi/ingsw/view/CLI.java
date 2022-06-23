@@ -13,17 +13,21 @@ import it.polimi.ingsw.network.client.InterfaceInterrupt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class CLI implements UserInterface {
     private StringBuilder View;
     private StringBuilder LastView;
     private StringBuilder LastElement;
+    private AtomicReference<String> readCommand;
+    private Thread readerThread;
 
     private final int startPosition = 0;
     private final int centerPosition = 10;
@@ -113,6 +117,22 @@ public class CLI implements UserInterface {
         gameInitInterrupts.add(gameInitUpdateAvailable);
         gameInitInterrupts.add(gameStarting);
         gameInitInterrupts.add(gameInterrupted);
+
+        readCommand = new AtomicReference<>("");
+        Thread readerThread = new Thread(() ->{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String command = "";
+            while(true) {
+                try {
+                    command = reader.readLine();
+                } catch (IOException e) {
+                    System.err.println("Error reading from standard input");
+                }
+                readCommand.set(command);
+            }
+        });
+        readerThread.setName("readerThread");
+        this.readerThread = readerThread;
     }
 
     /**
@@ -146,7 +166,6 @@ public class CLI implements UserInterface {
         gameInitInterrupts.add(gameInitUpdateAvailable);
         gameInitInterrupts.add(gameStarting);
         gameInitInterrupts.add(gameInterrupted);
-
 
         resetGameInfo();
     }
@@ -383,18 +402,15 @@ public class CLI implements UserInterface {
 
     @Override
     public void showLoginScreen() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
         String inputNickname;
 
         do{
             errorLogin = false;
             System.out.println("Insert your username: ");
-            try {
-                inputNickname = reader.readLine();
-            } catch (IOException e) {
-                errorLogin = true;
-                continue;
-            }
+
+            inputNickname = getInputNonBlocking();
+
             if(!initialConnector.login(inputNickname)){
                 errorLogin = true;
                 System.out.println("There was a problem connecting to the server, try again");
@@ -910,11 +926,16 @@ public class CLI implements UserInterface {
 
 
     private void communicationEntryPoint() {
+        startReaderThread();
         showLoginScreen();
         if(!errorLogin) initialConnector.startReceiving();
         //If the communication is cut short, then this routine will reset it and try again
         initialConnector.reset();
         this.reset();
+    }
+
+    private void startReaderThread() {
+        readerThread.start();
     }
 
     //<editor-fold desc="Asynchronous methods">
@@ -1058,12 +1079,26 @@ public class CLI implements UserInterface {
 
     //<editor-fold desc="Utility methods">
 
+
     /**
-     * Gets user input from the stream in the reader, exiting and returning the empty string
-     * in case the interruptingCondition is true
-     * @param interruptingCondition the condition that exits the method, in case the input wasn't
-     *                              read
-     * @return the string input by the user, or the empty string if the interruptingCondition was triggered
+     * Gets user input from the stream in the reader, via a thread dedicated to reading user input.
+     * When this method is called, every input is reset.
+     * @return the string input by the user
+     */
+    public String getInputNonBlocking(){
+
+        List<InterfaceInterrupt> interrupts = new ArrayList<>();
+        return getInputNonBlocking(interrupts);
+
+    }
+
+    /**
+     * Gets user input from the stream in the reader, via a thread dedicated to reading user input.
+     * When this method is called, every input is reset.
+     * This method returns with the empty string in case the interruptingConditions is triggered
+     * @param interruptingCondition the condition that makes the method return prematurely
+     * @return the string input by the user, or the empty string if the interruptingCondition
+     * was triggered
      */
     public String getInputNonBlocking(InterfaceInterrupt interruptingCondition){
 
@@ -1071,6 +1106,47 @@ public class CLI implements UserInterface {
         interrupts.add(interruptingCondition);
         return getInputNonBlocking(interrupts);
 
+    }
+
+
+    /**
+     * Gets user input from the stream in the reader, via a thread dedicated to reading user input.
+     * When this method is called, every input is reset.
+     * This method returns with the empty string in case one of the interruptingConditions is triggered
+     * @param interruptingConditions the conditions that make the method return prematurely
+     * @return the string input by the user, or the empty string if one of the interruptingConditions
+     * was triggered
+     */
+    public String getInputNonBlocking(List<InterfaceInterrupt> interruptingConditions){
+
+        readCommand.set("");
+        //Empty the current string, whatever was present needs to be read again
+        String currentSelection = "";
+
+        while(currentSelection.equals("") && !checkInterrupt(interruptingConditions)){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(checkInterrupt(interruptingConditions)){
+                //The interrupts come first in terms of importance
+                return "";
+            }
+            currentSelection = readCommand.get();
+            if(!currentSelection.equals("")){
+                return currentSelection;
+            }
+        }
+        return "";
+    }
+
+    private boolean checkInterrupt(List<InterfaceInterrupt> interruptingConditions) {
+        for(InterfaceInterrupt condition : interruptingConditions){
+            //If the condition is triggered when true(false) and the interrupt IS true(false), then return true
+            if( condition.isTriggered() ) return true;
+        }
+        return false;
     }
 
     /**
@@ -1081,8 +1157,7 @@ public class CLI implements UserInterface {
      * @return the string input by the user, or the empty string if one of the interruptingConditions
      * was triggered
      */
-    public String getInputNonBlocking(List<InterfaceInterrupt> interruptingConditions){
-
+    public String getInputNonBlockingLegacy(List<InterfaceInterrupt> interruptingConditions){
 
         String selection = "";
         ExecutorService readerExecutor = Executors.newSingleThreadExecutor();
@@ -1119,13 +1194,6 @@ public class CLI implements UserInterface {
         return selection;
     }
 
-    private boolean checkInterrupt(List<InterfaceInterrupt> interruptingConditions) {
-        for(InterfaceInterrupt condition : interruptingConditions){
-            //If the condition is triggered when true(false) and the interrupt IS true(false), then return true
-            if( condition.isTriggered() ) return true;
-        }
-        return false;
-    }
 
 
     /**
