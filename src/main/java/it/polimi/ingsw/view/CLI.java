@@ -435,7 +435,8 @@ public class CLI implements UserInterface {
         System.out.println("""
                 Which type of game would you like to play? (Type in the corresponding number)
                 1 - Simple game: No character cards
-                2 - Advanced game: Character cards allowed""");
+                2 - Advanced game: Character cards allowed
+                """);
         do {
             gameMode = getInputNonBlocking(connected);
             if(connected.isTriggered()){
@@ -938,7 +939,6 @@ public class CLI implements UserInterface {
         }
     }
 
-    //todo don't print immediately, just save and coordinate later
     public void printGameInitInfo(GameInitBean gameInitBean){
         this.gameInitBean = gameInitBean;
         gameInitUpdateAvailable.trigger();
@@ -1083,11 +1083,14 @@ public class CLI implements UserInterface {
      */
     public String getInputNonBlocking(List<InterfaceInterrupt> interruptingConditions){
 
+
         String selection = "";
         ExecutorService readerExecutor = Executors.newSingleThreadExecutor();
         Future<String> handler;
         Callable<String> readCallable = () -> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            while(!reader.ready() && !Thread.currentThread().isInterrupted()); // Can't wait or the input is invisible, can't interrupt because readLine is non-blocking, i hate I/O so much here take 20% of my cpu resources but please read the input
+            if(Thread.currentThread().isInterrupted()) return ""; // Only interrupted if we need to exit out of the function
             return reader.readLine();
         };
 
