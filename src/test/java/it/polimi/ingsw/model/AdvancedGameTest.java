@@ -114,8 +114,11 @@ public class AdvancedGameTest {
         int previousPlayerCoin = player.getNumCoins();
 
         //ADD 3 STUDENT WITH SAME COLOR AT PLAYER ENTRANCE
+
+        int position = 0;
+
         while(player.getBoard().entranceSize() != 0)
-            player.getBoard().removeFromEntrance(0);
+            player.getBoard().removeFromEntrance(position++);
 
         player.getBoard().addToEntrance(StudentEnum.RED);
         player.getBoard().addToEntrance(StudentEnum.RED);
@@ -125,9 +128,9 @@ public class AdvancedGameTest {
         //PUT 3 STUDENT WITH SAME COLOR AND PLAYER GETS A COIN
         game.selectStudentAtEntrance(player,0);
         game.moveFromEntranceToHall(player);
-        game.selectStudentAtEntrance(player,0);
+        game.selectStudentAtEntrance(player,1);
         game.moveFromEntranceToHall(player);
-        game.selectStudentAtEntrance(player,0);
+        game.selectStudentAtEntrance(player,2);
         game.moveFromEntranceToHall(player);
         int nowCoin = game.getAdvancedParameters().getNumCoins();
         int nowPlayerCoin = player.getNumCoins();
@@ -155,12 +158,14 @@ public class AdvancedGameTest {
         //WITH GLUTTON
 
         //Adding an overflowing red player to test
+        player1.getBoard().removeFromEntrance(player1.getBoard().entranceSize() - 1);
+        player2.getBoard().removeFromEntrance(player2.getBoard().entranceSize() - 1);
         player1.getBoard().addToEntrance(StudentEnum.RED);
         player2.getBoard().addToEntrance(StudentEnum.RED);
 
         //Player1 move a red student into Hall and gain red professor
         game.getParameters().setCurrentPlayer(player1);
-        game.selectStudentAtEntrance(player1,9);
+        game.selectStudentAtEntrance(player1,player1.getBoard().entranceSize() - 1);
         game.moveFromEntranceToHall(player1);
         PlayerEnum hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player1.getPlayerId(), hasRedProf, "Error getting professor");
@@ -172,7 +177,7 @@ public class AdvancedGameTest {
 
         //Player2 move a red student into Hall and gain red professor cause glutton effect
         game.getParameters().setCurrentPlayer(player2);
-        game.selectStudentAtEntrance(player2,9);
+        game.selectStudentAtEntrance(player2,player2.getBoard().entranceSize() - 1);
         game.moveFromEntranceToHall(player2);
         hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player2.getPlayerId(), hasRedProf, "Error getting professor");
@@ -188,12 +193,14 @@ public class AdvancedGameTest {
         //WITHOUT GLUTTON
 
         //Adding an overflowing red player to test
+        player1.getBoard().removeFromEntrance(player1.getBoard().entranceSize() - 1);
+        player2.getBoard().removeFromEntrance(player2.getBoard().entranceSize() - 1);
         player1.getBoard().addToEntrance(StudentEnum.RED);
         player2.getBoard().addToEntrance(StudentEnum.RED);
 
         //Player1 move a red student into Hall and gain red professor
         game.getParameters().setCurrentPlayer(player1);
-        game.selectStudentAtEntrance(player1,9);
+        game.selectStudentAtEntrance(player1,player1.getBoard().entranceSize() - 1);
         game.moveFromEntranceToHall(player1);
         hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player1.getPlayerId(), hasRedProf, "Error getting professor");
@@ -204,7 +211,7 @@ public class AdvancedGameTest {
         //Player2 move a red student into Hall, but he draws with player1 so player1 still
         //has red professor
         game.getParameters().setCurrentPlayer(player2);
-        game.selectStudentAtEntrance(player2,9);
+        game.selectStudentAtEntrance(player2, player2.getBoard().entranceSize() - 1);
         game.moveFromEntranceToHall(player2);
         hasRedProf = game.getParameters().getProfessors().get(StudentEnum.RED.index);
         assertEquals(player1.getPlayerId(), hasRedProf, "Error getting professor");

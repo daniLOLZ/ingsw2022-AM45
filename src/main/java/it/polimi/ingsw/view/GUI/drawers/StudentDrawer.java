@@ -29,12 +29,14 @@ public class StudentDrawer extends Drawer{
 
     public static ImageView drawStudent(StudentEnum studentType, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
+        if (studentType == StudentEnum.NOSTUDENT) return new ImageView();
+
         return drawFromCenterInteractiveImage(students.get(studentType.index), pos, scale, onClick);
     }
 
     public static ImageView drawStudent(StudentEnum studentType, Coord pos, double scale){
 
-        return drawFromCenterInteractiveImage(students.get(studentType.index), pos, scale, HandlingToolbox.NO_EFFECT);
+        return drawStudent(studentType, pos, scale, HandlingToolbox.NO_EFFECT);
     }
 
     public static double getStudentSize(){

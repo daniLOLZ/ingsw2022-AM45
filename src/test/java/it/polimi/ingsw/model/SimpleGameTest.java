@@ -155,8 +155,11 @@ public class SimpleGameTest {
     public void getFromCloudTest(){
         game.fillClouds();
         Player player = game.getPlayers().get(0);
+
+        int position = 0;
+
         while(player.getBoard().entranceSize() != 0)
-            player.getBoard().removeFromEntrance(0);
+            player.getBoard().removeFromEntrance(position++);
 
         game.getFromCloud(player,0);
 

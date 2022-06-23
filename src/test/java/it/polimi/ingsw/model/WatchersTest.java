@@ -166,19 +166,19 @@ public class WatchersTest {
 
 
         assertTrue(cloudBean.getStudents().isEmpty());
-        assertFalse(playerBean.getStudentsAtEntrance().isEmpty());
+        assertFalse(playerBean.getStudentsAtEntranceRealSize() == 0);
 
         cli.addBean(playerBean);
         cli.addBean(cloudBean);
         //cli.show();
 
-        int sizeBeforeMove = playerBean.getStudentsAtEntrance().size();
+        int sizeBeforeMove = playerBean.getStudentsAtEntranceRealSize();
         game.selectStudentAtEntrance(player,0);
         game.moveFromEntranceToHall(player);
         playerBean = virtualView.getAdvancedPlayerBean().get(0);
 
 
-        assertEquals(sizeBeforeMove - 1, playerBean.getStudentsAtEntrance().size());
+        assertEquals(sizeBeforeMove - 1, playerBean.getStudentsAtEntranceRealSize());
 
         cli.addBean(playerBean);
         cli.addBean(cloudBean);

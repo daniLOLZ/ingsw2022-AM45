@@ -230,4 +230,13 @@ public class PlayerBean extends GameElementBean{
     public void setTurn(int turn) {
         this.turn = turn;
     }
+
+    public int getStudentsAtEntranceRealSize(){
+        int size = 0;
+
+        //count every studentEnum who is a representation of an actual student
+        for (StudentEnum student : studentsAtEntrance) size += student != StudentEnum.NOSTUDENT? 1 : 0;
+
+        return size;
+    }
 }
