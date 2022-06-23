@@ -17,7 +17,7 @@ public class AdvancedSack extends Sack{
      */
     private void addStudent(StudentEnum student){
         List<StudentEnum> shuffleNeeds = new ArrayList<>();
-        int random = (int) Instant.now().getEpochSecond() % students.size();
+        int random = (int) Instant.now().getEpochSecond() % (students.size()-1);
         StudentEnum replaced;
 
         shuffleNeeds = drawNStudents(size()-1);

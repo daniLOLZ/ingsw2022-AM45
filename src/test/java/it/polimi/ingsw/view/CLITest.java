@@ -5,10 +5,7 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.assistantCards.FactoryWizard;
 import it.polimi.ingsw.model.beans.*;
-import it.polimi.ingsw.model.characterCards.CharacterCard;
-import it.polimi.ingsw.model.characterCards.Dame;
-import it.polimi.ingsw.model.characterCards.Juggler;
-import it.polimi.ingsw.model.characterCards.Priest;
+import it.polimi.ingsw.model.characterCards.*;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.ParameterHandler;
@@ -42,31 +39,31 @@ public class CLITest {
         selectedWizards.add(0);
         selectedWizards.add(10);
         selectedWizards.add(20);
-        selectedWizards.add(30);
+        //selectedWizards.add(30);
         final List<TeamEnum> teamColors = new ArrayList<>();
         teamColors.add(TeamEnum.WHITE);
-        teamColors.add(TeamEnum.WHITE);
+        //teamColors.add(TeamEnum.WHITE);
         teamColors.add(TeamEnum.BLACK);
-        teamColors.add(TeamEnum.BLACK);
-        //teamColors.add(TeamEnum.GREY);
+        //teamColors.add(TeamEnum.BLACK);
+        teamColors.add(TeamEnum.GREY);
         final List<String> nicknames = new ArrayList<>();
         final List<String> nicknames2 = new ArrayList<>();
         nicknames.add("Franco");
         nicknames.add("Mario");
         nicknames.add("Alice");
-        nicknames.add("Ben");
+        //nicknames.add("Ben");
         nicknames2.add("Tizia");
         nicknames2.add("Caia");
         nicknames2.add("Sempronia");
-        nicknames2.add("Flavia");
+        //nicknames2.add("Flavia");
         virtualView = new VirtualView();
         virtualViewSimple = new VirtualView();
 
 
         try {
-            game = new AdvancedGame(players ,selectedWizards,teamColors,nicknames,
+            game = new AdvancedGame(players -1 ,selectedWizards,teamColors,nicknames,
                     coins,CharacterCards, virtualView);
-            gameSimple = new SimpleGame(players,selectedWizards,teamColors,nicknames2,virtualViewSimple);
+            gameSimple = new SimpleGame(players-1,selectedWizards,teamColors,nicknames2,virtualViewSimple);
             gameSimple.initializeGame();
             game.initializeGame();
         } catch (IncorrectPlayersException e) {
@@ -81,20 +78,29 @@ public class CLITest {
         Player player1 = (Player)game.getPlayers().get(0);
         Player player2 = (Player)game.getPlayers().get(1);
         Player player3 = (Player)game.getPlayers().get(2);
-        Player player4 = (Player)game.getPlayers().get(3);
+        //Player player4 = (Player)game.getPlayers().get(3);
 
 
         game.selectStudentAtEntrance(player1,0);
         game.moveFromEntranceToHall(player1);
+
+        game.getFromCloud(player1,1);
 
 
 
         game.playAssistant(player1, 4);
         game.playAssistant(player2, 3);
         game.playAssistant(player3, 2);
-        game.playAssistant(player4, 1);
+        //game.playAssistant(player4, 1);
 
         game.sortPlayers();
+
+        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
+        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
+        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
+
+
+
 
         cli.printGameInterface(virtualView.renderAdvancedView());
         cli.printInterface();
@@ -104,6 +110,23 @@ public class CLITest {
 
         cli.printGameInterface(virtualViewSimple.renderSimpleView());
         cli.printInterface();
+
+    }
+
+
+
+    @Test
+    public void test11(){
+
+        String s1 = "Ciao";
+        StringBuilder s = new StringBuilder();
+                s.append(String.format("%-20s\t",s1)).append(String.format("%-20s\t",s1));
+                s.append("\n");
+                s.append(String.format("%-20s\t",s1)).append(String.format("%-20s\t",s1));
+        System.out.println(s);
+
+        CLI cli = new CLI();
+
 
     }
 

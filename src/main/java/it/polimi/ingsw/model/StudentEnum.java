@@ -13,7 +13,7 @@ public enum StudentEnum {
     YELLOW(2, StaticColorCLI.ANSI_YELLOW + "*" + StaticColorCLI.ANSI_RESET),
     PINK(3, StaticColorCLI.ANSI_PURPLE + "*" + StaticColorCLI.ANSI_RESET),
     BLUE(4, StaticColorCLI.ANSI_CYAN + "*" + StaticColorCLI.ANSI_RESET),
-    NOSTUDENT(5, "NOSTUDENT");
+    NOSTUDENT(5, StaticColorCLI.ANSI_WHITE+"°"+ StaticColorCLI.ANSI_RESET);
 
     public final int index;
     private final String color;
