@@ -291,10 +291,10 @@ public abstract class Drawer{
     public static EventHandler<MouseEvent> getChildrenEnteredZoom(Text text, Coord slot, double scale, double hoverZoom, ImageView parentView){
 
         return event -> {
+            text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() * hoverZoom));
             text.setWrappingWidth(text.getWrappingWidth() * hoverZoom);
             text.setX(parentView.getX() + parentView.getFitWidth() / 2 + slot.x * scale * hoverZoom - text.getWrappingWidth() / 2);
             text.setY(parentView.getY() + parentView.getFitHeight() / 2 + slot.y * scale * hoverZoom - text.maxHeight(-1) / 2);
-            text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() * hoverZoom));
         };
     }
 
@@ -302,10 +302,10 @@ public abstract class Drawer{
 
 
         return event -> {
+            text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() / hoverZoom));
             text.setWrappingWidth(text.getWrappingWidth() / hoverZoom);
             text.setX(parentView.getX() + parentView.getFitWidth() / 2 + slot.x * scale - text.getWrappingWidth() / 2);
             text.setY(parentView.getY() + parentView.getFitHeight() / 2 + slot.y * scale - text.maxHeight(-1) / 2);
-            text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() / hoverZoom));
         };
     }
 }

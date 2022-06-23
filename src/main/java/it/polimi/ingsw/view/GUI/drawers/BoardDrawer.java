@@ -8,9 +8,12 @@ import it.polimi.ingsw.view.GUI.handlingToolbox.BoardHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -28,6 +31,10 @@ import static it.polimi.ingsw.view.GUI.GUIApplication.*;
 public class BoardDrawer extends Drawer{
 
     public static final int USER = 0, RIGHT = 1, TOP = 2, LEFT = 3;
+
+    private static final double tableLength = 1623, tableWidth = 236;
+
+    private static final Coord firstButtonPos = new Coord(-1080, -589);
 
     private static final List<Image> boards = new ArrayList<>();
 
@@ -168,8 +175,8 @@ public class BoardDrawer extends Drawer{
         Coord textLocation = pos.pureSumX(textSlot.x * actualBoardScale.get()).pureSumY(textSlot.y * actualBoardScale.get());
 
 
-        playerInfo.setTextAlignment(TextAlignment.CENTER);
         playerInfo.setFont(Font.font(playerInfo.getFont().getName(),actualBoardScale.get() * textSize / playerInfo.getFont().getSize()));
+        playerInfo.setTextAlignment(TextAlignment.CENTER);
         playerInfo.setX(textLocation.x);
         playerInfo.setY(textLocation.y);
         playerInfo.setWrappingWidth(playerBoxWidth * actualBoardScale.get());
@@ -303,6 +310,35 @@ public class BoardDrawer extends Drawer{
 
                 entered.add(getChildrenEnteredZoom(diningView, finalDiningSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
                 exited.add(getChildrenExitedZoom(diningView, finalDiningSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+            }
+        }
+
+        //make the tables clickable (for putting students in hall and color selection)
+        if (orientation == USER){
+            for (StudentEnum color : StudentEnum.getStudents()){
+
+                Rectangle tableButton = new Rectangle();
+                tableButton.setFill(Color.TRANSPARENT);
+                tableButton.setStroke(Color.TRANSPARENT);
+
+                Coord buttonSlot = firstButtonPos.pureSumY(tableWidth * color.index);
+
+                tableButton.setX(pos.pureSumX(buttonSlot.x * actualBoardScale.get()).x);
+                tableButton.setY(pos.pureSumY(buttonSlot.y * actualBoardScale.get()).y);
+
+                tableButton.setWidth(tableLength * actualBoardScale.get());
+                tableButton.setHeight(tableWidth * actualBoardScale.get());
+
+
+                tableButton.setOnMouseClicked(event -> eventHandlers.getOnHallClick(color.index));
+
+                Coord finalButtonSlot = buttonSlot.pureSumX(tableLength / 2).pureSumY(tableWidth / 2);
+
+                entered.add(getChildrenEnteredZoom(tableButton, finalButtonSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+                exited.add(getChildrenExitedZoom(tableButton, finalButtonSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+
+                toDraw.add(tableButton);
+
             }
         }
 
