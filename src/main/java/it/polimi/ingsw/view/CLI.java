@@ -1398,64 +1398,7 @@ public class CLI implements UserInterface {
         return list1s;
     }
 
-    private String sideBySide(String left, String right ){
-        final int width = 4;
-        final int position = 1;
-        final String tab ="    ";
 
-        Scanner moreRowsLeftElement = new Scanner(left);
-        Scanner moreRowsRightElement = new Scanner(right);
-        moreRowsLeftElement.useDelimiter("\n");
-        moreRowsRightElement.useDelimiter("\n");
-        int leftElementRows = 0;
-        int rightElementRows = 0;
-        while(moreRowsLeftElement.hasNext()){
-            moreRowsLeftElement.next();
-            leftElementRows++;
-        }
-
-        while(moreRowsRightElement.hasNext()){
-            moreRowsRightElement.next();
-            rightElementRows++;
-        }
-
-        if(rightElementRows > leftElementRows){
-            String toggle = right;
-            right = left;
-            left = right;
-        }
-
-
-        //Old element to show in left position on screen
-        Scanner scannerLastElement = new Scanner(left);
-        scannerLastElement.useDelimiter("\n");
-
-        //new element to show in right position on screen
-        Scanner scannerThisElement = new Scanner(right);
-        scannerThisElement.useDelimiter("\n");
-
-        //OFFSET
-        StringBuilder offsetBuilder = new StringBuilder();
-        for(int i = 0; i < width * position; i++){
-            offsetBuilder.append(tab);
-        }
-
-        String offset = offsetBuilder.toString();
-        StringBuilder newString = new StringBuilder();
-
-         /*
-        now for each left element's row I append the right element's row with an offset.
-         */
-        while(scannerLastElement.hasNext() || scannerThisElement.hasNext()){
-            if(!scannerThisElement.hasNext())
-                newString.append(scannerLastElement.next()).append("\n");
-            else
-                newString.append(scannerLastElement.next()).append(offset).append(scannerThisElement.next()).append("\n");
-        }
-
-        return newString.toString();
-
-    }
 
     public void printCharacterCard(List<CharacterCardBean> characterCardBeans){
         StringBuilder characterString = new StringBuilder();
@@ -1513,7 +1456,7 @@ public class CLI implements UserInterface {
 
         //ID
         for (CloudBean cloud : clouds) {
-            s = "CLOUD :" + cloud.getIdCloud();
+            s = "CLOUD: " + cloud.getIdCloud();
             cloudsString.append(String.format("%-30s", s));
         }
 
@@ -1670,9 +1613,9 @@ public class CLI implements UserInterface {
         for(PlayerBean player: players){
             while(player.getStudentsAtEntrance().size() <= 9 )
                 player.getStudentsAtEntrance().add(StudentEnum.NOSTUDENT);
-            List<StudentEnum> list = player.getStudentsAtEntrance().subList(0,2);
+            List<StudentEnum> list = player.getStudentsAtEntrance().subList(0,3);
             s= "Entrance: " + list ;
-            playerString.append(String.format("%-48s",s));
+            playerString.append(String.format("%-57s",s));
         }
         playerString.append("\n");
 
@@ -1719,7 +1662,7 @@ public class CLI implements UserInterface {
                 s= "Assistant: " + player.getIdAssistants().subList(0,a);
             }
             else
-                s = "[]";
+                s = "Assistant: []";
             playerString.append(String.format("%-30s",s));
         }
         playerString.append("\n");
@@ -1727,7 +1670,7 @@ public class CLI implements UserInterface {
         //Assistant 2
         for(PlayerBean player: players){
             int assistantsSize = player.getIdAssistants().size();
-            if(assistantsSize > 4){
+            if(assistantsSize > 3){
                 int a = Math.min(assistantsSize, 8);
                 s= player.getIdAssistants().subList(3,a).toString();
             }
@@ -1740,7 +1683,7 @@ public class CLI implements UserInterface {
         //Assistant 3
         for(PlayerBean player: players){
             int assistantsSize = player.getIdAssistants().size();
-            if(assistantsSize > 9){
+            if(assistantsSize > 8){
                 s= player.getIdAssistants().subList(8,assistantsSize).toString();
             }
             else

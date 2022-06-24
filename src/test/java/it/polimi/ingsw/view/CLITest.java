@@ -81,10 +81,10 @@ public class CLITest {
         //Player player4 = (Player)game.getPlayers().get(3);
 
 
-        game.selectStudentAtEntrance(player1,0);
-        game.moveFromEntranceToHall(player1);
+        //game.selectStudentAtEntrance(player1,0);
+        //game.moveFromEntranceToHall(player1);
 
-        game.getFromCloud(player1,1);
+        //game.getFromCloud(player1,1);
 
 
 
@@ -94,6 +94,11 @@ public class CLITest {
         //game.playAssistant(player4, 1);
 
         game.sortPlayers();
+
+
+
+
+
 
         gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
         gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
@@ -113,22 +118,6 @@ public class CLITest {
 
     }
 
-
-
-    @Test
-    public void test11(){
-
-        String s1 = "Ciao";
-        StringBuilder s = new StringBuilder();
-                s.append(String.format("%-20s\t",s1)).append(String.format("%-20s\t",s1));
-                s.append("\n");
-                s.append(String.format("%-20s\t",s1)).append(String.format("%-20s\t",s1));
-        System.out.println(s);
-
-        CLI cli = new CLI();
-
-
-    }
 
 
 

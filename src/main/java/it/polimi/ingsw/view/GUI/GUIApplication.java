@@ -599,7 +599,7 @@ public class GUIApplication extends Application{
                 lighting.setSpecularConstant(0.0);
                 lighting.setSpecularExponent(0.0);
                 lighting.setSurfaceScale(0.0);
-                lighting.setLight(new Light.Distant(45, 45, Color.GREY));
+                lighting.setLight(new Light.Distant(45, 45, Color.RED));
 
                 towerView.setEffect(lighting);
             }
@@ -664,7 +664,7 @@ public class GUIApplication extends Application{
                 lighting.setSpecularConstant(0.0);
                 lighting.setSpecularExponent(0.0);
                 lighting.setSurfaceScale(0.0);
-                lighting.setLight(new Light.Distant(45, 45, Color.GREY));
+                lighting.setLight(new Light.Distant(45, 45, Color.RED));
 
                 wizardView.setEffect(lighting);
             }
