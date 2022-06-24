@@ -1,10 +1,12 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.FullEntranceException;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.Player;
 
 import java.util.ArrayList;
@@ -55,8 +57,8 @@ public class Minstrel extends CharacterCard {
         indexEntrance = parameters.getSelectedEntranceStudents().get();
         indexHall = parameters.getSelectedStudentTypes().get();
 
-        Collections.sort(indexEntrance);
-        Collections.reverse(indexEntrance);
+//        Collections.sort(indexEntrance);
+//        Collections.reverse(indexEntrance);
 
         if(indexHall.size() == 1){
             while(indexHall.size() != indexEntrance.size())
@@ -87,6 +89,10 @@ public class Minstrel extends CharacterCard {
      * @param colorHall != NOSTUDENT
      */
     public void tradeStudents( int indexStudentEntrance, StudentEnum colorHall){
+
+        StudentEnum studentToHall;
+        int numStudents;
+
         if(trades >= maxTradeableStudents)
             return;
 
@@ -95,7 +101,15 @@ public class Minstrel extends CharacterCard {
         Board board = player.getBoard();
         parameters.setSelectedEntranceStudents(new ArrayList<>(){{add(indexStudentEntrance);}});
 
-        board.moveFromEntranceToHall();
+        studentToHall = board.moveFromEntranceToHall();
+        numStudents = board.getStudentsAtTable(studentToHall);
+
+        //Check if you need to get coins
+        if(((AdvancedBoard)player.getBoard()).checkCoinSeat(studentToHall, numStudents)){
+            ((AdvancedPlayer)player).addCoin();
+            advancedParameters.removeCoin();
+        }
+
         try {
             board.moveFromHallToEntrance(colorHall);
             trades++;
@@ -103,6 +117,8 @@ public class Minstrel extends CharacterCard {
             e.printStackTrace();
             parameters.setErrorState("ENTRANCE FULL, OPERATION FAILED");
         }
+
+        player.alert();
 
     }
 

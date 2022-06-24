@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.assistantCards.FactoryWizard;
+import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.characterCards.*;
 import it.polimi.ingsw.model.game.AdvancedGame;
@@ -8,6 +10,7 @@ import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.IslandGroup;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.Player;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.view.VirtualView;
@@ -158,8 +161,8 @@ public class CharacterCardTest {
             return;
         }
 
-        Player player = new Player(PlayerEnum.PLAYER1,"Bob",TeamEnum.WHITE, true,game.getParameters());
-        Board board = player.getBoard();
+        AdvancedPlayer player = new AdvancedPlayer(PlayerEnum.PLAYER1,"Bob",TeamEnum.WHITE, FactoryWizard.getWizard(0), true,game.getParameters());
+        AdvancedBoard board = (AdvancedBoard) player.getBoard(); // It's gonna be advanced
         StudentEnum studentSel;
         IslandGroup island = new IslandGroup(0,null,null,
                 null, new ArrayList<>(),TeamEnum.NOTEAM,game.getParameters());

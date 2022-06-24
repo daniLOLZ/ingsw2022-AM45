@@ -41,6 +41,9 @@ public class SelectionHandler {
     }
 
     public boolean selectIsland(List<Integer> idIslandGroups){
+        //Deselect all previously selected islands
+        deselectIsland();
+
         for(Integer id: idIslandGroups){
             //If even just one fails, deselect everything
             if(!selectIsland(id)){
@@ -117,13 +120,24 @@ public class SelectionHandler {
         return true;
     }
 
-    public void selectStudentType(StudentEnum type){
-        controller.simpleGame.selectStudentType(type);
+    public boolean selectStudentType(StudentEnum type){
+        if(!type.equals(StudentEnum.NOSTUDENT)){
+            controller.simpleGame.selectStudentType(type);
+            return true;
+        }
+        return false;
     }
 
     public boolean selectStudentType(List<StudentEnum> types){
+        //Deselect all previously selected student types
+        deselectStudentType();
+
         for(StudentEnum type: types){
-            selectStudentType(type);
+            //If even just one fails, deselect everything
+            if(!selectStudentType(type)) {
+                deselectStudentType();
+                return false;
+            }
         }
         return true;
     }

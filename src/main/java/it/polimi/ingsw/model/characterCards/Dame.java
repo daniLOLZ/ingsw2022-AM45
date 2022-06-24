@@ -1,9 +1,11 @@
 package it.polimi.ingsw.model.characterCards;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
+import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.Player;
 
 
@@ -38,7 +40,7 @@ public class Dame extends InitialEffect{
      * Draw a new student from sack and put it on this card
      * @param sack != null
      */
-    public void placeStudentToHall(Sack sack){
+    public StudentEnum placeStudentToHall(Sack sack){
         Player player = parameters.getCurrentPlayer();
         int indexChosenStudent;
 
@@ -47,19 +49,31 @@ public class Dame extends InitialEffect{
             indexChosenStudent = advancedParameters.getSelectedStudentsOnCard().get().get(0);
         else{
             parameters.setErrorState("BAD PARAMETERS WITH SelectedStudentsOnCard");
-            return;
+            return StudentEnum.NOSTUDENT;
         }
 
         //CHECK IF SELECTED STUDENT IS IN A POSITION AVAILABLE
         if(indexChosenStudent < 0 || indexChosenStudent >= size() ){
             parameters.setErrorState("BAD PARAMETERS WITH SelectedStudentsOnCard");
-            return;
+            return StudentEnum.NOSTUDENT;
         }
 
+        StudentEnum studentToReturn = removeStudent(indexChosenStudent);
+        int numOfStudents;
+
         //MOVE STUDENT
-        player.getBoard().addToHall(removeStudent(indexChosenStudent));
+        player.getBoard().addToHall(studentToReturn);
+        numOfStudents = player.getBoard().getStudentsAtTable(studentToReturn);
+
+        //Get the coin if necessary
+        if(((AdvancedBoard)player.getBoard()).checkCoinSeat(studentToReturn, numOfStudents)){
+            ((AdvancedPlayer)player).addCoin();
+            advancedParameters.removeCoin();
+        }
         //DRAW FROM SACK
         if(! sack.isEmpty())
             addAllStudents(sack.drawNStudents(1));
+
+        return studentToReturn;
     }
 }

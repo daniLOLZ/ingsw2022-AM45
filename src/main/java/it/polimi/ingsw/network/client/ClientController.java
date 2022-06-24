@@ -136,7 +136,7 @@ public class ClientController {
 
     public void validateChooseAssistant() {
         if(!checkSuccessfulReply()){
-            userInterface.showGameCommandError();
+            userInterface.showGameCommandError((String)broker.readField(NetworkFieldEnum.ERROR_STATE));
         }
         else {
             userInterface.clearCommands();

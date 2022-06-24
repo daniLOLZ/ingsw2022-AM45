@@ -55,6 +55,7 @@ public class FactoryPlayer {
      * @param advanced true if the player should be its advanced version
      * @return a new player with the given characteristics
      */
+    @Deprecated
     public static Player getPlayer(String nick, PlayerEnum playerId, TeamEnum teamColor, Wizard wizard,
                                    boolean leader, ParameterHandler parameters, boolean advanced){
         Player player;
@@ -93,6 +94,7 @@ public class FactoryPlayer {
     /**
      * stub function, useful to create mock players
       */
+    @Deprecated
     public static List<Player> getNPlayers(int numberOfPlayers, ParameterHandler parameters) {
         List<Player> playerList = new ArrayList<>();
 

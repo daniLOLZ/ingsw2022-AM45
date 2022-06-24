@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * use this class to create one CharacterCard with static method getCharacterCard,
@@ -29,7 +30,9 @@ public class FactoryCharacterCard {
 
         CharacterCard x = new Glutton(parameters, advancedParameters); //placeholder
         int times=0;
-        int random = (int) Instant.now().getEpochSecond() % numCharacterCards;
+        Random randomizer = new Random();
+        int random = randomizer.nextInt() % numCharacterCards;
+//        random = 9;    //todo Used for testing character cards, remove later
 
         while(times < numCharacterCards){
             if(random == 0)

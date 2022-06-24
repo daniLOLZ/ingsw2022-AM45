@@ -82,7 +82,7 @@ public class Controller {
     /**
      * Creates a game with simple rules using the wizards, tower colors and nicknames stored in playerCreation
      */
-    public boolean createSimpleGame(){
+    private boolean createSimpleGame(){
         try{
             simpleGame = new SimpleGame(GameRuleEnum.getNumPlayers(gameRule.id),
                     playerCreation.getWizards(),
@@ -101,7 +101,7 @@ public class Controller {
      * Creates a game with advanced rules using the wizards, tower colors and nicknames stored in playerCreation,
      * and the number of coins and character cards stored within the method
      */
-    public boolean createAdvancedGame(){
+    private boolean createAdvancedGame(){
         final int numCoins = 20;
         final int numCharacterCards = 3;
 
@@ -120,10 +120,7 @@ public class Controller {
         return true;
     }
 
-
-
-
-    public void createPlayerCreation(){
+    private void createPlayerCreation(){
         playerCreation = new PlayerCreation(this);
     }
 
@@ -132,7 +129,7 @@ public class Controller {
      * It doesn't create the handlers that were necessary prior to the start of the actual game
      * @param advanced true if the game needs to be its advanced variation
      */
-    public void createBasicHandlers(boolean advanced){
+    private void createBasicHandlers(boolean advanced){
         assistantHandler = new AssistantHandler(this);
         turnHandler = new TurnHandler(this);
         winnerHandler = new WinnerHandler(this);
@@ -168,7 +165,7 @@ public class Controller {
     /**
      * Gets the position from the associative array playerNumbers
      * @param idUser the user of which we want to know the numbering in the game
-     * @return the number of this user in the game
+     * @return the number of this user in the game, or -1 if the id was not found
      */
     private int getPositionFromUserId (Integer idUser) {
         //We need to translate the idUser to the actual enumeration of the players
@@ -218,6 +215,9 @@ public class Controller {
     }
 
 
+    /**
+     * Sets this game "gameWon" flag to true
+     */
     private void gameWon() {
         this.gameWon.set(true);
     }
@@ -260,7 +260,7 @@ public class Controller {
     }
 
     /**
-     * Sets the flag used for detecting whether the game started to true
+     * Sets the flag used for detecting whether the game started to false
      */
     //todo maybe instead of unsetting this flag, make the clientHandler remember whether the user
     // already joined the game
@@ -388,6 +388,7 @@ public class Controller {
      * @return true if the assignment succeeded
      */
     public synchronized boolean setWizard(Integer idWizard, Integer idUser) {
+        //No need to sanitize the input, we assume the client won't send bad data
         int position = getPositionFromUserId(idUser);
         if (position >= 0){
             //The user might have already selected a wizard and changed their mind
@@ -418,6 +419,7 @@ public class Controller {
      * @return true if the new assignment succeeded
      */
     public synchronized boolean setTeamColor(TeamEnum towerColor, Integer idUser) {
+        //No need to sanitize the input, we assume the client won't send bad
         int position = getPositionFromUserId(idUser);
 
         if (position >= 0) {
@@ -456,7 +458,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean playAssistant(Integer idAssistant) {
-        if(!assistantHandler.playCard(idAssistant)){
+        if(!assistantHandler.playCard(idAssistant)){ //sanitized here
             return false;
         }
         turnHandler.endPlayerPhase();
@@ -479,7 +481,7 @@ public class Controller {
     public boolean selectStudent(Integer selectedStudent) {
         //needs to check that the player doesn't move more students than they're allowed
         if(boardHandler.allStudentsMoved()) return false;
-        if(!selectionHandler.selectStudentAtEntrance(selectedStudent)) return false;
+        if(!selectionHandler.selectStudentAtEntrance(selectedStudent)) return false; //sanitized here
         setGameUpdated(true);
         return true;
     }
@@ -489,7 +491,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean putInHall() {
-        if(!boardHandler.moveFromEntranceToHall()) return false;
+        if(!boardHandler.moveFromEntranceToHall()) return false; //sanitized here
         setGameUpdated(true);
         return true;
     }
@@ -500,7 +502,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean putInIsland(Integer idIsland) {
-        if(!boardHandler.moveFromEntranceToIsland(idIsland)) return false;
+        if(!boardHandler.moveFromEntranceToIsland(idIsland)) return false; //sanitized here
         setGameUpdated(true);
         return true;
     }
@@ -509,7 +511,7 @@ public class Controller {
      * By calling the appropriate handler, deselects the currently selected student
      * @return true if the action succeeded
      */
-    public boolean deselectStudent() {
+    public boolean deselectStudent() { // No input, no need to sanitize
         selectionHandler.deselectStudentAtEntrance();
         setGameUpdated(true);
         return true;
@@ -522,7 +524,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean moveMNToIsland(Integer steps) {
-        if(!islandHandler.moveMN(steps)){
+        if(!islandHandler.moveMN(steps)){  //sanitized here
             return false;
         }
         checkWinner();
@@ -537,7 +539,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean chooseCloud(Integer idCloud) {
-        if(!boardHandler.takeFromCloud(idCloud)){
+        if(!boardHandler.takeFromCloud(idCloud)){  //sanitized here
             return false;
         }
         setGameUpdated(true);
@@ -548,7 +550,7 @@ public class Controller {
      * By calling the appropriate handler, ends this player's action phase
      * @return true if the action succeeded
      */
-    public boolean endTurn(){
+    public boolean endTurn(){ // No input, no need to sanitize
         turnHandler.endPlayerPhase();
         if(turnHandler.isPhaseOver()){
             turnHandler.nextPhase();
@@ -571,7 +573,7 @@ public class Controller {
 
         int cardId = characterCardHandler.getIdFromPosition(cardPosition);
 
-        if(!characterCardHandler.selectCard(cardId)) {
+        if(!characterCardHandler.selectCard(cardId)) { //sanitized here
             return false;
         }
         setGameUpdated(true);
@@ -585,7 +587,7 @@ public class Controller {
      */
     public boolean selectStudentColor(List<StudentEnum> colors) {
 
-        if(!selectionHandler.selectStudentType(colors)){
+        if(!selectionHandler.selectStudentType(colors)){  //sanitized here
             return false;
         }
         setGameUpdated(true);
@@ -599,7 +601,7 @@ public class Controller {
      */
     public boolean selectStudentsOnCard(List<Integer> students) {
 
-        if(!((AdvancedSelectionHandler)selectionHandler).selectStudentOnCard(students)) return false;
+        if(!((AdvancedSelectionHandler)selectionHandler).selectStudentOnCard(students)) return false; //sanitized here
         setGameUpdated(true);
         return true;
 
@@ -612,7 +614,7 @@ public class Controller {
      */
     public boolean selectEntranceStudents(List<Integer> students) {
 
-        if(!selectionHandler.selectStudentAtEntrance(students)) return false;
+        if(!selectionHandler.selectStudentAtEntrance(students)) return false; //sanitized here
         setGameUpdated(true);
         return true;
     }
@@ -623,7 +625,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean selectIslandGroups(List<Integer> islandIds) {
-        if(!selectionHandler.selectIsland(islandIds)) return false;
+        if(!selectionHandler.selectIsland(islandIds)) return false; //sanitized here
         setGameUpdated(true);
         return true;
     }

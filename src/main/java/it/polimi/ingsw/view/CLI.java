@@ -366,13 +366,12 @@ public class CLI implements UserInterface {
         StringBuilder retString = new StringBuilder();
         List<NetworkFieldEnum> requiredFields = new ArrayList<>();
         retString.append("\n\t\t::CHOICES::\n");
-        for(int index=0;index<availableCommands.size();index++){
-            CommandEnum command = availableCommands.get(index);
+        for (CommandEnum command : availableCommands) {
             retString.append("|" + command);
             requiredFields = CommandEnum.getFieldsNeeded(command);
-            if(requiredFields.size() > 0) retString.append("   -   REQUIRES: ");
-            for(NetworkFieldEnum field: requiredFields){
-                retString.append("-"+field.toString()+"- ");
+            if (requiredFields.size() > 0) retString.append("   -   REQUIRES: ");
+            for (NetworkFieldEnum field : requiredFields) {
+                retString.append("-" + field.toString() + "- ");
             }
             retString.append("\n");
         }
@@ -791,6 +790,7 @@ public class CLI implements UserInterface {
             }
             case SELECT_STUDENT -> {
                 int chosenStudent = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                chosenStudent--;
                 sender.sendSelectedStudent(chosenStudent);
             }
             case PUT_IN_HALL -> {
@@ -816,6 +816,7 @@ public class CLI implements UserInterface {
             }
             case SELECT_CHARACTER -> {
                 int position = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                position--;
                 sender.sendSelectCharacter(position);
             }
             case SELECT_STUDENT_COLORS -> {
@@ -824,6 +825,9 @@ public class CLI implements UserInterface {
             }
             case SELECT_ENTRANCE_STUDENTS -> {
                 List<Integer> students = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
+                students = students.stream()
+                            .map(i -> i-1)
+                            .collect(Collectors.toList());
                 sender.sendSelectEntranceStudents(students);
             }
             case SELECT_ISLAND_GROUP -> {
@@ -832,6 +836,9 @@ public class CLI implements UserInterface {
             }
             case SELECT_STUDENTS_ON_CARD -> {
                 List<Integer> selectedStudent = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
+                selectedStudent = selectedStudent.stream()
+                                    .map(i -> i-1)
+                                    .collect(Collectors.toList());
                 sender.sendSelectStudentsOnCard(selectedStudent);
             }
             case PLAY_CHARACTER -> {
@@ -915,6 +922,7 @@ public class CLI implements UserInterface {
 
     @Override
     public void startInterface() {
+        startReaderThread();
         showWelcomeScreen();
         while(!userQuit){
             //This method ends here basically, everything else derives from the receiver
@@ -925,7 +933,6 @@ public class CLI implements UserInterface {
 
 
     private void communicationEntryPoint() {
-        startReaderThread();
         showLoginScreen();
         if(!errorLogin) initialConnector.startReceiving();
         //If the communication is cut short, then this routine will reset it and try again

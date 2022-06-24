@@ -44,8 +44,11 @@ public class CharacterCardHandler {
         }
 
         usingCard.getRequirements().setSatisfied();
+        //Keep these two in this order
         spendCoin();
         usingCard.activateEffect();
+
+        controller.advancedGame.alert(); //ugly but it's necessary to update the board's coins
         alreadyPlayed = true;
 
         //CAST WITH CORRECT AND SPECIFIC CHARACTER CARD TO USE MORE SPECIFIC ACTION
@@ -108,15 +111,17 @@ public class CharacterCardHandler {
                 Fungalmancer fungalmancer = (Fungalmancer) usingCard;
             }
 
-            //MINSTREL  useless
+            //MINSTREL
             case 10 -> {
                 Minstrel minstrel = (Minstrel) usingCard;
+                // coins gotten inside the activateEffect method
             }
 
             //DAME
             case 11 -> {
                 Dame dame = (Dame) usingCard;
-                dame.placeStudentToHall(controller.advancedGame.getSack());
+                StudentEnum toUpdate = dame.placeStudentToHall(controller.advancedGame.getSack()); // Given the coin already
+                controller.advancedGame.updateProfessor(toUpdate);
             }
 
             //LOAN-SHARK
