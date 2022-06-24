@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoardHandlingToolbox implements HandlingToolbox{
 
-    private List<EventHandler<MouseEvent>> onEntranceStudentClick;
+    private final List<EventHandler<MouseEvent>> onEntranceStudentClick;
     private List<EventHandler<MouseEvent>> onTableClick;
 
     public static final BoardHandlingToolbox NONINTERACTIVE = new BoardHandlingToolbox(9,5);
@@ -34,23 +34,30 @@ public class BoardHandlingToolbox implements HandlingToolbox{
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.SELECT_STUDENT){
-            AtomicInteger studentIndex = new AtomicInteger();
+            int studentIndex = 0;
+
             for (EventHandler<MouseEvent> ignored :
                  onEntranceStudentClick) {
-                if (onEntranceStudentClick.get(studentIndex.get()) == DISABLED) {
-                    onEntranceStudentClick.set(studentIndex.get(), event -> new Thread(() -> {
-                        resourceProvider.sendSelectedStudent(studentIndex.get());
-                        onEntranceStudentClick.set(studentIndex.get(), DISABLED);
-                        studentIndex.getAndIncrement();
-                    }).start());
-                }
+
+                int finalStudentIndex = studentIndex;
+
+                onEntranceStudentClick.set(finalStudentIndex, event -> {
+                        onEntranceStudentClick.set(finalStudentIndex, NO_EFFECT);
+                        new Thread(() ->
+                    resourceProvider.sendSelectedStudent(finalStudentIndex)).start();}
+                );
+
+                studentIndex++;
+
             }
+
         }
 
         if (command == CommandEnum.PUT_IN_HALL){
             int tableIndex = 0;
 
             for (EventHandler<MouseEvent> ignored : onTableClick) {
+
                 onTableClick.set(tableIndex, event -> new Thread (resourceProvider::sendPutInHall).start());
                 tableIndex++;
             }
@@ -73,23 +80,49 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
         if (command == CommandEnum.DESELECT_STUDENT){
 
+
+
             for (EventHandler<MouseEvent> handler:
                  onEntranceStudentClick) {
 
-                if (handler == DISABLED)
+                if (handler == NO_EFFECT) {
+
+                    int index = onEntranceStudentClick.indexOf(handler);
+
                     onEntranceStudentClick.set(
-                            onEntranceStudentClick.indexOf(handler),
-                            event -> new Thread(() -> {
-                                resourceProvider.sendDeselectStudent();
-                                onEntranceStudentClick.set(onEntranceStudentClick.indexOf(handler), DISABLED);
-                            }).start());
+                            index,
+                            event -> {
+                                onEntranceStudentClick.set(index, DISABLED);
+                                new Thread(resourceProvider::sendDeselectStudent).start();
+                            });
+                }
             }
+
         }
     }
 
     @Override
-    public void disableCommand(CommandEnum commandEnum) {
-        //TODO
+    public void disableCommand(CommandEnum command) {
+        if (command == CommandEnum.SELECT_STUDENT ||
+            command == CommandEnum.DESELECT_STUDENT ||
+            command == CommandEnum.SELECT_ENTRANCE_STUDENTS) {
+
+            for (EventHandler<MouseEvent> handler:
+                 onEntranceStudentClick) {
+
+                if (handler != NO_EFFECT) onEntranceStudentClick.set(onEntranceStudentClick.indexOf(handler), DISABLED);
+            }
+
+
+        }
+
+        if (command == CommandEnum.PUT_IN_HALL ||
+            command == CommandEnum.SELECT_STUDENT_COLORS)
+            for (EventHandler<MouseEvent> handler:
+                 onTableClick) {
+
+                if (handler != NO_EFFECT) onTableClick.set(onTableClick.indexOf(handler), DISABLED);
+            }
     }
 
 

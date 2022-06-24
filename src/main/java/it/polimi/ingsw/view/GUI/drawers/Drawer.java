@@ -291,6 +291,7 @@ public abstract class Drawer{
     public static EventHandler<MouseEvent> getChildrenEnteredZoom(Text text, Coord slot, double scale, double hoverZoom, ImageView parentView){
 
         return event -> {
+
             text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() * hoverZoom));
             text.setWrappingWidth(text.getWrappingWidth() * hoverZoom);
             text.setX(parentView.getX() + parentView.getFitWidth() / 2 + slot.x * scale * hoverZoom - text.getWrappingWidth() / 2);

@@ -287,9 +287,11 @@ public class GUI implements UserInterface {
     @Override
     public void showMainGameInterface() {
 
+        System.out.println("Printing Interface");
+
         int user = 0;
 
-        if (viewData == null) viewData = VirtualViewBean.getMockBean();
+        if (viewData == null) printGameInterface(VirtualViewBean.getMockBean());
 
         else {
             List<AdvancedPlayerBean> advancedPlayers = viewData.getAdvancedPlayerBeans();
@@ -317,6 +319,9 @@ public class GUI implements UserInterface {
     @Override
     public void showItsYourTurn(PhaseEnum phase) {
 
+        //todo
+        System.out.println("Updated Commands");
+        showMainGameInterface();
     }
 
     @Override
@@ -326,7 +331,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showGameCommandError() {
-
+        System.err.println("MALE MALE");
     }
 
     @Override
@@ -336,11 +341,12 @@ public class GUI implements UserInterface {
 
     @Override
     public void showGameCommandSuccess() {
-
+        System.out.println("Updated Commands");
     }
 
     @Override
     public void printGameInterface(VirtualViewBean virtualView) {
+        System.out.println("Updated VirtualView");
         viewData = virtualView;
         if (virtualView.getCharacterCardBeans() != null) {
             for (int character = 0; character < numCharacterCards; character++) {
