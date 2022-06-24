@@ -124,9 +124,10 @@ public class BeanTranslator {
                 islandGroupBean.getStudentsOnIsland(),
                 islandGroupBean.isPresentMN(),
                 islandGroupBean.getTowersColor(),
+                numBlockTiles,
                 islandGroupBean.getIdPrevIslandGroup(),
-                islandGroupBean.getIdNextIslandGroup(),
-                numBlockTiles
+                islandGroupBean.getIdNextIslandGroup()
+
         );
     }
 
