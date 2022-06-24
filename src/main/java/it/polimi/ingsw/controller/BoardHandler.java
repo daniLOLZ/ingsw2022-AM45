@@ -52,7 +52,8 @@ public class BoardHandler {
      */
     public boolean moveFromEntranceToHall(){
         getCurrentPlayer();
-        if(!controller.simpleGame.getParameters().getSelectedEntranceStudents().isPresent()){
+        if(controller.simpleGame.getParameters().getSelectedEntranceStudents().isEmpty() ||
+        controller.simpleGame.getParameters().getSelectedEntranceStudents().get().isEmpty()){
             controller.simpleGame.getParameters().setErrorState("CANNOT ADD TO HALL, STUDENT NOT CHOSEN");
             return false;
         }
@@ -89,7 +90,7 @@ public class BoardHandler {
             controller.simpleGame.getParameters().setErrorState("WRONG ID ISLAND-GROUP");
             return false;
         }
-        if(!controller.simpleGame.getParameters().getSelectedEntranceStudents().isPresent()
+        if(controller.simpleGame.getParameters().getSelectedEntranceStudents().isEmpty()
         || controller.simpleGame.getParameters().getSelectedEntranceStudents().get().isEmpty()){
             controller.simpleGame.getParameters().setErrorState("CANNOT ADD TO ENTRANCE, STUDENT NOT CHOSEN");
             return false;

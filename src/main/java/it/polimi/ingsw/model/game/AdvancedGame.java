@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.AdvancedSack;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
@@ -12,11 +11,9 @@ import it.polimi.ingsw.model.characterCards.CharacterCard;
 import it.polimi.ingsw.model.characterCards.FactoryCharacterCard;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
 import it.polimi.ingsw.model.islands.IslandGroup;
-import it.polimi.ingsw.model.islands.UnmergeableException;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.player.FactoryPlayer;
 import it.polimi.ingsw.model.player.Player;
-import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.view.VirtualView;
 import it.polimi.ingsw.view.observer.AdvancedGameWatcher;
 
@@ -24,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdvancedGame extends SimpleGame {
-    private List<CharacterCard> CharacterCards;
+    private List<CharacterCard> characterCards;
     private AdvancedParameterHandler advancedParameters;
 
     @Deprecated
@@ -34,10 +31,10 @@ public class AdvancedGame extends SimpleGame {
                                                     // time because we need to create parameters before
                                                     // creating the islands, this happens in the createParameters()
                                                     // method, which don't have the number of coins as input
-        CharacterCards = new ArrayList<>();
+        characterCards = new ArrayList<>();
         for(int card = 0; card < numCharacterCards; card++){
-            CharacterCards.add(FactoryCharacterCard.
-                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+            characterCards.add(FactoryCharacterCard.
+                    getCharacterCard(characterCards, super.getParameters(), advancedParameters));
         }
 
     }
@@ -62,14 +59,14 @@ public class AdvancedGame extends SimpleGame {
         // time because we need to create parameters before
         // creating the islands, this happens in the createParameters()
         // method, which don't have the number of coins as input
-        CharacterCards = new ArrayList<>();
+        characterCards = new ArrayList<>();
         for(int card = 0; card < numCharacterCards; card++){
-            CharacterCards.add(FactoryCharacterCard.
-                    getCharacterCard(CharacterCards, super.getParameters(), advancedParameters));
+            characterCards.add(FactoryCharacterCard.
+                    getCharacterCard(characterCards, super.getParameters(), advancedParameters));
         }
 
         for(int card = 0; card < numCharacterCards; card++){
-            CharacterCards.get(card).addWatcher(virtualView);
+            characterCards.get(card).addWatcher(virtualView);
         }
 
         watcherList = new ArrayList<>();
@@ -84,9 +81,9 @@ public class AdvancedGame extends SimpleGame {
     @Override
     public void initializeGame() {
         super.initializeGame();
-        int numCharacterCards = CharacterCards.size();
+        int numCharacterCards = characterCards.size();
         for(int card = 0; card < numCharacterCards; card++){
-            CharacterCards.get(card).initialise(this);
+            characterCards.get(card).initialise(this);
         }
         alert();
     }
@@ -97,7 +94,7 @@ public class AdvancedGame extends SimpleGame {
      * @return Character card in requested position
      */
     public CharacterCard getCharacterCard(int position) {
-        return CharacterCards.get(position);
+        return characterCards.get(position);
     }
 
     /**
@@ -119,7 +116,7 @@ public class AdvancedGame extends SimpleGame {
         for(Player player: players){ // Unhappy cast that could be resolved by separating
             // into two methods : getPlayer and getAdvancedPlayer
             advancedPlayers.add(
-                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                        FactoryPlayer.getPlayer(
                             player.getNickname(),
                             player.getPlayerId(),
                             player.getTeamColor(),
@@ -142,7 +139,7 @@ public class AdvancedGame extends SimpleGame {
         for(Player player: players){ // Unhappy cast that could be resolved by separating
             // into two methods : getPlayer and getAdvancedPlayer
             advancedPlayers.add(
-                    (AdvancedPlayer)FactoryPlayer.getPlayer(
+                        FactoryPlayer.getPlayer(
                             player.getNickname(),
                             player.getPlayerId(),
                             player.getTeamColor(),
@@ -309,7 +306,7 @@ public class AdvancedGame extends SimpleGame {
      */
     public boolean canUseCharacterCard(AdvancedPlayer player, final int idCard){
         CharacterCard card = null;
-        for(CharacterCard x : CharacterCards){
+        for(CharacterCard x : characterCards){
             if(x.id == idCard)
                 card = x;
         }
@@ -378,7 +375,7 @@ public class AdvancedGame extends SimpleGame {
         PhaseEnum phase = parameters.getCurrentPhase();
         int numCoins = advancedParameters.getNumCoins();
 
-        List<Integer> idCharacterCards = CharacterCards.stream().mapToInt(card -> card.id).
+        List<Integer> idCharacterCards = characterCards.stream().mapToInt(card -> card.id).
                                                 collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 
         sortIslandGroups();
@@ -409,7 +406,7 @@ public class AdvancedGame extends SimpleGame {
     }
 
     public void setCharacterCards(List<CharacterCard> characterCards) {
-        CharacterCards = characterCards;
+        this.characterCards = characterCards;
     }
 }
 
