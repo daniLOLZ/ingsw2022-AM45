@@ -295,9 +295,8 @@ public class ClientSender {
     public boolean sendSelectIslandGroup(int idIslandGroup) {
         if(!acquireSendingRights()) return false;
 
-        int[] islandGroups = {idIslandGroup};
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_ISLAND_GROUP);
-        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ISLAND_CHAR, islandGroups);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ISLAND_CHAR, idIslandGroup);
 
         sendToServer();
         return true;

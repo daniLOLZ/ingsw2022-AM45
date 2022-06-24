@@ -34,13 +34,19 @@ public class SelectionHandler {
         return true;
     }
 
-    public void selectIsland(int idIslandGroup){
+    public boolean selectIsland(int idIslandGroup){
+        if(!controller.simpleGame.checkValidIdIsland(idIslandGroup)) return false;
         controller.simpleGame.selectIslandGroup(idIslandGroup);
+        return true;
     }
 
     public boolean selectIsland(List<Integer> idIslandGroups){
         for(Integer id: idIslandGroups){
-            selectIsland(id);
+            //If even just one fails, deselect everything
+            if(!selectIsland(id)){
+                deselectIsland();
+                return false;
+            }
         }
         return true;
     }
