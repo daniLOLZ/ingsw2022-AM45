@@ -790,6 +790,7 @@ public class CLI implements UserInterface {
             }
             case SELECT_STUDENT -> {
                 int chosenStudent = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                chosenStudent--;
                 sender.sendSelectedStudent(chosenStudent);
             }
             case PUT_IN_HALL -> {
@@ -815,6 +816,7 @@ public class CLI implements UserInterface {
             }
             case SELECT_CHARACTER -> {
                 int position = ApplicationHelper.getIntFromString(input.split(" ")[1]);
+                position--;
                 sender.sendSelectCharacter(position);
             }
             case SELECT_STUDENT_COLORS -> {
@@ -823,6 +825,9 @@ public class CLI implements UserInterface {
             }
             case SELECT_ENTRANCE_STUDENTS -> {
                 List<Integer> students = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
+                students = students.stream()
+                            .map(i -> i-1)
+                            .collect(Collectors.toList());
                 sender.sendSelectEntranceStudents(students);
             }
             case SELECT_ISLAND_GROUP -> {
@@ -831,6 +836,9 @@ public class CLI implements UserInterface {
             }
             case SELECT_STUDENTS_ON_CARD -> {
                 List<Integer> selectedStudent = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
+                selectedStudent = selectedStudent.stream()
+                                    .map(i -> i-1)
+                                    .collect(Collectors.toList());
                 sender.sendSelectStudentsOnCard(selectedStudent);
             }
             case PLAY_CHARACTER -> {
