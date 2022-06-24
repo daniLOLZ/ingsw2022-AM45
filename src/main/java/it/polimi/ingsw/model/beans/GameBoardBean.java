@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.beans;
 
+import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.BeanEnum;
@@ -91,6 +92,15 @@ public class GameBoardBean extends GameElementBean{
             players.add(PlayerEnum.getPlayer(x).name);
         }
 
+        idAssistantsPlayed = idAssistantsPlayed.stream().mapToInt( x ->{
+            if(x == 0)
+                return 0;
+            int y= x % 10;
+            if(y == 0)
+                y = 10;
+            return y;
+        }).collect(ArrayList::new,ArrayList::add,ArrayList::addAll);
+
         String Eryantis = StaticColorCLI.ANSI_RED + "E" +
                 StaticColorCLI.ANSI_YELLOW + "R" +
                 StaticColorCLI.ANSI_GREEN + "I" +
@@ -101,18 +111,100 @@ public class GameBoardBean extends GameElementBean{
                 StaticColorCLI.ANSI_YELLOW + "S" +
                 StaticColorCLI.ANSI_RESET  ;
 
+        String s;
+        String x;
 
-        toReturn.append("\t______________________________________________________\t\n");
-        toReturn.append("\t\t\t\t::").append(Eryantis).append("::").append("\n");
-        toReturn.append("\t\tTURN: ").append(turn).append("\n");
-        toReturn.append("\t\tPHASE: ").append(phase).append("\n");
-        toReturn.append("\t\tISLANDS: ").append(idIslandGroups).append("\n");
-        toReturn.append("\t\tCURRENT PLAYER: ").append(currentPlayer).append("\n");
-        toReturn.append("\t\tPLAYERS: ").append(players).append("\n");
-        toReturn.append("\t\tASSISTANTS PLAYED: ").append(idAssistantsPlayed).append("\n");
-        toReturn.append("\t______________________________________________________\t\n");
+        s = "______________________________________________________";
+        x= String.format("%-105s",s);
+        s = "________________________________________";
+        x+= String.format("%-40s",s);
+        x+="\n";
+        s= ("::") + (Eryantis) + ("::") ;
+        x+=String.format("%-149s",s);
+        s="ASSISTANT VALUES  (MN steps, Turn Order)";
+        x+=String.format("%-20s",s);
+        x+="\n";
+        s= ("TURN: ") + (turn);
+        x+=String.format("%-105s",s);
+        s="ID";
+        x+=String.format("%-10s",s);
+        s="VALUES";
+        x+=String.format("%-10s|",s);
+        s="ID";
+        x+=String.format("%-10s",s);
+        s="VALUES";
+        x+=String.format("%-10s",s);
+        x+="\n";
 
-        return toReturn.toString();
+
+        s = ("PHASE: ")+(phase);
+        x+=String.format("%-105s",s);
+        s="1";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(1).toString();
+        x+=String.format("%-10s|",s);
+        s="6";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(6).toString();;
+        x+=String.format("%-10s",s);
+        x+="\n";
+
+        s= ("ISLANDS: ") + (idIslandGroups);
+        x+=String.format("%-105s",s);
+        s="2";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(2).toString();
+        x+=String.format("%-10s|",s);
+        s="7";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(7).toString();;
+        x+=String.format("%-10s",s);
+        x+="\n";
+
+        s = ("CURRENT PLAYER: ") + (currentPlayer);
+        x+=String.format("%-105s",s);
+        s="3";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(3).toString();
+        x+=String.format("%-10s|",s);
+        s="8";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(8).toString();;
+        x+=String.format("%-10s",s);
+        x+="\n";
+
+        s=("PLAYERS: ") + (players);
+        x+=String.format("%-105s",s);
+        s="4";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(4).toString();
+        x+=String.format("%-10s|",s);
+        s="9";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(9).toString();;
+        x+=String.format("%-10s",s);
+        x+="\n";
+
+        s= ("ASSISTANTS PLAYED: ") + (idAssistantsPlayed);
+        x+=String.format("%-105s",s);
+        s="5";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(5).toString();
+        x+=String.format("%-10s|",s);
+        s="10";
+        x+=String.format("%-10s",s);
+        s= FactoryAssistant.getAssistant(10).toString();;
+        x+=String.format("%-10s",s);
+        x+="\n";
+
+        s = ("______________________________________________________");
+        x+=String.format("%-105s",s);
+        s = "________________________________________";
+        x+= String.format("%-40s",s);
+        x+="\n";
+
+
+        return x;
     }
 
 }
