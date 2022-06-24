@@ -83,6 +83,7 @@ public abstract class CharacterCard extends DrawableObject {
         if(!HasBeenUsed()){
             hasBeenUsed = true;
             cardCost += 1;
+            advancedParameters.removeCoin();
             alert();
         }
 

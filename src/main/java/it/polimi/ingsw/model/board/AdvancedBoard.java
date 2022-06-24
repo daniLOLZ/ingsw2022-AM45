@@ -29,7 +29,8 @@ public class AdvancedBoard extends Board {
 
     /**
      * checks if the player who just put a student in his board should receive a coin
-     * @param table the table whom seat you want to check
+     * If that's the case, remove it from the pile of available coins on this table
+     * @param table the table whose seat you want to check
      * @param seat  the seat of the table you want to check
      * @return true if the given seat in the given table has a coin on it; false otherwise
      */

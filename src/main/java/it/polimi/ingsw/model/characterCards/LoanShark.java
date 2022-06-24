@@ -56,6 +56,7 @@ public class LoanShark extends CharacterCard {
         for(Player player: game.getPlayers()){
             sack.addStudents(player.getBoard().
                     removeNStudentsFromHall(colorStudent,numStudentToSubtract));
+            player.alert();
         }
     }
 }

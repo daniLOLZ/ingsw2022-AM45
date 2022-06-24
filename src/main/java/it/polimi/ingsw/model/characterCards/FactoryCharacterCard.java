@@ -32,7 +32,7 @@ public class FactoryCharacterCard {
         int times=0;
         Random randomizer = new Random();
         int random = randomizer.nextInt() % numCharacterCards;
-        random = 0;    //todo Used for testing character cards, remove later
+//        random = 9;    //todo Used for testing character cards, remove later
 
         while(times < numCharacterCards){
             if(random == 0)

@@ -49,7 +49,7 @@ public class AssistantHandler {
             assistantsPlayed.add(FactoryAssistant.getAssistant(id));
         }
         else{
-            controller.simpleGame.getParameters().setErrorState("INVALID ASSISTANT");
+            controller.simpleGame.getParameters().setErrorState("Could not play this assistant!");
             return false;
         }
         return true;

@@ -264,6 +264,7 @@ public class SimpleGame extends DrawableObject {
      * @param selectedColors array containing the correspondence between player and selected tower color
      * @param nicknames array containing the users' nicknames
      */
+    @Deprecated
     protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
                                  List<TeamEnum> selectedColors, List<String> nicknames){
         List<TeamEnum> alreadyAssignedLeaders = new ArrayList<>();
