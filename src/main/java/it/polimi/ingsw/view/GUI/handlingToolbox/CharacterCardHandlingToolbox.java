@@ -43,14 +43,14 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
         allowedCommands.add(command);
 
-        if (command == CommandEnum.SELECT_STUDENT_ON_CARD) {
+        if (command == CommandEnum.SELECT_STUDENTS_ON_CARD) { //todo fix sorry
 
             int studentIndex = 0;
 
             for (EventHandler<MouseEvent> ignored:
                  onStudentOnCardClick) {
                 int finalIndex = studentIndex;
-                onStudentOnCardClick.set(studentIndex, event -> new Thread(() -> resourceProvider.sendSelectStudentOnCard(finalIndex)).start());
+ //               onStudentOnCardClick.set(studentIndex, event -> new Thread(() -> resourceProvider.sendSelectStudentOnCard(finalIndex)).start());
                 studentIndex++;
             }
         }
@@ -62,7 +62,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
         allowedCommands.remove(command);
 
-        if (command == CommandEnum.SELECT_STUDENT_ON_CARD){
+        if (command == CommandEnum.SELECT_STUDENTS_ON_CARD){
 
             int index = 0;
 

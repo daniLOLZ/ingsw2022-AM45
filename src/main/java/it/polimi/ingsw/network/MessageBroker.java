@@ -254,8 +254,7 @@ public class MessageBroker {
 
         for (NetworkFieldEnum field : deserializedMessage.keySet()){
             if(field.equals(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS) ||
-                field.equals(NetworkFieldEnum.CHOSEN_CARD_POSITIONS) ||
-                field.equals(NetworkFieldEnum.CHOSEN_ISLANDS)){
+                field.equals(NetworkFieldEnum.CHOSEN_CARD_POSITIONS)){
                 ArrayList<Double> values = (ArrayList<Double>) deserializedMessage.get(field);
                 deserializedMessage.put(field,
                         (double[])(values.stream()
@@ -328,6 +327,7 @@ public class MessageBroker {
                 case ID_CLOUD:
                 case CHOSEN_ENTRANCE_STUDENT:
                 case CHOSEN_ISLAND:
+                case CHOSEN_ISLAND_CHAR:
                 case STEPS_MN:
                 case CHARACTER_CARD_POSITION:
                 case ASYNC_ID_REQUEST:
@@ -354,7 +354,6 @@ public class MessageBroker {
                     neededClass = GameRuleEnum.class;
                     break;
                 case CHOSEN_ENTRANCE_POSITIONS:
-                case CHOSEN_ISLANDS:
                 case CHOSEN_CARD_POSITIONS:
                     // The json reads these parameters as doubles, where they should be ints,
                     // in case they actually are doubles, "cast" to integer

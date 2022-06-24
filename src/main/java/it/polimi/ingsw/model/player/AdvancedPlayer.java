@@ -29,6 +29,9 @@ public class AdvancedPlayer extends Player {
         this.numCoins = 1;
     }
 
+    /**
+     * View-less constructor, not to be used
+     */
     public AdvancedPlayer(PlayerEnum playerId, String nickname, TeamEnum teamColor,
                           Wizard wizard, boolean leader, ParameterHandler parameters){
         super(playerId, nickname,teamColor, wizard, leader, parameters);

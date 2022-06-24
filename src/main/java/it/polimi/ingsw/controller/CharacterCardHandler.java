@@ -1,5 +1,7 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.model.StudentEnum;
+import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
@@ -14,9 +16,11 @@ public class CharacterCardHandler {
     private final List<CharacterCard> cardList;
     private CharacterCard usingCard;
     private final Controller controller;
+    private boolean alreadyPlayed;
 
     public CharacterCardHandler(Controller controller){
         this.controller = controller;
+        alreadyPlayed = false;
         cardList = new ArrayList<>();
         AdvancedGame game = controller.advancedGame;
 
@@ -32,72 +36,17 @@ public class CharacterCardHandler {
      * @return true if the action succeeded
      */
     public boolean playCard(){
-        Requirements requirements =   controller.
-                                                advancedGame.
-                                                getAdvancedParameters().
-                                                getRequirementsForThisAction();
 
-        boolean satisfied = true;
-
-        //Checks that the requirements have been satisfied
-        //Here the check is done both to see if the optional is not present
-        // AND to see if it's present but the list is empty
-
-        if(requirements.islands != 0){
-            if(controller.getSimpleGame().getParameters().getSelectedIslands().isEmpty()
-            || controller.getSimpleGame().getParameters().getSelectedIslands().get().isEmpty()) satisfied = false;
-            else if(requirements.islands == 1 &&
-                controller.getSimpleGame().getParameters().getSelectedIslands().get().size() != 1)
-                    satisfied = false;
-            else if(requirements.islands > 1 &&
-                controller.getSimpleGame().getParameters().getSelectedIslands().get().size() > requirements.islands)
-                    satisfied = false;
-        }
-        if(requirements.studentType != 0){
-            if(controller.getSimpleGame().getParameters().getSelectedStudentTypes().isEmpty()
-            || controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().isEmpty()) satisfied = false;
-            else if(requirements.studentType == 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().size() != 1)
-                satisfied = false;
-            else if(requirements.studentType > 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().size() > requirements.studentType)
-                satisfied = false;
-        }
-        if(requirements.studentOnCard != 0){
-            if(controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().isEmpty()
-            || controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().isEmpty()) satisfied = false;
-            else if(requirements.studentOnCard == 1 &&
-                    controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().size() != 1)
-                satisfied = false;
-            else if(requirements.studentOnCard > 1 &&
-                    controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().size() > requirements.studentOnCard)
-                satisfied = false;
-        }
-        if(requirements.studentAtEntrance != 0){
-            if(controller.getSimpleGame().getParameters().getSelectedEntranceStudents().isEmpty()
-            || controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().isEmpty()) satisfied = false;
-            else if(requirements.studentAtEntrance == 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().size() != 1)
-                satisfied = false;
-            else if(requirements.studentAtEntrance > 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().size() > requirements.studentAtEntrance)
-                satisfied = false;
-        }
-
-        if(satisfied) requirements.setSatisfied();
-
-        if(!requirements.isSatisfied()){
-            controller.simpleGame.getParameters().setErrorState("REQUIREMENTS FOR CARD NOT SATISFIED");
-            controller.simpleGame.deselectAllIslandGroup();
-            controller.simpleGame.deselectAllStudentTypes();
-            controller.simpleGame.deselectAllEntranceStudents();
-            controller.advancedGame.deselectAllCardStudents();
+        if(!checkRequirements() || !checkCardSpecificRequisites()){
+            controller.simpleGame.getParameters().setErrorState("Requirements for this card not satisfied");
+            controller.selectionHandler.deselectAll();
             return false;
         }
 
+        usingCard.getRequirements().setSatisfied();
         spendCoin();
         usingCard.activateEffect();
-
+        alreadyPlayed = true;
 
         //CAST WITH CORRECT AND SPECIFIC CHARACTER CARD TO USE MORE SPECIFIC ACTION
         //WHERE THESE ARE NECESSARY
@@ -125,6 +74,7 @@ public class CharacterCardHandler {
                 FlagBearer flagBearer = (FlagBearer) usingCard;
                 flagBearer.evaluate(controller.advancedGame); //todo possible duplicate evaluation
                 controller.islandHandler.evaluateIsland(idIsland);
+                controller.checkWinner();
             }
 
             //MAILMAN   useless
@@ -177,10 +127,129 @@ public class CharacterCardHandler {
 
         }
 
+        controller.selectionHandler.deselectAll();
         usingCard = null;
 
         return true;
     }
+
+    private boolean checkRequirements() {
+        Requirements requirements =   controller.
+                advancedGame.
+                getAdvancedParameters().
+                getRequirementsForThisAction();
+
+        boolean satisfied = true;
+
+        //Checks that the requirements have been satisfied
+        // Here the check is done both to see if the optional is not present
+        // AND to see if it's present but the list is empty
+
+        if(requirements.islands != 0){
+            if(controller.getSimpleGame().getParameters().getSelectedIslands().isEmpty()
+                    || controller.getSimpleGame().getParameters().getSelectedIslands().get().isEmpty()) satisfied = false;
+            else if(requirements.islands == 1 &&
+                    controller.getSimpleGame().getParameters().getSelectedIslands().get().size() != 1)
+                satisfied = false;
+            else if(requirements.islands > 1 &&
+                    controller.getSimpleGame().getParameters().getSelectedIslands().get().size() > requirements.islands)
+                satisfied = false;
+        }
+        if(requirements.studentType != 0){
+            if(controller.getSimpleGame().getParameters().getSelectedStudentTypes().isEmpty()
+                    || controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().isEmpty()) satisfied = false;
+            else if(requirements.studentType == 1 &&
+                    controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().size() != 1)
+                satisfied = false;
+            else if(requirements.studentType > 1 &&
+                    controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().size() > requirements.studentType)
+                satisfied = false;
+        }
+        if(requirements.studentOnCard != 0){
+            if(controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().isEmpty()
+                    || controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().isEmpty()) satisfied = false;
+            else if(requirements.studentOnCard == 1 &&
+                    controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().size() != 1)
+                satisfied = false;
+            else if(requirements.studentOnCard > 1 &&
+                    controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().size() > requirements.studentOnCard)
+                satisfied = false;
+        }
+        if(requirements.studentAtEntrance != 0){
+            if(controller.getSimpleGame().getParameters().getSelectedEntranceStudents().isEmpty()
+                    || controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().isEmpty()) satisfied = false;
+            else if(requirements.studentAtEntrance == 1 &&
+                    controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().size() != 1)
+                satisfied = false;
+            else if(requirements.studentAtEntrance > 1 &&
+                    controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().size() > requirements.studentAtEntrance)
+                satisfied = false;
+        }
+
+        return satisfied;
+    }
+
+    private boolean checkCardSpecificRequisites() {
+        ParameterHandler parameters = controller.getSimpleGame().getParameters();
+        AdvancedParameterHandler advancedParameters = controller.getAdvancedGame().getAdvancedParameters();
+        boolean entranceEmpty = (parameters.getSelectedEntranceStudents().isEmpty() || parameters.getSelectedEntranceStudents().get().isEmpty());
+        boolean cardEmpty = (advancedParameters.getSelectedStudentsOnCard().isEmpty() || advancedParameters.getSelectedStudentsOnCard().get().isEmpty());
+        boolean islandEmpty = (parameters.getSelectedIslands().isEmpty() || parameters.getSelectedIslands().get().isEmpty());
+        boolean colorEmpty = (parameters.getSelectedStudentTypes().isEmpty() || parameters.getSelectedStudentTypes().get().isEmpty());
+
+
+        switch (usingCard.id){
+            //PRIEST, GLUTTON, FLAG-BEARER, MAILMAN, HERBALIST, CENTAUR, KNIGHT, FUNGALMANCER, LOANSHARK
+            case 1, 2, 3, 4, 5, 6, 8, 9, 12 -> {
+                //Not necessary
+            }
+            //JUGGLER
+            case 7 -> {
+                //Check that the amount of selected students on the card and at the entrance is the same
+                if ( entranceEmpty || cardEmpty ) return false;
+                if (parameters.getSelectedEntranceStudents().get().size()
+                        != advancedParameters.getSelectedStudentsOnCard().get().size()) return false;
+            }
+            //MINSTREL
+            case 10 -> {
+                // todo what if there's already too many students of a type, it'll cause an overflow
+                if(entranceEmpty || colorEmpty) return false;
+                if(parameters.getSelectedEntranceStudents().get().size()
+                        < parameters.getSelectedStudentTypes().get().size()) return false;
+
+                // horrible but it must be done
+                // this only works when the amount of students to exchange is 2
+
+                Board playerBoard = parameters.getCurrentPlayer().getBoard();
+                // Just one student, so also one color
+                if(parameters.getSelectedEntranceStudents().get().size() == 1){
+                    if(playerBoard.getStudentsAtTable(parameters.getSelectedStudentTypes().get().get(0)) < 1) return false;
+                }
+                // Two students
+                else {
+                    // Just one type OR two of the same type
+                    if (parameters.getSelectedStudentTypes().get().size() == 1
+                            || parameters.getSelectedStudentTypes().get().get(0).equals(parameters.getSelectedStudentTypes().get().get(1))
+                    ) {
+                        if (playerBoard.getStudentsAtTable(parameters.getSelectedStudentTypes().get().get(0)) < 2)
+                            return false;
+                    }
+                    // Two different types
+                    else {
+                        for (StudentEnum type : parameters.getSelectedStudentTypes().get()) {
+                            if (playerBoard.getStudentsAtTable(type) < 1) return false;
+                        }
+                    }
+                }
+            }
+            //DAME
+            case 11 -> {
+                //todo check that it doesn't overflow the table
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Check if User can use this card and update Model to make
@@ -191,6 +260,10 @@ public class CharacterCardHandler {
      * @return true if the card could be selected
      */
     public boolean selectCard(int idCard){
+        if(!playableThisTurn()){
+            controller.simpleGame.getParameters().setErrorState("A character card has already been played this turn");
+            return false;
+        }
         if(!correctId(idCard)){
             controller.simpleGame.getParameters().setErrorState("Incorrect card id");
             return false;
@@ -203,6 +276,14 @@ public class CharacterCardHandler {
             usingCard.select();
             return true;
         }
+    }
+
+    /**
+     *  Checks whether a character card was already played this turn
+     * @return True if a character card was already played this turn
+     */
+    private boolean playableThisTurn() {
+        return !alreadyPlayed;
     }
 
     /**
@@ -258,5 +339,17 @@ public class CharacterCardHandler {
     public int getIdFromPosition(Integer cardPosition) {
         if(cardPosition < 0 || cardPosition > 2) return -1; //todo hardcoding
         return controller.advancedGame.getCharacterCard(cardPosition).id;
+    }
+
+    /**
+     * Resets the played status for character cards for this turn
+     */
+    public void resetTurnRestriction() {
+        alreadyPlayed = false;
+    }
+
+    //friendly
+    CharacterCard getUsingCard() {
+        return usingCard;
     }
 }

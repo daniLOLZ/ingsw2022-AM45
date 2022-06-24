@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
@@ -57,12 +56,12 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             }
         }
 
-        if (command == CommandEnum.SELECT_STUDENT_COLOR) {
+        if (command == CommandEnum.SELECT_STUDENT_COLORS) { // todo fix sorry
             int tableIndex = 0;
 
             for (EventHandler<MouseEvent> ignored : onTableClick){
                 int finalIndex = tableIndex;
-                onTableClick.set(tableIndex, event -> new Thread (() -> resourceProvider.sendSelectStudentColor(StudentEnum.getColorById(finalIndex))).start());
+//                onTableClick.set(tableIndex, event -> new Thread (() -> resourceProvider.sendSelectStudentColor(StudentEnum.getColorById(finalIndex))).start());
                 tableIndex++;
             }
         }

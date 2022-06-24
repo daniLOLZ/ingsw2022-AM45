@@ -326,6 +326,10 @@ public class ClientController {
     public void validatePlayCharacter() {
         if(!checkSuccessfulReply()){
             userInterface.showGameCommandError((String)broker.readField(NetworkFieldEnum.ERROR_STATE));
+            //If it fails, go back to the state before playing the card
+            userInterface.clearCommands();
+            gameState = callBackGameState;
+            allowStateCommands();
         }
         else {
             userInterface.clearCommands();

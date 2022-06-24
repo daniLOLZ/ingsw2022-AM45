@@ -208,6 +208,13 @@ public class ApplicationHelper {
         return StudentEnum.valueOf(s);
     }
 
+    public static List<StudentEnum> getStudentEnumListFromString(String s) {
+        String[] splitString = stripBracketAndSplit(s);
+        return Arrays.stream(splitString)
+                .map(ApplicationHelper::getStudentEnumFromString)
+                .toList();
+    }
+
     public static List<Integer> getIntListFromString(String s) {
         String[] splitString = stripBracketAndSplit(s);
         return Arrays.stream(splitString)

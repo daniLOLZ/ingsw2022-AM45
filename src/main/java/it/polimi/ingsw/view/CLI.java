@@ -13,7 +13,6 @@ import it.polimi.ingsw.network.client.InterfaceInterrupt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.*;
@@ -819,9 +818,9 @@ public class CLI implements UserInterface {
                 int position = ApplicationHelper.getIntFromString(input.split(" ")[1]);
                 sender.sendSelectCharacter(position);
             }
-            case SELECT_STUDENT_COLOR -> {
-                StudentEnum color = ApplicationHelper.getStudentEnumFromString(input.split(" ")[1]);
-                sender.sendSelectStudentColor(color);
+            case SELECT_STUDENT_COLORS -> {
+                List<StudentEnum> colors = ApplicationHelper.getStudentEnumListFromString(input.split(" ")[1]);
+                sender.sendSelectStudentColors(colors);
             }
             case SELECT_ENTRANCE_STUDENTS -> {
                 List<Integer> students = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
@@ -831,9 +830,9 @@ public class CLI implements UserInterface {
                 int idIslandGroup = ApplicationHelper.getIntFromString(input.split(" ")[1]);
                 sender.sendSelectIslandGroup(idIslandGroup);
             }
-            case SELECT_STUDENT_ON_CARD -> {
-                int selectedStudent = ApplicationHelper.getIntFromString(input.split(" ")[1]);
-                sender.sendSelectStudentOnCard(selectedStudent);
+            case SELECT_STUDENTS_ON_CARD -> {
+                List<Integer> selectedStudent = ApplicationHelper.getIntListFromString(input.split(" ")[1]);
+                sender.sendSelectStudentsOnCard(selectedStudent);
             }
             case PLAY_CHARACTER -> {
                 sender.sendPlayCharacter();

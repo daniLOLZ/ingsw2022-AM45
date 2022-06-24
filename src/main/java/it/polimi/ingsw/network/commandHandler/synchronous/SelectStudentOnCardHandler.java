@@ -6,13 +6,14 @@ import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SelectStudentOnCardHandler extends CommandHandler{
 
     public SelectStudentOnCardHandler(){
-        commandAccepted = CommandEnum.SELECT_STUDENT_ON_CARD;
+        commandAccepted = CommandEnum.SELECT_STUDENTS_ON_CARD;
     }
 
     /**
@@ -25,12 +26,12 @@ public class SelectStudentOnCardHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Object[] objectArray = (Object[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_CARD_POSITIONS);
-        List<Integer> students = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
-            students.add((Integer)o);
-        }
-        if(parameters.getUserController().selectStudentOnCard(students)){
+        double[] readStudents = (double[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_CARD_POSITIONS);
+        List<Integer> students = Arrays.stream(readStudents)
+                .mapToInt(d -> (int) d)
+                .boxed()
+                .collect(Collectors.toList());
+        if(parameters.getUserController().selectStudentsOnCard(students)){
             notifySuccessfulOperation(messageBroker);
             return true;
         }

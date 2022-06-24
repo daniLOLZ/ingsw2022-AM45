@@ -27,7 +27,7 @@ public class SelectCharacterHandler extends CommandHandler{
 
         Integer cardPosition = ApplicationHelper.getIntFromBrokerField(messageBroker.readField(NetworkFieldEnum.CHARACTER_CARD_POSITION));
         if(!parameters.getUserController().selectCard(cardPosition)){
-            notifyError(messageBroker,parameters.getUserController().getSimpleGame().getErrorState().getErrorMessage());
+            notifyError(messageBroker,parameters.getUserController().getGameErrorMessage());
             return false;
         }
         else {

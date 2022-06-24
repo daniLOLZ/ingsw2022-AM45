@@ -7,13 +7,14 @@ import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.MessageBroker;
 import it.polimi.ingsw.network.NetworkFieldEnum;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SelectStudentColorHandler extends CommandHandler{
 
     public SelectStudentColorHandler(){
-        commandAccepted = CommandEnum.SELECT_STUDENT_COLOR;
+        commandAccepted = CommandEnum.SELECT_STUDENT_COLORS;
     }
 
     /**
@@ -26,11 +27,9 @@ public class SelectStudentColorHandler extends CommandHandler{
         CommandEnum readCommand = CommandEnum.fromObjectToEnum(messageBroker.readField(NetworkFieldEnum.COMMAND));
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
-        Object[] objectArray = (Object[]) messageBroker.readField(NetworkFieldEnum.COLORS_REQUIRED);
-        List<StudentEnum> colors = new ArrayList<>();
-        for(Object o : objectArray){ //TODO could be wrong
-            colors.add(StudentEnum.fromObjectToEnum(o));
-        }
+        StudentEnum[] readColors = (StudentEnum[]) messageBroker.readField(NetworkFieldEnum.CHOSEN_STUDENT_COLORS);
+        List<StudentEnum> colors = Arrays.stream(readColors)
+                .collect(Collectors.toList());
 
         if(parameters.getUserController().selectStudentColor(colors)){
             notifySuccessfulOperation(messageBroker);

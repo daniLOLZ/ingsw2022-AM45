@@ -28,6 +28,10 @@ public class PlayCharacterHandler extends CommandHandler{
             return true;
         }
         else {
+            //Error while playing the card
+            // everything has been deselect already
+            // go back to the previous state
+            parameters.setConnectionState(parameters.getCallbackConnectionState());
             notifyError(messageBroker,"Couldn't play the character card");
             return false;
         }

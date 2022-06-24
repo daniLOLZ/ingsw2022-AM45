@@ -97,11 +97,12 @@ public class TurnHandler {
 
     /**
      * Start a new player's ActionPhase, now player
-     *      * in position 'playersPlayedInThisTurn' can play their action phase
+     * in position 'playersPlayedInThisTurn' can play their action phase
      */
     private void startActionPhase(){
         controller.simpleGame.startActionPhase(playersPlayedInThisTurn);
         controller.boardHandler.resetStudentsMoved();
+        if(controller.characterCardHandler != null) controller.characterCardHandler.resetTurnRestriction();
     }
 
     /**
@@ -112,12 +113,9 @@ public class TurnHandler {
      */
     @Deprecated
     public boolean askForControl(Integer idUser, PhaseEnum gamePhase){
-        if( controller.playerNumbers.indexOf(idUser) ==
+        return controller.playerNumbers.indexOf(idUser) ==
                 controller.simpleGame.getParameters().getCurrentPlayer().getPlayerId().index &&
-            gamePhase.equals(controller.simpleGame.getParameters().getCurrentPhase())){
-            return true;
-        }
-        return false;
+                gamePhase.equals(controller.simpleGame.getParameters().getCurrentPhase());
     }
 
     public PhaseEnum getCurrentPhase(){

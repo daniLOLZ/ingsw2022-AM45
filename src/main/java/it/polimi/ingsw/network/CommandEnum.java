@@ -32,11 +32,11 @@ public enum CommandEnum {
     CHOOSE_CLOUD("Choose Cloud",                                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, ID_CLOUD}),
     END_TURN("End of turn",                                     new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
     SELECT_CHARACTER("Select Character",                        new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHARACTER_CARD_POSITION}),
-    SELECT_STUDENT_COLOR("Select Student Color",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_STUDENT_COLORS}),
-    SELECT_ENTRANCE_STUDENTS("Select Entrance Student",         new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_POSITIONS}), //TODO duplicated of SELECT_STUDENT?
+    SELECT_STUDENT_COLORS("Select Student Colors",                new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_STUDENT_COLORS}),
+    SELECT_ENTRANCE_STUDENTS("Select Entrance Student",         new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ENTRANCE_POSITIONS}),
     // For now this and SELECT_STUDENT are kept separate to better separate these two different scenarios
-    SELECT_ISLAND_GROUP("Select Island Group",                  new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLANDS}),
-    SELECT_STUDENT_ON_CARD("Select Student on Card",            new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_CARD_POSITIONS}),
+    SELECT_ISLAND_GROUP("Select Island Group",                  new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_ISLAND_CHAR}),
+    SELECT_STUDENTS_ON_CARD("Select Student on Card",            new NetworkFieldEnum[] {ID_USER, ID_REQUEST, CHOSEN_CARD_POSITIONS}),
     PLAY_CHARACTER("Play Character",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
 
     //From here we're talking about server commands

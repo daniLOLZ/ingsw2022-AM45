@@ -326,11 +326,8 @@ public class Controller {
      * @return true if it's this user's turn
      */
     public boolean isMyTurn(int idUser){
-        if( playerNumbers.indexOf(idUser) ==
-                simpleGame.getParameters().getCurrentPlayer().getPlayerId().index){
-            return true;
-        }
-        return false;
+        return playerNumbers.indexOf(idUser) ==
+                simpleGame.getParameters().getCurrentPlayer().getPlayerId().index;
     }
 
     public PhaseEnum getGamePhase(){
@@ -346,6 +343,19 @@ public class Controller {
             return virtualView.renderSimpleView();
         }
         else return virtualView.renderAdvancedView();
+    }
+
+    /**
+     * Checks whether at this moment someone won the game
+     * @return true if a team won the game
+     */
+    public boolean checkWinner(){
+        TeamEnum winner = winnerHandler.checkWinner();
+        if(!winner.equals(TeamEnum.NOTEAM)){
+            gameWon();
+            return true;
+        }
+        return false;
     }
 
     /*____________________________
@@ -515,10 +525,7 @@ public class Controller {
         if(!islandHandler.moveMN(steps)){
             return false;
         }
-        TeamEnum winner = winnerHandler.checkWinner();
-        if(!winner.equals(TeamEnum.NOTEAM)){
-            gameWon();
-        }
+        checkWinner();
         setGameUpdated(true);
         return true;
     }
@@ -546,11 +553,7 @@ public class Controller {
         if(turnHandler.isPhaseOver()){
             turnHandler.nextPhase();
         }
-        TeamEnum winner = winnerHandler.checkWinner();
-        if (!winner.equals(TeamEnum.NOTEAM)){
-            gameWon();
-        }
-        else{
+        if(!checkWinner()){
             setNewTurn(true);
         }
         setGameUpdated(true);
@@ -594,9 +597,9 @@ public class Controller {
      * @param students the positions of the students on the card
      * @return true if the action succeeded
      */
-    public boolean selectStudentOnCard(List<Integer> students) {
+    public boolean selectStudentsOnCard(List<Integer> students) {
 
-        if(!selectionHandler.selectStudentAtEntrance(students)) return false;
+        if(!((AdvancedSelectionHandler)selectionHandler).selectStudentOnCard(students)) return false;
         setGameUpdated(true);
         return true;
 
@@ -609,7 +612,7 @@ public class Controller {
      */
     public boolean selectEntranceStudents(List<Integer> students) {
 
-        if(selectionHandler.selectStudentAtEntrance(students)) return false;
+        if(!selectionHandler.selectStudentAtEntrance(students)) return false;
         setGameUpdated(true);
         return true;
     }
@@ -620,7 +623,7 @@ public class Controller {
      * @return true if the action succeeded
      */
     public boolean selectIslandGroups(List<Integer> islandIds) {
-        if(selectionHandler.selectIsland(islandIds)) return false;
+        if(!selectionHandler.selectIsland(islandIds)) return false;
         setGameUpdated(true);
         return true;
     }
@@ -631,9 +634,9 @@ public class Controller {
      */
     public boolean playCard(){
 
-        if(!characterCardHandler.playCard()) return false;
+        //We update the game regardless
         setGameUpdated(true);
-        return true;
+        return characterCardHandler.playCard();
 
     }
 
@@ -643,6 +646,11 @@ public class Controller {
      */
     public void setError(String error){
         if(simpleGame != null) simpleGame.getParameters().setErrorState(error);
+    }
+
+    public String getGameErrorMessage() {
+        if(simpleGame != null) return simpleGame.getParameters().getErrorState();
+        else return "Generic game error";
     }
 
     //What is this for?  Maybe for test when there was the deprecated one
@@ -672,6 +680,7 @@ public class Controller {
         //TODO chiudi le connessioni
         setNetworkError(true);
     }
+
 
 
 }

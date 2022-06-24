@@ -10,10 +10,8 @@ import it.polimi.ingsw.network.NetworkFieldEnum;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class is only tasked to send messages to the server, it doesn't check
@@ -269,13 +267,13 @@ public class ClientSender {
         return true;
     }
 
-    public boolean sendSelectStudentColor(StudentEnum color) {
+    public boolean sendSelectStudentColors(List<StudentEnum> colors) {
         if(!acquireSendingRights()) return false;
 
-        StudentEnum[] colors = {color} ;
+        StudentEnum[] colorsArray = colors.toArray(StudentEnum[]::new);
 
-        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENT_COLOR);
-        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_STUDENT_COLORS, colors);
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENT_COLORS);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_STUDENT_COLORS, colorsArray);
 
         sendToServer();
         return true;
@@ -299,18 +297,20 @@ public class ClientSender {
 
         int[] islandGroups = {idIslandGroup};
         mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_ISLAND_GROUP);
-        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ISLANDS, islandGroups);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_ISLAND_CHAR, islandGroups);
 
         sendToServer();
         return true;
     }
 
-    public boolean sendSelectStudentOnCard(int selectedStudent) {
+    public boolean sendSelectStudentsOnCard(List<Integer> selectedStudents) {
         if(!acquireSendingRights()) return false;
 
-        int[] studentPositions = {selectedStudent};
-        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENT_ON_CARD);
-        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_CARD_POSITIONS, studentPositions);
+        int[] studentsArray = selectedStudents.stream()
+                    .mapToInt(Integer::intValue)
+                    .toArray();
+        mainBroker.addToMessage(NetworkFieldEnum.COMMAND, CommandEnum.SELECT_STUDENTS_ON_CARD);
+        mainBroker.addToMessage(NetworkFieldEnum.CHOSEN_CARD_POSITIONS, studentsArray);
 
         sendToServer();
         return true;

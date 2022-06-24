@@ -1,19 +1,18 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.StudentEnum;
-import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 
 import java.util.List;
 
 public class SelectionHandler {
     Controller controller;
-    ParameterHandler parameter;
-    AdvancedParameterHandler advancedParameter;
+    ParameterHandler parameters;
+
 
     public SelectionHandler(Controller controller){
         this.controller = controller;
-        parameter = controller.simpleGame.getParameters();
+        parameters = controller.simpleGame.getParameters();
     }
 
     /**
@@ -66,13 +65,13 @@ public class SelectionHandler {
     }
 
     public boolean selectStudentAtEntrance(int position){
-        if(position < controller.simpleGame
-                .getParameters()
-                .getCurrentPlayer()
-                .getBoard()
-                .getStudentsAtEntrance()
-                .size()
-        && position >= 0) {
+        if(position >= 0
+        && position < parameters.getMaxStudentsAtEntrance()
+        && !parameters
+            .getCurrentPlayer()
+            .getBoard()
+            .getAtEntrance(position).equals(StudentEnum.NOSTUDENT))
+        {
             controller.simpleGame.selectEntranceStudent(position);
             return true;
         }
@@ -85,10 +84,10 @@ public class SelectionHandler {
 
         for(Integer position: positions){
             if(!selectStudentAtEntrance(position)){
+                //If even one failed, deselect everything
+                deselectStudentAtEntrance();
                 return false;
             }
-            //If even one failed, deselect everything
-            deselectStudentAtEntrance();
         }
         return true;
     }

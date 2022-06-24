@@ -138,10 +138,10 @@ public class ClientReceiver {
                 case CHOOSE_CLOUD -> clientController.validateChooseCloud();
                 case END_TURN -> clientController.validateEndTurn();
                 case SELECT_CHARACTER -> clientController.validateSelectCharacter();
-                case SELECT_STUDENT_COLOR -> clientController.validateSelectStudentColor();
+                case SELECT_STUDENT_COLORS -> clientController.validateSelectStudentColor();
                 case SELECT_ENTRANCE_STUDENTS -> clientController.validateSelectEntranceStudents();
                 case SELECT_ISLAND_GROUP -> clientController.validateSelectIslandGroup();
-                case SELECT_STUDENT_ON_CARD -> clientController.validateSelectStudentOnCard();
+                case SELECT_STUDENTS_ON_CARD -> clientController.validateSelectStudentOnCard();
                 case PLAY_CHARACTER -> clientController.validatePlayCharacter();
 //              case QUIT -> closeConnection();
 //              it doesn't make sense that the client waits for confirmation to quit from the server,

@@ -25,7 +25,7 @@ public enum NetworkFieldEnum {
     STEPS_MN("stepsMN", int.class),
     CHARACTER_CARD_POSITION("characterCardPosition", int.class),
     CHOSEN_ENTRANCE_POSITIONS("chosenEntrancePositions", int[].class),
-    CHOSEN_ISLANDS("chosenIslands", int[].class),
+    CHOSEN_ISLAND_CHAR("chosenIslandChar", int.class),
     CHOSEN_CARD_POSITIONS("chosenCardPositions", int[].class),
     CHOSEN_STUDENT_COLORS("chosenStudentColors", StudentEnum[].class),
 
