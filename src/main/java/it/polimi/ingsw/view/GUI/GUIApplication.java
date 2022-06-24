@@ -73,7 +73,7 @@ public class GUIApplication extends Application{
     private static final Coord cloudCenterPos = center.pureSumY(-5.0/78 * WINDOW_HEIGHT);
     private static final Coord
             userBoardPos = downCenter.pureSumY(-145),
-            oppositeBoardPos = upCenter.pureSumY(120),
+            oppositeBoardPos = upCenter.pureSumY(70),
             leftBoardPos = centerLeft.pureSumX(100),
             rightBoardPos = centerRight.pureSumX(-100);
 

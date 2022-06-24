@@ -171,12 +171,12 @@ public class BoardDrawer extends Drawer{
         exited.add(getChildrenExitedZoom(playerBox, finalBoxSlot, actualBoardScale.get(), hoverZoom, boardView, Coord.NO_ROTATION));
 
 
-        Coord textSlot = boxSlot.pureSumY(playerBoxHeight / 2);
+        Coord textSlot = boxSlot.pureSumY(playerBoxHeight / 2).pureSumY(- playerBoxHeight * 0.1).pureSumX(playerBoxWidth * 0.1);
         Coord textLocation = pos.pureSumX(textSlot.x * actualBoardScale.get()).pureSumY(textSlot.y * actualBoardScale.get());
 
 
         playerInfo.setFont(Font.font(playerInfo.getFont().getName(),actualBoardScale.get() * textSize / playerInfo.getFont().getSize()));
-        playerInfo.setTextAlignment(TextAlignment.CENTER);
+        playerInfo.setTextAlignment(TextAlignment.JUSTIFY);
         playerInfo.setX(textLocation.x);
         playerInfo.setY(textLocation.y);
         playerInfo.setWrappingWidth(playerBoxWidth * actualBoardScale.get());
@@ -329,8 +329,9 @@ public class BoardDrawer extends Drawer{
                 tableButton.setWidth(tableLength * actualBoardScale.get());
                 tableButton.setHeight(tableWidth * actualBoardScale.get());
 
+                int table = color.index;
 
-                tableButton.setOnMouseClicked(event -> eventHandlers.getOnHallClick(color.index));
+                tableButton.setOnMouseClicked(eventHandlers.getOnHallClick(table));
 
                 Coord finalButtonSlot = buttonSlot.pureSumX(tableLength / 2).pureSumY(tableWidth / 2);
 
