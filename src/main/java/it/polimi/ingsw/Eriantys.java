@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Eriantys {
 
-    public static final List<String> allowedParameters = Arrays.asList("--cli", "--gui", "--server", "--hostname", "--port");
+    public static final List<String> allowedParameters = Arrays.asList("--cli", "--gui", "--server", "--host", "--port");
     public static final List<Boolean> parameterRequiresInput = Arrays.asList(false, false, false, true, true); //positional reference
     private static String hostname;
     private static int portNumber;
