@@ -778,7 +778,7 @@ public class CLI implements UserInterface {
         // Handle the correct input.
         // Input is already completely inserted and checked for both availability and syntax correctness
 
-        parsedInput = CommandEnum.valueOf(input.split(" ")[0]);
+        parsedInput = CommandEnum.valueOf(input.split(" ")[0].toUpperCase(Locale.ROOT));
         switch (parsedInput){
             case QUIT -> {
                 sender.sendQuit();
@@ -1225,11 +1225,11 @@ public class CLI implements UserInterface {
 
         //Check if command available. Note that the command must match exactly
         try{
-            if (!availableCommands.contains(CommandEnum.valueOf(inputCommand))) return false;
+            if (!availableCommands.contains(CommandEnum.valueOf(inputCommand.toUpperCase(Locale.ROOT)))) return false;
         } catch (IllegalArgumentException e){
             return false;
         }
-        actualCommand = CommandEnum.valueOf(inputCommand);
+        actualCommand = CommandEnum.valueOf(inputCommand.toUpperCase(Locale.ROOT));
 
         //Check whether the input fields are same in number with the needed ones
         requiredFields = CommandEnum.getFieldsNeeded(actualCommand);
