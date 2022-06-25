@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.VirtualViewBean;
+import it.polimi.ingsw.model.characterCards.Requirements;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.model.game.PhaseEnum;
@@ -81,6 +82,7 @@ public class Controller {
 
     /**
      * Creates a game with simple rules using the wizards, tower colors and nicknames stored in playerCreation
+     * @return true if the creation succeeded
      */
     private boolean createSimpleGame(){
         try{
@@ -99,19 +101,15 @@ public class Controller {
 
     /**
      * Creates a game with advanced rules using the wizards, tower colors and nicknames stored in playerCreation,
-     * and the number of coins and character cards stored within the method
+     * and the default amount of coins and character cards, stored in AdvancedParameterHandler
+     * @return true if the creation succeeded
      */
     private boolean createAdvancedGame(){
-        final int numCoins = 20;
-        final int numCharacterCards = 3;
-
         try{
             advancedGame = new AdvancedGame(GameRuleEnum.getNumPlayers(gameRule.id),
                     playerCreation.getWizards(),
                     playerCreation.getTeamColors(),
                     playerCreation.getNicknames(),
-                    numCoins,
-                    numCharacterCards,
                     virtualView);
         } catch (IncorrectPlayersException e) {
             System.err.println("Error creating the game!");
@@ -120,6 +118,9 @@ public class Controller {
         return true;
     }
 
+    /**
+     * Creates the player creation handler
+     */
     private void createPlayerCreation(){
         playerCreation = new PlayerCreation(this);
     }
@@ -148,6 +149,9 @@ public class Controller {
 
     }
 
+    /**
+     * Creates the virtual view for this game
+     */
     private void createView(){
         virtualView = new VirtualView();
     }
@@ -233,7 +237,7 @@ public class Controller {
 
     /**
      * Gets all the team colors that are still available for choosing
-     * @return a list of all the team colors (as TeamEnum) chosen
+     * @return a list of all the team colors (as TeamEnum) still available
      */
     public List<TeamEnum> getTowerColorsAvailable(){
         return  TeamEnum.getTeams().stream()
@@ -243,7 +247,7 @@ public class Controller {
 
     /**
      * Gets all the wizards that are still available for choosing
-     * @return a list of all the wizards (as WizardEnum) chosen
+     * @return a list of all the wizards (as WizardEnum) still available
      */
     public List<WizardEnum> getWizardsAvailable(){
         return  WizardEnum.getWizards().stream()
@@ -257,6 +261,15 @@ public class Controller {
      */
     public synchronized boolean isGameStarted(){
         return this.gameStarted;
+    }
+
+    /**
+     * Returns the card requirements for the currently selected card
+     * @return the requirements for the card, or null if there was no selected card
+     */
+    public Requirements getCardRequirements(){
+        if(characterCardHandler.getUsingCard() == null) return null;
+        else return characterCardHandler.getUsingCard().getRequirements();
     }
 
     /**
@@ -341,7 +354,7 @@ public class Controller {
 
     /**
      * Gets the current virtual view as a bean containing all the beans of game elements
-     * @return a VirtualViewBean
+     * @return a VirtualViewBean, containing either the simple or advanced game information
      */
     public VirtualViewBean getView() {
         if(GameRuleEnum.isSimple(gameRule.id)){
@@ -673,6 +686,9 @@ public class Controller {
     }
 
     //What is this for?  Maybe for test when there was the deprecated one
+    /**
+     * For tests only
+     */
     public void createSimpleGame(int numPlayers, List<Integer> selectedWizards, List<TeamEnum> teamColors, List<String> nicknames) {
         try {
 
@@ -693,11 +709,11 @@ public class Controller {
         lostConnectionHandle();
     }
 
+    /**
+     * The controller takes the actions necessary to signal that the game was interrupted
+     * due to connection being lost
+     */
     public void lostConnectionHandle(){
-        /*TODO Aggiorna la view con il messaggio di errore settato dal ClientHandler
-         * che ha perso la connessione (in teoria già fatto dal clientHandler)*/
-        /*TODO invia la view a tutti gli user della lobby incriminata */
-        //TODO chiudi le connessioni
         setNetworkError(true);
     }
 

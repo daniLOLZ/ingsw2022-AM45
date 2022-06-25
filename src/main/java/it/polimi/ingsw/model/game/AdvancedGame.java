@@ -78,6 +78,36 @@ public class AdvancedGame extends SimpleGame {
 
     }
 
+    /**
+     * Version with observer pattern
+     */
+    public AdvancedGame(int numPlayers, List<Integer> selectedWizards,
+                        List<TeamEnum> selectedColors, List<String> nicknames,
+                        VirtualView virtualView) throws  IncorrectPlayersException{
+        super(numPlayers, selectedWizards, selectedColors, nicknames, virtualView);
+        advancedParameters.setNumCoins(AdvancedParameterHandler.numStartingCoinsOnBoard); // number of coins in the parameters is added at a later
+        // time because we need to create parameters before
+        // creating the islands, this happens in the createParameters()
+        // method, which don't have the number of coins as input
+        characterCards = new ArrayList<>();
+        for(int card = 0; card < AdvancedParameterHandler.numCharacterCardPerGame; card++){
+            characterCards.add(FactoryCharacterCard.
+                    getCharacterCard(characterCards, super.getParameters(), advancedParameters));
+        }
+
+        for(int card = 0; card < AdvancedParameterHandler.numCharacterCardPerGame; card++){
+            characterCards.get(card).addWatcher(virtualView);
+        }
+
+        watcherList = new ArrayList<>();
+        AdvancedGameWatcher watcher = new AdvancedGameWatcher(this, virtualView);
+        watcherList.add(watcher);
+        watchers = watcherList;
+
+
+
+    }
+
     @Override
     public void initializeGame() {
         super.initializeGame();
@@ -108,6 +138,7 @@ public class AdvancedGame extends SimpleGame {
 
 
 
+    // No virtual view
     @Override
     protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
                                  List<TeamEnum> selectedColors, List<String> nicknames) {

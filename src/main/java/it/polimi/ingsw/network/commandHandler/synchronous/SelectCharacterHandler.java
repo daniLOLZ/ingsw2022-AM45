@@ -36,8 +36,7 @@ public class SelectCharacterHandler extends CommandHandler{
             parameters.setCallbackConnectionState(parameters.getConnectionState());
 
             notifySuccessfulOperation(messageBroker);
-            Requirements requirements = parameters.getUserController().getAdvancedGame()
-                    .getAdvancedParameters().getRequirementsForThisAction();
+            Requirements requirements = parameters.getUserController().getCardRequirements();
             messageBroker.addToMessage(NetworkFieldEnum.ENTRANCE_REQUIRED, requirements.studentAtEntrance);
             messageBroker.addToMessage(NetworkFieldEnum.COLORS_REQUIRED, requirements.studentType);
             messageBroker.addToMessage(NetworkFieldEnum.ISLANDS_REQUIRED, requirements.islands);

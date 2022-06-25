@@ -13,7 +13,7 @@ public class BoardHandler {
 
     public BoardHandler(Controller controller){
         this.controller = controller;
-        maxNumberOfStudentsToMove = controller.getSimpleGame().getParameters().getStudentsPerCloud();
+        maxNumberOfStudentsToMove = controller.simpleGame.getParameters().getStudentsPerCloud();
     }
 
     //GET THE CURRENT PLAYER

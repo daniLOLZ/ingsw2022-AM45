@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.board.AdvancedBoard;
 import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.view.VirtualView;
@@ -43,7 +44,7 @@ public class AdvancedPlayer extends Player {
                           Wizard wizard, boolean leader,
                           ParameterHandler parameters, VirtualView virtualView){
         super(playerId, nickname,teamColor, wizard, leader, parameters);
-        this.numCoins = 1;
+        this.numCoins = AdvancedParameterHandler.numInitialCoinsPerPlayer;
 
         watcherList = new ArrayList<>();
         AdvancedPlayerWatcher watcher = new AdvancedPlayerWatcher(this, virtualView);

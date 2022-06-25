@@ -11,6 +11,9 @@ public class AdvancedParameterHandler {
 
     //STATIC PARAMETERS
     public static final int numCharacterCardPerGame = 3;
+    public static final int numStartingCoinsOnBoard = 20;
+    public static final int numInitialCoinsPerPlayer = 1;
+
     // todo remove/modify this fixed number, since the constructor of advancedGame has a parameter for this
 
     //DYNAMIC PARAMETERS
@@ -25,6 +28,14 @@ public class AdvancedParameterHandler {
 
     //CHOSEN PARAMETERS
     private Optional<List<Integer>> selectedStudentsOnCard;
+
+    /**
+     * Loads in the default amount of coins on the board
+     */
+    public AdvancedParameterHandler(){
+        this.numCoins = numStartingCoinsOnBoard;
+        resetCardEffects();
+    }
 
     public AdvancedParameterHandler(int numCoins){
         this.numCoins = numCoins;

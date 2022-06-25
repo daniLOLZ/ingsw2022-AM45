@@ -151,43 +151,43 @@ public class CharacterCardHandler {
         // AND to see if it's present but the list is empty
 
         if(requirements.islands != 0){
-            if(controller.getSimpleGame().getParameters().getSelectedIslands().isEmpty()
-                    || controller.getSimpleGame().getParameters().getSelectedIslands().get().isEmpty()) satisfied = false;
+            if(controller.simpleGame.getParameters().getSelectedIslands().isEmpty()
+                    || controller.simpleGame.getParameters().getSelectedIslands().get().isEmpty()) satisfied = false;
             else if(requirements.islands == 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedIslands().get().size() != 1)
+                    controller.simpleGame.getParameters().getSelectedIslands().get().size() != 1)
                 satisfied = false;
             else if(requirements.islands > 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedIslands().get().size() > requirements.islands)
+                    controller.simpleGame.getParameters().getSelectedIslands().get().size() > requirements.islands)
                 satisfied = false;
         }
         if(requirements.studentType != 0){
-            if(controller.getSimpleGame().getParameters().getSelectedStudentTypes().isEmpty()
-                    || controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().isEmpty()) satisfied = false;
+            if(controller.simpleGame.getParameters().getSelectedStudentTypes().isEmpty()
+                    || controller.simpleGame.getParameters().getSelectedStudentTypes().get().isEmpty()) satisfied = false;
             else if(requirements.studentType == 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().size() != 1)
+                    controller.simpleGame.getParameters().getSelectedStudentTypes().get().size() != 1)
                 satisfied = false;
             else if(requirements.studentType > 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedStudentTypes().get().size() > requirements.studentType)
+                    controller.simpleGame.getParameters().getSelectedStudentTypes().get().size() > requirements.studentType)
                 satisfied = false;
         }
         if(requirements.studentOnCard != 0){
-            if(controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().isEmpty()
-                    || controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().isEmpty()) satisfied = false;
+            if(controller.advancedGame.getAdvancedParameters().getSelectedStudentsOnCard().isEmpty()
+                    || controller.advancedGame.getAdvancedParameters().getSelectedStudentsOnCard().get().isEmpty()) satisfied = false;
             else if(requirements.studentOnCard == 1 &&
-                    controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().size() != 1)
+                    controller.advancedGame.getAdvancedParameters().getSelectedStudentsOnCard().get().size() != 1)
                 satisfied = false;
             else if(requirements.studentOnCard > 1 &&
-                    controller.getAdvancedGame().getAdvancedParameters().getSelectedStudentsOnCard().get().size() > requirements.studentOnCard)
+                    controller.advancedGame.getAdvancedParameters().getSelectedStudentsOnCard().get().size() > requirements.studentOnCard)
                 satisfied = false;
         }
         if(requirements.studentAtEntrance != 0){
-            if(controller.getSimpleGame().getParameters().getSelectedEntranceStudents().isEmpty()
-                    || controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().isEmpty()) satisfied = false;
+            if(controller.simpleGame.getParameters().getSelectedEntranceStudents().isEmpty()
+                    || controller.simpleGame.getParameters().getSelectedEntranceStudents().get().isEmpty()) satisfied = false;
             else if(requirements.studentAtEntrance == 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().size() != 1)
+                    controller.simpleGame.getParameters().getSelectedEntranceStudents().get().size() != 1)
                 satisfied = false;
             else if(requirements.studentAtEntrance > 1 &&
-                    controller.getSimpleGame().getParameters().getSelectedEntranceStudents().get().size() > requirements.studentAtEntrance)
+                    controller.simpleGame.getParameters().getSelectedEntranceStudents().get().size() > requirements.studentAtEntrance)
                 satisfied = false;
         }
 
@@ -195,8 +195,8 @@ public class CharacterCardHandler {
     }
 
     private boolean checkCardSpecificRequisites() {
-        ParameterHandler parameters = controller.getSimpleGame().getParameters();
-        AdvancedParameterHandler advancedParameters = controller.getAdvancedGame().getAdvancedParameters();
+        ParameterHandler parameters = controller.simpleGame.getParameters();
+        AdvancedParameterHandler advancedParameters = controller.advancedGame.getAdvancedParameters();
         boolean entranceEmpty = (parameters.getSelectedEntranceStudents().isEmpty() || parameters.getSelectedEntranceStudents().get().isEmpty());
         boolean cardEmpty = (advancedParameters.getSelectedStudentsOnCard().isEmpty() || advancedParameters.getSelectedStudentsOnCard().get().isEmpty());
         boolean islandEmpty = (parameters.getSelectedIslands().isEmpty() || parameters.getSelectedIslands().get().isEmpty());
