@@ -18,12 +18,22 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     private EnumSet<CommandEnum> allowedCommands = EnumSet.noneOf(CommandEnum.class);
     private ClientSender sender;
 
+
+    private boolean selected = false;
+    private int cardIndex;
+
+    private List<Integer> selectedStudentsOnCard;
+
     public CharacterCardHandlingToolbox(){
         onCharacterCardClick = HandlingToolbox.NO_EFFECT;
         onStudentOnCardClick = new ArrayList<>();
+        selectedStudentsOnCard = new ArrayList<>();
     }
 
-    public void setNumStudents(int numStudents){
+    public void setCardInfo(int cardIndex, int numStudents){
+
+        this.cardIndex = cardIndex;
+
         for (int student = 0; student < numStudents; student++) {
             onStudentOnCardClick.add(NO_EFFECT);
         }
@@ -37,20 +47,30 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
-        //TODO
 
         if (!sender.equals(resourceProvider)) sender = resourceProvider;
 
         allowedCommands.add(command);
 
-        if (command == CommandEnum.SELECT_STUDENTS_ON_CARD) { //todo fix sorry
+        if (command == CommandEnum.SELECT_CHARACTER){
+
+            selected = false;
+
+            onCharacterCardClick = event -> {
+                selected = true;
+                new Thread(() -> resourceProvider.sendSelectCharacter(cardIndex)).start();
+            };
+            resetSelections();
+        }
+
+        if (selected && command == CommandEnum.SELECT_STUDENTS_ON_CARD) {
 
             int studentIndex = 0;
 
             for (EventHandler<MouseEvent> ignored:
                  onStudentOnCardClick) {
                 int finalIndex = studentIndex;
- //               onStudentOnCardClick.set(studentIndex, event -> new Thread(() -> resourceProvider.sendSelectStudentOnCard(finalIndex)).start());
+                onStudentOnCardClick.set(finalIndex, event ->  selectedStudentsOnCard.add(finalIndex));
                 studentIndex++;
             }
         }
@@ -58,9 +78,12 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
     @Override
     public void disableCommand(CommandEnum command) {
-        //TODO
 
         allowedCommands.remove(command);
+
+        if (command == CommandEnum.SELECT_CHARACTER){
+            onCharacterCardClick = NO_EFFECT;
+        }
 
         if (command == CommandEnum.SELECT_STUDENTS_ON_CARD){
 
@@ -80,5 +103,17 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
     public EventHandler<MouseEvent> getOnStudentOnCardClick(int pos) {
         return onStudentOnCardClick.get(pos);
+    }
+
+    public List<Integer> getSelectedStudentsOnCard(){
+        return selectedStudentsOnCard;
+    }
+
+    public boolean isSelected(){
+        return selected;
+    }
+
+    private void resetSelections(){
+        selectedStudentsOnCard = new ArrayList<>();
     }
 }

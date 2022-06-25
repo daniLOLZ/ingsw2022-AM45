@@ -3,8 +3,6 @@ package it.polimi.ingsw.view.GUI;
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
-import it.polimi.ingsw.model.assistantCards.Assistant;
-import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
 import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
@@ -21,9 +19,7 @@ import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class GUI implements UserInterface {
 
@@ -354,7 +350,7 @@ public class GUI implements UserInterface {
         if (virtualView.getCharacterCardBeans() != null) {
             for (int character = 0; character < numCharacterCards; character++) {
                 gameToolBoxContainer
-                        .setNumStudentsOnCharacterCard(
+                        .setCharacterCardInfo(
                                 character,
                                 virtualView
                                         .getCharacterCardBeans()
