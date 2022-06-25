@@ -3,6 +3,8 @@ package it.polimi.ingsw.view.GUI;
 import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
+import it.polimi.ingsw.model.assistantCards.Assistant;
+import it.polimi.ingsw.model.assistantCards.FactoryAssistant;
 import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.beans.PlayerBean;
@@ -52,6 +54,7 @@ public class GUI implements UserInterface {
     private VirtualViewBean viewData;
     private GameInitBean gameInitData;
     private boolean selectedTowerColor = false;
+    private boolean yourTurn = false;
 
     private String nickname;
 
@@ -361,6 +364,10 @@ public class GUI implements UserInterface {
             }
         }
         gameToolBoxContainer.updateIslandGroups(virtualView.getIslandGroupBeans());
+        if (yourTurn) {
+            int yourSlot = lobbyBean.getNicknames().indexOf(nickname);
+            gameToolBoxContainer.setMaxMNSteps(virtualView.getPlayerBeans().get(yourSlot).getAssistantPlayed().motherNatureSteps);
+        }
     }
 
     @Override
@@ -375,7 +382,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void setYourTurn(boolean isYourTurn) {
-
+        yourTurn = isYourTurn;
     }
 
     @Override

@@ -37,6 +37,10 @@ public class GameToolBoxContainer {
         characterCardHandlingToolboxes.get(index).setNumStudents(numStudents);
     }
 
+    public void setMaxMNSteps(int steps){
+        islandHandlingToolbox.setMaxMNSteps(steps);
+    }
+
     public List<HandlingToolbox> getAll() {
         List<HandlingToolbox> handlingToolboxes = new ArrayList<>();
 

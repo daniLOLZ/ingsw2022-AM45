@@ -82,21 +82,21 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
         if (command == CommandEnum.MOVE_MN){
 
-            for (int pos = motherNaturePos + 1; pos < motherNaturePos + maxMNSteps; pos++){
+            for (int pos = motherNaturePos + 1; pos <= motherNaturePos + maxMNSteps; pos++){
 
-                int finalPos = pos;
-                onIslandClick.set(pos % onIslandClick.size(), event -> new Thread(() ->  resourceProvider.sendMoveMN(finalPos - motherNaturePos)).start());
+                int finalSteps = pos - motherNaturePos;
+                onIslandClick.set(pos % onIslandClick.size(), event -> new Thread(() ->  resourceProvider.sendMoveMN(finalSteps)).start());
             }
         }
     }
 
     @Override
     public void disableCommand(CommandEnum command) {
-        //TODO MOVE_MOTHER_NATURE
-
         allowedCommands.remove(command);
 
-        if (command == CommandEnum.PUT_IN_ISLAND || command == CommandEnum.SELECT_ISLAND_GROUP){
+        if (command == CommandEnum.PUT_IN_ISLAND ||
+                command == CommandEnum.SELECT_ISLAND_GROUP ||
+                command == CommandEnum.MOVE_MN){
 
             int index = 0;
 

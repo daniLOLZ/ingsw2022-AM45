@@ -44,11 +44,16 @@ public class CloudDrawer extends Drawer{
 
 
         //draw cloud
-        ImageView cloudView = drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, onClick);
+        EventHandler<MouseEvent> actualEffectOnClick;
+
+        if (data.getStudents().isEmpty()) actualEffectOnClick = HandlingToolbox.NO_EFFECT;
+        else actualEffectOnClick = onClick;
+
+        ImageView cloudView = drawFromCenterInteractiveImage(clouds.get(data.getIdCloud()), pos, scale, actualEffectOnClick);
         toDraw.add(cloudView);
 
-        int index = 0;
         //draw students
+        int index = 0;
         for (StudentEnum student: students) {
 
             Coord studentSlot = slots.get(index);
@@ -57,7 +62,7 @@ public class CloudDrawer extends Drawer{
                     student,
                     pos.pureSumX(studentSlot.x * scale).pureSumY(studentSlot.y * scale),
                     studentSize / StudentDrawer.getStudentSize() * scale,
-                    onClick);
+                    actualEffectOnClick);
 
             toDraw.add(studentView);
 
