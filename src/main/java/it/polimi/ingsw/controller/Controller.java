@@ -288,6 +288,11 @@ public class Controller {
         return newTurn.get();
     }
 
+    /**
+     * To be set to true if there is another player that should now take control,
+     * either for the planning or action phase
+     * @param value true if after the handling of this command a different player should take control
+     */
     public void setNewTurn(boolean value) {
         newTurn.set(value);
     }
@@ -347,10 +352,25 @@ public class Controller {
 
     /**
      * Checks whether at this moment someone won the game
+     * Checks the condition of having no more towers or having too few island groups left
      * @return true if a team won the game
      */
-    public boolean checkWinner(){
-        TeamEnum winner = winnerHandler.checkWinner();
+    public boolean checkInstantWinner(){
+        TeamEnum winner = winnerHandler.checkInstantWinner();
+        if(!winner.equals(TeamEnum.NOTEAM)){
+            gameWon();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * To be called after a turn ends, checks the winning conditions
+     * other than having no more towers or there being too few island groups
+     * @return true if a team won the game
+     */
+    public boolean checkDeferredWinner(){
+        TeamEnum winner = winnerHandler.checkDeferredWinner();
         if(!winner.equals(TeamEnum.NOTEAM)){
             gameWon();
             return true;
@@ -527,7 +547,7 @@ public class Controller {
         if(!islandHandler.moveMN(steps)){  //sanitized here
             return false;
         }
-        checkWinner();
+        checkInstantWinner();
         setGameUpdated(true);
         return true;
     }
@@ -554,9 +574,6 @@ public class Controller {
         turnHandler.endPlayerPhase();
         if(turnHandler.isPhaseOver()){
             turnHandler.nextPhase();
-        }
-        if(!checkWinner()){
-            setNewTurn(true);
         }
         setGameUpdated(true);
         return true;

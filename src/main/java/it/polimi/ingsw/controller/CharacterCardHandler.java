@@ -133,7 +133,7 @@ public class CharacterCardHandler {
 
         controller.selectionHandler.deselectAll();
         usingCard = null;
-        controller.checkWinner();
+        controller.checkInstantWinner();
 
         return true;
     }

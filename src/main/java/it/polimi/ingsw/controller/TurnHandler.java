@@ -42,6 +42,7 @@ public class TurnHandler {
         controller.simpleGame.initialiseSelection();
         controller.boardHandler.refillClouds();
         controller.assistantHandler.clearAssistantsPlayed();
+        checkLastTurn();
     }
 
     /**
@@ -55,7 +56,10 @@ public class TurnHandler {
 
         // If the last action phase is ending, we need to take certain turn ending actions
         if (currentPhase.equals(PhaseEnum.ACTION)){
-            initializeNewTurn();
+            if(!controller.checkDeferredWinner()){
+                controller.setNewTurn(true);
+                initializeNewTurn();
+            }
         }
         else if(currentPhase.equals(PhaseEnum.PLANNING)){
             controller.simpleGame.sortPlayers();
@@ -81,6 +85,7 @@ public class TurnHandler {
     public void endPlayerPhase(){
         playersPlayedInThisTurn++;
         if(playersPlayedInThisTurn != numPlayers) {
+            controller.setNewTurn(true);
             if (currentPhase.equals(PhaseEnum.PLANNING)) {
                 startPlanningPhase();
             } else startActionPhase();

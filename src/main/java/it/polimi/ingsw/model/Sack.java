@@ -21,7 +21,8 @@ public class Sack {
         students = shuffle(studentsList);
     }
     private StudentEnum drawOneStudent(){
-        return students.pop();
+        if(!students.isEmpty()) return students.pop();
+        else return StudentEnum.NOSTUDENT;
     }
     public List<StudentEnum> drawNStudents(int numStudents){
         List<StudentEnum> drawnStudents = new ArrayList<>();

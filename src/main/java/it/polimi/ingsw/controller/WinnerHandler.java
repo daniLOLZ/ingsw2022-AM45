@@ -19,34 +19,53 @@ public class WinnerHandler {
 
     /**
      * Check if a team has won.
-     * This method must be called after action phase ends.
-     * You win if you put all towers on islands.
-     * You win if when the game ends you have placed more towers than others.
-     * You win if when the game ends there is no player that have placed more tower than you and
-     * you have more professors than others.
-     * @return the winner team if exists or NoTeam if nobody won
+     * This method must be called after any tower or island update is detected <br>
+     * You win if you put all towers on islands or if there are too few island groups and
+     * you meet the remaining winning criteria
+     * @return the winner team if it exists or NOTEAM if nobody won
      */
-    public TeamEnum checkWinner(){
-        TeamEnum winnerTeam = TeamEnum.NOTEAM;
-        winnerTeam = controller.simpleGame.noMoreTowers();
+    public TeamEnum checkInstantWinner() {
+        TeamEnum winner = TeamEnum.NOTEAM;
+        winner = controller.simpleGame.noMoreTowers();
 
-        if(winnerTeam != TeamEnum.NOTEAM){
-            this.winnerTeam = winnerTeam;
-            return winnerTeam;
-        }
-
-        if(controller.simpleGame.islandShortage() || controller.simpleGame.isLastTurn()){
-            winnerTeam = morePlacedTowers();
-            if(winnerTeam == TeamEnum.NOTEAM){
-                winnerTeam = moreProfessors();
+        if (winner == TeamEnum.NOTEAM) {
+            if(controller.simpleGame.islandShortage()){
+                winner = morePlacedTowers();
                 if(winnerTeam == TeamEnum.NOTEAM){
-                    //Default to the white team, as the rules don't specify this possibility
-                    winnerTeam = TeamEnum.WHITE;
+                    winner = moreProfessors();
+                    if(winnerTeam == TeamEnum.NOTEAM){
+                        //Default to the white team, as the rules don't specify this possibility
+                        winner = TeamEnum.WHITE;
+                    }
                 }
             }
         }
+        this.winnerTeam = winner;
+        return winnerTeam;
+    }
 
-        this.winnerTeam = winnerTeam;
+    /**
+     * The game is won if when the game ends you have placed more towers than the other teams. <br>
+     * The game is won if when the game ends there is no player who built more towers than the other players
+     * AND you have more professors than others. <br>
+     * If both conditions are equal, the white team wins
+     * @return true if there is a winner
+     */
+    public TeamEnum checkDeferredWinner(){
+
+        TeamEnum winner = TeamEnum.NOTEAM;
+
+        if(controller.simpleGame.isLastTurn()){
+            winner = morePlacedTowers();
+            if(winner == TeamEnum.NOTEAM){
+                winner = moreProfessors();
+                if(winner == TeamEnum.NOTEAM){
+                    //Default to the white team, as the rules don't specify this possibility
+                    winner = TeamEnum.WHITE;
+                }
+            }
+        }
+        this.winnerTeam = winner;
         return winnerTeam;
     }
 

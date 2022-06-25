@@ -279,7 +279,7 @@ public class ClientHandler implements Runnable{
             messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_MESSAGE, "ERR");
             messageBroker.addToMessage(NetworkFieldEnum.SERVER_REPLY_STATUS, 1);
             messageBroker.addToMessage(NetworkFieldEnum.ID_REQUEST, messageBroker.readField(NetworkFieldEnum.ID_REQUEST));
-        } //TODO close connection?
+        }
     }
 
     /**
