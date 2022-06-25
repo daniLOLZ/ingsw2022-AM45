@@ -77,7 +77,6 @@ public class CharacterCardHandler {
                 FlagBearer flagBearer = (FlagBearer) usingCard;
                 flagBearer.evaluate(controller.advancedGame); //todo possible duplicate evaluation
                 controller.islandHandler.evaluateIsland(idIsland);
-                controller.checkWinner();
             }
 
             //MAILMAN   useless
@@ -134,6 +133,7 @@ public class CharacterCardHandler {
 
         controller.selectionHandler.deselectAll();
         usingCard = null;
+        controller.checkWinner();
 
         return true;
     }

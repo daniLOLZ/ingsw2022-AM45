@@ -39,6 +39,10 @@ public class WinnerHandler {
             winnerTeam = morePlacedTowers();
             if(winnerTeam == TeamEnum.NOTEAM){
                 winnerTeam = moreProfessors();
+                if(winnerTeam == TeamEnum.NOTEAM){
+                    //Default to the white team, as the rules don't specify this possibility
+                    winnerTeam = TeamEnum.WHITE;
+                }
             }
         }
 
@@ -59,7 +63,7 @@ public class WinnerHandler {
                 winnerTeam = team;
             }
 
-            if(curr != null && curr.equals(max)){
+            else if(curr != null && curr.equals(max)){
                 winnerTeam = TeamEnum.NOTEAM;
             }
         }
@@ -80,8 +84,7 @@ public class WinnerHandler {
                 max = curr;
                 winnerTeam = team;
             }
-
-            if(curr != null && curr.equals(max)){
+            else if(curr != null && curr.equals(max)){
                 winnerTeam = TeamEnum.NOTEAM;
             }
         }
