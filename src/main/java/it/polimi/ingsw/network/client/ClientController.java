@@ -12,6 +12,10 @@ import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import it.polimi.ingsw.view.UserInterface;
 
+/**
+ * This class contains methods to validate whether the command sent received
+ * a positive response or not, updates the UI accordingly, and shows the appropriate screen
+ */
 public class ClientController {
 
     private UserInterface userInterface;
@@ -23,13 +27,8 @@ public class ClientController {
     // todo? make it its own state instead of leeching off of
     //  the connection states
 
-    /*
-       SYNCHRONOUS COMMANDS
-                            */
+    //<editor-fold desc="Synchronous commands">
 
-    /**
-     * Validate whether the login was successful and shows the correct screen
-     */
     public void validateLogin(){
         if(!checkSuccessfulReply()){
             userInterface.showLoginScreenFailure();
@@ -88,8 +87,6 @@ public class ClientController {
             userInterface.showSuccessStartGame();
         }
         userInterface.showLobby(); // We return to showLobby waiting for the asynchronous message to arrive
-        // todo: If the message is late, this will print again the lobby, fix, maybe by calling from here
-        //  setLobbyStarting in case of success, doesn't change much if it's "the server" or client doing it
     }
 
     public void validateLobbyLeave() {
@@ -340,6 +337,10 @@ public class ClientController {
         userInterface.showMainGameInterface();
     }
 
+    //</editor-fold>
+    /**
+     * Allows the user interface to show the commands stated in the current game state
+     */
     private void allowStateCommands(){
         for(CommandEnum command : gameState.allowedFields()) {
             userInterface.addCommand(command);
@@ -430,6 +431,9 @@ public class ClientController {
         allowStateCommands();
     }
 
+    /**
+     * Instructs the UI to show a network error message
+     */
     public void connectionClose() {
         userInterface.showNetworkError();
     }

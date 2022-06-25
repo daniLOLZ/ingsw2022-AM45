@@ -33,6 +33,26 @@ properly show the game interface.
 <h3>GUI:</h3>
 Todo
 
+<h3>Game instructions:</h3>
+While in game, to input a command you must type 
+in exactly the name of the command (case insensitive)
+
+When selecting elements identified by their id, the 
+parameter to write will be the id
+
+When selecting elements identified by their position, 
+the parameter to write will be the position, starting from 1
+
+When using commands that require multiple elements to be
+selected at once, the parameter will be written enclosed 
+in square brackets, separated by commas and without
+any whitespaces in them <br>
+`ex: [value1,value2,...,valueN]`
+
+The colors of the students have to be in capital letters <br>
+`ex: RED`
+
+
 <H1> Coverage </H1>
 
 | Package | Class        | Method        | Line           |

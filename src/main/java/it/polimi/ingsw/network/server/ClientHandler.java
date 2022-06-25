@@ -155,7 +155,7 @@ public class ClientHandler implements Runnable{
 
     /**
      * Called after trying to send the async commands for all clients;
-     * clears the condition that (eventually) made the commands trigger
+     * clears the condition that made the commands trigger
      */
     private void clearAsyncConditions() {
         for(AsyncCommandHandler handler : asyncHandlers){
@@ -198,7 +198,8 @@ public class ClientHandler implements Runnable{
     /**
      * Handle the exceptions thrown by losing connection.
      * This method is called by any class that has a way of intercepting a connection loss
-     * Set error state in order to show the error to the other players in future view.
+     * Sets error state in order to show the error to the other players in future view.
+     * It signals a problem and if necessary brings the server back to a consistent state
      * Closes connection.
      */
     public void connectionLostAlert(String error){
@@ -237,10 +238,8 @@ public class ClientHandler implements Runnable{
         closeConnection();
     }
 
-    //below methods moved to CommandHandler
-
     /**
-     * Closes the current connection
+     * Closes the current connection's sockets
      * Sets isConnected to false.
      */
     private void closeConnection() {
@@ -315,6 +314,10 @@ public class ClientHandler implements Runnable{
         return connected.get();
     }
 
+    /**
+     * Used by the Server class to coordinate opening the ping socket
+     * @return the Socket for this user
+     */
     public Socket getMainSocket(){
         return mainSocket;
     }

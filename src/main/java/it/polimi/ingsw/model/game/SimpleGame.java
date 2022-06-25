@@ -309,6 +309,7 @@ public class SimpleGame extends DrawableObject {
      * @param selectedWizards array containing the correspondence between player and selected wizard
      * @param selectedColors array containing the correspondence between player and selected tower color
      * @param nicknames array containing the users' nicknames
+     * @param virtualView the virtual view to update after a model change
      */
     protected void createPlayers(int numPlayers, List<Integer> selectedWizards,
                                  List<TeamEnum> selectedColors, List<String> nicknames,
