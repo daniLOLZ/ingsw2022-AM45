@@ -46,11 +46,10 @@ public class BrokerTest {
         broker = new MessageBroker();
     }
 
-    @Test
-    public void serializeTest(){
-        //todo
-    }
-
+    /**
+     *  Check if the message broker can deserialize a simple json string representing a message
+     *  sent by the user
+     */
     @Test
     public void deserializeTest(){
         InputStream stream = createJSONFile("""
@@ -70,10 +69,14 @@ public class BrokerTest {
             fail();
         }
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
-        assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
+        assertEquals(broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
         broker.flushFirstSyncMessage();
     }
 
+    /**
+     * Tests whether two messages waiting on the input buffer are correctly separated and translated
+     * into two distinct messages
+     */
     @Test
     public void twoMessagesQuickSuccession(){
         InputStream stream = createJSONFile("""
@@ -97,7 +100,7 @@ public class BrokerTest {
         } catch (InterruptedException e) {
             fail("No first message to read");
         }
-        assertEquals("gigio", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
+        assertEquals("gigio", ( broker.readField(NetworkFieldEnum.NICKNAME)));
         broker.flushFirstSyncMessage();
 
         try {
@@ -105,7 +108,7 @@ public class BrokerTest {
         } catch (InterruptedException e) {
             fail("No second message to read");
         }
-        assertEquals("gigio2", ((String) broker.readField(NetworkFieldEnum.NICKNAME)));
+        assertEquals("gigio2", ( broker.readField(NetworkFieldEnum.NICKNAME)));
         broker.flushFirstSyncMessage();
         //If the messages were correctly parsed, the broker should be able to read two different messages correctly
     }

@@ -61,7 +61,7 @@ public class AdvancedGameTest {
     }
 
     /**
-     * Test teh correct existence of character cards
+     * Test the correct existence of character cards
      */
     @Test
     public void checkCharacterCards(){

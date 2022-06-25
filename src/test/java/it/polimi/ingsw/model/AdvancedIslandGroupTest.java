@@ -72,6 +72,9 @@ public class AdvancedIslandGroupTest {
 
     }
 
+    /**
+     * Checks whether attributes in this island group have been correctly created
+     */
     @Test
     public void checkAttributesNotNull(){
 
@@ -152,6 +155,9 @@ public class AdvancedIslandGroupTest {
 
     }
 
+    /**
+     * Tests whether the evaluation takes into account the effect of the centaur
+     */
     @Test
     public void EvaluateWithoutTowers(){
         Centaur centaur = new Centaur(parameters, advancedParameters);
@@ -181,6 +187,9 @@ public class AdvancedIslandGroupTest {
         assertEquals(island.evaluateMostInfluential(), TeamEnum.NOTEAM, "problem after activating centaur");
     }
 
+    /**
+     * Tests whether the evaluation takes into account the effect of the knight
+     */
     @Test
     public void checkAdditionalInfluence(){
         Knight knight = new Knight(parameters, advancedParameters);
@@ -211,6 +220,9 @@ public class AdvancedIslandGroupTest {
         assertEquals(island.evaluateMostInfluential(), player0.getTeamColor());
     }
 
+    /**
+     * Tests whether the evaluation takes into account the effect of the fungalmancer
+     */
     @Test
     public void ignoredStudentTypeTest(){
         Fungalmancer fungalmancer = new Fungalmancer(parameters, advancedParameters);

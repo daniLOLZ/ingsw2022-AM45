@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApplicationHelperTest {
 
+    /**
+     * Checks if the application helper can correctly identify well-formatted integer arrays
+     */
     @Test
     public void badlyFormattedIntArraysTest(){
         assertFalse(ApplicationHelper.isIntArray("[1,2,3"));

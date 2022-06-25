@@ -57,6 +57,10 @@ public class CommandHandlerTest {
                 commandsHandled.containsAll(commandsAvailable));
     }
 
+    /**
+     * Checks whether an array is correctly converted in a list, this structure
+     * is used during the network communication
+     */
     @Test
     public void checkStudentsConversion(){
         List<Integer> realStudents = new ArrayList<>();
