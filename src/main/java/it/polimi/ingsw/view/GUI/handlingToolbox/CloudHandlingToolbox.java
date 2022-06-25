@@ -28,12 +28,15 @@ public class CloudHandlingToolbox implements HandlingToolbox{
             AtomicInteger cloudIndex = new AtomicInteger();
             for (EventHandler<MouseEvent> ignored:
                  onCloudClick) {
-                if (onCloudClick.get(cloudIndex.get()) == DISABLED) {
-                    onCloudClick.set(cloudIndex.get(), event -> new Thread(() -> {
-                       resourceProvider.sendChooseCloud(cloudIndex.get());
-                       onCloudClick.set(cloudIndex.get(), NO_EFFECT);
 
-                       if (allIneffective(onCloudClick)) reset();}).start());
+                int index = cloudIndex.getAndIncrement();
+
+                if (onCloudClick.get(index) == DISABLED) {
+
+                    onCloudClick.set(index, event -> new Thread(() -> {
+                        onCloudClick.set(index, DISABLED);
+                        resourceProvider.sendChooseCloud(index);
+                    }).start());
                 }
             }
         }
@@ -51,27 +54,7 @@ public class CloudHandlingToolbox implements HandlingToolbox{
         }
     }
 
-    /**
-     * Makes all the clouds available to reawaken
-     */
-    private void reset(){
-        int index = 0;
-        for (EventHandler<MouseEvent> ignored: onCloudClick) onCloudClick.set(index++, DISABLED);
-    }
 
-    /**
-     * Checks if all the effects are NO_EFFECT
-     * @param effects the list to evaluate
-     * @return true if all effects are NO_EFFECT. false otherwise
-     */
-    private boolean allIneffective(List<EventHandler<MouseEvent>> effects){
-
-        for (EventHandler<MouseEvent> effect:
-             effects) {
-            if (effect != NO_EFFECT) return false;
-        }
-        return true;
-    }
 
     public EventHandler<MouseEvent> getOnCloudClick(int pos) {
         return onCloudClick.get(pos);
