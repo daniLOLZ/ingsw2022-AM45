@@ -34,9 +34,8 @@ public class Preferences {
         }
 
         map = gson.fromJson(reader, mapType);
-        Double parsedValue = (Double)map.get("defaultPort");
-        returnPort = parsedValue.intValue();
-        return returnPort;
+
+        return ApplicationHelper.getIntFromBrokerField(map.get("defaultPort"));
     }
 
     public static String readHostnameFromJson(){

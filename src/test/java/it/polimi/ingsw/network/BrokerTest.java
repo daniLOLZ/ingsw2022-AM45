@@ -59,7 +59,7 @@ public class BrokerTest {
                     "NICKNAME" : "gigio"
                 }""");
         try{
-        broker.receive(stream);
+            broker.receive(stream);
         }
         catch (IOException e){
             //null
@@ -69,10 +69,8 @@ public class BrokerTest {
         } catch (InterruptedException e) {
             fail();
         }
-        //while (!broker.lock());
         assertEquals(CommandEnum.fromObjectToEnum(broker.readField(NetworkFieldEnum.COMMAND)), CommandEnum.CONNECTION_REQUEST);
         assertEquals((String)broker.readField(NetworkFieldEnum.NICKNAME), "gigio");
-        //broker.unlock();
         broker.flushFirstSyncMessage();
     }
 

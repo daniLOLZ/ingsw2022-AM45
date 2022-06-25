@@ -661,6 +661,7 @@ public class Controller {
 
             simpleGame = new SimpleGame(numPlayers,selectedWizards,teamColors,nicknames, virtualView);
         } catch (IncorrectPlayersException e) {
+            System.err.println("Error while creating test game");
             e.printStackTrace();
         }
     }

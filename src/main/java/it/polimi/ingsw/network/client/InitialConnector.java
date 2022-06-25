@@ -156,7 +156,11 @@ public class InitialConnector {
             if(pingSocket != null) pingSocket.close();
             System.err.println("Sockets closed");
         }
-        catch (IOException | NullPointerException e){
+        catch (IOException e){
+            System.err.println("Problem while closing the sockets");
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.err.println("Couldn't access the sockets, please restart the application");
             e.printStackTrace();
         }
     }

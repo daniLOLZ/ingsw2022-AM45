@@ -47,6 +47,7 @@ public class AdvancedGameTest {
                     coins,CharacterCards, virtualView);
             game.initializeGame();
         } catch (IncorrectPlayersException e) {
+            System.err.println("Error while initializing test game");
             e.printStackTrace();
         }
     }

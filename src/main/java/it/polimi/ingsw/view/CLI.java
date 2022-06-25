@@ -1133,7 +1133,9 @@ public class CLI implements UserInterface {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.err.println("Interrupted while waiting for input, starting a new cycle");
+                //e.printStackTrace();
+                continue;
             }
             if(checkInterrupt(interruptingConditions)){
                 //The interrupts come first in terms of importance

@@ -251,6 +251,7 @@ public class ClientHandler implements Runnable{
             System.out.println("[ user " + parameters.getIdUser() + " ] Connection closed");
         }
         catch (IOException e){
+            System.err.println("Problem while closing the sockets");
             e.printStackTrace();
         }
     }
