@@ -31,10 +31,10 @@ public class FactoryCharacterCard {
         CharacterCard x = new Glutton(parameters, advancedParameters); //placeholder
         int times=0;
         Random randomizer = new Random();
-        int random = randomizer.nextInt() % numCharacterCards;
+        int random = Math.abs(randomizer.nextInt() % numCharacterCards);
 //        random = 9;    //todo Used for testing character cards, remove later
 
-        while(times < numCharacterCards){
+        while(times < numCharacterCards){ //wtf
             if(random == 0)
                 x = new Priest(parameters ,advancedParameters);
             if(random == 1)
