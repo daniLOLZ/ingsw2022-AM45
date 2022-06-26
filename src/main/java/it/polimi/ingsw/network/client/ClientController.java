@@ -419,6 +419,9 @@ public class ClientController {
 
     public void handleGameWon(){
         TeamEnum winner = TeamEnum.fromObjectToEnum(broker.readAsyncField(NetworkFieldEnum.ASYNC_WINNER));
+        userInterface.clearCommands();
+        gameState = new LookingForLobby();
+        allowStateCommands();
         userInterface.setGameWon(winner);
     }
 

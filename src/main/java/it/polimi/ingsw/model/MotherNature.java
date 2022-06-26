@@ -10,8 +10,7 @@ public class MotherNature {
     }
     /**
      * Moves Mother Nature across IslandGroups, the movement happens via the nextIslandGroup pointers;
-     * @requires steps != 0
-     * @param steps the number of steps to move Mother Nature
+     * @param steps the number of steps to move Mother Nature ( must be > 0 )
      * @return IslandGroup of the current position of Mother Nature
      */
     public IslandGroup move(int steps){
