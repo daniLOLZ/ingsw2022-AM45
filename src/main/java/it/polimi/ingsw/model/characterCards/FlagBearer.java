@@ -20,10 +20,7 @@ public class FlagBearer extends CharacterCard {
         requirements = new Requirements(1,0,0,0);
     }
 
-    /**
-     *
-     *
-     */
+
     @Override
     public void activateEffect() {
         super.activateEffect();

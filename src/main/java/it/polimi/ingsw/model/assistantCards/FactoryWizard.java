@@ -39,6 +39,10 @@ public class FactoryWizard {
         return getWizard(0);
     }
 
+    /**
+     *
+     * @return the list containing all wizards
+     */
     public static List<Wizard> getAllWizards()  {
         List<Wizard> listToReturn = new ArrayList<>();
         for(int i: idWizard)
@@ -48,7 +52,7 @@ public class FactoryWizard {
 
     /**
      *
-     * @param id  > 0
+     * @param id  >= 0
      * @return true if idWizard contains id
      */
     public static boolean checkCorrectId(int id){

@@ -23,6 +23,10 @@ public class Dame extends InitialEffect{
         requirements = new Requirements(0,0,0,1);
     }
 
+    /**
+     * Initialise the list of students on this card drawing from the sack
+     * @param game != null
+     */
     @Override
     public void initialise(AdvancedGame game) {
         super.initialise(game);

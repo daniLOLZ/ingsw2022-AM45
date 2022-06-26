@@ -1435,9 +1435,13 @@ public class CLI implements UserInterface {
 
         characterString.append("\n");
 
-        //Students
+        //Students or Blocks
         for (CharacterCardBean bean: characterCardBeans) {
-            if(bean.getStudents() == null){
+            if(bean.getNumBlocks() != null){
+                s="BLOCKS: " + bean.getNumBlocks();
+                characterString.append(String.format("%-30s", s));
+            }
+            else if(bean.getStudents() == null){
                 s = "[]";
                 characterString.append(String.format("%-30s", s));
             }
@@ -1633,9 +1637,9 @@ public class CLI implements UserInterface {
 
         //Entrance 2
         for(PlayerBean player: players){
-            List<StudentEnum> list = player.getStudentsAtEntrance().subList(3,10);
+            List<StudentEnum> list = player.getStudentsAtEntrance().subList(3,9);
             s= list.toString() ;
-            playerString.append(String.format("%-93s",s));
+            playerString.append(String.format("%-84s",s));
         }
         playerString.append("\n");
 

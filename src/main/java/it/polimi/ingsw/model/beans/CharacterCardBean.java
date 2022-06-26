@@ -13,6 +13,7 @@ public class CharacterCardBean extends GameElementBean {
     private int cost;
     private String description;
     private List<StudentEnum> students;
+    private Integer numBlocks;
 
     public CharacterCardBean(int id, String name, String description, List<StudentEnum> students,int cost){
         final int highPriority = 2;
@@ -22,6 +23,7 @@ public class CharacterCardBean extends GameElementBean {
         this.name = name;
         this.students = students;
         priority = highPriority;
+        numBlocks = null;
     }
 
     @Override
@@ -47,6 +49,14 @@ public class CharacterCardBean extends GameElementBean {
 
     public String getName() {
         return name;
+    }
+
+    public Integer getNumBlocks() {
+        return numBlocks;
+    }
+
+    public void setNumBlocks(int numBlocks) {
+        this.numBlocks = numBlocks;
     }
 
     @Override

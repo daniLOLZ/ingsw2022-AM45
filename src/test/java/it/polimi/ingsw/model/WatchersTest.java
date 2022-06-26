@@ -55,6 +55,9 @@ public class WatchersTest {
     }
 
 
+    /**
+     * Test the watchers' state when the game starts
+     */
     @Test
     public void initialStateTest(){
         AdvancedGameBoardBean gameBean = virtualView.getAdvancedGameBean();
@@ -95,6 +98,9 @@ public class WatchersTest {
 
     }
 
+    /**
+     * Test the watcher's state when an assistant is played
+     */
     @Test
     public void playAssistants(){
         AdvancedGameBoardBean gameBean = virtualView.getAdvancedGameBean();
@@ -139,6 +145,9 @@ public class WatchersTest {
     }
 
 
+    /**
+     * test the watchers' state when a student is moved from entrance to Hall
+     */
     @Test
     public void moveStudentsFromEntranceToHall(){
         AdvancedPlayer player = (AdvancedPlayer) game.getPlayers().get(0);
@@ -187,6 +196,9 @@ public class WatchersTest {
 
     }
 
+    /**
+     * test the watchers' state when MN is moved
+     */
     @Test
     public void moveMN(){
         Player player1 = game.getPlayers().get(0);

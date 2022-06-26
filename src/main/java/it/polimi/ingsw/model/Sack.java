@@ -24,6 +24,12 @@ public class Sack {
         if(!students.isEmpty()) return students.pop();
         else return StudentEnum.NOSTUDENT;
     }
+
+    /**
+     *
+     * @param numStudents number of student you want to draw
+     * @return a list of students, drawn from sack, and its size is numStudents
+     */
     public List<StudentEnum> drawNStudents(int numStudents){
         List<StudentEnum> drawnStudents = new ArrayList<>();
 
