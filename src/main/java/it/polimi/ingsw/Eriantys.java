@@ -40,6 +40,7 @@ public class Eriantys {
         else if(CLIMode){
             ClientMain client = new ClientMain(hostname, portNumber, false);
             client.startApplication();
+            System.exit(0);
         }
     }
 

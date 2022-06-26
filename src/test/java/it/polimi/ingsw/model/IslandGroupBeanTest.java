@@ -8,6 +8,9 @@ import java.util.List;
 
 public class IslandGroupBeanTest {
 
+    /**
+     * Test for correct view of island bean
+     */
     @Test
     public void testDrawCLI(){
         List<Integer> islands = new ArrayList<>();

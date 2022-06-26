@@ -509,6 +509,7 @@ public class CLI implements UserInterface {
             selection = getInputNonBlocking(lobbyInterrupts);
 
             if (lobbyStarting.isTriggered()){
+                lobbyStarting.clearInterrupt();
                 showTowerAndWizardSelection();
                 break;
             }
@@ -604,6 +605,7 @@ public class CLI implements UserInterface {
             if(gameStarting.isTriggered()){
                 System.out.println("Everyone made their choice, the game is starting!");
                 showMainGameInterface();
+                gameStarting.clearInterrupt();
                 return;
             }
             else if(gameInitUpdateAvailable.isTriggered()){
@@ -759,6 +761,7 @@ public class CLI implements UserInterface {
                 //The game is over, show the winner and exit from this method
                 gameWon.clearInterrupt();
                 showGameOverScreen();
+                return;
             }
 
             if(!checkInterrupt(gameInterrupts)){
@@ -870,10 +873,10 @@ public class CLI implements UserInterface {
         System.out.println(MessageFormat.format("""
                 
                 The game is over! {0} won!
-                Press enter to go back to the game selection screen.
+                Type anything and press enter to go back to the game selection screen.
                 
                 """, this.winnerTeam.name));
-        scanner.nextLine();
+        getInputNonBlocking();
 
         resetGameInfo();
 
@@ -1432,9 +1435,13 @@ public class CLI implements UserInterface {
 
         characterString.append("\n");
 
-        //Students
+        //Students or Blocks
         for (CharacterCardBean bean: characterCardBeans) {
-            if(bean.getStudents() == null){
+            if(bean.getNumBlocks() != null){
+                s="BLOCKS: " + bean.getNumBlocks();
+                characterString.append(String.format("%-30s", s));
+            }
+            else if(bean.getStudents() == null){
                 s = "[]";
                 characterString.append(String.format("%-30s", s));
             }
@@ -1630,9 +1637,9 @@ public class CLI implements UserInterface {
 
         //Entrance 2
         for(PlayerBean player: players){
-            List<StudentEnum> list = player.getStudentsAtEntrance().subList(3,10);
+            List<StudentEnum> list = player.getStudentsAtEntrance().subList(3,9);
             s= list.toString() ;
-            playerString.append(String.format("%-93s",s));
+            playerString.append(String.format("%-84s",s));
         }
         playerString.append("\n");
 

@@ -11,6 +11,9 @@ import java.util.List;
 
 public class BeanTest {
 
+    /**
+     * Test the correct creation and methods of cloud bean
+     */
     @Test
     public void CloudBeanTest(){
         List<StudentEnum> list = new ArrayList<>();
@@ -34,6 +37,9 @@ public class BeanTest {
 
     }
 
+    /**
+     * Test the correct creation of islandGroup bean
+     */
     @Test
     public void IslandGroupBean(){
         List<Integer> islands = new ArrayList<>();
@@ -70,6 +76,9 @@ public class BeanTest {
         assertNotNull(string);
     }
 
+    /**
+     * Test the correct creation of advanced island group bean
+     */
     @Test
     public void advancedIslandGroupTest(){
         List<Integer> islands = new ArrayList<>();
@@ -90,6 +99,9 @@ public class BeanTest {
 
     }
 
+    /**
+     * Test the correct creation of character card bean
+     */
     @Test
     public void CharacterCardBeanTest(){
         List<StudentEnum> list2 = new ArrayList<>();
@@ -105,6 +117,9 @@ public class BeanTest {
         assertNotNull(string);
     }
 
+    /**
+     * Test the correct creation of game bean
+     */
     @Test
     public void GameBoardBeanTest(){
         List<Integer> islands2 = new ArrayList<>();
@@ -148,6 +163,9 @@ public class BeanTest {
         assertNotNull(string);
     }
 
+    /**
+     * Test the correct creation of advanced game bean
+     */
     @Test
     public void AdvancedGameBoardTest(){
         List<Integer> islands2 = new ArrayList<>();
@@ -203,6 +221,9 @@ public class BeanTest {
 
     }
 
+    /**
+     * Test the correct creation of player bean
+     */
     @Test
     public void playerBeanTest(){
         List<StudentEnum> list2 = new ArrayList<>();
@@ -262,6 +283,9 @@ public class BeanTest {
         assertNotNull(string);
     }
 
+    /**
+     * Test the correct creation of advanced player bean
+     */
     @Test
     public void advancedPlayerBeanTest(){
         List<StudentEnum> list2 = new ArrayList<>();
@@ -290,6 +314,9 @@ public class BeanTest {
 
     }
 
+    /**
+     * Test the correct creation of error bean
+     */
     @Test
     public void errorBeanTest(){
         ErrorBean bean = new ErrorBean("ERROR");

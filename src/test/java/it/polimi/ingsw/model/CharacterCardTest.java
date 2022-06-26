@@ -290,6 +290,9 @@ public class CharacterCardTest {
         assertEquals(StudentEnum.BLUE, player.getBoard().getAtEntrance(8));
     }
 
+    /**
+     * Test Minstrel effect when 1 color has been selected
+     */
     @Test
     public void MinstrelTest1Color(){
         Minstrel minstrel = new Minstrel(parameter,advancedParameter);

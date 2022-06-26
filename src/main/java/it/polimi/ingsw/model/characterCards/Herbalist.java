@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.characterCards;
 
+import it.polimi.ingsw.model.beans.CharacterCardBean;
+import it.polimi.ingsw.model.beans.GameElementBean;
 import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
@@ -76,8 +78,25 @@ public class Herbalist extends CharacterCard {
                 tileToUse = tile;
                 chosenIsland.block(tileToUse);
                 tile.setAssigned(true);
+
+                //RESTORE CORRECT NUMBER OF FREE TILES
+                numBlockTiles = (int) blockTiles.stream().
+                        filter((tileX)-> ! tileX.isAssigned()).
+                        count();
+
+                alert();
+
                 return;
             }
         }
+
+
+    }
+
+    @Override
+    public GameElementBean toBean() {
+        CharacterCardBean bean = (CharacterCardBean) super.toBean();
+        bean.setNumBlocks(numBlockTiles);
+        return  bean;
     }
 }

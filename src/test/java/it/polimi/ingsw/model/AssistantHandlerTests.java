@@ -52,16 +52,7 @@ public class AssistantHandlerTests {
     }
 
 
-    /**
-     * Check if Handler recognize as invalid card the Player 2 (Current Player)  Card,
-     * Because the Player 2 Card is equal to already played card
-     *//*
-    @Test
-    public void InvalidCardAlreadyPlayed(){
-        assertFalse(assistantHandler.checkValidAssistant(assistantPlayer1ID + currentWizard.getIdWizard()),
-                "Invalid card is not recognized");
-    }
-    */
+
 
     /**
      * Player 2 play a card played by player 1 but this time this action is valid

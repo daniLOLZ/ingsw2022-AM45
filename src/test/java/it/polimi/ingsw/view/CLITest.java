@@ -71,6 +71,9 @@ public class CLITest {
         }
     }
 
+    /**
+     * Test the correct CLI visualization
+     */
     @Test
     public void test(){
         CLI cli = new CLI();
@@ -79,6 +82,16 @@ public class CLITest {
         Player player2 = (Player)game.getPlayers().get(1);
         Player player3 = (Player)game.getPlayers().get(2);
         //Player player4 = (Player)game.getPlayers().get(3);
+        Herbalist y;
+        for(int i=0; i< 3 ; i++){
+            CharacterCard x = game.getCharacterCard(i);
+
+            if(x.equals(new Herbalist(game.getParameters(),game.getAdvancedParameters()))){
+                y = (Herbalist) x;
+                game.selectIslandGroup(0);
+                y.blockIsland();
+            }
+        }
 
 
         //game.selectStudentAtEntrance(player1,0);
@@ -101,8 +114,8 @@ public class CLITest {
 
 
         gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
-        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
-        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(2);
+        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(5);
+        gameSimple.getPlayers().get(1).getBoard().removeFromEntrance(6);
 
 
 
