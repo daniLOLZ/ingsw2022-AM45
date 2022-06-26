@@ -567,6 +567,17 @@ public class SimpleGameTest {
 
     }
 
-
+    /**
+     * Tests whether the parameters for a simple game are correct and follow the rules
+     */
+    @Test
+    public void adherenceToRules(){
+        assertEquals(ParameterHandler.maxStudentsAtEntrance2or4Players, 7);
+        assertEquals(ParameterHandler.maxStudentsAtEntrance3Players, 9);
+        assertEquals(ParameterHandler.numTowers2or4Players, 8);
+        assertEquals(ParameterHandler.numTowers3Players, 6);
+        assertEquals(ParameterHandler.studentsPerCloud2or4Players, 3);
+        assertEquals(ParameterHandler.studentsPerCloud3Players, 4);
+    }
 
 }

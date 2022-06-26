@@ -98,10 +98,16 @@ public class BeanTranslator {
         int cost = ApplicationHelper.getIntFromBrokerField(map.get("cost"));
         String description = (String) map.get("description");
         List<StudentEnum> students = null;
+        int numBlocks = -1;
+        if(fieldPresent(map.get("numBlocks"))){
+            numBlocks = ApplicationHelper.getIntFromBrokerField(map.get("numBlocks"));
+        }
         if(fieldPresent(map.get("students"))) {
             students = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("students"));
         }
-        return new CharacterCardBean(id,name, description, students, cost);
+        CharacterCardBean beanToReturn = new CharacterCardBean(id,name, description, students, cost);
+        if(numBlocks != -1) beanToReturn.setNumBlocks(numBlocks);
+        return beanToReturn;
     }
 
     private static IslandGroupBean deserializeIslandGroupBean(LinkedTreeMap<String, Object> map) {
