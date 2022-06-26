@@ -167,6 +167,9 @@ public class SimpleGameTest {
         assertTrue(game.cloudIsEmpty(0));
     }
 
+    /**
+     * Test if when all assistants are played noMoreAssistant() return true
+     */
     @Test
     public void noMoreAssistantTest(){
         boolean noMoreAssistant = game.noMoreAssistant();
@@ -481,6 +484,9 @@ public class SimpleGameTest {
         assertEquals(size - 1,player3.getWizard().size());
     }
 
+    /**
+     * Test the correct update of playedAssistant list
+     */
     @Test
     public void playedAssistantsTest(){
         Player player1 = game.getPlayers().get(0);
@@ -521,6 +527,9 @@ public class SimpleGameTest {
         assertFalse(assistantPlayedId.contains(1));
     }
 
+    /**
+     * Test emptySack condition when sack is empty
+     */
     @Test
     public void emptySackTest(){
         assertFalse(game.emptySack());

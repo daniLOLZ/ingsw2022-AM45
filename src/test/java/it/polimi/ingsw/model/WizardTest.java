@@ -49,4 +49,14 @@ public class WizardTest {
         assertThrows(NoSuchAssistantException.class, () -> wizard.playCard(1000),"Method did not signal invalid AssistantId");
         assertEquals(wizard.size(),FactoryWizard.numOfCardsPerWizard,"Deck was altered");
     }
+
+    /**
+     * Test if correct id is recognized
+     */
+    @Test
+    public void checkCorrectIdTest(){
+        assertTrue(FactoryWizard.checkCorrectId(0));
+        assertFalse(FactoryWizard.checkCorrectId(2));
+        assertFalse(FactoryWizard.checkCorrectId(-5));
+    }
 }

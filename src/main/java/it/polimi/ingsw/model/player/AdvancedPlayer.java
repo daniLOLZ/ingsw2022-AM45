@@ -65,6 +65,9 @@ public class AdvancedPlayer extends Player {
         return color;
     }
 
+    /**
+     * Increment numCoins
+     */
     public void addCoin(){
         numCoins++;
         alert();

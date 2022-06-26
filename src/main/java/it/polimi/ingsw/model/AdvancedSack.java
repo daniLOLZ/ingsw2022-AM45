@@ -28,6 +28,10 @@ public class AdvancedSack extends Sack{
 
     }
 
+    /**
+     * Add students in sack from the list passed as argument
+     * @param studentsToAdd
+     */
     public void addStudents(List<StudentEnum> studentsToAdd){
         for(StudentEnum instance: studentsToAdd)
             addStudent(instance);

@@ -1,11 +1,14 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
 import it.polimi.ingsw.view.VirtualView;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +38,25 @@ public class AdvancedPlayerTest {
                     nicknames,20,3, virtualView);
             game.initializeGame();
             player = (AdvancedPlayer) game.getPlayers().get(0);
+
         } catch (IncorrectPlayersException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Test coin methods
+     */
+    @Test
+    public void coinTest(){
+        assertEquals(1,player.getNumCoins());
+
+        player.addCoin();
+        assertEquals(2,player.getNumCoins());
+
+        player.useCoin();
+        assertEquals(1,player.getNumCoins());
+    }
 
 
 
