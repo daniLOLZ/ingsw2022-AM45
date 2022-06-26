@@ -5,11 +5,9 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Glutton extends CharacterCard {
     private static final String name ="GLUTTON";
-    private static final String description= "During this turn, you take control\n" +
-                                         "\t|\tof any number of Professors\n" +
-                                         "\t|\teven if you have the same number\n" +
-                                         "\t|\tof students as the player who currently\n" +
-                                         "\t|\tcontrols them";
+    private static final String description=
+            "During this turn, you take control of any number of Professors " +
+            "even if you have the same number of students as the player who currently controls them.";
     public Glutton(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(2,2, parameters, advancedParameters, name, description);
     }

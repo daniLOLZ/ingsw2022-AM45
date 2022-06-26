@@ -32,8 +32,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -82,14 +84,30 @@ public class GUIApplication extends Application{
     private static final Coord firstCharacterCardSlot = upCenter.pureSumX(WINDOW_WIDTH / 5).pureSumY(WINDOW_HEIGHT / 8);
 
     private static final double characterCardWidth = 90, characterCardGap = characterCardWidth * 1.2;
+    private static final double gameBoardCoinsSize = 25;
 
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
+    private static final Coord gameBoardCoinsSlot = islandsPos.pureSumX(- islandsSemiWidth / 2);
 
     private static String preselectedGameRule = availableGameRules.get(0);
     private static Integer preselectedNumPlayers = availablePlayerNumber.get(0);
     private static WizardEnum selectedWizard = WizardEnum.NO_WIZARD;
     private static TeamEnum selectedTowerColor = TeamEnum.NOTEAM;
+
+    private static int
+            maxIslandsRequired = 0,
+            maxStudentsOnCardRequired = 0,
+            maxStudentsAtEntranceRequired = 0,
+            maxColorsRequired = 0;
+
+    private static boolean
+            islandRequired = false,
+            studentOnCardRequired = false,
+            studentAtEntranceRequired = false,
+            colorRequired = false,
+
+            characterCardRequirementsInSelection = false;
 
     private static Stage stage;
     private static InitialConnector initialConnector;
@@ -691,6 +709,138 @@ public class GUIApplication extends Application{
     public static void showGameInterface(VirtualViewBean data, GameToolBoxContainer eventHandlerContainer, int user){
         Group root = new Group();
 
+        //<editor-fold desc="Game Board">
+
+        GameBoardBean gameBoard = data.getGameBoardBean();
+
+        if (gameBoard == null){
+
+            AdvancedGameBoardBean advancedGameBoard = data.getAdvancedGameBoardBean();
+            gameBoard = advancedGameBoard;
+
+            StackPane stackPane = new StackPane();
+            stackPane.setAlignment(Pos.CENTER);
+            stackPane.getTransforms().add(new Translate(gameBoardCoinsSlot.x, gameBoardCoinsSlot.y));
+            root.getChildren().add(stackPane);
+
+            stackPane.getChildren().add(CoinDrawer.drawCoin(gameBoardCoinsSlot, gameBoardCoinsSize / CoinDrawer.getCoinSize()));
+
+            Text numCoins = new Text(advancedGameBoard.getNumGameCoins().toString());
+            stackPane.getChildren().add(numCoins);
+
+        }
+
+        VBox layout = new VBox(WINDOW_HEIGHT / 36);
+        layout.setAlignment(Pos.TOP_LEFT);
+        root.getChildren().add(layout);
+
+        String currPlayerNickname;
+
+        List<PlayerBean> playerBeans = data.getPlayerBeans();
+
+        Label yourTurn = new Label("It's your turn!");
+
+        if (playerBeans != null){
+            currPlayerNickname = playerBeans.get(gameBoard.getCurrentPlayerId()).getNickname();
+            yourTurn.setVisible(data.getPlayerBeans().get(user).getNickname().equals(currPlayerNickname));
+        }
+        else {
+            currPlayerNickname = data.getAdvancedPlayerBeans().get(gameBoard.getCurrentPlayerId()).getNickname();
+            yourTurn.setVisible(data.getAdvancedPlayerBeans().get(user).getNickname().equals(currPlayerNickname));
+        }
+
+        Label currPlayer = new Label("Current Player : " + currPlayerNickname);
+
+        layout.getChildren().add(currPlayer);
+
+        Label turnPhase = new Label("Turn : " + gameBoard.getTurn().toString() + " | Phase : " + gameBoard.getPhase());
+
+        layout.getChildren().addAll(turnPhase, yourTurn);
+
+        //weird helping buttons
+
+        GridPane subLayout = new GridPane();
+        subLayout.setPadding(new Insets(5, 5, 5,5));
+        subLayout.setVgap(5);
+        subLayout.setHgap(10);
+        subLayout.setAlignment(Pos.CENTER);
+
+        layout.getChildren().add(subLayout);
+
+        Button endTurn = new Button("End turn");
+        endTurn.setOnAction(eventHandlerContainer.getHelpingToolBox().getOnEndTurnClick());
+        if (HandlingToolbox.NO_ACTION.equals(endTurn.getOnAction())) endTurn.setVisible(false);
+
+        String tooFewSelectionText = "Select at least one";
+
+        Button sendStudentsOnCardRequirement = new Button("Confirm Students (on card)");
+        sendStudentsOnCardRequirement.setVisible(false);
+        Label tooFewStudentsOnCard = new Label(tooFewSelectionText);
+        tooFewStudentsOnCard.setVisible(false);
+
+        Button sendStudentsAtEntranceRequirement = new Button("Confirm Students (at Entrance)");
+        sendStudentsAtEntranceRequirement.setVisible(false);
+        Label tooFewStudentsAtEntrance = new Label(tooFewSelectionText);
+        tooFewStudentsAtEntrance.setVisible(false);
+
+        Button sendColors = new Button("Confirm Colors");
+        sendColors.setVisible(false);
+        Label tooFewColors = new Label(tooFewSelectionText);
+        tooFewColors.setVisible(false);
+
+        Button playCharacter = new Button("Activate Character effect");
+        playCharacter.setVisible(false);
+
+        subLayout.add(endTurn, 0, 0);
+        subLayout.add(sendStudentsOnCardRequirement, 1, 0);
+        subLayout.add(tooFewStudentsOnCard, 1, 1);
+        subLayout.add(sendStudentsAtEntranceRequirement, 2, 0);
+        subLayout.add(tooFewStudentsAtEntrance, 2, 1);
+        subLayout.add(sendColors, 3, 0);
+        subLayout.add(tooFewColors, 3, 1);
+        subLayout.add(playCharacter, 4, 0);
+
+        if (characterCardRequirementsInSelection){
+
+            if (maxStudentsOnCardRequired > 0){
+                sendStudentsOnCardRequirement.setVisible(true);
+                if (studentOnCardRequired) tooFewStudentsOnCard.setVisible(true);
+                else sendStudentsOnCardRequirement.setOnAction(event -> {
+                    eventHandlerContainer.getHelpingToolBox().getOnSendStudentsOnCardRequirementClick().handle(event);
+                    maxStudentsOnCardRequired = 0;
+                });
+            }
+
+            if (maxStudentsAtEntranceRequired > 0){
+                sendStudentsAtEntranceRequirement.setVisible(true);
+                if (studentAtEntranceRequired) tooFewStudentsAtEntrance.setVisible(true);
+                else sendStudentsAtEntranceRequirement.setOnAction(event -> {
+                    eventHandlerContainer.getHelpingToolBox().getOnSendEntranceStudentRequirementsClick().handle(event);
+                    maxStudentsAtEntranceRequired = 0;
+                });
+            }
+
+            if (maxColorsRequired > 0){
+                sendColors.setVisible(true);
+                if (colorRequired) tooFewColors.setVisible(true);
+                else sendColors.setOnAction(event -> {
+                    eventHandlerContainer.getHelpingToolBox().getOnSendStudentColorRequirementClick().handle(event);
+                    maxColorsRequired = 0;
+                });
+            }
+
+            if (maxStudentsOnCardRequired == 0 &&
+                maxStudentsAtEntranceRequired == 0 &&
+                maxColorsRequired == 0)
+                playCharacter.setVisible(true);
+                playCharacter.setOnAction(event -> {
+                    eventHandlerContainer.getHelpingToolBox().getOnPlayCharacterClick().handle(event);
+                    characterCardRequirementsInSelection = false;
+                });
+        }
+
+        //</editor-fold>
+
         //<editor-fold desc="Islands">
 
         List<AdvancedIslandGroupBean> advancedIslandsList = data.getAdvancedIslandGroupBeans();
@@ -732,7 +882,7 @@ public class GUIApplication extends Application{
 
         //</editor-fold>
 
-        //<editor-fold desc="Game Boards">
+        //<editor-fold desc="Player Boards">
 
         PlayerBean userBean;
 
@@ -882,11 +1032,28 @@ public class GUIApplication extends Application{
         return slots;
     }
 
+    public static void setMaxRequirement(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired){
+        maxIslandsRequired = islandsRequired;
+        maxStudentsOnCardRequired = studentsOnCardRequired;
+        maxStudentsAtEntranceRequired = studentsAtEntranceRequired;
+        maxColorsRequired = colorsRequired;
+        islandRequired = islandsRequired > 0;
+        studentOnCardRequired = studentsOnCardRequired > 0;
+        studentAtEntranceRequired = studentsAtEntranceRequired > 0;
+        colorRequired = colorsRequired > 0;
+
+        characterCardRequirementsInSelection = true;
+    }
+
     public static void setInitialConnector(InitialConnector initialConnector){
         GUIApplication.initialConnector = initialConnector;
     }
 
     public static void setDefaultSender(ClientSender defaultSender) {
         GUIApplication.defaultSender = defaultSender;
+    }
+
+    public static boolean areCharacterCardRequirementsInSelection() {
+        return characterCardRequirementsInSelection;
     }
 }

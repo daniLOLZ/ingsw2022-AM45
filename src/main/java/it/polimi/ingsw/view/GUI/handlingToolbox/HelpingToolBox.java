@@ -6,6 +6,7 @@ import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -17,22 +18,22 @@ import java.util.List;
    will provide functionalities for non-physical elements*/
 public class HelpingToolBox implements HandlingToolbox{
 
-    private EventHandler<MouseEvent> onEndTurnClick;
-    private EventHandler<MouseEvent> onSendEntranceStudentRequirementsClick;
-    private EventHandler<MouseEvent> onSendStudentColorRequirementClick;
-    private EventHandler<MouseEvent> onSendStudentsOnCardRequirementClick;
-    private EventHandler<MouseEvent> onPlayCharacterClick;
+    private EventHandler<ActionEvent> onEndTurnClick;
+    private EventHandler<ActionEvent> onSendEntranceStudentRequirementsClick;
+    private EventHandler<ActionEvent> onSendStudentColorRequirementClick;
+    private EventHandler<ActionEvent> onSendStudentsOnCardRequirementClick;
+    private EventHandler<ActionEvent> onPlayCharacterClick;
 
     private List<Integer> selectedEntranceStudents;
     private List<StudentEnum> selectedColors;
     private List<Integer> selectedStudentsOnCard;
 
     public HelpingToolBox(){
-        onEndTurnClick                         = DISABLED;
-        onSendEntranceStudentRequirementsClick = DISABLED;
-        onSendStudentColorRequirementClick     = DISABLED;
-        onSendStudentsOnCardRequirementClick   = DISABLED;
-        onPlayCharacterClick                   = DISABLED;
+        onEndTurnClick                         = NO_ACTION;
+        onSendEntranceStudentRequirementsClick = NO_ACTION;
+        onSendStudentColorRequirementClick     = NO_ACTION;
+        onSendStudentsOnCardRequirementClick   = NO_ACTION;
+        onPlayCharacterClick                   = NO_ACTION;
 
         selectedEntranceStudents = new ArrayList<>();
         selectedColors = new ArrayList<>();
@@ -70,15 +71,15 @@ public class HelpingToolBox implements HandlingToolbox{
     @Override
     public void disableCommand(CommandEnum command) {
 
-        if (command == CommandEnum.END_TURN)                 onEndTurnClick                         = DISABLED;
+        if (command == CommandEnum.END_TURN)                 onEndTurnClick                         = NO_ACTION;
 
-        if (command == CommandEnum.SELECT_ENTRANCE_STUDENTS) onSendEntranceStudentRequirementsClick = DISABLED;
+        if (command == CommandEnum.SELECT_ENTRANCE_STUDENTS) onSendEntranceStudentRequirementsClick = NO_ACTION;
 
-        if (command == CommandEnum.SELECT_STUDENT_COLORS)    onSendStudentColorRequirementClick     = DISABLED;
+        if (command == CommandEnum.SELECT_STUDENT_COLORS)    onSendStudentColorRequirementClick     = NO_ACTION;
 
-        if (command == CommandEnum.SELECT_STUDENTS_ON_CARD)  onSendStudentsOnCardRequirementClick   = DISABLED;
+        if (command == CommandEnum.SELECT_STUDENTS_ON_CARD)  onSendStudentsOnCardRequirementClick   = NO_ACTION;
 
-        if (command == CommandEnum.PLAY_CHARACTER)           onPlayCharacterClick                   = DISABLED;
+        if (command == CommandEnum.PLAY_CHARACTER)           onPlayCharacterClick                   = NO_ACTION;
     }
 
     public void setSelectedEntranceStudents(List<Integer> selectedEntranceStudents) {
@@ -93,23 +94,23 @@ public class HelpingToolBox implements HandlingToolbox{
         this.selectedStudentsOnCard = selectedStudentsOnCard;
     }
 
-    public EventHandler<MouseEvent> getOnEndTurnClick() {
+    public EventHandler<ActionEvent> getOnEndTurnClick() {
         return onEndTurnClick;
     }
 
-    public EventHandler<MouseEvent> getOnSendEntranceStudentRequirementsClick() {
+    public EventHandler<ActionEvent> getOnSendEntranceStudentRequirementsClick() {
         return onSendEntranceStudentRequirementsClick;
     }
 
-    public EventHandler<MouseEvent> getOnSendStudentColorRequirementClick() {
+    public EventHandler<ActionEvent> getOnSendStudentColorRequirementClick() {
         return onSendStudentColorRequirementClick;
     }
 
-    public EventHandler<MouseEvent> getOnSendStudentsOnCardRequirementClick() {
+    public EventHandler<ActionEvent> getOnSendStudentsOnCardRequirementClick() {
         return onSendStudentsOnCardRequirementClick;
     }
 
-    public EventHandler<MouseEvent> getOnPlayCharacterClick() {
+    public EventHandler<ActionEvent> getOnPlayCharacterClick() {
         return onPlayCharacterClick;
     }
 }

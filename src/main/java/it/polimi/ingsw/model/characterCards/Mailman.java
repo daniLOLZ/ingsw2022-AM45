@@ -5,10 +5,11 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Mailman extends CharacterCard {
     private static final String name ="MAILMAN";
-    private static final String description = "You may move Mother Nature\n" +
-                                          "\t|\tup to 2 additional Islands\n" +
-                                          "\t|\tthan is indicated by the Assistant\n" +
-                                          "\t|\tcard you've played";
+    private static final String description =
+            "You may move Mother Nature " +
+            "up to 2 additional Islands " +
+            "than is indicated by the Assistant " +
+            "card you've played.";
 
 
 

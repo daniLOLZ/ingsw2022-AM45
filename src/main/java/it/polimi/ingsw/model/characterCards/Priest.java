@@ -7,10 +7,11 @@ import it.polimi.ingsw.model.islands.IslandGroup;
 
 public class Priest extends InitialEffect{
     private static final String name ="PRIEST";
-    private static final String description = "Take 1 student from this card\n" +
-                                          "\t|\tand place it on an Island of your choice.\n" +
-                                          "\t|\tThen, draw a new Student from the Bag and\n" +
-                                          "\t|\tplace it on this card";
+    private static final String description =
+            "Take 1 student from this card " +
+            "and place it on an Island of your choice. " +
+            "Then, draw a new Student from the Bag and " +
+            "place it on this card";
 
 
     public Priest(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){

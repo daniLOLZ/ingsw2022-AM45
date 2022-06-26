@@ -1,6 +1,9 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
+import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
+import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
+import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
@@ -26,12 +29,12 @@ public class IslandHandlingToolbox implements HandlingToolbox{
      * Provides the toolbox with the necessary information regarding the islands to keep providing the handling resources
      * @param islands The list containing all the relevant information about each island
      */
-    public void updateIslandGroups(List<IslandGroupBean> islands){
+    public void updateAdvancedIslandGroups(List<AdvancedIslandGroupBean> islands){
 
         List<EventHandler<MouseEvent>> newOnIslandClick = new ArrayList<>();
         Map<Integer, Integer> newIndexToId = new HashMap<>();
 
-        for (IslandGroupBean island : islands){
+        for (AdvancedIslandGroupBean island : islands){
 
             newOnIslandClick.add(NO_EFFECT);
 
@@ -48,6 +51,18 @@ public class IslandHandlingToolbox implements HandlingToolbox{
                 allowCommand(command, sender);
             }
         }
+    }
+
+    public void updateIslandGroups(List<IslandGroupBean> islands){
+
+        List<AdvancedIslandGroupBean> adaptedIslands = new ArrayList<>();
+
+        for (IslandGroupBean island:
+             islands) {
+            adaptedIslands.add(AdvancedIslandGroupBean.getPromotedBean(island));
+        }
+
+        updateAdvancedIslandGroups(adaptedIslands);
     }
 
     public void setMaxMNSteps(int steps){maxMNSteps = steps;}

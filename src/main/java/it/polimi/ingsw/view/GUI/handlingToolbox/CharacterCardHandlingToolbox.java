@@ -48,7 +48,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
 
-        if (!sender.equals(resourceProvider)) sender = resourceProvider;
+        if (!resourceProvider.equals(sender)) sender = resourceProvider;
 
         allowedCommands.add(command);
 
@@ -113,7 +113,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         return selected;
     }
 
-    private void resetSelections(){
+    public void resetSelections(){
         selectedStudentsOnCard = new ArrayList<>();
     }
 }

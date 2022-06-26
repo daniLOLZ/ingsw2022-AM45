@@ -12,12 +12,12 @@ import java.util.List;
 
 public class Herbalist extends CharacterCard {
     private static final String name = "HERBALIST";
-    private static final String description = "Place a No Entry tile on an Island\n" +
-                                          "\t|\tof your choice. The first time Mother\n" +
-                                          "\t|\tNature ends her movement there,\n" +
-                                          "\t|\tput the No Entry tile back onto this\n" +
-                                          "\t|\tcard, DO NOT calculate influence on that Island,\n" +
-                                          "\t|\tor place any Towers";
+    private static final String description =
+            "Place a No Entry tile on an Island of your choice. " +
+            "The first time Mother Nature ends her movement there, " +
+            "put the No Entry tile back onto this card, " +
+            "DO NOT calculate influence on that Island, " +
+            "or place any Towers.";
 
 
     private int numBlockTiles;

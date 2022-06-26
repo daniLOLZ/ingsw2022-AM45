@@ -1,25 +1,28 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.controller.GameRuleEnum;
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
-import it.polimi.ingsw.model.beans.AdvancedPlayerBean;
-import it.polimi.ingsw.model.beans.GameElementBean;
-import it.polimi.ingsw.model.beans.PlayerBean;
-import it.polimi.ingsw.model.beans.VirtualViewBean;
+import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.client.InitialConnector;
+import it.polimi.ingsw.view.GUI.handlingToolbox.CharacterCardHandlingToolbox;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import it.polimi.ingsw.view.UserInterface;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GUI implements UserInterface {
 
@@ -51,6 +54,12 @@ public class GUI implements UserInterface {
     private GameInitBean gameInitData;
     private boolean selectedTowerColor = false;
     private boolean yourTurn = false;
+
+    private int
+            islandsRequired = 0,
+            studentsOnCardRequired = 0,
+            studentsAtEntranceRequired = 0,
+            colorsRequired = 0;
 
     private String nickname;
 
@@ -326,16 +335,35 @@ public class GUI implements UserInterface {
     @Override
     public void setCardRequirements(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired) {
 
+        this.islandsRequired = islandsRequired;
+        this.studentsOnCardRequired = studentsOnCardRequired;
+        this.studentsAtEntranceRequired = studentsAtEntranceRequired;
+        this.colorsRequired = colorsRequired;
+
+        GUIApplication.setMaxRequirement(this.islandsRequired, this.studentsOnCardRequired, this.studentsAtEntranceRequired, this.colorsRequired);
+
     }
 
     @Override
     public void showGameCommandError() {
-        System.err.println("MALE MALE");
+        if (GUIApplication.areCharacterCardRequirementsInSelection()) {
+            setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
+            for (CharacterCardHandlingToolbox character:
+                 gameToolBoxContainer.getCharacterCardHandlingToolboxes()) {
+                character.resetSelections();
+            }
+        }
     }
 
     @Override
     public void showGameCommandError(String error) {
-
+        if (GUIApplication.areCharacterCardRequirementsInSelection()) {
+            setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
+            for (CharacterCardHandlingToolbox character:
+                    gameToolBoxContainer.getCharacterCardHandlingToolboxes()) {
+                character.resetSelections();
+            }
+        }
     }
 
     @Override
@@ -349,20 +377,33 @@ public class GUI implements UserInterface {
         viewData = virtualView;
         if (virtualView.getCharacterCardBeans() != null) {
             for (int character = 0; character < numCharacterCards; character++) {
-                gameToolBoxContainer
-                        .setCharacterCardInfo(
-                                character,
-                                virtualView
-                                        .getCharacterCardBeans()
-                                        .get(character)
-                                        .getStudents()
-                                        .size());
+
+                List<StudentEnum> studentsOnCard =
+                        virtualView
+                        .getCharacterCardBeans()
+                        .get(character)
+                        .getStudents();
+
+                if (studentsOnCard == null) studentsOnCard = new ArrayList<>();
+
+                gameToolBoxContainer.setCharacterCardInfo(character, studentsOnCard.size());
             }
         }
-        gameToolBoxContainer.updateIslandGroups(virtualView.getIslandGroupBeans());
+
+        List<IslandGroupBean> islands = virtualView.getIslandGroupBeans();
+
+        if (islands != null) gameToolBoxContainer.updateIslandGroups(islands);
+        else gameToolBoxContainer.updateAdvancedIslandGroups(virtualView.getAdvancedIslandGroupBeans());
+
         if (yourTurn) {
             int yourSlot = lobbyBean.getNicknames().indexOf(nickname);
-            gameToolBoxContainer.setMaxMNSteps(virtualView.getPlayerBeans().get(yourSlot).getAssistantPlayed().motherNatureSteps);
+
+            int MNSteps;
+
+            List<PlayerBean> allPlayers = virtualView.getPlayerBeans();
+            if (allPlayers != null)  MNSteps = allPlayers.get(yourSlot).getAssistantPlayed().motherNatureSteps;
+            else MNSteps = virtualView.getAdvancedPlayerBeans().get(yourSlot).getAssistantPlayed().motherNatureSteps;
+            gameToolBoxContainer.setMaxMNSteps(MNSteps);
         }
     }
 

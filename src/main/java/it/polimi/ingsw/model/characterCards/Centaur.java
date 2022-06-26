@@ -6,9 +6,9 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Centaur extends CharacterCard {
     private static final String name = "CENTAUR";
-    private static final String description = "When resolving a Conquering\n" +
-                                          "\t|\ton an Island,Towers do not count\n" +
-                                          "\t|\ttowards influence." ;
+    private static final String description =
+            "When resolving a Conquering on an Island, " +
+            "Towers do not count towards influence.";
 
     public Centaur(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(3,6, parameters, advancedParameters, name, description);

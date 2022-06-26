@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
@@ -33,6 +34,10 @@ public class GameToolBoxContainer {
 
     public void updateIslandGroups(List<IslandGroupBean> islands){
         islandHandlingToolbox.updateIslandGroups(islands);
+    }
+
+    public void updateAdvancedIslandGroups(List<AdvancedIslandGroupBean> islands){
+        islandHandlingToolbox.updateAdvancedIslandGroups(islands);
     }
 
     public void setCharacterCardInfo(int index, int numStudents){

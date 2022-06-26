@@ -11,10 +11,9 @@ import it.polimi.ingsw.model.player.Player;
 
 public class Dame extends InitialEffect{
     private final static String  name = "DAME";
-    private final static String description = "Take 1 Student from this card\n" +
-                                          "\t|\tand place it in your Dining Room.\n" +
-                                          "\t|\tThen draw a new Student from the Bag\n" +
-                                          "\t|\tand place it on this card";
+    private final static String description =
+            "Take 1 Student from this card and place it in your Dining Room. " +
+            "Then draw a new Student from the Bag and place it on this card.";
 
 
 

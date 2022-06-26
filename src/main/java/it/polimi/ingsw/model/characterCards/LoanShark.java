@@ -9,11 +9,11 @@ import it.polimi.ingsw.model.player.Player;
 
 public class LoanShark extends CharacterCard {
     private static final String name ="LOANSHARK";
-    private static final String description= "Choose a type of Student: every player\n" +
-                                        "\t|\t(including yourself) must return 3 Students\n" +
-                                        "\t|\tof that type from their Dining Room to the bag.\n" +
-                                        "\t|\tIf any player has fewer than 3 Students of\n" +
-                                        "\t|\tthat type, return as many Students as they have";
+    private static final String description= "Choose a type of Student: every player " +
+                                        "(including yourself) must return 3 Students " +
+                                        "of that type from their Dining Room to the bag. " +
+                                        "If any player has fewer than 3 Students of " +
+                                        "that type, return as many Students as they have.";
 
 
 

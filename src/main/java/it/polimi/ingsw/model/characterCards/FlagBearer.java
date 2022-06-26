@@ -9,11 +9,7 @@ import it.polimi.ingsw.model.islands.IslandGroup;
 
 public class FlagBearer extends CharacterCard {
     private final static String name = "FLAG-BEARER";
-    private final static String description = "Choose an Island and resolve the Island\n" +
-                                          "\t|\tas if Mother Nature had ended her movement\n" +
-                                          "\t|\tthere. Mother Nature will still move\n" +
-                                          "\t|\tand the island where she ends her movement\n" +
-                                          "\t|\twill also be resolved";
+    private final static String description = "Choose an Island and resolve the Island as if Mother Nature had ended her movement there. Mother Nature will still move and the island where she ends her movement will also be resolved.";
 
     public FlagBearer(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(3,3, parameters, advancedParameters, name, description);

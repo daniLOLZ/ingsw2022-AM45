@@ -17,9 +17,9 @@ import java.util.List;
 
 public class Minstrel extends CharacterCard {
     private static final String name ="MINSTREL";
-    private static final String description ="You may exchange up to 2 Students\n" +
-                                         "\t|\tbetween your Entrance and your\n" +
-                                         "\t|\tDining Room";
+    private static final String description ="You may exchange up to 2 Students " +
+                                         "between your Entrance and your " +
+                                         "Dining Room.";
 
     private final int maxTradeableStudents = 2;
     private int trades;

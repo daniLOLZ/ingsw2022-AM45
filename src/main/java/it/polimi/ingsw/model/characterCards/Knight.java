@@ -6,8 +6,9 @@ import it.polimi.ingsw.model.game.ParameterHandler;
 
 public class Knight extends CharacterCard {
     private static final String name ="KNIGHT";
-    private static final String description ="During the influence calculation this turn,\n" +
-                                         "\t|\tyou count as having 2 more influence";
+    private static final String description =
+            "During the influence calculation this turn, " +
+            "you count as having 2 more influence.";
 
 
 
