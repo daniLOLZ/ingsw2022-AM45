@@ -85,7 +85,9 @@ public class AdvancedGame extends SimpleGame {
                         List<TeamEnum> selectedColors, List<String> nicknames,
                         VirtualView virtualView) throws  IncorrectPlayersException{
         super(numPlayers, selectedWizards, selectedColors, nicknames, virtualView);
-        advancedParameters.setNumCoins(AdvancedParameterHandler.numStartingCoinsOnBoard); // number of coins in the parameters is added at a later
+        advancedParameters.setNumCoins(AdvancedParameterHandler.numStartingCoinsOnBoard -
+               AdvancedParameterHandler.numInitialCoinsPerPlayer*numPlayers );
+        // number of coins in the parameters is added at a later
         // time because we need to create parameters before
         // creating the islands, this happens in the createParameters()
         // method, which don't have the number of coins as input
