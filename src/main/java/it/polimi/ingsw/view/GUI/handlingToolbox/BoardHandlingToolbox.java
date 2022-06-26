@@ -159,4 +159,9 @@ public class BoardHandlingToolbox implements HandlingToolbox{
     public List<Integer> getEntranceStudentsSelected() {
         return entranceStudentsSelected;
     }
+
+    public void resetSelections(){
+        entranceStudentsSelected = new ArrayList<>();
+        colorsSelected = new ArrayList<>();
+    }
 }

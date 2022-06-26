@@ -112,6 +112,14 @@ public class GameToolBoxContainer {
     public HelpingToolBox getHelpingToolBox() {
         return helpingToolBox;
     }
+
+    public void resetSelections(){
+        for (CharacterCardHandlingToolbox character:
+             characterCardHandlingToolboxes) {
+            character.resetSelections();
+        }
+        boardHandlingToolbox.resetSelections();
+    }
 }
 
 

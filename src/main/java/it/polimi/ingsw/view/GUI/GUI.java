@@ -348,10 +348,7 @@ public class GUI implements UserInterface {
     public void showGameCommandError() {
         if (GUIApplication.areCharacterCardRequirementsInSelection()) {
             setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
-            for (CharacterCardHandlingToolbox character:
-                 gameToolBoxContainer.getCharacterCardHandlingToolboxes()) {
-                character.resetSelections();
-            }
+            gameToolBoxContainer.resetSelections();
         }
     }
 
@@ -359,10 +356,7 @@ public class GUI implements UserInterface {
     public void showGameCommandError(String error) {
         if (GUIApplication.areCharacterCardRequirementsInSelection()) {
             setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
-            for (CharacterCardHandlingToolbox character:
-                    gameToolBoxContainer.getCharacterCardHandlingToolboxes()) {
-                character.resetSelections();
-            }
+            gameToolBoxContainer.resetSelections();
         }
     }
 
