@@ -6,7 +6,10 @@ import it.polimi.ingsw.model.characterCards.Glutton;
 import it.polimi.ingsw.model.characterCards.Herbalist;
 import it.polimi.ingsw.model.game.AdvancedGame;
 import static org.junit.jupiter.api.Assertions.*;
+
+import it.polimi.ingsw.model.game.AdvancedParameterHandler;
 import it.polimi.ingsw.model.game.IncorrectPlayersException;
+import it.polimi.ingsw.model.game.ParameterHandler;
 import it.polimi.ingsw.model.islands.AdvancedIslandGroup;
 import it.polimi.ingsw.model.islands.IslandGroup;
 import it.polimi.ingsw.model.player.AdvancedPlayer;
@@ -356,7 +359,16 @@ public class AdvancedGameTest {
         assertEquals(0,game.getAdvancedParameters().getSelectedStudentsOnCard().get().get(0));
     }
 
+    /**
+     * Tests whether the parameters for an advanced game are correct and follow the rules
+     */
+    @Test
+    public void adherenceToRules(){
+        assertEquals(AdvancedParameterHandler.numCharacterCardPerGame, 3);
+        assertEquals(AdvancedParameterHandler.numStartingCoinsOnBoard, 20);
+        assertEquals(AdvancedParameterHandler.numInitialCoinsPerPlayer, 1);
 
+    }
 
 
 }

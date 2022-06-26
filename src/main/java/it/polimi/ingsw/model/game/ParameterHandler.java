@@ -18,12 +18,12 @@ import java.util.*;
 public class ParameterHandler extends DrawableObject {
 
     //STATIC PARAMETER FOR DIFFERENT GAME TYPE
-    private static final int studentsPerCloud2or4Players = 3;
-    private static final int studentsPerCloud3Players = 4;
-    private static final int maxStudentsAtEntrance2or4Players = 7;
-    private static final int maxStudentsAtEntrance3Players = 9;
-    private static final int numTowers2or4Players = 8;
-    private static final int numTowers3Players = 6;
+    public static final int studentsPerCloud2or4Players = 3;
+    public static final int studentsPerCloud3Players = 4;
+    public static final int maxStudentsAtEntrance2or4Players = 7;
+    public static final int maxStudentsAtEntrance3Players = 9;
+    public static final int numTowers2or4Players = 8;
+    public static final int numTowers3Players = 6;
 
     //STATIC PARAMETERS
     private final int studentsPerCloud;
@@ -72,8 +72,8 @@ public class ParameterHandler extends DrawableObject {
 
     /**
      * Version with observer pattern
-     * @param numPlayers
-     * @param virtualView
+     * @param numPlayers The number of players for this game
+     * @param virtualView the virtual view to report changes to
      */
     public ParameterHandler(int numPlayers, VirtualView virtualView){
 
