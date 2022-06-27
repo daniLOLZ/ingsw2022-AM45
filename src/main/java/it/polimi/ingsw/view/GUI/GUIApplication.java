@@ -784,6 +784,10 @@ public class GUIApplication extends Application{
 
         Button playCharacter = new Button("Activate Character effect");
         playCharacter.setVisible(false);
+        playCharacter.setOnAction(event -> {
+            eventHandlerContainer.getHelpingToolbox().getOnPlayCharacterClick().handle(event);
+            characterCardRequirementsInSelection = false;
+        });
 
         subLayout.add(endTurn, 0, 0);
         subLayout.add(playCharacter, 1, 0);
@@ -799,7 +803,7 @@ public class GUIApplication extends Application{
             if (maxStudentsOnCardRequired > 0){
                 sendStudentsOnCardRequirement.setVisible(true);
                 if (studentOnCardRequired) tooFewStudentsOnCard.setVisible(true);
-                else sendStudentsOnCardRequirement.setOnAction(event -> {
+                sendStudentsOnCardRequirement.setOnAction(event -> {
                     eventHandlerContainer.getHelpingToolbox().getOnSendStudentsOnCardRequirementClick().handle(event);
                     maxStudentsOnCardRequired = 0;
                 });
@@ -808,7 +812,7 @@ public class GUIApplication extends Application{
             if (maxStudentsAtEntranceRequired > 0){
                 sendStudentsAtEntranceRequirement.setVisible(true);
                 if (studentAtEntranceRequired) tooFewStudentsAtEntrance.setVisible(true);
-                else sendStudentsAtEntranceRequirement.setOnAction(event -> {
+                sendStudentsAtEntranceRequirement.setOnAction(event -> {
                     eventHandlerContainer.getHelpingToolbox().getOnSendEntranceStudentRequirementsClick().handle(event);
                     maxStudentsAtEntranceRequired = 0;
                 });
@@ -817,7 +821,7 @@ public class GUIApplication extends Application{
             if (maxColorsRequired > 0){
                 sendColors.setVisible(true);
                 if (colorRequired) tooFewColors.setVisible(true);
-                else sendColors.setOnAction(event -> {
+                sendColors.setOnAction(event -> {
                     eventHandlerContainer.getHelpingToolbox().getOnSendStudentColorRequirementClick().handle(event);
                     maxColorsRequired = 0;
                 });
@@ -827,10 +831,6 @@ public class GUIApplication extends Application{
                 maxStudentsAtEntranceRequired == 0 &&
                 maxColorsRequired == 0)
                 playCharacter.setVisible(true);
-                playCharacter.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolbox().getOnPlayCharacterClick().handle(event);
-                    characterCardRequirementsInSelection = false;
-                });
         }
 
         //</editor-fold>
@@ -895,8 +895,8 @@ public class GUIApplication extends Application{
 
             for (int board = 1; board < numPlayers; board++) {
 
-                int absIndex = (user + board) % boardSlots.size();
-                root.getChildren().addAll(BoardDrawer.drawBoard(advancedPlayers.get(absIndex), boardSlots.get(absIndex), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(board - 1)));
+                int absIndex = (user + board) % advancedPlayers.size();
+                root.getChildren().addAll(BoardDrawer.drawBoard(advancedPlayers.get(absIndex), boardSlots.get(board - 1), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(board - 1)));
             }
         }
 
@@ -915,7 +915,7 @@ public class GUIApplication extends Application{
 
             for (int board = 1; board < numPlayers; board++) {
 
-                int absIndex = (user + board) % (boardSlots.size() + 1);
+                int absIndex = (user + board) % players.size();
                 root.getChildren().addAll(BoardDrawer.drawBoard(players.get(absIndex), boardSlots.get(board - 1), 0.5 * boardWidth / BoardDrawer.getBoardWidth(), boardRotations.get(board - 1)));
             }
         }
@@ -973,7 +973,7 @@ public class GUIApplication extends Application{
         List<Integer> rotations = new ArrayList<>();
 
         if (total > 2) rotations.add(BoardDrawer.RIGHT);
-        if (total == 2 || total == 4) rotations.add(BoardDrawer.TOP);
+        if (total == 2 || total > 3) rotations.add(BoardDrawer.TOP);
         if (total > 2) rotations.add(BoardDrawer.LEFT);
 
         return rotations;
@@ -1008,7 +1008,7 @@ public class GUIApplication extends Application{
 
     private static double getIslandGroupY(double x, double semiWidth, double semiHeight){
 
-        return semiHeight * Math.sqrt(1 - Math.pow(x, 2) / Math.pow(semiWidth, 2));
+        return - semiHeight * Math.sqrt(1 - Math.pow(x, 2) / Math.pow(semiWidth, 2));
     }
 
     private static List<Coord> getCloudsSlots(int amount, Coord center){

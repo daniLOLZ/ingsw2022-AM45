@@ -1,17 +1,13 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
-import com.sun.javafx.collections.ImmutableObservableList;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /* this is a special HandlingToolbox implementation that
@@ -24,9 +20,9 @@ public class HelpingToolBox implements HandlingToolbox{
     private EventHandler<ActionEvent> onSendStudentsOnCardRequirementClick;
     private EventHandler<ActionEvent> onPlayCharacterClick;
 
-    private List<Integer> selectedEntranceStudents;
-    private List<StudentEnum> selectedColors;
-    private List<Integer> selectedStudentsOnCard;
+    private AtomicReference<List<Integer>> selectedEntranceStudents;
+    private AtomicReference<List<StudentEnum>> selectedColors;
+    private AtomicReference<List<Integer>> selectedStudentsOnCard;
 
     public HelpingToolBox(){
         onEndTurnClick                         = NO_ACTION;
@@ -34,10 +30,6 @@ public class HelpingToolBox implements HandlingToolbox{
         onSendStudentColorRequirementClick     = NO_ACTION;
         onSendStudentsOnCardRequirementClick   = NO_ACTION;
         onPlayCharacterClick                   = NO_ACTION;
-
-        selectedEntranceStudents = new ArrayList<>();
-        selectedColors = new ArrayList<>();
-        selectedStudentsOnCard = new ArrayList<>();
     }
 
     @Override
@@ -49,18 +41,15 @@ public class HelpingToolBox implements HandlingToolbox{
 
 
         if (command == CommandEnum.SELECT_ENTRANCE_STUDENTS){
-            List<Integer> finalSelectedEntranceStudents = selectedEntranceStudents;
-            onSendEntranceStudentRequirementsClick = event -> new Thread(() -> resourceProvider.sendSelectEntranceStudents(finalSelectedEntranceStudents)).start();
+            onSendEntranceStudentRequirementsClick = event -> new Thread(() -> resourceProvider.sendSelectEntranceStudents(selectedEntranceStudents.get())).start();
         }
 
         if (command == CommandEnum.SELECT_STUDENT_COLORS){
-            List<StudentEnum> finalSelectedColor = selectedColors;
-            onSendStudentColorRequirementClick = event -> new Thread(() -> resourceProvider.sendSelectStudentColors(finalSelectedColor)).start();
+            onSendStudentColorRequirementClick = event -> new Thread(() -> resourceProvider.sendSelectStudentColors(selectedColors.get())).start();
         }
 
         if (command == CommandEnum.SELECT_STUDENTS_ON_CARD){
-            List<Integer> finalSelectedStudentsOnCard = selectedStudentsOnCard;
-            onSendStudentsOnCardRequirementClick = event -> new Thread(() -> resourceProvider.sendSelectStudentsOnCard(finalSelectedStudentsOnCard)).start();
+            onSendStudentsOnCardRequirementClick = event -> new Thread(() -> resourceProvider.sendSelectStudentsOnCard(selectedStudentsOnCard.get())).start();
         }
 
         if (command == CommandEnum.PLAY_CHARACTER){
@@ -82,15 +71,15 @@ public class HelpingToolBox implements HandlingToolbox{
         if (command == CommandEnum.PLAY_CHARACTER)           onPlayCharacterClick                   = NO_ACTION;
     }
 
-    public void setSelectedEntranceStudents(List<Integer> selectedEntranceStudents) {
+    public void setSelectedEntranceStudents(AtomicReference<List<Integer>> selectedEntranceStudents) {
         this.selectedEntranceStudents = selectedEntranceStudents;
     }
 
-    public void setSelectedColors(List<StudentEnum> selectedColors) {
+    public void setSelectedColors(AtomicReference<List<StudentEnum>> selectedColors) {
         this.selectedColors = selectedColors;
     }
 
-    public void setSelectedStudentsOnCard(List<Integer> selectedStudentsOnCard) {
+    public void setSelectedStudentsOnCard(AtomicReference<List<Integer>> selectedStudentsOnCard) {
         this.selectedStudentsOnCard = selectedStudentsOnCard;
     }
 

@@ -8,6 +8,7 @@ import it.polimi.ingsw.view.GUI.handlingToolbox.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GameToolBoxContainer {
 
@@ -67,12 +68,13 @@ public class GameToolBoxContainer {
             helpingToolbox.setSelectedEntranceStudents(boardHandlingToolbox.getEntranceStudentsSelected());
             helpingToolbox.setSelectedColors(boardHandlingToolbox.getColorsSelected());
 
-            List<Integer> selectedStudentsOnCard = new ArrayList<>();
+            AtomicReference<List<Integer>> selectedStudentsOnCard = new AtomicReference<>();
+            selectedStudentsOnCard.set(new ArrayList<>());
 
             for (CharacterCardHandlingToolbox character:
                  characterCardHandlingToolboxes) {
                 if (character.isSelected()) {
-                    selectedStudentsOnCard.addAll(character.getSelectedStudentsOnCard());
+                    selectedStudentsOnCard.get().addAll(character.getSelectedStudentsOnCard().get());
                     break;
                 }
             }

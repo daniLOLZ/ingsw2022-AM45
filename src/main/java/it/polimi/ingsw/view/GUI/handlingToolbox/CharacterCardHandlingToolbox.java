@@ -8,6 +8,7 @@ import javafx.scene.input.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
@@ -22,20 +23,23 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     private boolean selected = false;
     private int cardIndex;
 
-    private List<Integer> selectedStudentsOnCard;
+    private AtomicReference<List<Integer>> selectedStudentsOnCard;
 
     public CharacterCardHandlingToolbox(){
         onCharacterCardClick = HandlingToolbox.NO_EFFECT;
         onStudentOnCardClick = new ArrayList<>();
-        selectedStudentsOnCard = new ArrayList<>();
+        selectedStudentsOnCard = new AtomicReference<>();
+        selectedStudentsOnCard.set(new ArrayList<>());
     }
 
     public void setCardInfo(int cardIndex, int numStudents){
 
         this.cardIndex = cardIndex;
 
-        for (int student = 0; student < numStudents; student++) {
-            onStudentOnCardClick.add(NO_EFFECT);
+        if (onStudentOnCardClick.isEmpty()) {
+            for (int student = 0; student < numStudents; student++) {
+                onStudentOnCardClick.add(NO_EFFECT);
+            }
         }
 
         if (!allowedCommands.isEmpty()){
@@ -70,7 +74,10 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
             for (EventHandler<MouseEvent> ignored:
                  onStudentOnCardClick) {
                 int finalIndex = studentIndex;
-                onStudentOnCardClick.set(finalIndex, event ->  selectedStudentsOnCard.add(finalIndex));
+                onStudentOnCardClick.set(finalIndex, event -> {
+                    selectedStudentsOnCard.get().add(finalIndex - 1);
+                    System.out.println("Added student on card");
+                });
                 studentIndex++;
             }
         }
@@ -105,7 +112,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         return onStudentOnCardClick.get(pos);
     }
 
-    public List<Integer> getSelectedStudentsOnCard(){
+    public AtomicReference<List<Integer>> getSelectedStudentsOnCard(){
         return selectedStudentsOnCard;
     }
 
@@ -114,6 +121,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     }
 
     public void resetSelections(){
-        selectedStudentsOnCard = new ArrayList<>();
+        selectedStudentsOnCard = new AtomicReference<>();
+        selectedStudentsOnCard.set(new ArrayList<>());
     }
 }

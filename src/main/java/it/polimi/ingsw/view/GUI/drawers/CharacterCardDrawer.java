@@ -75,7 +75,7 @@ public class CharacterCardDrawer extends Drawer{
         toDraw.add(descBox);
         toDraw.add(description);
 
-        description.setFont(Font.font(description.getFont().getName(), 120 * scale));
+        description.setFont(Font.font(description.getFont().getName(), 110 * scale));
 
         descBox.setFill(Color.BURLYWOOD);
 
@@ -118,7 +118,7 @@ public class CharacterCardDrawer extends Drawer{
             descBox.setX(characterView.getX() - characterView.getFitWidth() * 0.3);
             descBox.setY(characterView.getY() + 1.075 * characterView.getFitHeight());
             descBox.setWidth(characterView.getFitWidth() * 1.6);
-            descBox.setHeight(description.maxHeight(-1));
+            descBox.setHeight(description.maxHeight(-1) * 1.075);
             description.setVisible(true);
             descBox.setVisible(true);
 
