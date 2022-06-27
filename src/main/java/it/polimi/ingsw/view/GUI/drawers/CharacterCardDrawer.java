@@ -83,9 +83,9 @@ public class CharacterCardDrawer extends Drawer{
 
         List<ImageView> studentViews = new ArrayList<>();
 
-        int studentIndex = 0;
-
         if (data.getStudents() != null) {
+
+            int studentIndex = 0;
             for (StudentEnum student:
                     data.getStudents()) {
 
@@ -104,6 +104,7 @@ public class CharacterCardDrawer extends Drawer{
                 studentIndex++;
             }
         }
+
 
         toDraw.addAll(studentViews);
 
