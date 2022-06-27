@@ -53,6 +53,9 @@ public class SimpleGameTest {
 
     }
 
+    /**
+     * Checks whether an exception is launched when a wrong number of players is inserted
+     */
     @Test
     public void wrongNumberOfPlayers(){
         SimpleGame game2;
@@ -61,6 +64,9 @@ public class SimpleGameTest {
         assertThrows(IncorrectPlayersException.class, () -> new SimpleGame(0,null,null,null,null));
     }
 
+    /**
+     * Checks whether the game has its initialized flag set to true
+     */
     @Test
     public void checkInitialized(){
         //assertFalse(game.isHasBeenInitialized());
