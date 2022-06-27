@@ -106,8 +106,8 @@ public class AssistantHandler {
     }
 
     /**
-     *
-     * @param assistant!=null
+     * Checks if the card was played in this turn already
+     * @param assistant the assistant to check
      * @return true if and only if played card is equal to at least one card of already played cards
      */
     private boolean isPlayed(final Assistant assistant){

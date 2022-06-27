@@ -48,6 +48,11 @@ public enum TeamEnum {
         return NOTEAM;
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param field the team enum in Object form
+     * @return the converted enum
+     */
     public static TeamEnum fromObjectToEnum(Object field) {
         return TeamEnum.valueOf((String)field);
     }

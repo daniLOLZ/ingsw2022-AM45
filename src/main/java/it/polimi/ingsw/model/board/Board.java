@@ -106,7 +106,6 @@ public class Board {
      * call empty from chosenCloud and add the elements of the obtained collection to studentsAtEntrance collection
      * @param chosenCloud the Cloud chosen by the current player
      */
-    //todo remove legacy selection, now in parameters
     public void moveFromCloud(Cloud chosenCloud){
 
         //get students from chosenCloud
@@ -116,6 +115,11 @@ public class Board {
         for (StudentEnum student : students) addToEntrance(student);
     }
 
+    /**
+     * Moves a student from the hall to the entrance of the board
+     * @param chosenTable the table from which to extract a student
+     * @throws FullEntranceException if the entrance is full and no more students can be added
+     */
     public void moveFromHallToEntrance(StudentEnum chosenTable) throws FullEntranceException {
 
         if (entranceSize() == parameters.getMaxStudentsAtEntrance()) throw new FullEntranceException();
@@ -147,6 +151,10 @@ public class Board {
         return returnList;
     }
 
+    /**
+     * Adds a student to the entrance in the first available space
+     * @param studentToAdd the color of the student to add
+     */
     public void addToEntrance(StudentEnum studentToAdd){
 
         int freeSlot = studentsAtEntrance.indexOf(StudentEnum.NOSTUDENT);
@@ -171,6 +179,10 @@ public class Board {
         return removedStudent;
     }
 
+    /**
+     * Adds a student to the hall in the right table
+     * @param student the color of the student to add
+     */
     public void addToHall(StudentEnum student){
 
         Integer previousNumStudents = studentsPerTable.get(student.index);

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network.client;
 
 /**
- * todo UPDATE ALL CLASSES USING THIS MANAGER
+ * Remnant of the old network protocol
  */
 @Deprecated
 public class ClientNetworkManager {

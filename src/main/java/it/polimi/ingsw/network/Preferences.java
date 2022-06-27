@@ -16,6 +16,10 @@ public class Preferences {
     private static final String standardHostname = "127.0.0.1";
     private static final Gson gson = new Gson();
 
+    /**
+     * Reads the default network port from a json file
+     * @return the port read from the file
+     */
     public static int readPortFromJson(){
 
         Type mapType = new TypeToken<Map<String, Object>>() {}.getType();    //Map<NetworkFieldEnum, Object> is a generic Type. It needs to be specified
@@ -38,6 +42,10 @@ public class Preferences {
         return ApplicationHelper.getIntFromBrokerField(map.get("defaultPort"));
     }
 
+    /**
+     * Reads the default network host from a json file
+     * @return the host name read from the file
+     */
     public static String readHostnameFromJson(){
 
         Type mapType = new TypeToken<Map<String, Object>>() {}.getType();    //Map<NetworkFieldEnum, Object> is a generic Type. It needs to be specified

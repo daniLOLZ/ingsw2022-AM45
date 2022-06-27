@@ -52,6 +52,9 @@ public class AdvancedBoard extends Board {
         else return false;
     }
 
+    /**
+     * For tests only
+     */
     public List<Stack<Integer>> getCoinsOnBoard() {
         return coinsOnBoard;
     }

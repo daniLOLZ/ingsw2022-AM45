@@ -15,6 +15,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The main server-side class for handling the client connection
+ * After initializing the connection, this handler will continously listen for new messages
+ * from the client, which will then dispatch to one of the command handlers <br>
+ * If necessary, it also sends messages to the other users related to this client via
+ * the other users' client handlers
+ */
 public class ClientHandler implements Runnable{
 
     private final List<CommandHandler> commandHandlers = FactoryCommandHandler.getAllCommandHandlers();

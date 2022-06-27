@@ -123,6 +123,10 @@ public class TurnHandler {
                 gamePhase.equals(controller.simpleGame.getParameters().getCurrentPhase());
     }
 
+    /**
+     *
+     * @return The current game phase
+     */
     public PhaseEnum getCurrentPhase(){
         return controller.simpleGame.getParameters().getCurrentPhase();
     }

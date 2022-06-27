@@ -53,6 +53,11 @@ public enum PlayerEnum {
         return NOPLAYER;
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param field the player enum in Object form
+     * @return the converted enum
+     */
     public static PlayerEnum fromObjectToEnum(Object field) {
         return PlayerEnum.valueOf((String)field);
     }

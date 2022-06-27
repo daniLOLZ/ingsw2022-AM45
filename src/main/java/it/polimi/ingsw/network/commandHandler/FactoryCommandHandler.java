@@ -8,6 +8,10 @@ import java.util.List;
 
 public class FactoryCommandHandler {
 
+    /**
+     *
+     * @return a list of all Synchronous command handlers
+     */
     public static List<CommandHandler> getAllCommandHandlers(){
 
         List<CommandHandler> commandHandlers = new ArrayList<>();
@@ -38,6 +42,12 @@ public class FactoryCommandHandler {
         return commandHandlers;
     }
 
+    /**
+     * Gets all the asynchronous command handlers.
+     * The order in which these are returned, and thus the order in which
+     * they are queried by the client handler, matters as some updates have priority over others
+     * @return a list of all the Async command handlers
+     */
     public static List<AsyncCommandHandler> getAsyncCommandHandlers() {
         List<AsyncCommandHandler> asyncHandlers = new ArrayList<>();
         //LobbyStart must come before GameInitUpdate!

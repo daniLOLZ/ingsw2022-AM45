@@ -36,7 +36,6 @@ public class MessageBroker {
     private Map<NetworkFieldEnum, Object> outgoingMessage;
 
     private final int BLOCKING_QUEUE_CAPACITY = 100;
-    //private boolean readyForNext;
 
     public MessageBroker(){
         gson = new Gson();
@@ -179,6 +178,7 @@ public class MessageBroker {
 
     /**
      * Receives and stores the received message as an HashMap in the incoming message buffer
+     * This method blocks until the end of the json message is read
      * @param sourceInput the InputStream of the host to read the message from
      */
     public void receive(InputStream sourceInput) throws IOException  //IOException includes SocketException
@@ -214,7 +214,7 @@ public class MessageBroker {
         } catch (SocketException e) {
             System.err.println("Socket error, couldn't read the message");
             System.err.println(e.getMessage());
-            //TODO handle user disconnection by passing it to ClientHandler somehow
+
             //e.printStackTrace();
             throw e;
 
@@ -249,8 +249,10 @@ public class MessageBroker {
         }
     }
 
+    /**
+     * Extremely crude way to circumvent gson deserialization behavior
+     */
     private void convertListsToArrays(Map<NetworkFieldEnum, Object> deserializedMessage) {
-        //extremely crude, change if possible
 
         for (NetworkFieldEnum field : deserializedMessage.keySet()){
             if(field.equals(NetworkFieldEnum.CHOSEN_ENTRANCE_POSITIONS) ||

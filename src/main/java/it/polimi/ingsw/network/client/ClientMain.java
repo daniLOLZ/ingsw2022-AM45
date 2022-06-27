@@ -39,6 +39,10 @@ public class ClientMain {
 
     }
 
+    /**
+     * Sets up the two messaging parties of the client
+     * and starts the user interface
+     */
     public void startApplication(){
         initialConnector.setSender(sender);
         initialConnector.setReceiver(receiver);

@@ -30,13 +30,17 @@ public class AdvancedParameterHandler {
     private Optional<List<Integer>> selectedStudentsOnCard;
 
     /**
-     * Loads in the default amount of coins on the board
+     * Creates an advanced parameter handler with the default amount of coins on the board
      */
     public AdvancedParameterHandler(){
         this.numCoins = numStartingCoinsOnBoard;
         resetCardEffects();
     }
 
+    /**
+     * Creates an advanced parameter handler with the amount of coins specified on the board
+     * @param numCoins the amount of coins this game should have
+     */
     public AdvancedParameterHandler(int numCoins){
         this.numCoins = numCoins;
         resetCardEffects();

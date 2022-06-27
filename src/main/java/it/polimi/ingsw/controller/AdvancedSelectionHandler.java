@@ -32,6 +32,11 @@ public class AdvancedSelectionHandler extends SelectionHandler{
         return true;
     }
 
+    /**
+     * Selects a single student on the card selected previously
+     * @param position the position of the student on the card
+     * @return true if the selection happened successfully
+     */
     public boolean selectStudentOnCard(int position){
 
         InitialEffect initialEffectCard;
@@ -50,6 +55,12 @@ public class AdvancedSelectionHandler extends SelectionHandler{
         else return false;
     }
 
+    /**
+     * Deselects all students on the card and selects the ones in the parameter
+     * @param positions the students to select, which will replace the previously selected students
+     * @return true if the selection happened successfully.
+     * If even just one selection fails, this method returns false
+     */
     public boolean selectStudentOnCard(List<Integer> positions){
         //Deselect all previously selected students
         deselectStudentOnCard();

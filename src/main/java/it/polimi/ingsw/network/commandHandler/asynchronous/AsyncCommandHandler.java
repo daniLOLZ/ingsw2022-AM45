@@ -17,6 +17,12 @@ public abstract class AsyncCommandHandler {
         return commandHandled;
     }
 
+    /**
+     * Each AsyncCommandHandler will execute a single command
+     * @param messageBroker the broker on which to write the result of the command
+     * @param parameters the parameters of this connection
+     * @return true if the command was executed successfully
+     */
     public abstract boolean executeCommand(MessageBroker messageBroker, ClientHandlerParameters parameters);
 
     /**

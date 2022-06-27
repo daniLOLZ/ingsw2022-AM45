@@ -27,11 +27,11 @@ To make sure that the screen is cleared properly when
 it needs to be, the terminal on which the application is launched
 must support ANSI escape codes.
 
-The terminal must have a width of at least *`width`* characters to
+The terminal must have a width of at least *`145`* characters to
 properly show the game interface.
 
 <h3>GUI:</h3>
-Todo
+
 
 <h3>Game instructions:</h3>
 While in game, to input a command you must type 

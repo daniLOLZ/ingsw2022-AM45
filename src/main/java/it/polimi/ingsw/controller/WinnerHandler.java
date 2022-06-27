@@ -13,6 +13,10 @@ public class WinnerHandler {
         winnerTeam = TeamEnum.NOTEAM;
     }
 
+    /**
+     *
+     * @return the winning team
+     */
     public TeamEnum getWinnerTeam() {
         return winnerTeam;
     }
@@ -69,6 +73,10 @@ public class WinnerHandler {
         return winnerTeam;
     }
 
+    /**
+     * Checks which team has the most towers placed
+     * @return the team with the most towers put on islands
+     */
     private TeamEnum morePlacedTowers(){
         Map<TeamEnum, Integer> placedTowers = controller.simpleGame.towersOnIslands();
         TeamEnum winnerTeam = TeamEnum.NOTEAM;
@@ -91,6 +99,10 @@ public class WinnerHandler {
 
     }
 
+    /**
+     * Checks which team controls the most professors
+     * @return The team with the most professors controlled
+     */
     private TeamEnum moreProfessors(){
         Map<TeamEnum,Integer> numProfessorsPerTeam = controller.simpleGame.professorsPerTeam();
         TeamEnum winnerTeam = TeamEnum.NOTEAM;

@@ -11,6 +11,11 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * This class is used to initialize the connection between the client and the server
+ * It manages the coordination between the sender and receiver classes, and holds
+ * the shared resources between the two
+ */
 public class InitialConnector {
     private ClientSender sender;
     private ClientReceiver receiver;

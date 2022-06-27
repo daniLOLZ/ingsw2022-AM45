@@ -30,6 +30,11 @@ public enum WizardEnum {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param field the wizard in Object form
+     * @return the converted enum
+     */
     public static WizardEnum fromObjectToEnum(Object field) {
         return WizardEnum.valueOf((String)field);
     }

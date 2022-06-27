@@ -37,6 +37,15 @@ public class ClientReceiver {
         this.clientController = new ClientController();
     }
 
+    /**
+     * Initializes the receiver of messages
+     * @param inputStream the stream from which to read
+     * @param mainBroker the message broker that will hold the messages that this class should receive
+     * @param connected a boolean shared with the initialConnector and the sender
+     *                 to notify each other of a network problem
+     * @param isCommandScheduled a lock-like atomic boolean used to avoid congesting the queue,
+     *                           also accessed by the sender
+     */
     public void initialize(InputStream inputStream, MessageBroker mainBroker, AtomicBoolean connected, AtomicBoolean isCommandScheduled) {
         this.inputStream = inputStream;
         this.mainBroker = mainBroker;
@@ -53,6 +62,11 @@ public class ClientReceiver {
         }
     }
 
+    /**
+     * Resets the flags for the receiver and puts it in a state
+     * ready to start a new connection with the server
+     * It closes the previously opened threads
+     */
     public void reset() {
         receiverStarted = false;
         hasBeenClosedAlready = false;
@@ -102,9 +116,13 @@ public class ClientReceiver {
         return receiveMessages;
     }
 
-    //todo a method to check and compare id requests between the received one and the
-    // one that we know we're supposed to receive
-
+    /**
+     * The main routine.
+     * After initialization, this method will continously wait for messages
+     * from the server, in response to ones sent by the sender.
+     * After receiving one, it will evaluate the command received and call the appropriate
+     * ClientController method
+     */
     public void parseMessages(){
 
         while(connected.get()) {
@@ -153,6 +171,11 @@ public class ClientReceiver {
 
     }
 
+    /**
+     * Checks that the received reply has the same id as the one sent by the
+     * sender just before
+     * @return true if the id matches the expected one
+     */
     private boolean checkCorrectIdRequest() {
         if(initialConnector.getCurrentIdRequest() !=
         ApplicationHelper.getIntFromBrokerField(mainBroker.readField(NetworkFieldEnum.ID_REQUEST))) {
@@ -163,6 +186,10 @@ public class ClientReceiver {
         return true;
     }
 
+    /**
+     * Creates a thread to parse asynchronous messages from the server and returns
+     * @return a Thread containing the asynchronous parsing routine
+     */
     public Thread parseAsyncMessages(){
         if(parseAsyncStarted) return null;
 
@@ -201,7 +228,8 @@ public class ClientReceiver {
     }
 
     /**
-     * After receiving an asynchronous message from the server, sends an ack message back to the server
+     * After receiving an asynchronous message from the server, sends an ack message back to the server. <br>
+     * Not implemented
      */
     private void sendAsynchronousACK() {
         //Todo
