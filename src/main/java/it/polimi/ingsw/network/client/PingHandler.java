@@ -16,7 +16,7 @@ public class PingHandler {
     private InitialConnector initialConnector;
     public static final int PING_TIMEOUT_SECONDS = 5;
     private final Duration timeout = Duration.ofSeconds(PING_TIMEOUT_SECONDS);
-    public static final int waitBetweenPingsMilliseconds = 2000;
+    public static final int waitBetweenPingsMilliseconds = 1000;
     private int idUser;
 
     public PingHandler(InitialConnector initialConnector, MessageBroker pingBroker, Socket pingSocket) {

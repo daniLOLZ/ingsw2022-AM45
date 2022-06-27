@@ -25,7 +25,7 @@ public class EriantysTest {
     @Test
     public void correctPingDuration(){
         assertEquals(5, PingHandler.PING_TIMEOUT_SECONDS);
-        assertEquals(2000, PingHandler.waitBetweenPingsMilliseconds);
+        assertEquals(1000, PingHandler.waitBetweenPingsMilliseconds);
         assertEquals(5, PongHandler.PONG_TIMEOUT_SECONDS);
     }
 
