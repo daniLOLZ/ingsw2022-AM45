@@ -405,7 +405,7 @@ public class CLI implements UserInterface {
 
         do{
             errorLogin = false;
-            System.out.println("Insert your username: ");
+            System.out.println("Insert your nickname: ");
 
             inputNickname = getInputNonBlocking();
 

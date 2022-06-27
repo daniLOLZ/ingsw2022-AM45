@@ -40,13 +40,13 @@ public enum CommandEnum {
     PLAY_CHARACTER("Play Character",                            new NetworkFieldEnum[] {ID_USER, ID_REQUEST}),
 
     //From here we're talking about server commands
-    SERVER_LOBBY_STATUS("Lobby status",                         new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
+    SERVER_LOBBY_STATUS("Lobby status",                         new NetworkFieldEnum[] {ASYNC_ID_REQUEST, BEAN_TYPE, BEAN}),
     SERVER_LOBBY_START("Lobby starting",                     new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
-    SERVER_GAME_INITIALIZATION_STATUS("Game init status",       new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
+    SERVER_GAME_INITIALIZATION_STATUS("Game init status",       new NetworkFieldEnum[] {ASYNC_ID_REQUEST, BEAN_TYPE, BEAN}),
     SERVER_GAME_START("Game starting",                       new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
     SERVER_YOUR_TURN("Your turn to move",                       new NetworkFieldEnum[] {ASYNC_ID_REQUEST, ASYNC_GAME_PHASE}),
     SERVER_GAME_UPDATE("Game model update",                     new NetworkFieldEnum[] {ASYNC_ID_REQUEST, ASYNC_VIEW}),
-    SERVER_USER_DISCONNECTED("User disconnected",               new NetworkFieldEnum[] {ASYNC_ID_REQUEST}),
+    SERVER_USER_DISCONNECTED("User disconnected",               new NetworkFieldEnum[] {ASYNC_ID_REQUEST, ASYNC_ID_USER, ASYNC_USER_NICKNAME}),
     SERVER_GAME_WON("Game won",                                 new NetworkFieldEnum[]{ASYNC_ID_REQUEST, ASYNC_WINNER});
 
 

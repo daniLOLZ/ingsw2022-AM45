@@ -17,7 +17,7 @@ public class PongHandler {
     private final ClientHandler clientHandler;
     private final MessageBroker pingBroker;
     private final Socket pingSocket;
-    private final int PONG_TIMEOUT_SECONDS = 500;
+    public static final int PONG_TIMEOUT_SECONDS = 5;
     private final Duration timeout = Duration.ofSeconds(PONG_TIMEOUT_SECONDS);
     private boolean pongStarted;
 
