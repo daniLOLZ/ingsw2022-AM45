@@ -33,7 +33,6 @@ public class ClientController {
         if(!checkSuccessfulReply()){
             userInterface.showLoginScreenFailure();
 
-            userInterface.showLoginScreen();
         }
         else{
             userInterface.setChosenNickname((String)broker.readField(NetworkFieldEnum.NICKNAME));
