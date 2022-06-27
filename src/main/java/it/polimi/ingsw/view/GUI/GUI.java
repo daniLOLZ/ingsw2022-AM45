@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.GameRuleEnum;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
+import it.polimi.ingsw.model.assistantCards.Assistant;
 import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.model.game.PhaseEnum;
 import it.polimi.ingsw.network.Bean;
@@ -218,7 +219,10 @@ public class GUI implements UserInterface {
 
     @Override
     public void showNetworkError() {
-       if (GUIApplication.isStarted()) Platform.runLater(GUIApplication::showNetworkError);
+       if (GUIApplication.isStarted()) {
+           Platform.runLater(GUIApplication::showNetworkError);
+           Platform.runLater(this::showLoginScreen);
+       }
     }
 
     //@Override
@@ -392,11 +396,16 @@ public class GUI implements UserInterface {
         if (yourTurn) {
             int yourSlot = lobbyBean.getNicknames().indexOf(nickname);
 
-            int MNSteps;
+            int MNSteps = 0;
 
             List<PlayerBean> allPlayers = virtualView.getPlayerBeans();
             if (allPlayers != null)  MNSteps = allPlayers.get(yourSlot).getAssistantPlayed().motherNatureSteps;
-            else MNSteps = virtualView.getAdvancedPlayerBeans().get(yourSlot).getAssistantPlayed().motherNatureSteps;
+            else {
+                Assistant assistantPlayed = virtualView.getAdvancedPlayerBeans().get(yourSlot).getAssistantPlayed();
+                if (assistantPlayed != null) {
+                    MNSteps = assistantPlayed.motherNatureSteps;
+                }
+            }
             gameToolBoxContainer.setMaxMNSteps(MNSteps);
         }
     }

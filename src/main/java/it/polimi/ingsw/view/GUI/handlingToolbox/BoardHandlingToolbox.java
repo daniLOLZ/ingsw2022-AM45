@@ -8,7 +8,7 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BoardHandlingToolbox implements HandlingToolbox{
 
@@ -17,8 +17,8 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
     public static final BoardHandlingToolbox NONINTERACTIVE = new BoardHandlingToolbox(9,5);
 
-    private List<StudentEnum> colorsSelected;
-    private List<Integer> entranceStudentsSelected;
+    private AtomicReference<List<StudentEnum>> colorsSelected;
+    private AtomicReference<List<Integer>> entranceStudentsSelected;
 
     public BoardHandlingToolbox(int entranceStudents, int numTables){
 
@@ -34,83 +34,87 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             onTableClick.add(DISABLED);
         }
 
-        colorsSelected = new ArrayList<>();
-        entranceStudentsSelected = new ArrayList<>();
+        colorsSelected = new AtomicReference<>();
+        colorsSelected.set(new ArrayList<>());
+        entranceStudentsSelected = new AtomicReference<>();
+        entranceStudentsSelected.set(new ArrayList<>());
     }
 
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
-        if (command == CommandEnum.SELECT_STUDENT){
-            int studentIndex = 0;
+        switch (command) {
+            case SELECT_STUDENT -> {
+                int studentIndex = 0;
 
-            for (EventHandler<MouseEvent> ignored :
-                 onEntranceStudentClick) {
+                for (EventHandler<MouseEvent> ignored :
+                        onEntranceStudentClick) {
 
-                int finalStudentIndex = studentIndex;
+                    int finalStudentIndex = studentIndex;
 
-                onEntranceStudentClick.set(finalStudentIndex, event -> {
-                        onEntranceStudentClick.set(finalStudentIndex, NO_EFFECT);
-                        new Thread(() ->
-                    resourceProvider.sendSelectedStudent(finalStudentIndex)).start();}
-                );
+                    onEntranceStudentClick.set(finalStudentIndex, event -> {
+                                onEntranceStudentClick.set(finalStudentIndex, NO_EFFECT);
+                                new Thread(() ->
+                                        resourceProvider.sendSelectedStudent(finalStudentIndex)).start();
+                            }
+                    );
 
-                studentIndex++;
-
-            }
-
-        }
-
-        if (command == CommandEnum.PUT_IN_HALL){
-            int tableIndex = 0;
-
-            for (EventHandler<MouseEvent> ignored : onTableClick) {
-
-                onTableClick.set(tableIndex, event -> new Thread (resourceProvider::sendPutInHall).start());
-                tableIndex++;
-            }
-        }
-
-        if (command == CommandEnum.SELECT_STUDENT_COLORS) {
-            int tableIndex = 0;
-
-            for (EventHandler<MouseEvent> ignored : onTableClick){
-                int finalIndex = tableIndex;
-                onTableClick.set(finalIndex, event -> new Thread(() -> colorsSelected.add(StudentEnum.getColorById(finalIndex))).start());
-                tableIndex++;
-            }
-        }
-
-        if (command == CommandEnum.SELECT_ENTRANCE_STUDENTS){
-
-            int studentIndex = 0;
-
-            for (EventHandler<MouseEvent> ignored: onEntranceStudentClick){
-                int finalIndex = studentIndex;
-                onEntranceStudentClick.set(finalIndex, event -> new Thread(() -> entranceStudentsSelected.add(finalIndex)).start());
-                studentIndex++;
-            }
-        }
-
-        if (command == CommandEnum.DESELECT_STUDENT){
-
-
-
-            for (EventHandler<MouseEvent> handler:
-                 onEntranceStudentClick) {
-
-                if (handler == NO_EFFECT) {
-
-                    int index = onEntranceStudentClick.indexOf(handler);
-
-                    onEntranceStudentClick.set(
-                            index,
-                            event -> {
-                                onEntranceStudentClick.set(index, DISABLED);
-                                new Thread(resourceProvider::sendDeselectStudent).start();
-                            });
+                    studentIndex++;
                 }
             }
 
+            case PUT_IN_HALL -> {
+                int tableIndex = 0;
+
+                for (EventHandler<MouseEvent> ignored : onTableClick) {
+
+                    onTableClick.set(tableIndex, event -> new Thread(resourceProvider::sendPutInHall).start());
+                    tableIndex++;
+                }
+            }
+
+            case SELECT_STUDENT_COLORS -> {
+                int tableIndex = 0;
+
+                for (EventHandler<MouseEvent> ignored : onTableClick) {
+                    int finalIndex = tableIndex;
+                    onTableClick.set(finalIndex, event -> new Thread(() -> colorsSelected.get().add(StudentEnum.getColorById(finalIndex + 1))).start());
+                    tableIndex++;
+                }
+            }
+
+            case SELECT_ENTRANCE_STUDENTS -> {
+
+                int studentIndex = 0;
+
+                for (EventHandler<MouseEvent> ignored : onEntranceStudentClick) {
+                    int finalIndex = studentIndex;
+                    onEntranceStudentClick.set(finalIndex, event -> new Thread(() -> entranceStudentsSelected.get().add(finalIndex + 1)).start());
+                    studentIndex++;
+                }
+            }
+
+            case DESELECT_STUDENT -> {
+                for (EventHandler<MouseEvent> handler :
+                        onEntranceStudentClick) {
+
+                    if (handler == NO_EFFECT) {
+
+                        int index = onEntranceStudentClick.indexOf(handler);
+
+                        onEntranceStudentClick.set(
+                                index,
+                                event -> {
+                                    onEntranceStudentClick.set(index, DISABLED);
+                                    new Thread(resourceProvider::sendDeselectStudent).start();
+                                });
+                    }
+                }
+
+            }
+
+            case SELECT_CHARACTER -> resetSelections();
+
+            default -> {}
         }
     }
 
@@ -152,16 +156,18 @@ public class BoardHandlingToolbox implements HandlingToolbox{
         return onTableClick.get(pos);
     }
 
-    public List<StudentEnum> getColorsSelected() {
+    public AtomicReference<List<StudentEnum>> getColorsSelected() {
         return colorsSelected;
     }
 
-    public List<Integer> getEntranceStudentsSelected() {
+    public AtomicReference<List<Integer>> getEntranceStudentsSelected() {
         return entranceStudentsSelected;
     }
 
     public void resetSelections(){
-        entranceStudentsSelected = new ArrayList<>();
-        colorsSelected = new ArrayList<>();
+        entranceStudentsSelected = new AtomicReference<>();
+        entranceStudentsSelected.set(new ArrayList<>());
+        colorsSelected = new AtomicReference<>();
+        colorsSelected.set(new ArrayList<>());
     }
 }
