@@ -96,7 +96,8 @@ public class VirtualView {
             if(watcher.isAlive()){
                 beans.add(watcher.getBean());
             }
-        return  beans;
+        orderIslandBeans(beans);
+        return beans;
     }
 
     public List<AdvancedIslandGroupBean> getAdvancedIslandBean(){
@@ -105,7 +106,8 @@ public class VirtualView {
             if(watcher.isAlive()){
                 beans.add(watcher.getBean());
             }
-        return  beans;
+        orderIslandBeans(beans);
+        return beans;
     }
 
     public List<PlayerBean> getPlayerBean(){
@@ -178,6 +180,23 @@ public class VirtualView {
     }
 
 
+    /**
+     * Orders the list of island group beans based on
+     * the lowest id of the islands contained in them
+     * @param beans the list of beans to sort
+     */
+    private void orderIslandBeans(List<? extends IslandGroupBean> beans) {
+        beans.sort((x,y) -> x.getIdIslands().stream()
+                            .sorted()
+                            .findFirst()
+                            .get()
+                            -
+                            y.getIdIslands().stream()
+                            .sorted()
+                            .findFirst()
+                            .get());
+    }
+
     /*
 
     private <S extends GameElementBean, T extends Watcher> List<S> getBeansFromWatchers(List<T> watchers) {
@@ -188,14 +207,6 @@ public class VirtualView {
     }
 
      */
+
 }
-
-
-
-// public CloudObserver{
-//  CloudBean bean;
-//  update(Observable obj, Object arg){
-//   this.bean = (CloudBean)obj.toBean();
-//  }
-// }
 
