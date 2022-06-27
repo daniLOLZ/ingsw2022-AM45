@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI.handlingToolbox;
 
+import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
 import javafx.event.EventHandler;
@@ -16,6 +17,9 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
     public static final BoardHandlingToolbox NONINTERACTIVE = new BoardHandlingToolbox(9,5);
 
+    private List<StudentEnum> colorsSelected;
+    private List<Integer> entranceStudentsSelected;
+
     public BoardHandlingToolbox(int entranceStudents, int numTables){
 
         onEntranceStudentClick = new ArrayList<>();
@@ -29,6 +33,9 @@ public class BoardHandlingToolbox implements HandlingToolbox{
         for (int table = 0; table < numTables; table++) {
             onTableClick.add(DISABLED);
         }
+
+        colorsSelected = new ArrayList<>();
+        entranceStudentsSelected = new ArrayList<>();
     }
 
     @Override
@@ -63,19 +70,25 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             }
         }
 
-        if (command == CommandEnum.SELECT_STUDENT_COLORS) { // todo fix sorry
+        if (command == CommandEnum.SELECT_STUDENT_COLORS) {
             int tableIndex = 0;
 
             for (EventHandler<MouseEvent> ignored : onTableClick){
                 int finalIndex = tableIndex;
-//                onTableClick.set(tableIndex, event -> new Thread (() -> resourceProvider.sendSelectStudentColor(StudentEnum.getColorById(finalIndex))).start());
+                onTableClick.set(finalIndex, event -> new Thread(() -> colorsSelected.add(StudentEnum.getColorById(finalIndex))).start());
                 tableIndex++;
             }
         }
 
         if (command == CommandEnum.SELECT_ENTRANCE_STUDENTS){
 
-            //TODO might work in an odd way
+            int studentIndex = 0;
+
+            for (EventHandler<MouseEvent> ignored: onEntranceStudentClick){
+                int finalIndex = studentIndex;
+                onEntranceStudentClick.set(finalIndex, event -> new Thread(() -> entranceStudentsSelected.add(finalIndex)).start());
+                studentIndex++;
+            }
         }
 
         if (command == CommandEnum.DESELECT_STUDENT){
@@ -137,5 +150,18 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
     public EventHandler<MouseEvent> getOnHallClick(int pos) {
         return onTableClick.get(pos);
+    }
+
+    public List<StudentEnum> getColorsSelected() {
+        return colorsSelected;
+    }
+
+    public List<Integer> getEntranceStudentsSelected() {
+        return entranceStudentsSelected;
+    }
+
+    public void resetSelections(){
+        entranceStudentsSelected = new ArrayList<>();
+        colorsSelected = new ArrayList<>();
     }
 }

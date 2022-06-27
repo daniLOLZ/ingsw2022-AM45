@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.model.beans.AdvancedIslandGroupBean;
 import it.polimi.ingsw.model.beans.IslandGroupBean;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
@@ -15,12 +16,14 @@ public class GameToolBoxContainer {
     private CloudHandlingToolbox cloudHandlingToolbox;
     private IslandHandlingToolbox islandHandlingToolbox;
     private List<CharacterCardHandlingToolbox> characterCardHandlingToolboxes;
+    private HelpingToolBox helpingToolBox;
 
     public GameToolBoxContainer(int numAssistants, int entranceStudents, int numTables, int numClouds, int numCharacterCards){
         assistantHandlingToolbox = new AssistantHandlingToolbox(numAssistants);
         boardHandlingToolbox = new BoardHandlingToolbox(entranceStudents, numTables);
         cloudHandlingToolbox = new CloudHandlingToolbox(numClouds);
         islandHandlingToolbox = new IslandHandlingToolbox();
+        helpingToolBox = new HelpingToolBox();
 
         characterCardHandlingToolboxes = new ArrayList<>();
 
@@ -33,8 +36,12 @@ public class GameToolBoxContainer {
         islandHandlingToolbox.updateIslandGroups(islands);
     }
 
-    public void setNumStudentsOnCharacterCard(int index, int numStudents){
-        characterCardHandlingToolboxes.get(index).setNumStudents(numStudents);
+    public void updateAdvancedIslandGroups(List<AdvancedIslandGroupBean> islands){
+        islandHandlingToolbox.updateAdvancedIslandGroups(islands);
+    }
+
+    public void setCharacterCardInfo(int index, int numStudents){
+        characterCardHandlingToolboxes.get(index).setCardInfo(index, numStudents);
     }
 
     public void setMaxMNSteps(int steps){
@@ -54,6 +61,23 @@ public class GameToolBoxContainer {
     }
 
     public void allowCommand(CommandEnum command, ClientSender resourceProvider){
+
+        if (command == CommandEnum.PLAY_CHARACTER){
+            helpingToolBox.setSelectedEntranceStudents(boardHandlingToolbox.getEntranceStudentsSelected());
+            helpingToolBox.setSelectedColors(boardHandlingToolbox.getColorsSelected());
+
+            List<Integer> selectedStudentsOnCard = new ArrayList<>();
+
+            for (CharacterCardHandlingToolbox character:
+                 characterCardHandlingToolboxes) {
+                if (character.isSelected()) {
+                    selectedStudentsOnCard.addAll(character.getSelectedStudentsOnCard());
+                    break;
+                }
+            }
+
+            helpingToolBox.setSelectedStudentsOnCard(selectedStudentsOnCard);
+        }
 
         for (HandlingToolbox toolbox: getAll()) toolbox.allowCommand(command, resourceProvider);
     }
@@ -83,6 +107,18 @@ public class GameToolBoxContainer {
 
     public List<CharacterCardHandlingToolbox> getCharacterCardHandlingToolboxes() {
         return characterCardHandlingToolboxes;
+    }
+
+    public HelpingToolBox getHelpingToolBox() {
+        return helpingToolBox;
+    }
+
+    public void resetSelections(){
+        for (CharacterCardHandlingToolbox character:
+             characterCardHandlingToolboxes) {
+            character.resetSelections();
+        }
+        boardHandlingToolbox.resetSelections();
     }
 }
 

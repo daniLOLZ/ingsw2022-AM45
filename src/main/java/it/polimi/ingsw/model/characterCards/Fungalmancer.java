@@ -6,9 +6,10 @@ import it.polimi.ingsw.model.StudentEnum;
 
 public class Fungalmancer extends CharacterCard {
     private static final String name = "FUNGALMANCER";
-    private static final String description = "Choose a color of Student: \n" +
-                                          "\t|\tduring the influence calculation this turn,\n" +
-                                          "\t|\tthat color adds no influence";
+    private static final String description =
+            "Choose a color of Student: " +
+            "during the influence calculation this turn, " +
+            "that color adds no influence.";
 
     public Fungalmancer(ParameterHandler parameters, AdvancedParameterHandler advancedParameters){
         super(3,9, parameters,advancedParameters, name, description);

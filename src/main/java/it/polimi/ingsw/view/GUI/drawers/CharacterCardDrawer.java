@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,18 +85,24 @@ public class CharacterCardDrawer extends Drawer{
 
         int studentIndex = 0;
 
-        for (StudentEnum student:
-                data.getStudents()) {
+        if (data.getStudents() != null) {
+            for (StudentEnum student:
+                    data.getStudents()) {
 
-            studentViews.add(StudentDrawer.drawStudent(
-                    student,
-                    pos
-                            .pureSumX(studentsSlots.get(studentIndex).x * scale)
-                            .pureSumY(studentsSlots.get(studentIndex).y * scale),
-                    scale * childrenSize / StudentDrawer.getStudentSize(),
-                    eventHandlers.getOnStudentOnCardClick(studentIndex)));
+                ImageView studentView = StudentDrawer.drawStudent(
+                        student,
+                        pos
+                                .pureSumX(studentsSlots.get(studentIndex).x * scale)
+                                .pureSumY(studentsSlots.get(studentIndex).y * scale),
+                        scale * childrenSize / StudentDrawer.getStudentSize(),
+                        eventHandlers.getOnStudentOnCardClick(studentIndex));
 
-            studentIndex++;
+                studentView.setOnMouseClicked(eventHandlers.getOnStudentOnCardClick(studentIndex));
+
+                studentViews.add(studentView);
+
+                studentIndex++;
+            }
         }
 
         toDraw.addAll(studentViews);
@@ -103,13 +110,14 @@ public class CharacterCardDrawer extends Drawer{
 
         EventHandler<MouseEvent> showDescription = event -> {
 
-            description.setX(characterView.getX());
+            description.setX(characterView.getX() - characterView.getFitWidth() * 0.2);
             description.setY(characterView.getY() + 1.15 * characterView.getFitHeight());
-            description.setWrappingWidth(characterView.getFitWidth());
-            descBox.setX(characterView.getX());
+            description.setWrappingWidth(characterView.getFitWidth() * 1.4);
+            description.setTextAlignment(TextAlignment.JUSTIFY);
+            descBox.setX(characterView.getX() - characterView.getFitWidth() * 0.3);
             descBox.setY(characterView.getY() + 1.075 * characterView.getFitHeight());
-            descBox.setWidth(characterView.getFitWidth());
-            descBox.setHeight(description.getFont().getSize() * 2);
+            descBox.setWidth(characterView.getFitWidth() * 1.6);
+            descBox.setHeight(description.maxHeight(-1));
             description.setVisible(true);
             descBox.setVisible(true);
 

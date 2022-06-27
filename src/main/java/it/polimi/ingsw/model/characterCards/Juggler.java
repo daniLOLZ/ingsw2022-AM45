@@ -12,10 +12,11 @@ import java.util.List;
 
 public class Juggler extends InitialEffect{
     private static final String name ="JUGGLER";
-    private static final String description = "You may take up to 3 Students\n" +
-                                          "\t|\tfrom this card and replace them\n" +
-                                          "\t|\twith the same number of Students\n" +
-                                          "\t|\tfrom your Entrance";
+    private static final String description =
+            "You may take up to 3 Students " +
+            "from this card and replace them " +
+            "with the same number of Students " +
+            "from your Entrance.";
 
 
     private final int maxTradeableStudents = 3;
