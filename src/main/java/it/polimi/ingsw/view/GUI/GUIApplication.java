@@ -1,11 +1,8 @@
 package it.polimi.ingsw.view.GUI;
 
-import it.polimi.ingsw.controller.GameRuleEnum;
-import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.model.TeamEnum;
 import it.polimi.ingsw.model.WizardEnum;
 import it.polimi.ingsw.model.beans.*;
-import it.polimi.ingsw.model.player.PlayerEnum;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.client.InitialConnector;
 import it.polimi.ingsw.view.GUI.drawers.*;
@@ -13,9 +10,6 @@ import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -41,7 +35,6 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 
@@ -768,8 +761,9 @@ public class GUIApplication extends Application{
         layout.getChildren().add(subLayout);
 
         Button endTurn = new Button("End turn");
-        endTurn.setOnAction(eventHandlerContainer.getHelpingToolBox().getOnEndTurnClick());
-        if (HandlingToolbox.NO_ACTION.equals(endTurn.getOnAction())) endTurn.setVisible(false);
+        endTurn.setOnAction(eventHandlerContainer.getHelpingToolbox().getOnEndTurnClick());
+        if (HandlingToolbox.NO_ACTION.equals(endTurn.getOnAction()))
+            endTurn.setVisible(false);
 
         String tooFewSelectionText = "Select at least one";
 
@@ -792,13 +786,13 @@ public class GUIApplication extends Application{
         playCharacter.setVisible(false);
 
         subLayout.add(endTurn, 0, 0);
-        subLayout.add(sendStudentsOnCardRequirement, 1, 0);
-        subLayout.add(tooFewStudentsOnCard, 1, 1);
-        subLayout.add(sendStudentsAtEntranceRequirement, 2, 0);
-        subLayout.add(tooFewStudentsAtEntrance, 2, 1);
-        subLayout.add(sendColors, 3, 0);
-        subLayout.add(tooFewColors, 3, 1);
-        subLayout.add(playCharacter, 4, 0);
+        subLayout.add(playCharacter, 1, 0);
+        subLayout.add(sendStudentsOnCardRequirement, 0, 1);
+        subLayout.add(tooFewStudentsOnCard, 0, 2);
+        subLayout.add(sendStudentsAtEntranceRequirement, 1, 1);
+        subLayout.add(tooFewStudentsAtEntrance, 1, 2);
+        subLayout.add(sendColors, 2, 1);
+        subLayout.add(tooFewColors, 2, 2);
 
         if (characterCardRequirementsInSelection){
 
@@ -806,7 +800,7 @@ public class GUIApplication extends Application{
                 sendStudentsOnCardRequirement.setVisible(true);
                 if (studentOnCardRequired) tooFewStudentsOnCard.setVisible(true);
                 else sendStudentsOnCardRequirement.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolBox().getOnSendStudentsOnCardRequirementClick().handle(event);
+                    eventHandlerContainer.getHelpingToolbox().getOnSendStudentsOnCardRequirementClick().handle(event);
                     maxStudentsOnCardRequired = 0;
                 });
             }
@@ -815,7 +809,7 @@ public class GUIApplication extends Application{
                 sendStudentsAtEntranceRequirement.setVisible(true);
                 if (studentAtEntranceRequired) tooFewStudentsAtEntrance.setVisible(true);
                 else sendStudentsAtEntranceRequirement.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolBox().getOnSendEntranceStudentRequirementsClick().handle(event);
+                    eventHandlerContainer.getHelpingToolbox().getOnSendEntranceStudentRequirementsClick().handle(event);
                     maxStudentsAtEntranceRequired = 0;
                 });
             }
@@ -824,7 +818,7 @@ public class GUIApplication extends Application{
                 sendColors.setVisible(true);
                 if (colorRequired) tooFewColors.setVisible(true);
                 else sendColors.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolBox().getOnSendStudentColorRequirementClick().handle(event);
+                    eventHandlerContainer.getHelpingToolbox().getOnSendStudentColorRequirementClick().handle(event);
                     maxColorsRequired = 0;
                 });
             }
@@ -834,7 +828,7 @@ public class GUIApplication extends Application{
                 maxColorsRequired == 0)
                 playCharacter.setVisible(true);
                 playCharacter.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolBox().getOnPlayCharacterClick().handle(event);
+                    eventHandlerContainer.getHelpingToolbox().getOnPlayCharacterClick().handle(event);
                     characterCardRequirementsInSelection = false;
                 });
         }
@@ -930,7 +924,7 @@ public class GUIApplication extends Application{
 
         for (Integer assistant: userBean.getIdAssistants()) {
             Coord slot = firstAssistantSlot.pureSumX(assistantIndex * assistantWidth * 0.28 * 10 / userBean.getIdAssistants().size());
-            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth(), eventHandlerContainer.getAssistantHandlingToolbox().getOnAssistantClick(assistantIndex));
+            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth(), eventHandlerContainer.getAssistantHandlingToolbox().getOnAssistantClick((assistant - 1) % 10));
             addHoveringEffects(assistantView, slot, assistantWidth / AssistantDrawer.getAssistantWidth(), HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.7, false);
             root.getChildren().add(assistantView);
             assistantIndex++;

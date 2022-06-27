@@ -16,14 +16,14 @@ public class GameToolBoxContainer {
     private CloudHandlingToolbox cloudHandlingToolbox;
     private IslandHandlingToolbox islandHandlingToolbox;
     private List<CharacterCardHandlingToolbox> characterCardHandlingToolboxes;
-    private HelpingToolBox helpingToolBox;
+    private HelpingToolBox helpingToolbox;
 
     public GameToolBoxContainer(int numAssistants, int entranceStudents, int numTables, int numClouds, int numCharacterCards){
         assistantHandlingToolbox = new AssistantHandlingToolbox(numAssistants);
         boardHandlingToolbox = new BoardHandlingToolbox(entranceStudents, numTables);
         cloudHandlingToolbox = new CloudHandlingToolbox(numClouds);
         islandHandlingToolbox = new IslandHandlingToolbox();
-        helpingToolBox = new HelpingToolBox();
+        helpingToolbox = new HelpingToolBox();
 
         characterCardHandlingToolboxes = new ArrayList<>();
 
@@ -56,6 +56,7 @@ public class GameToolBoxContainer {
         handlingToolboxes.add(cloudHandlingToolbox);
         handlingToolboxes.add(islandHandlingToolbox);
         handlingToolboxes.addAll(characterCardHandlingToolboxes);
+        handlingToolboxes.add(helpingToolbox);
 
         return handlingToolboxes;
     }
@@ -63,8 +64,8 @@ public class GameToolBoxContainer {
     public void allowCommand(CommandEnum command, ClientSender resourceProvider){
 
         if (command == CommandEnum.PLAY_CHARACTER){
-            helpingToolBox.setSelectedEntranceStudents(boardHandlingToolbox.getEntranceStudentsSelected());
-            helpingToolBox.setSelectedColors(boardHandlingToolbox.getColorsSelected());
+            helpingToolbox.setSelectedEntranceStudents(boardHandlingToolbox.getEntranceStudentsSelected());
+            helpingToolbox.setSelectedColors(boardHandlingToolbox.getColorsSelected());
 
             List<Integer> selectedStudentsOnCard = new ArrayList<>();
 
@@ -76,7 +77,7 @@ public class GameToolBoxContainer {
                 }
             }
 
-            helpingToolBox.setSelectedStudentsOnCard(selectedStudentsOnCard);
+            helpingToolbox.setSelectedStudentsOnCard(selectedStudentsOnCard);
         }
 
         for (HandlingToolbox toolbox: getAll()) toolbox.allowCommand(command, resourceProvider);
@@ -109,8 +110,8 @@ public class GameToolBoxContainer {
         return characterCardHandlingToolboxes;
     }
 
-    public HelpingToolBox getHelpingToolBox() {
-        return helpingToolBox;
+    public HelpingToolBox getHelpingToolbox() {
+        return helpingToolbox;
     }
 
     public void resetSelections(){
