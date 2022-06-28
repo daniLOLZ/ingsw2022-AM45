@@ -11,7 +11,6 @@ public final class LobbyBean implements Bean {
     private List<Boolean> readyPlayers; // positional
     private boolean gameStarted;
     private Integer host;
-    //todo add gameType
 
     @Override
     public BeanEnum getBeanType() {

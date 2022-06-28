@@ -33,6 +33,15 @@ public class ClientSender {
         progressiveIdRequest = 0;
     }
 
+    /**
+     * Initializes the sender of messages
+     * @param outputStream the stream on which to send messages
+     * @param mainBroker the message broker that will be used to send the messages to the server
+     * @param connected a boolean shared with the initialConnector and the sender
+     *                  to notify each other of a network problem
+     * @param isCommandScheduled a lock-like atomic boolean used to avoid congesting the queue,
+     *                           also accessed by the receiver
+     */
     public void initialize(OutputStream outputStream, MessageBroker mainBroker, AtomicBoolean connected, AtomicBoolean isCommandScheduled) {
         this.outputStream = outputStream;
         this.mainBroker = mainBroker;
@@ -40,6 +49,10 @@ public class ClientSender {
         this.isCommandScheduled = isCommandScheduled;
     }
 
+    /**
+     * Resets the flags for the receiver and puts it in a state
+     * ready to start a new connection with the server
+     */
     public void reset() {
         progressiveIdRequest = 0;
     }
@@ -343,17 +356,7 @@ public class ClientSender {
             initialConnector.notifyNetworkError("Couldn't send the message to the server, closing...");
             return false;
         }
-        //todo add ack check basically
 
-        /*
-        Double gottenId;
-        gottenId = (Double) mainBroker.readField(NetworkFieldEnum.ID_REQUEST);
-        if(requestId != gottenId.intValue()){
-            System.out.println("Messages received in wrong order.");
-            return false;
-        }
-
-         */
         return true;
     }
 

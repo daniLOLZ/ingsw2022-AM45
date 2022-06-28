@@ -18,10 +18,10 @@ import java.util.List;
  * Translates from a LinkedTreeMap to a bean of the correct type
  * This class is fairly fragile, as it needs updating every time an attribute
  * name changes
+ * All translating methods in this class take a map from the gson serialization
+ * and return a bean of the associated type
  */
 public class BeanTranslator {
-
-    //todo handle various exceptions in case it's not the correct type of bean
 
     /**
      * Takes a map from the gson serialization and returns a LobbyBean

@@ -200,14 +200,29 @@ public class ApplicationHelper {
         return true;
     }
 
+    /**
+     * Get an integer from a string.
+     * The string must represent an integer
+     * @return the int that the string represented
+     */
     public static int getIntFromString(String s) {
         return Integer.parseInt(s);
     }
 
+    /**
+     * Get a student enum from a string.
+     * The string must represent an student enum
+     * @return the student enum that the string represented
+     */
     public static StudentEnum getStudentEnumFromString(String s) {
         return StudentEnum.valueOf(s);
     }
 
+    /**
+     * Get a student enum list from a string.
+     * The string must represent a student enum list
+     * @return the student enum list that the string represented
+     */
     public static List<StudentEnum> getStudentEnumListFromString(String s) {
         String[] splitString = stripBracketAndSplit(s);
         return Arrays.stream(splitString)
@@ -215,6 +230,11 @@ public class ApplicationHelper {
                 .toList();
     }
 
+    /**
+     * Get an int list from a string.
+     * The string must represent an list
+     * @return the int list that the string represented
+     */
     public static List<Integer> getIntListFromString(String s) {
         String[] splitString = stripBracketAndSplit(s);
         return Arrays.stream(splitString)

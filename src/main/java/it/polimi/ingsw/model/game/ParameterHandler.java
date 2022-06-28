@@ -120,6 +120,10 @@ public class ParameterHandler extends DrawableObject {
         return numTowers;
     }
 
+    /**
+     * Sets this game's players association between their id (PlayerEnum) and team color (TeamEnum)
+     * @param players the players of the game
+     */
     public void setPlayersAllegiance(List<Player> players){
         for (Player player : players){
             playersAllegiance.put(player.getPlayerId(), player.getTeamColor());
@@ -246,6 +250,9 @@ public class ParameterHandler extends DrawableObject {
         return selectedStudentTypes;
     }
 
+    /**
+     * Sets the selection components of this class to an empty optional
+     */
     public void undoSelection(){
         selectedIslands = Optional.empty();
         selectedEntranceStudents = Optional.empty();

@@ -12,6 +12,11 @@ public enum PhaseEnum {
         this.name = name;
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param field the phase in Object form
+     * @return the converted enum
+     */
     public static PhaseEnum fromObjectToEnum(Object field) {
         return PhaseEnum.valueOf((String)field);
     }

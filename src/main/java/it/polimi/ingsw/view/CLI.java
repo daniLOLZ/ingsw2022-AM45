@@ -362,6 +362,7 @@ public class CLI implements UserInterface {
      * Returs a string containing the available commands during the game
      * and the relative required fields
      */
+    @Deprecated
     private void printAvailableCommands(){
         StringBuilder retString = new StringBuilder();
         List<NetworkFieldEnum> requiredFields = new ArrayList<>();
@@ -949,6 +950,7 @@ public class CLI implements UserInterface {
 
     //<editor-fold desc="Asynchronous methods">
 
+    @Override
     public void printLobby(LobbyBean lobbyBean) {
         this.lobbyBean = lobbyBean;
         lobbyUpdateAvailable.trigger();
@@ -969,6 +971,7 @@ public class CLI implements UserInterface {
         }
     }
 
+    @Override
     public void printGameInitInfo(GameInitBean gameInitBean){
         this.gameInitBean = gameInitBean;
         gameInitUpdateAvailable.trigger();
@@ -1109,7 +1112,7 @@ public class CLI implements UserInterface {
      * @return the string input by the user, or the empty string if the interruptingCondition
      * was triggered
      */
-    public String getInputNonBlocking(InterfaceInterrupt interruptingCondition){
+    private String getInputNonBlocking(InterfaceInterrupt interruptingCondition){
 
         List<InterfaceInterrupt> interrupts = new ArrayList<>();
         interrupts.add(interruptingCondition);
@@ -1126,7 +1129,7 @@ public class CLI implements UserInterface {
      * @return the string input by the user, or the empty string if one of the interruptingConditions
      * was triggered
      */
-    public String getInputNonBlocking(List<InterfaceInterrupt> interruptingConditions){
+    private String getInputNonBlocking(List<InterfaceInterrupt> interruptingConditions){
 
         readCommand.set("");
         //Empty the current string, whatever was present needs to be read again
@@ -1152,9 +1155,15 @@ public class CLI implements UserInterface {
         return "";
     }
 
+    /**
+     * If the condition is triggered when true(false) and the interrupt IS true(false)
+     * for any interrupt in the list return true
+     * @param interruptingConditions the conditions to check
+     * @return true if at least one condition is triggered
+     */
     private boolean checkInterrupt(List<InterfaceInterrupt> interruptingConditions) {
         for(InterfaceInterrupt condition : interruptingConditions){
-            //If the condition is triggered when true(false) and the interrupt IS true(false), then return true
+
             if( condition.isTriggered() ) return true;
         }
         return false;
@@ -1168,6 +1177,7 @@ public class CLI implements UserInterface {
      * @return the string input by the user, or the empty string if one of the interruptingConditions
      * was triggered
      */
+    @Deprecated
     public String getInputNonBlockingLegacy(List<InterfaceInterrupt> interruptingConditions){
 
         String selection = "";
@@ -1287,10 +1297,6 @@ public class CLI implements UserInterface {
     @Override
     public void setSender(ClientSender sender) {
         this.sender = sender;
-    }
-
-    public void setNumberOfPlayers(int numberOfPlayers) {
-        this.numberOfPlayers = numberOfPlayers;
     }
 
     public void setGameMode(GameRuleEnum gameMode) {

@@ -448,6 +448,10 @@ public class SimpleGame extends DrawableObject {
         alert();
     }
 
+    /**
+     * Sets this game's last turn flag
+     * @param isLast the value of the flag
+     */
     public void setLastTurn(boolean isLast) {
         isLastTurn = isLast;
         alert();
@@ -482,9 +486,9 @@ public class SimpleGame extends DrawableObject {
     }
 
 
-    /*
+    /**
      * increments by one the current group id and returns it
-     * this way there won't be, two equal IDs
+     * this way there won't be two equal IDs
      * @return a new islandGroup id
      */
     public int getNewCurrentIslandId(){
@@ -723,6 +727,10 @@ public class SimpleGame extends DrawableObject {
         parameters.setSelectedIslands(new ArrayList<>());
     }
 
+    /**
+     * Selects the island group given
+     * @param idIslandGroup the island group to select
+     */
     public void selectIslandGroup(int idIslandGroup){
         IslandGroup islandGroup = islandGroups.get(idIslandGroup);
         if(parameters.getSelectedIslands().isEmpty()){
@@ -754,6 +762,10 @@ public class SimpleGame extends DrawableObject {
         parameters.setSelectedEntranceStudents(new ArrayList<>());
     }
 
+    /**
+     * Selects the student at the entrance at the position given
+     * @param position the position of the student
+     */
     public void selectEntranceStudent(Integer position){
 
         if(parameters.getSelectedEntranceStudents().isEmpty()){
@@ -785,6 +797,10 @@ public class SimpleGame extends DrawableObject {
         parameters.setSelectedStudentTypes(new ArrayList<>());
     }
 
+    /**
+     * Selects the type of the student given
+     * @param type the type of the student
+     */
     public void selectStudentType(StudentEnum type){
         if(parameters.getSelectedStudentTypes().isEmpty()){
             List<StudentEnum> typeList = new ArrayList<>();

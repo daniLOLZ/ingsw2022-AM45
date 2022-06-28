@@ -80,6 +80,17 @@ public class AdvancedGame extends SimpleGame {
 
     /**
      * Version with observer pattern
+     * Creates a new AdvancedGame with the parameters chosen by the players,
+     * must be initialized after creation via the initializeGame() function
+     * This constructor uses the default amount of coins and character cards specified in the
+     * advanced parameters
+     * @param numPlayers number of players in the game [2,4]
+     * @param selectedWizards array containing users' selection for their wizards
+     * @param selectedColors array containing users' selection for their tower colors
+     * @param nicknames array containing users' nicknames
+     * @param virtualView the view that will hold the watchers for the model classes
+     * @throws IncorrectPlayersException the number of players isn't in the
+     *                                  allowed range
      */
     public AdvancedGame(int numPlayers, List<Integer> selectedWizards,
                         List<TeamEnum> selectedColors, List<String> nicknames,
@@ -269,6 +280,11 @@ public class AdvancedGame extends SimpleGame {
             advancedParameters.getSelectedStudentsOnCard().get().remove((Integer) position);
         }
     }
+
+    /**
+     * Selects the student at the given position
+     * @param position the position of the student to select
+     */
     public void selectStudentOnCard(int position){
         if(advancedParameters.getSelectedStudentsOnCard().isEmpty()){
             List<Integer> positionList = new ArrayList<>();

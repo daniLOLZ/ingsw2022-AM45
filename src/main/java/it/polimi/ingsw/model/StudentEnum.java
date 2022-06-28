@@ -63,6 +63,11 @@ public enum StudentEnum {
         };
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param field the rule in Object form
+     * @return the converted enum
+     */
     public static StudentEnum fromObjectToEnum (Object field){
         return StudentEnum.valueOf((String)field);
     }

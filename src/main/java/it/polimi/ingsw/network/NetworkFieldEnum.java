@@ -67,6 +67,11 @@ public enum NetworkFieldEnum {
         return field.fieldClass;
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param field the network field in Object form
+     * @return the converted enum
+     */
     public static NetworkFieldEnum fromObjectToEnum (Object field){
         return NetworkFieldEnum.valueOf((String)field);
     }

@@ -93,6 +93,11 @@ public enum CommandEnum {
         return retList;
     }
 
+    /**
+     * Gets the enum value from the read object
+     * @param command the command in Object form
+     * @return the converted enum
+     */
     public static CommandEnum fromObjectToEnum (Object command){
         return CommandEnum.valueOf((String)command);
     }

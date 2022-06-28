@@ -9,6 +9,7 @@ public class AdvancedIslandHandler extends IslandHandler{
         super(controller);
     }
 
+
     @Override
     public boolean moveMN(int steps) {
         if(!checkCorrectSteps(steps)){

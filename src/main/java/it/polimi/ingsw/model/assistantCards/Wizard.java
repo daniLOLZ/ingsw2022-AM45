@@ -24,10 +24,18 @@ public class Wizard {
         return assistant;
     }
 
+    /**
+     *
+     * @return true if the assistants' list is empty
+     */
     public boolean isEmpty(){
         return assistants.isEmpty();
     }
 
+    /**
+     *
+     * @return the size of the assistants array under this wizard
+     */
     public int size(){
         return assistants.size();
     }

@@ -7,7 +7,6 @@ import java.util.List;
 
 public class GameHelper {
 
-    //TODO maybe handle the case in which the player is not present better
     /**
      * Finds and returns the player in a list associated with a specific id
      * returns null if there is no such player

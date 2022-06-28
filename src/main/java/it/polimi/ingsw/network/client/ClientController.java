@@ -15,6 +15,10 @@ import it.polimi.ingsw.view.UserInterface;
 /**
  * This class contains methods to validate whether the command sent received
  * a positive response or not, updates the UI accordingly, and shows the appropriate screen
+ * The validateX methods will notify to the UI the result of a synchronous method
+ * The handleX methods will do the same for asynchronous methods
+ * handleX methods are guaranteed not to block the UI as they're meant for
+ * quick game updates that the main UI routine will then handle
  */
 public class ClientController {
 
@@ -24,8 +28,8 @@ public class ClientController {
     private ConnectionState gameState;
     private GameRuleEnum chosenRule;
     private ConnectionState callBackGameState;
-    // todo? make it its own state instead of leeching off of
-    //  the connection states
+    //  make it its own state instead of leeching off of
+    //  the connection states maybe
 
     //<editor-fold desc="Synchronous commands">
 

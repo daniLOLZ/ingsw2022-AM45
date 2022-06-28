@@ -62,6 +62,8 @@ public class AdvancedIslandGroup extends IslandGroup {
         watchers = watcherList;
         alert();
     }
+
+    @Deprecated
     public AdvancedIslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup,
                                IslandGroup prevIslandGroup, List<StudentEnum> students,
                                TeamEnum towerColor, List<BlockTile> blockTiles, ParameterHandler parameters,
@@ -73,7 +75,7 @@ public class AdvancedIslandGroup extends IslandGroup {
 
     /**
      * Version with observer pattern
-     * @param idGroup
+     * @param idGroup the group this
      * @param islands
      * @param nextIslandGroup
      * @param prevIslandGroup

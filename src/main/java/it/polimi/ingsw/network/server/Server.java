@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    //TODO Make this a singleton class
     private int portNumber; // java doesn't support unsigned int
     private ServerSocket serverSocket;
     private List<ClientHandler> pinglessClients = new ArrayList<>(); //contains all clients not having a ping socket

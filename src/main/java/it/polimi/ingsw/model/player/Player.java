@@ -154,6 +154,9 @@ public class Player extends DrawableObject {
         alert();
     }
 
+    /**
+     * Set this player's assistant played to null
+     */
     public void clearAssistantPlayed() {
         setAssistantPlayed(null);
         alert();

@@ -113,8 +113,14 @@ public interface UserInterface {
      */
     void showErrorStartGame();
 
+    /**
+     * Show that the lobby was successfully left
+     */
     void showSuccessLeaveLobby();
 
+    /**
+     * Show that there was a problem leaving the lobby
+     */
     void showErrorLeaveLobby();
 
     /**
@@ -194,8 +200,16 @@ public interface UserInterface {
 
     // Asynchronous methods
 
+    /**
+     * Sends the updated lobby bean to the UI
+     * @param lobbyBean the updated lobby bean received from the server
+     */
     void printLobby(LobbyBean lobbyBean);
 
+    /**
+     * Sends the updated game init bean to the UI
+     * @param gameInitBean the updated game init bean received from the server
+     */
     void printGameInitInfo(GameInitBean gameInitBean);
 
     /**
@@ -246,6 +260,10 @@ public interface UserInterface {
      */
     void setYourTurn(boolean isYourTurn);
 
+    /**
+     * Sets the game's winner to the specified team
+     * @param winner the team that won the game
+     */
     void setGameWon (TeamEnum winner);
 
     /**

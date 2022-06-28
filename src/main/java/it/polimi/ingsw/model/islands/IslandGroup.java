@@ -39,6 +39,7 @@ public class IslandGroup extends DrawableObject {
         parameters = new ParameterHandler(2);
     }
 
+    @Deprecated
     public IslandGroup(int idGroup, List<Island> islands, IslandGroup nextIslandGroup, IslandGroup prevIslandGroup, List<StudentEnum> students, TeamEnum towerColor, ParameterHandler parameters) {
         this.idGroup = idGroup;
         this.islands = islands;
@@ -51,13 +52,14 @@ public class IslandGroup extends DrawableObject {
 
     /**
      * version with pattern observer
-     * @param idGroup
-     * @param islands
-     * @param nextIslandGroup
-     * @param prevIslandGroup
-     * @param students
-     * @param towerColor
-     * @param parameters
+     * @param idGroup the id this island group should have
+     * @param islands the list of islands this groups is made of
+     * @param nextIslandGroup the next island group on the board
+     * @param prevIslandGroup the previous island group on the board
+     * @param students the stuednts this group contains
+     * @param towerColor the color of the tower that this group has on top
+     * @param parameters the parameters of the game
+     * @param virtualView the view that will get updated upon model changes
      */
     public IslandGroup(int idGroup, List<Island> islands,
                        IslandGroup nextIslandGroup, IslandGroup prevIslandGroup,

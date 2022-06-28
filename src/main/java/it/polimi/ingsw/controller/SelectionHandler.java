@@ -34,12 +34,23 @@ public class SelectionHandler {
         return true;
     }
 
+    /**
+     * Selects the island in the parameter
+     * @param idIslandGroup the island to select
+     * @return true if succeeded
+     */
     public boolean selectIsland(int idIslandGroup){
         if(!controller.simpleGame.checkValidIdIsland(idIslandGroup)) return false;
         controller.simpleGame.selectIslandGroup(idIslandGroup);
         return true;
     }
 
+    /**
+     * Deselects all islands selected previously and selects the ones in the parameter
+     * @param idIslandGroups the islands to select, which will replace the previously selected islands
+     * @return true if the selection happened successfully.
+     * If even just one selection fails, this method returns false
+     */
     public boolean selectIsland(List<Integer> idIslandGroups){
         //Deselect all previously selected islands
         deselectIsland();
@@ -73,6 +84,11 @@ public class SelectionHandler {
         return true;
     }
 
+    /**
+     * Selects a student at the entrance
+     * @param position the position of the student at the entrance to select
+     * @return true if succeeded
+     */
     public boolean selectStudentAtEntrance(int position){
         if(position >= 0
         && position < parameters.getMaxStudentsAtEntrance()
@@ -87,6 +103,12 @@ public class SelectionHandler {
         else return false;
     }
 
+    /**
+     * Deselects all students selected previously and selects the ones in the parameter
+     * @param positions the students to select, which will replace the previously selected students
+     * @return true if the selection happened successfully.
+     * If even just one selection fails, this method returns false
+     */
     public boolean selectStudentAtEntrance(List<Integer> positions){
         //Deselect all previously selected students
         deselectStudentAtEntrance();
@@ -120,6 +142,11 @@ public class SelectionHandler {
         return true;
     }
 
+    /**
+     * Selects the student type in the parameter
+     * @param type the type of student to select
+     * @return true if succeeded
+     */
     public boolean selectStudentType(StudentEnum type){
         if(!type.equals(StudentEnum.NOSTUDENT)){
             controller.simpleGame.selectStudentType(type);
@@ -128,6 +155,12 @@ public class SelectionHandler {
         return false;
     }
 
+    /**
+     * Deselects all types selected previously and selects the ones in the parameter
+     * @param types the student types to select, which will replace the previously selected student types
+     * @return true if the selection happened successfully.
+     * If even just one selection fails, this method returns false
+     */
     public boolean selectStudentType(List<StudentEnum> types){
         //Deselect all previously selected student types
         deselectStudentType();
@@ -143,7 +176,7 @@ public class SelectionHandler {
     }
 
     /**
-     * Deselects everything selected in the game parameters that doesn't relate to character cards
+     * Deselects everything selected in the game parameters
      */
     public void deselectAll(){
         deselectStudentAtEntrance();

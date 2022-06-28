@@ -138,6 +138,11 @@ public class CharacterCardHandler {
         return true;
     }
 
+    /**
+     * Checks whether the generic requirements specified in the requirements attribute of
+     * each character card are met. Unneeded requirements are ignored even if previously selected
+     * @return true if the requirements are met.
+     */
     private boolean checkRequirements() {
         Requirements requirements =   controller.
                 advancedGame.
@@ -194,6 +199,10 @@ public class CharacterCardHandler {
         return satisfied;
     }
 
+    /**
+     * Checks character specific requirements
+     * @return true if the additional requirements have been fulfilled
+     */
     private boolean checkCardSpecificRequisites() {
         ParameterHandler parameters = controller.simpleGame.getParameters();
         AdvancedParameterHandler advancedParameters = controller.advancedGame.getAdvancedParameters();
