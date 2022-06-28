@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.GUI.handlingToolbox;
 
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
+import it.polimi.ingsw.view.GUI.CharacterCardSelection;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -23,13 +24,11 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     private boolean selected = false;
     private int cardIndex;
 
-    private AtomicReference<List<Integer>> selectedStudentsOnCard;
+    private CharacterCardSelection selections;
 
     public CharacterCardHandlingToolbox(){
         onCharacterCardClick = HandlingToolbox.NO_EFFECT;
         onStudentOnCardClick = new ArrayList<>();
-        selectedStudentsOnCard = new AtomicReference<>();
-        selectedStudentsOnCard.set(new ArrayList<>());
     }
 
     public void setCardInfo(int cardIndex, int numStudents){
@@ -64,7 +63,6 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
                 selected = true;
                 new Thread(() -> resourceProvider.sendSelectCharacter(cardIndex)).start();
             };
-            resetSelections();
         }
 
         if (selected && command == CommandEnum.SELECT_STUDENTS_ON_CARD) {
@@ -75,7 +73,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
                  onStudentOnCardClick) {
                 int finalIndex = studentIndex;
                 onStudentOnCardClick.set(finalIndex, event -> {
-                    selectedStudentsOnCard.get().add(finalIndex - 1);
+                    selections.addStudentOnCard(finalIndex + 1);
                     System.out.println("Added student on card");
                 });
                 studentIndex++;
@@ -104,6 +102,10 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    public void setSelectionsContainer(CharacterCardSelection selections) {
+        this.selections = selections;
+    }
+
     public EventHandler<MouseEvent> getOnCharacterCardClick() {
         return onCharacterCardClick;
     }
@@ -112,16 +114,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         return onStudentOnCardClick.get(pos);
     }
 
-    public AtomicReference<List<Integer>> getSelectedStudentsOnCard(){
-        return selectedStudentsOnCard;
-    }
-
     public boolean isSelected(){
         return selected;
-    }
-
-    public void resetSelections(){
-        selectedStudentsOnCard = new AtomicReference<>();
-        selectedStudentsOnCard.set(new ArrayList<>());
     }
 }

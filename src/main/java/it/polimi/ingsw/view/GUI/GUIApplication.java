@@ -804,8 +804,8 @@ public class GUIApplication extends Application{
                 sendStudentsOnCardRequirement.setVisible(true);
                 if (studentOnCardRequired) tooFewStudentsOnCard.setVisible(true);
                 sendStudentsOnCardRequirement.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolbox().getOnSendStudentsOnCardRequirementClick().handle(event);
                     maxStudentsOnCardRequired = 0;
+                    eventHandlerContainer.getHelpingToolbox().getOnSendStudentsOnCardRequirementClick().handle(event);
                 });
             }
 
@@ -813,8 +813,8 @@ public class GUIApplication extends Application{
                 sendStudentsAtEntranceRequirement.setVisible(true);
                 if (studentAtEntranceRequired) tooFewStudentsAtEntrance.setVisible(true);
                 sendStudentsAtEntranceRequirement.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolbox().getOnSendEntranceStudentRequirementsClick().handle(event);
                     maxStudentsAtEntranceRequired = 0;
+                    eventHandlerContainer.getHelpingToolbox().getOnSendEntranceStudentRequirementsClick().handle(event);
                 });
             }
 
@@ -822,8 +822,8 @@ public class GUIApplication extends Application{
                 sendColors.setVisible(true);
                 if (colorRequired) tooFewColors.setVisible(true);
                 sendColors.setOnAction(event -> {
-                    eventHandlerContainer.getHelpingToolbox().getOnSendStudentColorRequirementClick().handle(event);
                     maxColorsRequired = 0;
+                    eventHandlerContainer.getHelpingToolbox().getOnSendStudentColorRequirementClick().handle(event);
                 });
             }
 

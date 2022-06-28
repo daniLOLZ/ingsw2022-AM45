@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.GUI.handlingToolbox;
 import it.polimi.ingsw.model.StudentEnum;
 import it.polimi.ingsw.network.CommandEnum;
 import it.polimi.ingsw.network.client.ClientSender;
+import it.polimi.ingsw.view.GUI.CharacterCardSelection;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -17,8 +18,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
     public static final BoardHandlingToolbox NONINTERACTIVE = new BoardHandlingToolbox(9,5);
 
-    private AtomicReference<List<StudentEnum>> colorsSelected;
-    private AtomicReference<List<Integer>> entranceStudentsSelected;
+    private CharacterCardSelection selections;
 
     public BoardHandlingToolbox(int entranceStudents, int numTables){
 
@@ -33,11 +33,6 @@ public class BoardHandlingToolbox implements HandlingToolbox{
         for (int table = 0; table < numTables; table++) {
             onTableClick.add(DISABLED);
         }
-
-        colorsSelected = new AtomicReference<>();
-        colorsSelected.set(new ArrayList<>());
-        entranceStudentsSelected = new AtomicReference<>();
-        entranceStudentsSelected.set(new ArrayList<>());
     }
 
     @Override
@@ -77,7 +72,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
                 for (EventHandler<MouseEvent> ignored : onTableClick) {
                     int finalIndex = tableIndex;
-                    onTableClick.set(finalIndex, event -> new Thread(() -> colorsSelected.get().add(StudentEnum.getColorById(finalIndex + 1))).start());
+                    onTableClick.set(finalIndex, event -> new Thread(() -> selections.addColor(StudentEnum.getColorById(finalIndex + 1))).start());
                     tableIndex++;
                 }
             }
@@ -88,7 +83,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
                 for (EventHandler<MouseEvent> ignored : onEntranceStudentClick) {
                     int finalIndex = studentIndex;
-                    onEntranceStudentClick.set(finalIndex, event -> new Thread(() -> entranceStudentsSelected.get().add(finalIndex + 1)).start());
+                    onEntranceStudentClick.set(finalIndex, event -> new Thread(() -> selections.addEntranceStudent(finalIndex + 1)).start());
                     studentIndex++;
                 }
             }
@@ -111,8 +106,6 @@ public class BoardHandlingToolbox implements HandlingToolbox{
                 }
 
             }
-
-            case SELECT_CHARACTER -> resetSelections();
 
             default -> {}
         }
@@ -142,6 +135,9 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             }
     }
 
+    public void setSelectionsContainer(CharacterCardSelection selections){
+        this.selections = selections;
+    }
 
     /**
      * Returns the allowed action for the given entrance student
@@ -154,20 +150,5 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
     public EventHandler<MouseEvent> getOnHallClick(int pos) {
         return onTableClick.get(pos);
-    }
-
-    public AtomicReference<List<StudentEnum>> getColorsSelected() {
-        return colorsSelected;
-    }
-
-    public AtomicReference<List<Integer>> getEntranceStudentsSelected() {
-        return entranceStudentsSelected;
-    }
-
-    public void resetSelections(){
-        entranceStudentsSelected = new AtomicReference<>();
-        entranceStudentsSelected.set(new ArrayList<>());
-        colorsSelected = new AtomicReference<>();
-        colorsSelected.set(new ArrayList<>());
     }
 }

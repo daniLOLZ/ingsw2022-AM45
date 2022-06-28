@@ -225,7 +225,7 @@ public class GUI implements UserInterface {
        }
     }
 
-    //@Override
+    @Override
     public void showUserDisconnected(String disconnectedUser) {
         //todo
     }
@@ -262,13 +262,15 @@ public class GUI implements UserInterface {
 
     @Override
     public void setGameMode(GameRuleEnum gameMode) {
+        CharacterCardSelection selections = new CharacterCardSelection();
         this.currentGameRule = gameMode;
         gameToolBoxContainer = new GameToolBoxContainer(
                 numAssistants,
                 GameRuleEnum.getNumPlayers(gameMode.id) == 3 ? entranceSlots3Players : entranceSlots2_4Players,
                 numTables,
                 GameRuleEnum.getNumPlayers(gameMode.id),
-                GameRuleEnum.isAdvanced(gameMode.id) ? numCharacterCards : 0);
+                GameRuleEnum.isAdvanced(gameMode.id) ? numCharacterCards : 0,
+                selections);
     }
 
     @Override

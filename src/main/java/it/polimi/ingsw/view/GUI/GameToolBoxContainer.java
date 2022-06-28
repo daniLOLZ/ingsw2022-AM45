@@ -8,7 +8,6 @@ import it.polimi.ingsw.view.GUI.handlingToolbox.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class GameToolBoxContainer {
 
@@ -18,18 +17,24 @@ public class GameToolBoxContainer {
     private IslandHandlingToolbox islandHandlingToolbox;
     private List<CharacterCardHandlingToolbox> characterCardHandlingToolboxes;
     private HelpingToolBox helpingToolbox;
+    private CharacterCardSelection selections;
 
-    public GameToolBoxContainer(int numAssistants, int entranceStudents, int numTables, int numClouds, int numCharacterCards){
+    public GameToolBoxContainer(int numAssistants, int entranceStudents, int numTables, int numClouds, int numCharacterCards, CharacterCardSelection selections){
         assistantHandlingToolbox = new AssistantHandlingToolbox(numAssistants);
         boardHandlingToolbox = new BoardHandlingToolbox(entranceStudents, numTables);
         cloudHandlingToolbox = new CloudHandlingToolbox(numClouds);
         islandHandlingToolbox = new IslandHandlingToolbox();
         helpingToolbox = new HelpingToolBox();
+        this.selections = selections;
+
+        boardHandlingToolbox.setSelectionsContainer(selections);
+        helpingToolbox.setSelectionsContainer(selections);
 
         characterCardHandlingToolboxes = new ArrayList<>();
 
         for (int character = 0; character < numCharacterCards; character++) {
             characterCardHandlingToolboxes.add(new CharacterCardHandlingToolbox());
+            characterCardHandlingToolboxes.get(character).setSelectionsContainer(selections);
         }
     }
 
@@ -64,23 +69,7 @@ public class GameToolBoxContainer {
 
     public void allowCommand(CommandEnum command, ClientSender resourceProvider){
 
-        if (command == CommandEnum.PLAY_CHARACTER){
-            helpingToolbox.setSelectedEntranceStudents(boardHandlingToolbox.getEntranceStudentsSelected());
-            helpingToolbox.setSelectedColors(boardHandlingToolbox.getColorsSelected());
-
-            AtomicReference<List<Integer>> selectedStudentsOnCard = new AtomicReference<>();
-            selectedStudentsOnCard.set(new ArrayList<>());
-
-            for (CharacterCardHandlingToolbox character:
-                 characterCardHandlingToolboxes) {
-                if (character.isSelected()) {
-                    selectedStudentsOnCard.get().addAll(character.getSelectedStudentsOnCard().get());
-                    break;
-                }
-            }
-
-            helpingToolbox.setSelectedStudentsOnCard(selectedStudentsOnCard);
-        }
+        if (command == CommandEnum.SELECT_CHARACTER) resetSelections();
 
         for (HandlingToolbox toolbox: getAll()) toolbox.allowCommand(command, resourceProvider);
     }
@@ -117,11 +106,7 @@ public class GameToolBoxContainer {
     }
 
     public void resetSelections(){
-        for (CharacterCardHandlingToolbox character:
-             characterCardHandlingToolboxes) {
-            character.resetSelections();
-        }
-        boardHandlingToolbox.resetSelections();
+        selections.resetSelections();
     }
 }
 
