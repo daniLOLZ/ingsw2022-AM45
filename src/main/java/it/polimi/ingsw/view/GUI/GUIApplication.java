@@ -958,6 +958,14 @@ public class GUIApplication extends Application{
         AlertBox.display("Error", "A network error occurred");
     }
 
+    public static void showUserDisconnected(String disconnectedUser){
+        AlertBox.display("Error", "Game was interrupted because " + disconnectedUser + " left");
+    }
+
+    public static void showWinner(TeamEnum winner){
+        AlertBox.display("Temporary", "Team " + winner.name() + " won!");
+    }
+
     private static List<Coord> getBoardSlots(int amount){
         List<Coord> slots = new ArrayList<>();
 

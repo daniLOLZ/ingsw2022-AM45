@@ -227,7 +227,12 @@ public class GUI implements UserInterface {
 
     @Override
     public void showUserDisconnected(String disconnectedUser) {
-        //todo
+        if (GUIApplication.isStarted()) {
+            Platform.runLater(() -> GUIApplication.showUserDisconnected(disconnectedUser));
+            resetErrors();
+            showGameruleSelection();
+        }
+
     }
 
     @Override
@@ -429,7 +434,11 @@ public class GUI implements UserInterface {
 
     @Override
     public void setGameWon(TeamEnum winner) {
-
+        if (GUIApplication.isStarted()) {
+            Platform.runLater(() -> GUIApplication.showWinner(winner));
+            resetErrors();
+            showGameruleSelection();
+        }
     }
 
     private void resetErrors(){
