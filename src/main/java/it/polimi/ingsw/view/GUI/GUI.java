@@ -405,13 +405,16 @@ public class GUI implements UserInterface {
 
             List<PlayerBean> allPlayers = virtualView.getPlayerBeans();
             Assistant assistantPlayed;
-            if (allPlayers != null)  assistantPlayed = virtualView.getPlayerBeans().get(yourSlot).getAssistantPlayed();
+            if (allPlayers != null) assistantPlayed = virtualView.getPlayerBeans().get(yourSlot).getAssistantPlayed();
             else {
                 assistantPlayed = virtualView.getAdvancedPlayerBeans().get(yourSlot).getAssistantPlayed();
-                if (assistantPlayed != null) {
-                    MNSteps = assistantPlayed.motherNatureSteps;
-                }
             }
+
+            if (assistantPlayed != null) {
+                MNSteps = assistantPlayed.motherNatureSteps;
+            }
+
+
             gameToolBoxContainer.setMaxMNSteps(MNSteps);
         }
     }
