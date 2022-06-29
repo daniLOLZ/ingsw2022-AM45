@@ -36,7 +36,7 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
         for (AdvancedIslandGroupBean island : islands){
 
-            newOnIslandClick.add(NO_EFFECT);
+            newOnIslandClick.add(DISABLED);
 
             newIndexToId.put(islands.indexOf(island), island.getIdIslandGroup());
 
@@ -90,7 +90,10 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
             for (EventHandler<MouseEvent> ignored: onIslandClick) {
                 int finalIndex = islandIndex;
-                onIslandClick.set(islandIndex, event -> new Thread(() -> resourceProvider.sendSelectIslandGroup(indexToId.get(finalIndex))).start());
+                onIslandClick.set(islandIndex, event -> {
+                    onIslandClick.set(finalIndex, NO_EFFECT);
+                    new Thread(() -> resourceProvider.sendSelectIslandGroup(indexToId.get(finalIndex))).start();
+                });
                 islandIndex++;
             }
         }

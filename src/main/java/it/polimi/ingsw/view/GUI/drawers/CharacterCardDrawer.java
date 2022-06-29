@@ -89,13 +89,17 @@ public class CharacterCardDrawer extends Drawer{
             for (StudentEnum student:
                     data.getStudents()) {
 
+                EventHandler<MouseEvent> onStudentClick = eventHandlers.getOnStudentOnCardClick(studentIndex);
+
                 ImageView studentView = StudentDrawer.drawStudent(
                         student,
                         pos
                                 .pureSumX(studentsSlots.get(studentIndex).x * scale)
                                 .pureSumY(studentsSlots.get(studentIndex).y * scale),
                         scale * childrenSize / StudentDrawer.getStudentSize(),
-                        eventHandlers.getOnStudentOnCardClick(studentIndex));
+                        onStudentClick);
+
+                if (onStudentClick == HandlingToolbox.NO_EFFECT) addLightning(studentView, Color.GRAY);
 
                 studentView.setOnMouseClicked(eventHandlers.getOnStudentOnCardClick(studentIndex));
 
@@ -107,7 +111,6 @@ public class CharacterCardDrawer extends Drawer{
 
 
         toDraw.addAll(studentViews);
-
 
         EventHandler<MouseEvent> showDescription = event -> {
 

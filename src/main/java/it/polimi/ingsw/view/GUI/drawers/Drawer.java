@@ -10,9 +10,13 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -308,5 +312,16 @@ public abstract class Drawer{
             text.setX(parentView.getX() + parentView.getFitWidth() / 2 + slot.x * scale - text.getWrappingWidth() / 2);
             text.setY(parentView.getY() + parentView.getFitHeight() / 2 + slot.y * scale - text.maxHeight(-1) / 2);
         };
+    }
+
+    public static void addLightning(ImageView imageView, Color color){
+        Lighting lighting = new Lighting();
+        lighting.setDiffuseConstant(1.0);
+        lighting.setSpecularConstant(0.0);
+        lighting.setSpecularExponent(0.0);
+        lighting.setSurfaceScale(0.0);
+        lighting.setLight(new Light.Distant(45, 45, color));
+
+        imageView.setEffect(lighting);
     }
 }

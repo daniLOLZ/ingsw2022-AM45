@@ -605,14 +605,7 @@ public class GUIApplication extends Application{
             ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
 
             if (!data.getChosenColors().contains(tower)){
-                Lighting lighting = new Lighting();
-                lighting.setDiffuseConstant(1.0);
-                lighting.setSpecularConstant(0.0);
-                lighting.setSpecularExponent(0.0);
-                lighting.setSurfaceScale(0.0);
-                lighting.setLight(new Light.Distant(45, 45, Color.RED));
-
-                towerView.setEffect(lighting);
+                Drawer.addLightning(towerView, Color.RED);
             }
 
             else {
@@ -670,14 +663,7 @@ public class GUIApplication extends Application{
 
             if (!data.getChosenWizards().contains(wizard)){
 
-                Lighting lighting = new Lighting();
-                lighting.setDiffuseConstant(1.0);
-                lighting.setSpecularConstant(0.0);
-                lighting.setSpecularExponent(0.0);
-                lighting.setSurfaceScale(0.0);
-                lighting.setLight(new Light.Distant(45, 45, Color.RED));
-
-                wizardView.setEffect(lighting);
+                Drawer.addLightning(wizardView, Color.RED);
             }
 
             else {

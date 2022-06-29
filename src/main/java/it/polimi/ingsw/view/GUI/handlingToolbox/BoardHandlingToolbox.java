@@ -72,7 +72,10 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
                 for (EventHandler<MouseEvent> ignored : onTableClick) {
                     int finalIndex = tableIndex;
-                    onTableClick.set(finalIndex, event -> new Thread(() -> selections.addColor(StudentEnum.getColorById(finalIndex + 1))).start());
+                    onTableClick.set(finalIndex, event -> {
+                        onTableClick.set(finalIndex, NO_EFFECT);
+                        new Thread(() -> selections.addColor(StudentEnum.getColorById(finalIndex + 1))).start();
+                    });
                     tableIndex++;
                 }
             }
@@ -83,7 +86,10 @@ public class BoardHandlingToolbox implements HandlingToolbox{
 
                 for (EventHandler<MouseEvent> ignored : onEntranceStudentClick) {
                     int finalIndex = studentIndex;
-                    onEntranceStudentClick.set(finalIndex, event -> new Thread(() -> selections.addEntranceStudent(finalIndex + 1)).start());
+                    onEntranceStudentClick.set(finalIndex, event -> {
+                        onEntranceStudentClick.set(finalIndex, NO_EFFECT);
+                        new Thread(() -> selections.addEntranceStudent(finalIndex + 1)).start();
+                    });
                     studentIndex++;
                 }
             }
@@ -131,7 +137,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             for (EventHandler<MouseEvent> handler:
                  onTableClick) {
 
-                if (handler != NO_EFFECT) onTableClick.set(onTableClick.indexOf(handler), DISABLED);
+                onTableClick.set(onTableClick.indexOf(handler), DISABLED);
             }
     }
 

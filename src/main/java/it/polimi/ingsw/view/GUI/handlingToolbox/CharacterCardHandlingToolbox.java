@@ -27,7 +27,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
     private CharacterCardSelection selections;
 
     public CharacterCardHandlingToolbox(){
-        onCharacterCardClick = HandlingToolbox.NO_EFFECT;
+        onCharacterCardClick = HandlingToolbox.DISABLED;
         onStudentOnCardClick = new ArrayList<>();
     }
 
@@ -37,7 +37,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
         if (onStudentOnCardClick.isEmpty()) {
             for (int student = 0; student < numStudents; student++) {
-                onStudentOnCardClick.add(NO_EFFECT);
+                onStudentOnCardClick.add(DISABLED);
             }
         }
 
@@ -73,7 +73,8 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
                  onStudentOnCardClick) {
                 int finalIndex = studentIndex;
                 onStudentOnCardClick.set(finalIndex, event -> {
-                    selections.addStudentOnCard(finalIndex + 1);
+                    onStudentOnCardClick.set(finalIndex, NO_EFFECT);
+                    selections.addStudentOnCard(finalIndex);
                     System.out.println("Added student on card");
                 });
                 studentIndex++;

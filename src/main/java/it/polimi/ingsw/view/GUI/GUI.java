@@ -267,7 +267,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void setGameMode(GameRuleEnum gameMode) {
-        CharacterCardSelection selections = new CharacterCardSelection();
+        CharacterCardSelection selections = new CharacterCardSelection(genericEvent -> showMainGameInterface());
         this.currentGameRule = gameMode;
         gameToolBoxContainer = new GameToolBoxContainer(
                 numAssistants,
@@ -358,7 +358,6 @@ public class GUI implements UserInterface {
     @Override
     public void showGameCommandError() {
         if (GUIApplication.areCharacterCardRequirementsInSelection()) {
-            setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
             gameToolBoxContainer.resetSelections();
         }
     }
@@ -366,7 +365,6 @@ public class GUI implements UserInterface {
     @Override
     public void showGameCommandError(String error) {
         if (GUIApplication.areCharacterCardRequirementsInSelection()) {
-            setCardRequirements(islandsRequired, studentsOnCardRequired, studentsAtEntranceRequired, colorsRequired);
             gameToolBoxContainer.resetSelections();
         }
     }

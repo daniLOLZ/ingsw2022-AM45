@@ -275,11 +275,13 @@ public class BoardDrawer extends Drawer{
             Coord finalStudentPos = studentPos.pureSumY(0);
             int finalStudentIndex = studentIndex;
 
+            EventHandler<MouseEvent> onStudentClick = eventHandlers.getOnEntranceStudentClick(finalStudentIndex);
+
             ImageView entranceStudentView = StudentDrawer.drawStudent(
                     entranceStudent,
                     finalStudentPos,
                     woodenSize / StudentDrawer.getStudentSize() * actualBoardScale.get(),
-                    eventHandlers.getOnEntranceStudentClick(finalStudentIndex));
+                    onStudentClick);
 
             toDraw.add(entranceStudentView);
             studentIndex++;
@@ -319,6 +321,7 @@ public class BoardDrawer extends Drawer{
 
                 Rectangle tableButton = new Rectangle();
                 tableButton.setFill(Color.TRANSPARENT);
+                tableButton.setStrokeWidth(tableButton.getStrokeWidth() * 3);
                 tableButton.setStroke(Color.TRANSPARENT);
 
                 Coord buttonSlot = firstButtonPos.pureSumY(tableWidth * color.index);
@@ -331,7 +334,11 @@ public class BoardDrawer extends Drawer{
 
                 int table = color.index;
 
-                tableButton.setOnMouseClicked(eventHandlers.getOnHallClick(table));
+                EventHandler<MouseEvent> onTableClick = eventHandlers.getOnHallClick(table);
+
+                tableButton.setOnMouseClicked(onTableClick);
+
+                if (onTableClick == HandlingToolbox.NO_EFFECT) tableButton.setStroke(Color.WHITE);
 
                 Coord finalButtonSlot = buttonSlot.pureSumX(tableLength / 2).pureSumY(tableWidth / 2);
 

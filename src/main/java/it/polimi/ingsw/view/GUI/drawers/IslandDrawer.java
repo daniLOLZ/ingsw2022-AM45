@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,8 @@ public class IslandDrawer extends Drawer{
         //draw island
         ImageView islandView = drawFromCenterInteractiveImage(islands.get((id - firstIslandId) % differentIslandTiles), pos, scale, onClick);
         toDraw.add(islandView);
+
+        if (onClick == HandlingToolbox.NO_EFFECT) addLightning(islandView, Color.GRAY);
 
         //draw students
         if (students.size() <= studentsOnIslandSlots.size()) {
