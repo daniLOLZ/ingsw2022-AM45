@@ -14,8 +14,6 @@ public class AdvancedParameterHandler {
     public static final int numStartingCoinsOnBoard = 20;
     public static final int numInitialCoinsPerPlayer = 1;
 
-    // todo remove/modify this fixed number, since the constructor of advancedGame has a parameter for this
-
     //DYNAMIC PARAMETERS
     private int numCoins;
     private boolean drawIsWin;

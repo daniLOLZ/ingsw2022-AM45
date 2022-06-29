@@ -234,11 +234,12 @@ public class GUIApplication extends Application{
 
         //sends the request to the network
         loginButton.setOnAction(event -> {
+            loginButton.setDisable(true);
             new Thread(() -> {
                 initialConnector.login(inputNickname.getText());
                 initialConnector.startReceiving();
+                initialConnector.reset(); // When the receiving stops we need to reset the connector
             }).start();
-            loginButton.setDisable(true);
         });
 
         HBox nicknameSelection = new HBox(10);
