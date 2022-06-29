@@ -221,6 +221,7 @@ public class GUI implements UserInterface {
     public void showNetworkError() {
        if (GUIApplication.isStarted()) {
            Platform.runLater(GUIApplication::showNetworkError);
+           // initialConnector.reset(); // maybe here?
            Platform.runLater(this::showLoginScreen);
        }
     }
