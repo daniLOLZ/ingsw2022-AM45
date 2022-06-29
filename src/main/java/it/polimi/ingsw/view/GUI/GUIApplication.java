@@ -592,7 +592,10 @@ public class GUIApplication extends Application{
         selectTower.setBackground(Background.EMPTY);
         selectTower.setFont(Font.font("Lucida Handwriting", 40));
         selectTower.setTextFill(Color.DARKRED);
-        selectTower.setOnAction(event -> new Thread(() -> defaultSender.sendTeamColorChoice(selectedTowerColor)).start());
+        selectTower.setOnAction(event -> new Thread(() -> {
+            defaultSender.sendTeamColorChoice(selectedTowerColor);
+            selectedTowerColor = TeamEnum.NOTEAM;
+        }).start());
         layout.getChildren().add(selectTower);
 
         Label errorMessage = new Label("Error! This color has already been selected");
@@ -605,17 +608,19 @@ public class GUIApplication extends Application{
 
             ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
 
-            if (!data.getChosenColors().contains(tower)){
-                Drawer.addLightning(towerView, Color.RED);
-            }
+            if (data != null) {
+                if (!data.getChosenColors().contains(tower)){
+                    Drawer.addLightning(towerView, Color.RED);
+                }
 
-            else {
-                towerView.setOnMouseClicked(event -> {
-                    selectedTowerColor = tower;
-                    selectTower.setText("Select " + tower.name);
-                    selectTower.setVisible(true);
-                });
-                addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+                else {
+                    towerView.setOnMouseClicked(event -> {
+                        selectedTowerColor = tower;
+                        selectTower.setText("Select " + tower.name);
+                        selectTower.setVisible(true);
+                    });
+                    addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+                }
             }
             towers.getChildren().add(towerView);
         }
@@ -655,26 +660,31 @@ public class GUIApplication extends Application{
         selectWizard.setBackground(Background.EMPTY);
         selectWizard.setFont(Font.font("Lucida Handwriting", 40));
         selectWizard.setTextFill(Color.DARKRED);
-        selectWizard.setOnAction(event -> new Thread(() -> defaultSender.sendWizardChoice(selectedWizard)).start());
+        selectWizard.setOnAction(event -> new Thread(() -> {
+            defaultSender.sendWizardChoice(selectedWizard);
+            selectedWizard = WizardEnum.NO_WIZARD;
+        }).start());
         layout.getChildren().add(selectWizard);
 
         for (WizardEnum wizard:
                 WizardEnum.getWizards()) {
             ImageView wizardView = WizardDrawer.drawWizard(wizard, center, 0.5);
 
-            if (!data.getChosenWizards().contains(wizard)){
+            if (data != null) {
+                if (!data.getChosenWizards().contains(wizard)){
 
-                Drawer.addLightning(wizardView, Color.RED);
-            }
+                    Drawer.addLightning(wizardView, Color.RED);
+                }
 
-            else {
-                wizardView.setOnMouseClicked(event -> {
-                    selectedWizard = wizard;
-                    selectWizard.setText("Select " + wizard.name);
-                    selectWizard.setVisible(true);
-                });
-                addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+                else {
+                    wizardView.setOnMouseClicked(event -> {
+                        selectedWizard = wizard;
+                        selectWizard.setText("Select " + wizard.name);
+                        selectWizard.setVisible(true);
+                    });
+                    addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
 
+                }
             }
 
             wizards.getChildren().add(wizardView);

@@ -74,7 +74,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
                     int finalIndex = tableIndex;
                     onTableClick.set(finalIndex, event -> {
                         onTableClick.set(finalIndex, NO_EFFECT);
-                        new Thread(() -> selections.addColor(StudentEnum.getColorById(finalIndex + 1))).start();
+                        new Thread(() -> selections.addColor(StudentEnum.getColorById(finalIndex))).start();
                     });
                     tableIndex++;
                 }

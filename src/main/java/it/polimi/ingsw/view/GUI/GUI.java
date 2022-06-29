@@ -136,6 +136,7 @@ public class GUI implements UserInterface {
 
     @Override
     public void showGameruleSelection() {
+        selectedTowerColor = false;
         if (GUIApplication.isStarted()) Platform.runLater(() -> GUIApplication.showSearchGameScreen(searchGameError));
     }
 
@@ -296,11 +297,13 @@ public class GUI implements UserInterface {
 
     @Override
     public void setLobbyStarting() {
+
         showTowerAndWizardSelection();
     }
 
     @Override
     public void setGameStarting() {
+        gameInitData = null;
         showMainGameInterface();
     }
 
