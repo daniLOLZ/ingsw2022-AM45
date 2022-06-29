@@ -404,9 +404,10 @@ public class GUI implements UserInterface {
             int MNSteps = 0;
 
             List<PlayerBean> allPlayers = virtualView.getPlayerBeans();
-            if (allPlayers != null)  MNSteps = allPlayers.get(yourSlot).getAssistantPlayed().motherNatureSteps;
+            Assistant assistantPlayed;
+            if (allPlayers != null)  assistantPlayed = virtualView.getPlayerBeans().get(yourSlot).getAssistantPlayed();
             else {
-                Assistant assistantPlayed = virtualView.getAdvancedPlayerBeans().get(yourSlot).getAssistantPlayed();
+                assistantPlayed = virtualView.getAdvancedPlayerBeans().get(yourSlot).getAssistantPlayed();
                 if (assistantPlayed != null) {
                     MNSteps = assistantPlayed.motherNatureSteps;
                 }
