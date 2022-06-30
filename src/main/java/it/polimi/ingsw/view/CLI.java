@@ -510,7 +510,10 @@ public class CLI implements UserInterface {
             selection = getInputNonBlocking(lobbyInterrupts);
 
             if (lobbyStarting.isTriggered()){
-                lobbyStarting.clearInterrupt();
+                lobbyInterrupts.remove(connected);
+                resetInterrupts(lobbyInterrupts);
+                lobbyInterrupts.add(connected);
+
                 showTowerAndWizardSelection();
                 break;
             }
@@ -605,8 +608,12 @@ public class CLI implements UserInterface {
 
             if(gameStarting.isTriggered()){
                 System.out.println("Everyone made their choice, the game is starting!");
+
+                gameInitInterrupts.remove(connected);
+                resetInterrupts(gameInitInterrupts);
+                gameInitInterrupts.add(connected);
+
                 showMainGameInterface();
-                gameStarting.clearInterrupt();
                 return;
             }
             else if(gameInitUpdateAvailable.isTriggered()){
@@ -718,10 +725,17 @@ public class CLI implements UserInterface {
             //The game was interrupted, show it to the client (might be removed as there are async handlers already)
             if(gameInterrupted.isTriggered()){
                 System.out.println("The game was interrupted :(\n");
-                gameInterrupted.clearInterrupt();
+
+                lobbyInterrupts.remove(connected);
+                gameInitInterrupts.remove(connected);
+                gameInterrupts.remove(connected);
                 resetInterrupts(lobbyInterrupts);
                 resetInterrupts(gameInitInterrupts);
                 resetInterrupts(gameInterrupts);
+                lobbyInterrupts.add(connected);
+                gameInitInterrupts.add(connected);
+                gameInterrupts.add(connected);
+
                 resetGameInfo();
                 showGameruleSelection();
                 return;

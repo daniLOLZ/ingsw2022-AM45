@@ -22,6 +22,11 @@
     java -jar Eriantys_AM45.jar --gui --host <hostname> --port <port number>
 
 <H1> Requirements </H1>
+
+<h3>Installing</h3>
+You will need to install the java jdk version 17.0.2 or higher to run the game
+
+
 <h3> CLI: </h3>
 To make sure that the screen is cleared properly when
 it needs to be, the terminal on which the application is launched
