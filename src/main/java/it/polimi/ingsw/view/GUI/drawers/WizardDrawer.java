@@ -24,6 +24,13 @@ public class WizardDrawer extends Drawer{
     private static final double wizardWidth = wizards.get(0).getWidth(),
                                 wizardHeight = wizards.get(0).getHeight();
 
+    /**
+     * Draws a wizard card at the given position with the given scaling factor.
+     * @param wizard The wizard to draw
+     * @param pos The position in which the wizard should be drawn
+     * @param scale The scaling factor to apply to the view
+     * @return The view containing the drawn wizard
+     */
     public static ImageView drawWizard(WizardEnum wizard, Coord pos, double scale){
 
 

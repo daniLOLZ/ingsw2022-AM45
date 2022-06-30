@@ -8,12 +8,9 @@ import it.polimi.ingsw.view.GUI.handlingToolbox.BoardHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.Border;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -118,6 +115,15 @@ public class BoardDrawer extends Drawer{
     private static final Coord firstCoinSlot = upLeftCorner.pureSumX(-boards.get(USER).getWidth() / 2 - playerBoxWidth / 2).pureSumY(-boards.get(USER).getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2);
 
 
+    /**
+     * Draws a Board with the given parameters.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @param orientation Determines where the player owning the board in drawing is placed around the imaginary table (also determines if the board is the user's one)
+     * @param eventHandlers The Object containing all the Handlers to respond to the user actions
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, int orientation, BoardHandlingToolbox eventHandlers){
 
         Image board = boards.get(orientation);
@@ -445,48 +451,143 @@ public class BoardDrawer extends Drawer{
         return toDraw;
     }
 
+    /**
+     * Draws a Board with the given parameters.
+     * This method implies that the board is the user's one.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @param eventHandlers The Object containing all the Handlers to respond to the user actions
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, BoardHandlingToolbox eventHandlers){
         return drawBoard(data, pos, scale, USER, eventHandlers);
     }
 
+    /**
+     * Draws a Board with the given parameters.
+     * This method implies that the board is the user's one and doesn't apply any scaling factor.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param eventHandlers The Object containing all the Handlers to respond to the user actions
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, BoardHandlingToolbox eventHandlers){
         return drawBoard(data, pos, REAL_SIZE, eventHandlers);
     }
 
-    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation, BoardHandlingToolbox eventHandlers){
-        AdvancedPlayerBean adaptedData = AdvancedPlayerBean.getPromotedBean(data);
-        return drawBoard(adaptedData, pos, scale, rotation, eventHandlers);
-    }
-
-    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, BoardHandlingToolbox eventHandlers){
-        return drawBoard(data, pos, scale, USER, eventHandlers);
-    }
-
-    public static List<Node> drawBoard(PlayerBean data, Coord pos, BoardHandlingToolbox eventHandlers){
-        return drawBoard(data, pos, REAL_SIZE, eventHandlers);
-    }
-
+    /**
+     * Draws a Board with the given parameters.
+     * This method implies that the board is the user's one.
+     * This method only draw noninteractive nodes.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale){
         return drawBoard(data, pos, scale, USER, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
+    /**
+     * Draws a Board with the given parameters.
+     * This method implies that the board is the user's one and doesn't apply any scaling factor.
+     * This method only draw noninteractive nodes.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos){
         return drawBoard(data, pos, REAL_SIZE, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
-    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int rotation){
+    /**
+     * Draws a Board with the given parameters.
+     * Version for not advanced games.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @param orientation Determines where the player owning the board in drawing is placed around the imaginary table (also determines if the board is the user's one)
+     * @param eventHandlers The Object containing all the Handlers to respond to the user actions
+     * @return A list containing all the nodes that have been drawn
+     */
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int orientation, BoardHandlingToolbox eventHandlers){
         AdvancedPlayerBean adaptedData = AdvancedPlayerBean.getPromotedBean(data);
-        return drawBoard(adaptedData, pos, scale, rotation, BoardHandlingToolbox.NONINTERACTIVE);
+        return drawBoard(adaptedData, pos, scale, orientation, eventHandlers);
     }
 
+    /**
+     * Draws a Board with the given parameters.
+     * Version for not advanced games.
+     * This method implies that the board is the user's one.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @param eventHandlers The Object containing all the Handlers to respond to the user actions
+     * @return A list containing all the nodes that have been drawn
+     */
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, BoardHandlingToolbox eventHandlers){
+        return drawBoard(data, pos, scale, USER, eventHandlers);
+    }
+
+    /**
+     * Draws a Board with the given parameters.
+     * Version for not advanced games.
+     * This method implies that the board is the user's one and doesn't apply any scaling factor.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param eventHandlers The Object containing all the Handlers to respond to the user actions
+     * @return A list containing all the nodes that have been drawn
+     */
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, BoardHandlingToolbox eventHandlers){
+        return drawBoard(data, pos, REAL_SIZE, eventHandlers);
+    }
+
+    /**
+     * Draws a Board with the given parameters.
+     * Version for not advanced games.
+     * This method only draw noninteractive nodes.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @param orientation Determines where the player owning the board in drawing is placed around the imaginary table (also determines if the board is the user's one)
+     * @return A list containing all the nodes that have been drawn
+     */
+    public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale, int orientation){
+        AdvancedPlayerBean adaptedData = AdvancedPlayerBean.getPromotedBean(data);
+        return drawBoard(adaptedData, pos, scale, orientation, BoardHandlingToolbox.NONINTERACTIVE);
+    }
+
+    /**
+     * Draws a Board with the given parameters.
+     * Version for not advanced games.
+     * This method implies that the board is the user's one.
+     * This method only draw noninteractive nodes.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(PlayerBean data, Coord pos, double scale){
         return drawBoard(data, pos, scale, USER, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
+    /**
+     * Draws a Board with the given parameters.
+     * Version for not advanced games.
+     * This method implies that the board is the user's one and doesn't apply any scaling factor.
+     * This method only draw noninteractive nodes.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @return A list containing all the nodes that have been drawn
+     */
     public static List<Node> drawBoard(PlayerBean data, Coord pos){
         return drawBoard(data, pos, REAL_SIZE, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
+    /**
+     * Gets the board image width.
+     * @return The board image width
+     */
     public static double getBoardWidth() {
         return boardWidth;
     }

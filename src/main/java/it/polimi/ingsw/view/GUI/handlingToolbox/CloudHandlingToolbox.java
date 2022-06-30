@@ -22,6 +22,11 @@ public class CloudHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for cloud handling.
+     * @param command          the command for which the toolbox will provide the handling resource if asked
+     * @param resourceProvider the provider on which the toolbox relies
+     */
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.CHOOSE_CLOUD) {
@@ -42,9 +47,13 @@ public class CloudHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for cloud handling.
+     * @param command the command to disable
+     */
     @Override
-    public void disableCommand(CommandEnum commandEnum) {
-        if (commandEnum == CommandEnum.CHOOSE_CLOUD){
+    public void disableCommand(CommandEnum command) {
+        if (command == CommandEnum.CHOOSE_CLOUD){
             int index = 0;
             for (EventHandler<MouseEvent> ignored:
                  onCloudClick) {
@@ -54,8 +63,11 @@ public class CloudHandlingToolbox implements HandlingToolbox{
         }
     }
 
-
-
+    /**
+     * Returns the allowed action for the given Cloud.
+     * @param pos The position of the cloud
+     * @return The EventHandler to assign to the Cloud
+     */
     public EventHandler<MouseEvent> getOnCloudClick(int pos) {
         return onCloudClick.get(pos);
     }

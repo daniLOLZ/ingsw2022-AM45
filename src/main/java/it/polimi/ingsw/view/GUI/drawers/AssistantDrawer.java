@@ -30,9 +30,16 @@ public class AssistantDrawer extends Drawer{
 
     private final static double assistantWidth = assistants.get(0).getWidth();
     private final static double assistantHeight = assistants.get(0).getHeight();
-    private final static double hoverZoom = 1.7;
     private final static int firstAssistantId = 1;
 
+    /**
+     * Draws the Assistant with the given parameters
+     * @param id The id of the assistant to draw
+     * @param pos The position in which the assistant must be drawn
+     * @param scale The scale to apply to the view
+     * @param onClick The action to perform when the assistant is clicked on
+     * @return The view containing the drawn assistant
+     */
     public static ImageView drawAssistant(int id, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         id = (id - firstAssistantId) % assistants.size();
@@ -40,14 +47,29 @@ public class AssistantDrawer extends Drawer{
         return drawFromCenterInteractiveImage(assistants.get(id), pos, scale, onClick);
     }
 
+    /**
+     * Draws the Assistant with the given parameters
+     * @param id The id of the assistant to draw
+     * @param pos The position in which the assistant must be drawn
+     * @param scale The scale to apply to the view
+     * @return The view containing the drawn assistant
+     */
     public static ImageView drawAssistant(int id, Coord pos, double scale){
         return drawAssistant(id, pos, scale, HandlingToolbox.NO_EFFECT);
     }
 
+    /**
+     * Return the actual width of the Assistant image
+     * @return The width of the Assistant
+     */
     public static double getAssistantWidth(){
         return assistantWidth;
     }
 
+    /**
+     * Return the actual height of the Assistant image
+     * @return The height of the Assistant
+     */
     public static double getAssistantHeight(){
         return assistantHeight;
     }

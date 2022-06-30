@@ -31,6 +31,11 @@ public class HelpingToolBox implements HandlingToolbox{
         onPlayCharacterClick                   = NO_ACTION;
     }
 
+    /**
+     * Implements the above method for helping functionalities handling.
+     * @param command          the command for which the toolbox will provide the handling resource if asked
+     * @param resourceProvider the provider on which the toolbox relies
+     */
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
 
@@ -56,6 +61,10 @@ public class HelpingToolBox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for helping functionalities handling.
+     * @param command the command to disable
+     */
     @Override
     public void disableCommand(CommandEnum command) {
 
@@ -70,26 +79,50 @@ public class HelpingToolBox implements HandlingToolbox{
         if (command == CommandEnum.PLAY_CHARACTER)           onPlayCharacterClick                   = NO_ACTION;
     }
 
+    /**
+     * Sets the container who will store the selections made by the user.
+     * @param selections The object able to store user selection
+     */
     public void setSelectionsContainer(CharacterCardSelection selections){
         this.selections = selections;
     }
 
+    /**
+     * Returns the allowed action for the "End turn" Button.
+     * @return The EventHandler to assign to the Button
+     */
     public EventHandler<ActionEvent> getOnEndTurnClick() {
         return onEndTurnClick;
     }
 
+    /**
+     * Returns the allowed action for the "Confirm Students (at Entrance)" Button.
+     * @return The EventHandler to assign to the Button
+     */
     public EventHandler<ActionEvent> getOnSendEntranceStudentRequirementsClick() {
         return onSendEntranceStudentRequirementsClick;
     }
 
+    /**
+     * Returns the allowed action for the "Confirm Colors" Button.
+     * @return The EventHandler to assign to the Button
+     */
     public EventHandler<ActionEvent> getOnSendStudentColorRequirementClick() {
         return onSendStudentColorRequirementClick;
     }
 
+    /**
+     * Returns the allowed action for the "Confirm Students (on Card)" Button.
+     * @return The EventHandler to assign to the Button
+     */
     public EventHandler<ActionEvent> getOnSendStudentsOnCardRequirementClick() {
         return onSendStudentsOnCardRequirementClick;
     }
 
+    /**
+     * Returns the allowed action for the "Play Character" Button.
+     * @return The EventHandler to assign to the Button
+     */
     public EventHandler<ActionEvent> getOnPlayCharacterClick() {
         return onPlayCharacterClick;
     }

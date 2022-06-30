@@ -15,7 +15,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-
+/**
+ * The AlertBox class offers the static method display to show messages as different simple windows on the screen
+ */
 public class AlertBox {
 
     private static final double alertBoxWidth = 210;

@@ -111,6 +111,11 @@ public abstract class GUIApplication extends Application{
         return started;
     }
 
+    /**
+     * Launches the application and displays the welcome screen.
+     * @param primaryStage The stage of the application
+     * @throws Exception for any error that may occur
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -246,94 +251,13 @@ public abstract class GUIApplication extends Application{
 
         login.getChildren().addAll(nicknameSelection, loginButton, errorMessage);
 
-        //<editor-fold desc="Debug">
-/*
-
-        Button success = new Button("Simulate success");
-        Button failure = new Button("Simulate failure");
-        Button debugScene = new Button("Show debug scene");
-
-        success.setOnAction(event -> showSearchGameScreen(false));
-        failure.setOnAction(event -> showLoginScreen(true));
-        //debugScene.setOnAction(event -> debug_showDebugScene());
-
-        login.getChildren().addAll(success, failure, debugScene);
-*/
-
-        //</editor-fold>
-
         stage.setScene(loginScene);
     }
 
-    //<editor-fold desc="Debugging methods">
-    private void debug_showDebugScene(){
-        Group root = new Group();
-
-        Group group = new Group();
-        root.getChildren().add(group);
-
-        ImageView testImage = drawFromCenterInteractiveImage(new Image("assets/board/no_borders.png"), center, 0.08, HandlingToolbox.NO_EFFECT);
-
-        group.getChildren().add(testImage);
-
-        ImageView tracker = drawFromCenterInteractiveImage(new Image("assets/tiles/blockTile.png"), new Coord(testImage.getX(), testImage.getY()), 0.05, HandlingToolbox.NO_EFFECT);
-        group.getChildren().add(tracker);
-
-        HBox options = new HBox(5);
-        root.getChildren().add(options);
-
-        Button rotateClockwise = new Button("Rotate clockwise");
-        //Button rotateCounterclockwise = new Button("Rotate counterclockwise");
-        Button zoom = new Button("Zoom");
-        Button shrink = new Button("Shrink");
-        Button moveLeft = new Button("Move left");
-        //Button moveRight = new Button("Move right");
-        Button moveUp = new Button("Move up");
-        //Button moveDown = new Button("Move down");
-        TextField input = new TextField();
-
-        options.getChildren().addAll(rotateClockwise, zoom, shrink, moveLeft, moveUp, input);
-
-        rotateClockwise.setOnAction(event -> {
-            testImage.getTransforms().add(new Rotate(-90, testImage.getX() + testImage.getFitWidth() / 2, testImage.getY() + testImage.getFitHeight() / 2));
-            debug_trackImage(testImage, tracker);
-        });
-
-        zoom.setOnAction(event -> {
-            testImage.setFitWidth(testImage.getFitWidth() * 1.3);
-            testImage.setFitHeight(testImage.getFitHeight() * 1.3);
-            debug_trackImage(testImage, tracker);
-        });
-
-        shrink.setOnAction(event -> {
-            testImage.setFitWidth(testImage.getFitWidth() / 1.3);
-            testImage.setFitHeight(testImage.getFitHeight() / 1.3);
-            debug_trackImage(testImage, tracker);
-        });
-
-        moveLeft.setOnAction(event -> {
-            testImage.setX(Integer.parseInt(input.getCharacters().toString()));
-            debug_trackImage(testImage, tracker);
-        });
-
-        moveUp.setOnAction(event -> {
-            testImage.setY(Integer.parseInt(input.getCharacters().toString()));
-            debug_trackImage(testImage, tracker);
-        });
-
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-        stage.setScene(scene);
-
-    }
-
-    private void debug_trackImage(ImageView imageView, ImageView tracker){
-        tracker.setX(imageView.getX() - tracker.getFitWidth() / 2);
-        tracker.setY(imageView.getY() - tracker.getFitHeight() / 2);
-    }
-
-    //</editor-fold>
-
-
+    /**
+     * Displays the game rule selection screen to allow user to look for a lobby to join
+     * @param searchGameError true if an error previously occurred
+     */
     public static void showSearchGameScreen(boolean searchGameError){
 
         //user is logged in. If he quits, the server is notified
@@ -411,43 +335,15 @@ public abstract class GUIApplication extends Application{
         root.getChildren().add(lookingForLobby);
         Scene searchGame = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-
-        //<editor-fold desc="Debug">
-
-        /*Label debugLabel = new Label("Debugging options");
-        Button success = new Button("Simulate game lobby");
-        Button failure = new Button("Simulate failure");
-
-        List<String> mockPlayers = new ArrayList<>();
-        mockPlayers.add("mock1");
-        mockPlayers.add("mock2");
-        mockPlayers.add("mock3");
-        mockPlayers.add("mock69");
-
-        List<Boolean> mockReady = new ArrayList<>();
-        mockReady.add(true);
-        mockReady.add(false);
-        mockReady.add(false);
-        mockReady.add(true);
-
-        LobbyBean lobbyBean = new LobbyBean(mockPlayers, mockReady, false, 3);
-
-        success.setOnAction(event -> showLobbyScreen(lobbyBean,false));
-        failure.setOnAction(event -> showSearchGameScreen(true));
-
-        HBox debug = new HBox(20);
-        debug.setAlignment(Pos.CENTER);
-        debug.getChildren().addAll(success, failure);
-
-        lookingForLobby.getChildren().addAll(debugLabel, debug);
-*/
-
-        //</editor-fold>
-
-
         stage.setScene(searchGame);
     }
 
+    /**
+     * Sends a request to the server asking to join a lobby.
+     * @param gameRule The specified game rules.
+     * @param numPlayers The desired number of players
+     * @param outNotify The Label which will display that a game is been looked for
+     */
     private static void sendSearchGameRequest(String gameRule, int numPlayers, Label outNotify){
 
         outNotify.setText("Searching...");
@@ -455,6 +351,13 @@ public abstract class GUIApplication extends Application{
 
     }
 
+    /**
+     * Displays the lobby screen, allowing the player to set himself as ready and or start the game (if host).
+     * @param data The Bean containing all relevant information about the lobby
+     * @param userSlot The index of the user in the Players' list
+     * @param startGameError true if a game previously failed to start
+     * @param leavingLobbyError true if a previous attempt to leave the lobby failed
+     */
     public static void showLobbyScreen(LobbyBean data, int userSlot, boolean startGameError, boolean leavingLobbyError){
 
         StackPane root = new StackPane();
@@ -535,18 +438,6 @@ public abstract class GUIApplication extends Application{
 
         leaveLobby.setOnAction(event -> defaultSender.leaveLobby());
 
-        //<editor-fold desc="Debug">
-
-        /*Button success = new Button("Simulate start game");
-        Button failure = new Button("Simulate failure");
-
-        success.setOnAction(event -> showWizardSelection(false));
-        //failure.setOnAction(event -> showLobbyScreen(true));
-
-        layout.getChildren().addAll(success,failure);
-        */
-        //</editor-fold>
-
         layout.getChildren().addAll(gameDetails, players, userActions, notification);
         root.getChildren().add(layout);
 
@@ -554,10 +445,19 @@ public abstract class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
+    /**
+     * Sends a message to the server, notifying the user's ready status.
+     * @param selected true if the user is ready to start
+     */
     private static void readyHandle(boolean selected){
         new Thread(() -> defaultSender.sendReadyStatus(selected)).start();
     }
 
+    /**
+     * Displays the Tower selection screen.
+     * @param data The Bean containing the available and non-available Towers
+     * @param colorSelectionError true if the previous attempt to select a Tower failed
+     */
     public static void showTowerColorSelection(GameInitBean data, boolean colorSelectionError){
         StackPane root = new StackPane();
 
@@ -629,7 +529,12 @@ public abstract class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
-    public static void showWizardSelection(GameInitBean data, boolean errorOccurred){
+    /**
+     *
+     * @param data The Bean containing all available and non-available Wizards.
+     * @param wizardSelectingError true if a previous attempt to select a Wizard failed
+     */
+    public static void showWizardSelection(GameInitBean data, boolean wizardSelectingError){
         StackPane root = new StackPane();
 
         //<editor-fold desc="Decorations">
@@ -694,6 +599,12 @@ public abstract class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
+    /**
+     * Displays the game interface
+     * @param data The Bean containing all the relevant information about the game
+     * @param eventHandlerContainer The object containing the non-constant actions to respond to the player input
+     * @param user The index of the user in the Player list
+     */
     public static void showGameInterface(VirtualViewBean data, GameToolBoxContainer eventHandlerContainer, int user){
         Group root = new Group();
 
@@ -949,18 +860,34 @@ public abstract class GUIApplication extends Application{
         stage.setScene(scene);
     }
 
+    /**
+     * Shows an AlertBox that notifies a network error occurred.
+     */
     public static void showNetworkError(){
         AlertBox.display("Error", "A network error occurred");
     }
 
+    /**
+     * Shows an AlertBox that notifies a user disconnected.
+     * @param disconnectedUser The nickname of the disconnected user
+     */
     public static void showUserDisconnected(String disconnectedUser){
         AlertBox.display("Error", "Game was interrupted because " + disconnectedUser + " left");
     }
 
+    /**
+     * Shows the winner.
+     * @param winner The winning team
+     */
     public static void showWinner(TeamEnum winner){
         AlertBox.display("Temporary", "Team " + winner.name() + " won!");
     }
 
+    /**
+     * Returns the slot available for the desired number of player.
+     * @param amount The amount of slots needed for all players
+     * @return The list containing all available slots
+     */
     private static List<Coord> getBoardSlots(int amount){
         List<Coord> slots = new ArrayList<>();
 
@@ -971,6 +898,11 @@ public abstract class GUIApplication extends Application{
         return slots;
     }
 
+    /**
+     * Returns the orientations of the boards for the desired number of player
+     * @param total The amount of slots needed for all players
+     * @return The list containing all available orientations
+     */
     private static List<Integer> getBoardRotation(int total){
 
         List<Integer> rotations = new ArrayList<>();
@@ -982,6 +914,14 @@ public abstract class GUIApplication extends Application{
         return rotations;
     }
 
+    /**
+     * Returns the slots in which the island groups shall be drawn.
+     * @param amount The amount of islands groups to draw
+     * @param semiWidth The semi-width which the island group slot will extend to
+     * @param semiHeight The semi-height which the island group slot will extend to
+     * @param centerPos The center of the ideal shape containing all island groups
+     * @return The list containing all available slot to draw the islands group
+     */
     private static List<Coord> getIslandGroupSlots(int amount, double semiWidth, double semiHeight, Coord centerPos){
         if (amount < 3) return new ArrayList<>();
 
@@ -1009,11 +949,24 @@ public abstract class GUIApplication extends Application{
         return slots;
     }
 
+    /**
+     * Gets the y position of an island group given its x position and the dimensions of the ideal shape containing all of them.
+     * @param x the x position of the island group
+     * @param semiWidth The semi-width of the ideal shape containing all island groups
+     * @param semiHeight The semi-height of the ideal shape containing all island groups
+     * @return The y position of the island group
+     */
     private static double getIslandGroupY(double x, double semiWidth, double semiHeight){
 
         return - semiHeight * Math.sqrt(1 - Math.pow(x, 2) / Math.pow(semiWidth, 2));
     }
 
+    /**
+     * Returns the slots for the desired number of clouds.
+     * @param amount The amount of clouds to draw
+     * @param center The center of the ideal shape containing all the clouds
+     * @return The list of all slots available to draw the clouds
+     */
     private static List<Coord> getCloudsSlots(int amount, Coord center){
 
         List<Coord> slots = new ArrayList<>();
@@ -1029,6 +982,13 @@ public abstract class GUIApplication extends Application{
         return slots;
     }
 
+    /**
+     * Sets the Character Card selection requirements
+     * @param islandsRequired The number of islands required.
+     * @param studentsOnCardRequired The number of students on card required.
+     * @param studentsAtEntranceRequired The number of students at entrance required.
+     * @param colorsRequired The number of colors required.
+     */
     public static void setMaxRequirement(int islandsRequired, int studentsOnCardRequired, int studentsAtEntranceRequired, int colorsRequired){
         maxIslandsRequired = islandsRequired;
         maxStudentsOnCardRequired = studentsOnCardRequired;
@@ -1042,14 +1002,26 @@ public abstract class GUIApplication extends Application{
         characterCardRequirementsInSelection = true;
     }
 
+    /**
+     * Sets the initial connector.
+     * @param initialConnector The connector that will be used to log in
+     */
     public static void setInitialConnector(InitialConnector initialConnector){
         GUIApplication.initialConnector = initialConnector;
     }
 
+    /**
+     * Sets the defaultSender property.
+     * @param defaultSender The default sender assigned to the GUI
+     */
     public static void setDefaultSender(ClientSender defaultSender) {
         GUIApplication.defaultSender = defaultSender;
     }
 
+    /**
+     * Checks if the user is selecting the requirements for a Character Card activation.
+     * @return true if requirements are in selection
+     */
     public static boolean areCharacterCardRequirementsInSelection() {
         return characterCardRequirementsInSelection;
     }

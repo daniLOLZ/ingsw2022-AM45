@@ -7,8 +7,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 
+/**
+ * The DecorationsDrawer class only draws secondary aesthetic objects.
+ */
 public class DecorationsDrawer extends Drawer{
 
+    /**
+     * Applies the default background to the provided region.
+     * @param region The region who should have the default background
+     */
     public static void showMenuBackground(Region region){
         Image background = new Image("assets/background.jpg");
         BackgroundImage backgroundImage = new BackgroundImage(background,
@@ -20,6 +27,10 @@ public class DecorationsDrawer extends Drawer{
         region.setBackground(new Background(backgroundImage));
     }
 
+    /**
+     * Draws the game logo in the given graphics context
+     * @param graphicsContext The graphics context which will be used to draw the logo
+     */
     public static void drawLogo(GraphicsContext graphicsContext){
         Image profsLogo = new Image("assets/decorations/login_screen/professors.png");
         Image textLogo = new Image("assets/decorations/login_screen/eriantys_text_logo.png");
@@ -33,6 +44,10 @@ public class DecorationsDrawer extends Drawer{
                 0.15);
     }
 
+    /**
+     * Shows some cute islands with a nice cloud behind them to decorate the given graphics context.
+     * @param graphicsContext The graphics context in which the decorative islands should be drawn
+     */
     public static void showDecorativeIslands(GraphicsContext graphicsContext){
 
         Image island1 = new Image("assets/tiles/island1.png");

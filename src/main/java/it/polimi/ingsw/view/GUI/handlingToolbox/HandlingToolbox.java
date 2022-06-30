@@ -6,20 +6,32 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * The HandlingToolbox class provides and stores EventHandlers to decorate any objects at run-time.
+ * It provides mainly allow and disable command methods. Every command can be enabled and disabled for any number of time.
+ * Nothing will happen if the HandlingToolbox doesn't offer any functionality for the input command.
+ */
 public interface HandlingToolbox {
+    /**
+     * An EventHandler assigned to NO_EFFECT has no assigned action
+     */
     EventHandler<MouseEvent> NO_EFFECT = event -> {
         };
 
+    /**
+     * An EventHandler assigned to DISABLED is temporary inactive
+     */
     EventHandler<MouseEvent> DISABLED = event -> {
         };
 
+    /**
+     * An EventHandler assigned to NO_ACTION has no assigned action
+     */
     EventHandler<ActionEvent> NO_ACTION = event -> {
 
         };
 
-    //note: commands can be allowed and disabled infinitely.
-    //      No effect will result if the toolbox doesn't
-    //      offer any functionality for the given command
+
     /**
      * Makes the relative handling resource available for the given command (limited to the toolbox functionalities).
      * Note that the correct use of the handling toolbox requires disabling all no-more-permitted commands before

@@ -53,6 +53,10 @@ public class IslandHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Provides the toolbox with the necessary information regarding the islands to keep providing the handling resources
+     * @param islands The list containing all the relevant information about each island
+     */
     public void updateIslandGroups(List<IslandGroupBean> islands){
 
         List<AdvancedIslandGroupBean> adaptedIslands = new ArrayList<>();
@@ -65,8 +69,17 @@ public class IslandHandlingToolbox implements HandlingToolbox{
         updateAdvancedIslandGroups(adaptedIslands);
     }
 
+    /**
+     * Updates the maximum number of mother nature steps.
+     * @param steps The maximum number of mother nature steps
+     */
     public void setMaxMNSteps(int steps){maxMNSteps = steps;}
 
+    /**
+     * Implements the above method for island handling.
+     * @param command          the command for which the toolbox will provide the handling resource if asked
+     * @param resourceProvider the provider on which the toolbox relies
+     */
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
 
@@ -108,6 +121,10 @@ public class IslandHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for island handling.
+     * @param command the command to disable
+     */
     @Override
     public void disableCommand(CommandEnum command) {
         allowedCommands.remove(command);
@@ -125,6 +142,11 @@ public class IslandHandlingToolbox implements HandlingToolbox{
 
     }
 
+    /**
+     * Returns the allowed action for the given island group.
+     * @param pos the position of the island group
+     * @return The EventHandler to assign to the island group
+     */
     public EventHandler<MouseEvent> getOnIslandClick(int pos){
         return onIslandClick.get(pos);
     }

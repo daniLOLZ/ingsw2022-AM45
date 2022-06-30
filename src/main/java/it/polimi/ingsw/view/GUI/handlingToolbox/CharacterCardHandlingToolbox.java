@@ -31,6 +31,11 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         onStudentOnCardClick = new ArrayList<>();
     }
 
+    /**
+     * Initializes the Character Card.
+     * @param cardIndex The id of the Character Card this Toolbox is assigned to
+     * @param numStudents The number of students on the Character Card
+     */
     public void setCardInfo(int cardIndex, int numStudents){
 
         this.cardIndex = cardIndex;
@@ -48,6 +53,11 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for Character Card handling.
+     * @param command          the command for which the toolbox will provide the handling resource if asked
+     * @param resourceProvider the provider on which the toolbox relies
+     */
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
 
@@ -82,6 +92,10 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for Character Card handling.
+     * @param command the command to disable
+     */
     @Override
     public void disableCommand(CommandEnum command) {
 
@@ -103,18 +117,35 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Sets the container who will store the selections made by the user.
+     * @param selections The object able to store user selection
+     */
     public void setSelectionsContainer(CharacterCardSelection selections) {
         this.selections = selections;
     }
 
+    /**
+     * Returns the allowed action to respond with when the user clicks on the card.
+     * @return The EventHandler to assign to the Character Card
+     */
     public EventHandler<MouseEvent> getOnCharacterCardClick() {
         return onCharacterCardClick;
     }
 
+    /**
+     * Returns the allowed action for the given student on the card.
+     * @param pos The position of the student on the card
+     * @return The EventHandler to assign to the student on the card
+     */
     public EventHandler<MouseEvent> getOnStudentOnCardClick(int pos) {
         return onStudentOnCardClick.get(pos);
     }
 
+    /**
+     * Returns the current value of the selected property.
+     * @return true if the Character Card is currently selected for activation
+     */
     public boolean isSelected(){
         return selected;
     }

@@ -21,7 +21,14 @@ public class IslandGroupDrawer extends Drawer{
     private static final double islandWidth = islandEdge * 2;
     private static final double islandHeight = Math.sqrt(3) * islandEdge;
 
-
+    /**
+     * Draws the island group with the given parameters.
+     * @param data The Bean containing all relevant information about the island group to draw
+     * @param pos The position in which the island group should be drawn
+     * @param scale The scaling factor to apply to the view
+     * @param onClick The action to perform when a player clicks on the island group
+     * @return The list of all the drawn nodes
+     */
     public static List<Node> drawIslandGroup(AdvancedIslandGroupBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         List<Node> toDraw = new ArrayList<>();
@@ -70,6 +77,15 @@ public class IslandGroupDrawer extends Drawer{
         return toDraw;
     }
 
+    /**
+     * Draws the island group with the given parameters.
+     * Version for not advanced games.
+     * @param data The Bean containing all relevant information about the island group to draw
+     * @param pos The position in which the island group should be drawn
+     * @param scale The scaling factor to apply to the view
+     * @param onClick The action to perform when a player clicks on the island group
+     * @return The list of all the drawn nodes
+     */
     public static List<Node> drawIslandGroup(IslandGroupBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         AdvancedIslandGroupBean adaptedData = AdvancedIslandGroupBean.getPromotedBean(data);
@@ -78,6 +94,13 @@ public class IslandGroupDrawer extends Drawer{
         return drawIslandGroup(adaptedData, pos, scale, onClick);
     }
 
+    /**
+     * Returns a list containing the coordinates in which the islands forming the group should be drawn.
+     * @param numIsland The amount of island to draw
+     * @param centerPos The center of the island group
+     * @param scale The scaling factor to apply to the view
+     * @return The list of all the coordinates available to draw the islands
+     */
     private static List<Coord> getIslandSlots(int numIsland, Coord centerPos, double scale) {
 
         List<Coord> positions = new ArrayList<>();
@@ -165,6 +188,12 @@ public class IslandGroupDrawer extends Drawer{
         return positions;
     }
 
+    /**
+     * Gets the number of block tiles to draw on the specific island (to avoid overcrowding).
+     * @param numBlockTile The total number of block tile to draw in the entire island group
+     * @param numIslands The index of the island
+     * @return The number of block that should be drawn on the specific island
+     */
     private static int getNumBlockTilePerIsland(int numBlockTile, int numIslands){
 
         if (numBlockTile <= numIslands) return 1;

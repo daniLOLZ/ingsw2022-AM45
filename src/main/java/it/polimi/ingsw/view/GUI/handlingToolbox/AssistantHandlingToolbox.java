@@ -19,6 +19,11 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
         for (int assistant = 0; assistant < numAssistants; assistant++) onAssistantClick.add(DISABLED);
     }
 
+    /**
+     * Implements the above method for assistant handling.
+     * @param command          the command for which the toolbox will provide the handling resource if asked
+     * @param resourceProvider the provider on which the toolbox relies
+     */
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         if (command == CommandEnum.CHOOSE_ASSISTANT){
@@ -32,6 +37,10 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for assistant handling.
+     * @param command the command to disable
+     */
     @Override
     public void disableCommand(CommandEnum command) {
 
@@ -41,7 +50,12 @@ public class AssistantHandlingToolbox implements HandlingToolbox{
         }
     }
 
-    public EventHandler<MouseEvent> getOnAssistantClick(int pos){
-        return onAssistantClick.get(pos);
+    /**
+     * Returns the allowed action for the given Assistant.
+     * @param id The id of the assistant card
+     * @return The EventHandler to assign to the Assistant
+     */
+    public EventHandler<MouseEvent> getOnAssistantClick(int id){
+        return onAssistantClick.get((id - 1) % onAssistantClick.size());
     }
 }

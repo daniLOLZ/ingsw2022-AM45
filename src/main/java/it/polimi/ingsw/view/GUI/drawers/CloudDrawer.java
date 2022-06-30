@@ -32,6 +32,14 @@ public class CloudDrawer extends Drawer{
     private static final double cloudSize = clouds.get(0).getWidth();
     private static final double hoverZoom = 2.4;
 
+    /**
+     * Draws a cloud with the given parameters.
+     * @param data The Bean containing all relevant information about the cloud to draw
+     * @param pos The position in which the cloud should be drawn
+     * @param scale The scaling factor to apply to the view
+     * @param onClick The action to perform when the user clicks on the cloud
+     * @return The list of all drawn nodes
+     */
     public static List<Node> drawCloud(CloudBean data, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         List<Node> toDraw = new ArrayList<>();
@@ -89,6 +97,11 @@ public class CloudDrawer extends Drawer{
         return toDraw;
     }
 
+    /**
+     * Returns a list containing all the coordinates in which the students on the cloud should be placed (relative to the center of the cloud and not scaled).
+     * @param amount The amount of slots to generate
+     * @return The list of all the slots available for the students
+     */
     private static List<Coord> getStudentsSlot(int amount){
         List<Coord> slots = new ArrayList<>();
 
@@ -108,6 +121,10 @@ public class CloudDrawer extends Drawer{
         return slots;
     }
 
+    /**
+     * Gets the size of the cloud image.
+     * @return The size of the cloud image
+     */
     public static double getCloudSize(){
         return cloudSize;
     }

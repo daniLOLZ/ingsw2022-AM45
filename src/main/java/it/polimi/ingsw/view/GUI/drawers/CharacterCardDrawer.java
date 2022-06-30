@@ -19,7 +19,6 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.view.GUI.GUIApplication.right;
 import static it.polimi.ingsw.view.GUI.GUIApplication.upLeftCorner;
 
 public class CharacterCardDrawer extends Drawer{
@@ -59,6 +58,14 @@ public class CharacterCardDrawer extends Drawer{
         studentsSlots.add(upLeftCorner.pureSumY(characterCardHeight / 2));
     }
 
+    /**
+     * Draws a character card with the give parameters.
+     * @param data The Bean containing all relevant information about the character card to draw
+     * @param pos The position in which the character card should be drawn
+     * @param scale The scaling factor to apply to the view
+     * @param eventHandlers The Object that contains all the Handlers to respond to the user's actions
+     * @return The list of all nodes drawn
+     */
     public static List<Node> drawCharacterCard(CharacterCardBean data, Coord pos, double scale, CharacterCardHandlingToolbox eventHandlers){
 
         List<Node> toDraw = new ArrayList<>();
@@ -99,7 +106,7 @@ public class CharacterCardDrawer extends Drawer{
                         scale * childrenSize / StudentDrawer.getStudentSize(),
                         onStudentClick);
 
-                if (onStudentClick == HandlingToolbox.NO_EFFECT) addLightning(studentView, Color.GRAY);
+                if (onStudentClick == HandlingToolbox.NO_EFFECT) addLighting(studentView, Color.GRAY);
 
                 studentView.setOnMouseClicked(eventHandlers.getOnStudentOnCardClick(studentIndex));
 
@@ -155,10 +162,18 @@ public class CharacterCardDrawer extends Drawer{
         return toDraw;
     }
 
+    /**
+     * Gets the character card image height.
+     * @return The character card image height
+     */
     public static double getCharacterCardHeight() {
         return characterCardHeight;
     }
 
+    /**
+     * Gets the character card image width.
+     * @return The character card image width
+     */
     public static double getCharacterCardWidth() {
         return characterCardWidth;
     }

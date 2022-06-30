@@ -9,7 +9,6 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class BoardHandlingToolbox implements HandlingToolbox{
 
@@ -35,6 +34,11 @@ public class BoardHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for board handling.
+     * @param command          the command for which the toolbox will provide the handling resource if asked
+     * @param resourceProvider the provider on which the toolbox relies
+     */
     @Override
     public void allowCommand(CommandEnum command, ClientSender resourceProvider) {
         switch (command) {
@@ -117,6 +121,10 @@ public class BoardHandlingToolbox implements HandlingToolbox{
         }
     }
 
+    /**
+     * Implements the above method for board handling.
+     * @param command the command to disable
+     */
     @Override
     public void disableCommand(CommandEnum command) {
         if (command == CommandEnum.SELECT_STUDENT ||
@@ -141,20 +149,29 @@ public class BoardHandlingToolbox implements HandlingToolbox{
             }
     }
 
+    /**
+     * Sets the container who will store the selections made by the user.
+     * @param selections The object able to store user selection
+     */
     public void setSelectionsContainer(CharacterCardSelection selections){
         this.selections = selections;
     }
 
     /**
-     * Returns the allowed action for the given entrance student
-     * @param pos the position of the student at the entrance
+     * Returns the allowed action for the given entrance student.
+     * @param pos The position of the student at the entrance
      * @return The EventHandler to assign to the Entrance student
      */
     public EventHandler<MouseEvent> getOnEntranceStudentClick(int pos){
         return onEntranceStudentClick.get(pos);
     }
 
-    public EventHandler<MouseEvent> getOnHallClick(int pos) {
-        return onTableClick.get(pos);
+    /**
+     * Returns the allowed operation for the given table.
+     * @param table The table required
+     * @return The EventHandler to assign to the table
+     */
+    public EventHandler<MouseEvent> getOnHallClick(int table) {
+        return onTableClick.get(table);
     }
 }

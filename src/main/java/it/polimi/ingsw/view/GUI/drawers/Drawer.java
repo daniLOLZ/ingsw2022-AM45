@@ -50,13 +50,19 @@ public abstract class Drawer{
 
         Platform.runLater(() -> graphicsContext.drawImage(image, alignment.x - anchor.x, alignment.y - anchor.y, imageWidth, imageHeight));
     }
-
+    /**
+     * Draws an image (in its real size).
+     * If alignment coordinates are inside the scene, the drawn image is always totally inside the scene (unless it's too big)
+     * @param graphicsContext The graphics context required to draw the image
+     * @param image The image to draw
+     * @param alignment The point the image should be placed
+     */
     public static void drawImage (GraphicsContext graphicsContext, Image image, Coord alignment){
         Drawer.drawImage(graphicsContext, image, alignment, REAL_SIZE);
     }
 
     /**
-     * Draws an image scaled by the given scaling factor, positioning its center at the give coordinates.
+     * Draws an image scaled by the given scaling factor, positioning its center at the given coordinates.
      * @param graphicsContext The graphics context required to draw the image
      * @param image The image to draw
      * @param pos The point the image's center should be placed
@@ -74,6 +80,15 @@ public abstract class Drawer{
         Drawer.drawFromCenterImage(graphicsContext, image, pos, REAL_SIZE);
     }
 
+    /**
+     * Creates a view of an image scaled by the given scaling factor, positioning its center at the given coordinates.
+     * Also allows to assign an action when the image is clicked on.
+     * @param image The image to draw
+     * @param pos The point the image's center should be placed
+     * @param scale The scaling factor applied to the image
+     * @param onClick The Handler containing the action to perform on click
+     * @return The view containing the desired image
+     */
     public static ImageView drawFromCenterInteractiveImage (Image image, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         ImageView imageView = new ImageView(image);
@@ -86,6 +101,17 @@ public abstract class Drawer{
         return imageView;
     }
 
+    /**
+     * Makes the provided view enlarge when hovered on. Also allows additional actions when the mouse enters and exits the view.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param entered The additional action to perform on mouse entered
+     * @param exited The additional action to perfrom on mouse exited
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param bringToFront true if the view must be brought in front of the other objects currently drawn on screen
+     * @param rotation The rotation that was applied to the view
+     */
     public static void addHoveringEffects(ImageView imageView, Coord pos, double scale,EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, boolean bringToFront, int rotation){
 
         List<Node> allNodes = new ArrayList<>();
@@ -114,11 +140,21 @@ public abstract class Drawer{
                     }
                 }
 
-                getOnMouseExitedHandler(imageView, pos, scale, exited, rotation).handle(event);
+                getOnMouseExitedHandler(imageView, pos, scale, exited).handle(event);
             });
         }
     }
 
+    /**
+     * Constructs the final Handler to assign when the user hover an image.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param entered The additional action to perform on mouse entered
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param bringToFront true if the view must be brought in front of the other objects currently drawn on screen
+     * @return The Handler that will be assigned to the view
+     */
     private static EventHandler<MouseEvent> getOnMouseEnteredHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, double hoverZoom, boolean bringToFront) {
         return event -> {
 
@@ -129,7 +165,15 @@ public abstract class Drawer{
         };
     }
 
-    private static EventHandler<MouseEvent> getOnMouseExitedHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> exited, int rotation) {
+    /**
+     * Constructs the final Handler to assign when the user hover an image.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param exited The additional action to perform on mouse exited
+     * @return The Handler that will be assigned to the view
+     */
+    private static EventHandler<MouseEvent> getOnMouseExitedHandler(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> exited) {
         return event -> {
             exitZoom(imageView, pos, scale).handle(event);
             exited.handle(event);
@@ -137,6 +181,18 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Makes the provided view enlarge when hovered on. Also allows additional actions when the mouse enters and exits the view.
+     * Also applies the same zoom effect to the provided children.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param entered The additional action to perform on mouse entered
+     * @param exited The additional action to perfrom on mouse exited
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param children The child nodes of the object to draw
+     * @param rotation The rotation that was applied to the view
+     */
     public static void addHoveringEffects(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, List<Node> children, int rotation){
         addHoveringEffects(imageView, pos, scale, event -> {
             entered.handle(event);
@@ -158,18 +214,47 @@ public abstract class Drawer{
 
             }, hoverZoom, true));
 
-            child.setOnMouseExited(getOnMouseExitedHandler(imageView, pos, scale, exited, rotation));
+            child.setOnMouseExited(getOnMouseExitedHandler(imageView, pos, scale, exited));
         }
     }
 
+    /**
+     * Makes the provided view enlarge when hovered on. Also allows additional actions when the mouse enters and exits the view.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param entered The additional action to perform on mouse entered
+     * @param exited The additional action to perfrom on mouse exited
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param bringToFront true if the view must be brought in front of the other objects currently drawn on screen
+     */
     public static void addHoveringEffects(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, boolean bringToFront){
         addHoveringEffects(imageView, pos, scale, entered, exited, hoverZoom, bringToFront, Coord.NO_ROTATION);
     }
 
+    /**
+     * Makes the provided view enlarge when hovered on. Also allows additional actions when the mouse enters and exits the view.
+     * Also applies the same zoom effect to the provided children.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param entered The additional action to perform on mouse entered
+     * @param exited The additional action to perfrom on mouse exited
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param children The child nodes of the object to draw
+     */
     public static void addHoveringEffects(ImageView imageView, Coord pos, double scale, EventHandler<MouseEvent> entered, EventHandler<MouseEvent> exited, double hoverZoom, List<Node> children){
         addHoveringEffects(imageView, pos, scale, entered, exited, hoverZoom, children, Coord.NO_ROTATION);
     }
 
+    /**
+     * Creates a Handler that enlarges the given view.
+     * @param imageView The view that should be zoomed
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @return The handler that will be used to enlarge the view
+     */
     private static EventHandler<MouseEvent> enterZoom(ImageView imageView, Coord pos, double scale, double hoverZoom){
 
         return event -> {
@@ -186,12 +271,27 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Gets the "anchor" of an image in the current screen of the application.
+     * (The anchor is a point for which it's true that the ratio between the position on the image, relative to the image current size is the same as the ratio between the position on the screen, relative to the screen size).
+     * @param image The Image for which to calculate the anchor
+     * @param pos The position of the center of the image on the screen
+     * @param scale The scale to be applied to the image (which changes its size and hence its anchor)
+     * @return The anchor of the image on the screen
+     */
     private static Coord getAnchor(Image image, Coord pos, double scale) {
 
         return new Coord((pos.x - image.getWidth() * scale / 2) * image.getWidth() * scale / GUIApplication.WINDOW_WIDTH / (1 - image.getWidth() * scale / GUIApplication.WINDOW_WIDTH),
                 (pos.y - image.getHeight() * scale / 2) * image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT / (1 - image.getHeight() * scale / GUIApplication.WINDOW_HEIGHT));
     }
 
+    /**
+     * Creates a Handler that shrinks the given view.
+     * @param imageView The view that should be shrunk
+     * @param pos The relative position of the view
+     * @param scale The scale that has been previously applied to the view
+     * @return The handler that will be used to shrink the view
+     */
     private static EventHandler<MouseEvent> exitZoom(ImageView imageView, Coord pos, double scale){
 
         return event -> {
@@ -205,6 +305,17 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Creates a Handler to apply a hovering zoom effect coordinated with the parent effect.
+     * ImageView version.
+     * @param child The child view
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @param rotation The rotation previously applied to the parent view
+     * @return The Handler which will be assigned to the parent to allow him to zoom his children
+     */
     public static EventHandler<MouseEvent> getChildrenEnteredZoom(ImageView child, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
 
         Coord rotatedSlot = slot.pureRotate(new Coord(0,0), rotation);
@@ -218,10 +329,31 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Creates a Handler to apply a hovering zoom effect coordinated with the parent effect.
+     * ImageView version.
+     * @param child The child view
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @return The Handler which will be assigned to the parent to allow him to zoom his children
+     */
     public static EventHandler<MouseEvent> getChildrenEnteredZoom(ImageView child, Coord slot, double scale, double hoverZoom, ImageView parentView){
         return getChildrenEnteredZoom(child, slot, scale, hoverZoom, parentView, Coord.NO_ROTATION);
     }
 
+    /**
+     * Creates a Handler to apply a shrink effect on mouse exited coordinated with the parent effect.
+     * ImageView version.
+     * @param child The child view
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @param rotation The rotation previously applied to the parent view
+     * @return The Handler which will be assigned to the parent to allow him to shrink his children
+     */
     public static EventHandler<MouseEvent> getChildrenExitedZoom(ImageView child, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
 
         Coord rotatedSlot = slot.pureRotate(new Coord(0,0), rotation);
@@ -234,10 +366,31 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Creates a Handler to apply a shrink effect on mouse exited coordinated with the parent effect.
+     * ImageView version.
+     * @param child The child view
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @return The Handler which will be assigned to the parent to allow him to shrink his children
+     */
     public static EventHandler<MouseEvent> getChildrenExitedZoom(ImageView child, Coord slot, double scale, double hoverZoom, ImageView parentView){
         return getChildrenExitedZoom(child, slot, scale, hoverZoom, parentView, Coord.NO_ROTATION);
     }
 
+    /**
+     * Creates a Handler to apply a hovering zoom effect coordinated with the parent effect.
+     * Rectangle version.
+     * @param rectangle The child rectangle
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @param rotation The rotation previously applied to the parent view
+     * @return The Handler which will be assigned to the parent to allow him to zoom his children
+     */
     public static EventHandler<MouseEvent> getChildrenEnteredZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
 
         double childWidth, childHeight, parentWidth, parentHeight;
@@ -265,6 +418,17 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Creates a Handler to apply a hovering shrinl effect coordinated with the parent effect.
+     * Rectangle version.
+     * @param rectangle The child rectangle
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @param rotation The rotation previously applied to the parent view
+     * @return The Handler which will be assigned to the parent to allow him to shrink his children
+     */
     public static EventHandler<MouseEvent> getChildrenExitedZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
 
         double childWidth, childHeight, parentWidth, parentHeight;
@@ -292,6 +456,16 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Creates a Handler to apply a hovering zoom effect coordinated with the parent effect.
+     * Text version.
+     * @param text The child text
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @return The Handler which will be assigned to the parent to allow him to zoom his children
+     */
     public static EventHandler<MouseEvent> getChildrenEnteredZoom(Text text, Coord slot, double scale, double hoverZoom, ImageView parentView){
 
         return event -> {
@@ -303,6 +477,16 @@ public abstract class Drawer{
         };
     }
 
+    /**
+     * Creates a Handler to apply a hovering shrinl effect coordinated with the parent effect.
+     * Text version.
+     * @param text The child text
+     * @param slot The position of the child (relative to its parent's and not scaled nor rotated)
+     * @param scale The scale that was applied to the parent view
+     * @param hoverZoom The zoom ratio that will be used when enlarging the view
+     * @param parentView The parent view
+     * @return The Handler which will be assigned to the parent to allow him to shrink his children
+     */
     public static EventHandler<MouseEvent> getChildrenExitedZoom(Text text, Coord slot, double scale, double hoverZoom, ImageView parentView){
 
 
@@ -314,7 +498,12 @@ public abstract class Drawer{
         };
     }
 
-    public static void addLightning(ImageView imageView, Color color){
+    /**
+     * Adds lighting of the given color to the provided view
+     * @param imageView The view to apply the lighting to
+     * @param color The color of the lighting to apply
+     */
+    public static void addLighting(ImageView imageView, Color color){
         Lighting lighting = new Lighting();
         lighting.setDiffuseConstant(1.0);
         lighting.setSpecularConstant(0.0);

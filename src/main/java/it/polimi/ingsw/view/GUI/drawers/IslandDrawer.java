@@ -55,6 +55,18 @@ public class IslandDrawer extends Drawer{
     private static final int firstIslandId = 0;//todo check if this is correct
     private static final int differentIslandTiles = 3;
 
+    /**
+     * Draws an island with the given parameters.
+     * @param id The id of the island to draw (will determine its appearance)
+     * @param students The list of the students on the island
+     * @param towerColor The color of the team controlling the island (NOTEAM if none is controlling it)
+     * @param isPresentMotherNature true if mother nature shall be drawn on this island
+     * @param numBlockTile The number of block tiles that should be drawn on this island
+     * @param pos The position in which the island should be drawn
+     * @param scale The scaling factor to apply to the view
+     * @param onClick The action to perform when the player clicks on the island
+     * @return The list of all drawn nodes
+     */
     public static List<Node> drawIsland(int id, List<StudentEnum> students, TeamEnum towerColor, boolean isPresentMotherNature, int numBlockTile, Coord pos, double scale, EventHandler<MouseEvent> onClick){
 
         List<Node> toDraw = new ArrayList<>();
@@ -66,7 +78,7 @@ public class IslandDrawer extends Drawer{
         ImageView islandView = drawFromCenterInteractiveImage(islands.get((id - firstIslandId) % differentIslandTiles), pos, scale, onClick);
         toDraw.add(islandView);
 
-        if (onClick == HandlingToolbox.NO_EFFECT) addLightning(islandView, Color.GRAY);
+        if (onClick == HandlingToolbox.NO_EFFECT) addLighting(islandView, Color.GRAY);
 
         //draw students
         if (students.size() <= studentsOnIslandSlots.size()) {
@@ -151,10 +163,19 @@ public class IslandDrawer extends Drawer{
         return drawIsland(id, students, towerColor, isPresentMotherNature, 0, pos, scale, onClick);
     }
 
+    /**
+     * Gets the size of the island image.
+     * @return The size of the island image
+     */
     public static double getIslandSize() {
         return islandSize;
     }
 
+    /**
+     * Returns a list containing the coordinates where the desired number of block tiles should be drawn.
+     * @param amount The amount of block tiles to be drawn
+     * @return The list of all the coordinates available for drawing the block tiles
+     */
     private static List<Coord> getBlockTileSlots(int amount){
 
         Coord start = GUIApplication.upLeftCorner;
