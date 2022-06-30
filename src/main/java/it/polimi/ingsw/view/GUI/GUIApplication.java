@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -39,7 +38,7 @@ import java.util.List;
 import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 
 
-public class GUIApplication extends Application{
+public abstract class GUIApplication extends Application{
 
     public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
     public static final double cloudSize = 40, assistantWidth = 100, islandSize = 120, boardWidth = 505;
@@ -609,7 +608,7 @@ public class GUIApplication extends Application{
 
             if (data != null) {
                 if (!data.getChosenColors().contains(tower)){
-                    Drawer.addLightning(towerView, Color.RED);
+                    Drawer.addLighting(towerView, Color.RED);
                 }
 
                 else {
@@ -672,7 +671,7 @@ public class GUIApplication extends Application{
             if (data != null) {
                 if (!data.getChosenWizards().contains(wizard)){
 
-                    Drawer.addLightning(wizardView, Color.RED);
+                    Drawer.addLighting(wizardView, Color.RED);
                 }
 
                 else {
@@ -920,7 +919,7 @@ public class GUIApplication extends Application{
 
         for (Integer assistant: userBean.getIdAssistants()) {
             Coord slot = firstAssistantSlot.pureSumX(assistantIndex * assistantWidth * 0.28 * 10 / userBean.getIdAssistants().size());
-            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth(), eventHandlerContainer.getAssistantHandlingToolbox().getOnAssistantClick((assistant - 1) % 10));
+            ImageView assistantView = AssistantDrawer.drawAssistant(assistant, slot,assistantWidth / AssistantDrawer.getAssistantWidth(), eventHandlerContainer.getAssistantHandlingToolbox().getOnAssistantClick(assistant));
             addHoveringEffects(assistantView, slot, assistantWidth / AssistantDrawer.getAssistantWidth(), HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.7, false);
             root.getChildren().add(assistantView);
             assistantIndex++;
