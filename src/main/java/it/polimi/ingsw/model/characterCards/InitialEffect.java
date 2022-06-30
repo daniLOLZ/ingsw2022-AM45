@@ -64,6 +64,6 @@ public abstract class InitialEffect extends CharacterCard{
 
     @Override
     public GameElementBean toBean() {
-        return new CharacterCardBean(id,name,description,students,cardCost);
+        return new CharacterCardBean(id,name,description,students,cardCost,hasBeenUsed);
     }
 }

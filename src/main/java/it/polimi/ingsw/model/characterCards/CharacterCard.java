@@ -132,6 +132,6 @@ public abstract class CharacterCard extends DrawableObject {
 
     @Override
     public GameElementBean toBean() {
-        return new CharacterCardBean(id, name,description,null,cardCost);
+        return new CharacterCardBean(id, name,description,null,cardCost, hasBeenUsed);
     }
 }

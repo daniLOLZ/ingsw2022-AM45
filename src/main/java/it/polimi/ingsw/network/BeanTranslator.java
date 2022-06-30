@@ -105,7 +105,8 @@ public class BeanTranslator {
         if(fieldPresent(map.get("students"))) {
             students = toListOfEnum(StudentEnum.class, (ArrayList<String>) map.get("students"));
         }
-        CharacterCardBean beanToReturn = new CharacterCardBean(id,name, description, students, cost);
+        boolean hasBeenUsed = (boolean)map.get("hasBeenUsed");
+        CharacterCardBean beanToReturn = new CharacterCardBean(id,name, description, students, cost, hasBeenUsed);
         if(numBlocks != -1) beanToReturn.setNumBlocks(numBlocks);
         return beanToReturn;
     }

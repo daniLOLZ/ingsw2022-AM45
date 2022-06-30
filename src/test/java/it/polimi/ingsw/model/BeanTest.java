@@ -106,7 +106,7 @@ public class BeanTest {
     public void CharacterCardBeanTest(){
         List<StudentEnum> list2 = new ArrayList<>();
         list2.add(StudentEnum.BLUE);
-        CharacterCardBean bean = new CharacterCardBean(1,"Priest","NO",list2,3);
+        CharacterCardBean bean = new CharacterCardBean(1,"Priest","NO",list2,3, false);
 
         assertEquals(3,bean.getCost());
         assertEquals(1,bean.getId());
