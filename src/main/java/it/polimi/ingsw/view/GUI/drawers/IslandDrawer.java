@@ -81,7 +81,7 @@ public class IslandDrawer extends Drawer{
         if (onClick == HandlingToolbox.NO_EFFECT) addLighting(islandView, Color.GRAY);
 
         //draw students
-        if (students.size() > 0) {
+        if (students.size() <= studentsOnIslandSlots.size()) {
             int studentIndex = 0;
 
             for (StudentEnum student:
@@ -89,7 +89,7 @@ public class IslandDrawer extends Drawer{
 
                 ImageView studentView = StudentDrawer.drawStudent(
                         student,
-                        pos.pureSumX(studentsOnIslandSlots.get(studentIndex % studentsOnIslandSlots.size()).x * scale).pureSumY((studentsOnIslandSlots.get(studentIndex % studentsOnIslandSlots.size()).y - defaultWoodenSize * scale / StudentDrawer.getStudentSize() / 3 * (studentIndex / studentsOnIslandSlots.size())) * scale),
+                        pos.pureSumX(studentsOnIslandSlots.get(studentIndex % studentsOnIslandSlots.size()).x * scale).pureSumY((studentsOnIslandSlots.get(studentIndex % studentsOnIslandSlots.size()).y - defaultWoodenSize * scale / StudentDrawer.getStudentSize() / 3 * studentIndex) * scale),
                         defaultWoodenSize / StudentDrawer.getStudentSize() * scale,
                         onClick);
 
