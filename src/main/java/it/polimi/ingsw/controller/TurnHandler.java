@@ -42,6 +42,9 @@ public class TurnHandler {
         controller.simpleGame.initialiseSelection();
         controller.boardHandler.refillClouds();
         controller.assistantHandler.clearAssistantsPlayed();
+        if(!(controller.advancedGame == null)){
+            controller.characterCardHandler.resetCardEffects();
+        }
         checkLastTurn();
     }
 

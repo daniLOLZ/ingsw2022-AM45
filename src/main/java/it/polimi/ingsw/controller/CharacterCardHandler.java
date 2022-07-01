@@ -362,8 +362,16 @@ public class CharacterCardHandler {
         alreadyPlayed = false;
     }
 
+    /**
+     * Resets the effects of character cards played this turn
+     */
+    public void resetCardEffects() {
+        controller.advancedGame.getAdvancedParameters().resetCardEffects();
+    }
+
     //friendly
     CharacterCard getUsingCard() {
         return usingCard;
     }
+
 }
