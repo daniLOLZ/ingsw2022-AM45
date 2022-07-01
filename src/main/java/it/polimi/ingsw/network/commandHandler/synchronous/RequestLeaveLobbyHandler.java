@@ -23,6 +23,7 @@ public class RequestLeaveLobbyHandler extends CommandHandler{
         if(!checkHandleable(readCommand, commandAccepted)) throw new UnexecutableCommandException();
 
         parameters.getUserLobby().removePlayer(parameters.getIdUser());
+        parameters.setJustLeftLobby(parameters.getUserLobby());
         parameters.setUserLobby(null);
         parameters.setConnectionState(new LookingForLobby());
         notifySuccessfulOperation(messageBroker);

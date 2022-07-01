@@ -141,13 +141,14 @@ public class ClientHandler implements Runnable{
                 mainBroker.flushFirstSyncMessage();
 
                 //Here, we handle other asynchronous commands to all other players
-                //todo if more than one command is sent per request, it could happen that two async
-                // commands end up having the same async id
+
                 tryAsyncCommandsForAll();
 
                 clearAsyncConditions(); // here we clear the conditions for calling async methods
                 // on this client handler only, whereas the actual sending of commands happens for
                 // all of handlers
+
+                cleanParameters();
 
             }
             catch (IOException e){
@@ -171,20 +172,36 @@ public class ClientHandler implements Runnable{
     }
 
     /**
+     * Clean eventual parameters used to answer this
+     * last request
+     */
+    private void cleanParameters() {
+        parameters.setJustLeftLobby(null);
+    }
+
+    /**
      * Requests all handlers for all clients in this user's lobby (if there are any) to try and
      * send asynchronous commands relative to the current game state
      */
     private void tryAsyncCommandsForAll() {
-        if(parameters.getUserLobby() == null){
+        if(parameters.getUserLobby() == null && parameters.getJustLeftLobby() == null){
             sendAsynchronousCommands();
             return;
         }
-        // The user is in a lobby with others
+        // This client need to update a lobby with others
         ClientHandler handler;
 
-        for(Integer user : parameters.getUserLobby().getPlayers()){
-            handler = ActiveClients.getHandlerFromId(user);
-            handler.sendAsynchronousCommands();
+        if(parameters.getUserLobby() != null) { //The lobby takes priority
+            for (Integer user : parameters.getUserLobby().getPlayers()) {
+                handler = ActiveClients.getHandlerFromId(user);
+                handler.sendAsynchronousCommands();
+            }
+        }
+        else { // The lobby that was left is a fallback
+            for (Integer user : parameters.getJustLeftLobby().getPlayers()) {
+                handler = ActiveClients.getHandlerFromId(user);
+                handler.sendAsynchronousCommands();
+            }
         }
     }
 
@@ -296,7 +313,7 @@ public class ClientHandler implements Runnable{
      */
     public void sendAsynchronousCommands(){
 
-        OutputStream outStream = null;
+        OutputStream outStream;
         try {
             outStream = mainSocket.getOutputStream();
         } catch (IOException e) {

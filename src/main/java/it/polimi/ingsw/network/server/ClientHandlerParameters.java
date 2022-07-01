@@ -17,6 +17,7 @@ public class ClientHandlerParameters {
     private ConnectionState connectionState;
     private ConnectionState callbackConnectionState;
     private Lobby userLobby;
+    private Lobby justLeftLobby;
     private Controller userController;
 
     public ClientHandlerParameters(){
@@ -65,4 +66,11 @@ public class ClientHandlerParameters {
         this.userController = userController;
     }
 
+    public void setJustLeftLobby(Lobby userLobby) {
+        this.justLeftLobby = userLobby;
+    }
+
+    public Lobby getJustLeftLobby() {
+        return justLeftLobby;
+    }
 }
