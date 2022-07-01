@@ -59,16 +59,16 @@ public class CharacterCardDrawer extends Drawer{
         studentsSlots.add(upLeftCorner.pureSumX(3 * characterCardWidth / 10));
         studentsSlots.add(upLeftCorner.pureSumX(-characterCardWidth / 10).pureSumY(3 * characterCardHeight / 8));
         studentsSlots.add(upLeftCorner.pureSumX(-3 * characterCardWidth / 10).pureSumY(characterCardHeight / 6));
-        studentsSlots.add(upLeftCorner.pureSumX(2 * characterCardWidth / 5).pureSumY(0.2917 * characterCardHeight));
+        studentsSlots.add(upLeftCorner.pureSumX(2 * characterCardWidth / 5).pureSumY(0.2917 * characterCardHeight)); //oddly specific number but the 6 students on the same character card is a little overcrowded
     }
 
     private static final List<Coord> blockTileSlots = new ArrayList<>();
 
     static {
-        blockTileSlots.add(upLeftCorner.pureSumX(childrenSize / 2 - characterCardWidth / 2).pureSumY(characterCardHeight / 3));
-        blockTileSlots.add(upLeftCorner.pureSumX(characterCardWidth / 2 - childrenSize / 2).pureSumY(characterCardHeight / 3));
-        blockTileSlots.add(upLeftCorner.pureSumX(childrenSize / 2 - characterCardWidth / 2).pureSumY(characterCardHeight /2 - childrenSize));
-        blockTileSlots.add(upLeftCorner.pureSumX(characterCardWidth / 2 - childrenSize / 2).pureSumY(characterCardHeight / 2 - childrenSize));
+        blockTileSlots.add(upLeftCorner.pureSumX(childrenSize / 2 - 0.93 * characterCardWidth / 2));
+        blockTileSlots.add(upLeftCorner.pureSumX(0.88 * characterCardWidth / 2 - childrenSize / 2));
+        blockTileSlots.add(upLeftCorner.pureSumX(childrenSize / 2 - 0.86 * characterCardWidth / 2).pureSumY(characterCardHeight /2 - childrenSize));
+        blockTileSlots.add(upLeftCorner.pureSumX(0.94 * characterCardWidth / 2 - childrenSize / 2).pureSumY(characterCardHeight / 2 - childrenSize));
     }
 
     /**
@@ -132,17 +132,20 @@ public class CharacterCardDrawer extends Drawer{
 
         toDraw.addAll(studentViews);
 
+        List<ImageView> blockTileViews = new ArrayList<>();
+
         //draw block tiles
         for (int blockTile = 0; blockTile < Optional.ofNullable(data.getNumBlocks()).orElse(0); blockTile++) {
 
-            ImageView blockView = BlockTileDrawer.drawBlockTile(
+            blockTileViews.add(BlockTileDrawer.drawBlockTile(
                     pos
                             .pureSumX(blockTileSlots.get(blockTile).x * scale)
                             .pureSumY(blockTileSlots.get(blockTile).y * scale),
-                    scale);
+                    childrenSize * scale / BlockTileDrawer.getBlockTileSize()));
 
-            toDraw.add(blockView);
         }
+
+        toDraw.addAll(blockTileViews);
 
         //draw cost if increased
 
@@ -185,14 +188,24 @@ public class CharacterCardDrawer extends Drawer{
                 cardCost.get().setY(coinView.get().getY() + 4 * coinView.get().getFitHeight() / 5);
             }
 
-            int index = 0;
+            int studentIndex = 0;
 
             for (ImageView studentView:
                  studentViews) {
 
-                getChildrenEnteredZoom(studentView, studentsSlots.get(index), scale, hoverZoom, characterView).handle(event);
+                getChildrenEnteredZoom(studentView, studentsSlots.get(studentIndex), scale, hoverZoom, characterView).handle(event);
 
-                index++;
+                studentIndex++;
+            }
+
+            int blockTileIndex = 0;
+
+            for (ImageView blockTileView:
+                    blockTileViews) {
+
+                getChildrenEnteredZoom(blockTileView, blockTileSlots.get(blockTileIndex), scale, hoverZoom, characterView).handle(event);
+
+                blockTileIndex++;
             }
         };
 
@@ -208,13 +221,23 @@ public class CharacterCardDrawer extends Drawer{
                 cardCost.get().setY(coinView.get().getY() + 4 * coinView.get().getFitHeight() / 5);
             }
 
-            int index = 0;
+            int studentIndex = 0;
 
             for (ImageView studentView:
                     studentViews) {
-                getChildrenExitedZoom(studentView, studentsSlots.get(index), scale, hoverZoom, characterView).handle(event);
+                getChildrenExitedZoom(studentView, studentsSlots.get(studentIndex), scale, hoverZoom, characterView).handle(event);
 
-                index++;
+                studentIndex++;
+            }
+
+            int blockTileIndex = 0;
+
+            for (ImageView blockTileView:
+                    blockTileViews) {
+
+                getChildrenExitedZoom(blockTileView, blockTileSlots.get(blockTileIndex), scale, hoverZoom, characterView).handle(event);
+
+                blockTileIndex++;
             }
         };
 

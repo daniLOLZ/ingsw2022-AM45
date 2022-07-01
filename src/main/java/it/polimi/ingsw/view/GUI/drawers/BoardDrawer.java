@@ -110,6 +110,15 @@ public class BoardDrawer extends Drawer{
         playerBoxSlots.add(upLeftCorner.pureSumX(boardHeight / 2 - playerBoxWidth).pureSumY(-boardWidth / 2 - playerBoxHeight));
     }
 
+    private static final List<Coord> lastAssistantPlayedSlots = new ArrayList<>();
+
+    static {
+        lastAssistantPlayedSlots.add(upLeftCorner.pureSumX(boardWidth / 2).pureSumY(-boardHeight / 2));
+        lastAssistantPlayedSlots.add(upLeftCorner.pureSumX(-boardHeight / 2 - assistantWidth).pureSumY(-boardWidth / 2));
+        lastAssistantPlayedSlots.add(lastAssistantPlayedSlots.get(USER));
+        lastAssistantPlayedSlots.add(upLeftCorner.pureSumX(boardHeight / 2).pureSumY(-boardWidth / 2));
+    }
+
     private static final double coinStep = 45, coinSize = 260;
 
     private static final Coord firstCoinSlot = upLeftCorner.pureSumX(-boards.get(USER).getWidth() / 2 - playerBoxWidth / 2).pureSumY(-boards.get(USER).getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2);
@@ -172,9 +181,9 @@ public class BoardDrawer extends Drawer{
 
         Coord finalBoxSlot = boxSlot.pureSumX(playerBoxWidth / 2).pureSumY(playerBoxHeight / 2);
 
-        entered.add(getChildrenEnteredZoom(playerBox, finalBoxSlot, actualBoardScale.get(), hoverZoom, boardView, Coord.NO_ROTATION));
+        entered.add(getChildrenEnteredZoom(playerBox, finalBoxSlot, actualBoardScale.get(), hoverZoom, boardView));
 
-        exited.add(getChildrenExitedZoom(playerBox, finalBoxSlot, actualBoardScale.get(), hoverZoom, boardView, Coord.NO_ROTATION));
+        exited.add(getChildrenExitedZoom(playerBox, finalBoxSlot, actualBoardScale.get(), hoverZoom, boardView));
 
 
         Coord textSlot = boxSlot.pureSumY(playerBoxHeight / 2).pureSumY(- playerBoxHeight * 0.1).pureSumX(playerBoxWidth * 0.1);
@@ -190,11 +199,11 @@ public class BoardDrawer extends Drawer{
         playerInfo.maxHeight(playerBoxHeight * actualBoardScale.get());
         playerInfo.setText(data.getPlayerId().name + "\n" + data.getNickname());
 
-        Coord finalTextSlot = textSlot.pureSumX(playerBoxWidth / 2).pureSumY(playerBoxHeight / 2);
+        entered.add(event -> {
+            getChildrenEnteredZoom(playerInfo, new Coord(playerBox.getX() + playerBox.getWidth() / 10, playerBox.getY() + 3 * playerBox.getHeight() / 8) , actualBoardScale.get(), hoverZoom, boardView).handle(event);
+        });
 
-        entered.add(getChildrenEnteredZoom(playerInfo, finalTextSlot, actualBoardScale.get(), hoverZoom, boardView));
-
-        exited.add(getChildrenExitedZoom(playerInfo, finalTextSlot, actualBoardScale.get(), hoverZoom, boardView));
+        exited.add(getChildrenExitedZoom(playerInfo, textLocation, actualBoardScale.get(), hoverZoom, boardView));
 
         //draw last assistant played
         Rectangle assistantLabel = new Rectangle();
@@ -203,63 +212,54 @@ public class BoardDrawer extends Drawer{
         toDraw.add(assistantLabel);
         toDraw.add(assistantText);
 
-        Coord assistantLabelSlot = new Coord(board.getWidth() / 2, -board.getHeight() / 2);
+        Coord assistantLabelSlot = lastAssistantPlayedSlots.get(orientation);
         Coord assistantLabelLocation =
                 pos
-                        .pureSumX(assistantLabelSlot.x * actualBoardScale.get())
-                        .pureSumY(assistantLabelSlot.y * actualBoardScale.get());
-
-        Coord labelPos = assistantLabelLocation.pureRotate(pos, rotation);
+                        .pureSumX(assistantLabelSlot.x * scale)
+                        .pureSumY(assistantLabelSlot.y * scale);
 
         assistantLabel.setFill(Color.WHITE);
-        assistantLabel.setX(labelPos.x);
-        assistantLabel.setY(labelPos.y);
+        assistantLabel.setX(assistantLabelLocation.x);
+        assistantLabel.setY(assistantLabelLocation.y);
         assistantLabel.setWidth(assistantWidth * actualBoardScale.get());
         assistantLabel.setHeight(assistantLabelHeight * actualBoardScale.get());
-        assistantLabel.getTransforms().add(new Rotate(90 * rotation, labelPos.x + assistantLabel.getWidth() / 2, labelPos.y + assistantLabel.getHeight() / 2));
 
         Coord finalAssistantLabelSlot = assistantLabelSlot.pureSumX(assistantWidth / 2).pureSumY(assistantLabelHeight / 2);
 
-        entered.add(getChildrenEnteredZoom(assistantLabel, finalAssistantLabelSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+        entered.add(getChildrenEnteredZoom(assistantLabel, finalAssistantLabelSlot, actualBoardScale.get(), hoverZoom, boardView));
 
-        exited.add(getChildrenExitedZoom(assistantLabel, finalAssistantLabelSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+        exited.add(getChildrenExitedZoom(assistantLabel, finalAssistantLabelSlot, actualBoardScale.get(), hoverZoom, boardView));
 
 
         Coord assistantTextSlot = assistantLabelSlot.pureSumY(assistantLabelHeight / 2);
         Coord assistantTextLocation = pos.pureSumX(assistantTextSlot.x * actualBoardScale.get()).pureSumY(assistantTextSlot.y * actualBoardScale.get());
-        Coord assistantTextPos = assistantTextLocation.pureRotate(pos, rotation);
 
-        assistantText.setTextAlignment(TextAlignment.CENTER);
+        assistantText.setTextAlignment(TextAlignment.JUSTIFY);
         assistantText.setFont(Font.font(assistantText.getFont().getName(), textSize / 2 * actualBoardScale.get() / assistantText.getFont().getSize()));
-        assistantText.setX(assistantTextPos.x);
-        assistantText.setY(assistantTextPos.y);
+        assistantText.setX(assistantTextLocation.x);
+        assistantText.setY(assistantTextLocation.y);
         assistantText.setWrappingWidth(assistantWidth * actualBoardScale.get());
         assistantText.minHeight(assistantLabelHeight * actualBoardScale.get());
         assistantText.maxHeight(assistantLabelHeight * actualBoardScale.get());
-        assistantText.getTransforms().add(new Rotate(90 * rotation, assistantTextPos.x + assistantText.getWrappingWidth() / 2, assistantTextPos.y + assistantText.maxHeight(-1) / 2));
 
-        Coord finalAssistantTextSlot = assistantTextSlot.pureSumX(assistantWidth / 2).pureSumY(assistantLabelHeight / 2).pureRotate(pos, rotation);
+        entered.add(event -> {
+            getChildrenEnteredZoom(assistantText, new Coord(assistantLabel.getX() + assistantLabel.getWidth() / 10, assistantLabel.getY() + 3 * assistantLabel.getHeight() / 8), actualBoardScale.get(), hoverZoom, boardView).handle(event);
+        });
 
-        entered.add(getChildrenEnteredZoom(assistantText, finalAssistantTextSlot, actualBoardScale.get(), hoverZoom, boardView));
+        exited.add(getChildrenExitedZoom(assistantText, assistantTextLocation, actualBoardScale.get(), hoverZoom, boardView));
 
-        exited.add(getChildrenExitedZoom(assistantText, finalAssistantTextSlot, actualBoardScale.get(), hoverZoom, boardView));
-
-        Coord assistantSlot = assistantTextSlot.pureSumX(assistantWidth / 2).pureSumY(assistantHeight / 2 + assistantLabelHeight / 2);
+        Coord assistantSlot = assistantLabelSlot.pureSumX(assistantWidth / 2).pureSumY(assistantHeight / 2 + assistantLabelHeight);
         Coord assistantLocation = pos.pureSumX(assistantSlot.x * actualBoardScale.get()).pureSumY(assistantSlot.y * actualBoardScale.get());
-        Coord assistantPos = assistantLocation.pureRotate(pos, rotation);
-
 
         if (data.getAssistantPlayed() != null) {
-            ImageView assistantView = AssistantDrawer.drawAssistant(data.getAssistantPlayed().id, assistantPos, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
+            ImageView assistantView = AssistantDrawer.drawAssistant(data.getAssistantPlayed().id, assistantLocation, assistantWidth / AssistantDrawer.getAssistantWidth() * actualBoardScale.get());
             toDraw.add(assistantView);
 
-            assistantView.getTransforms().add(new Rotate(90 * rotation, assistantView.getX() + assistantView.getFitWidth() / 2, assistantView.getY() + assistantView.getFitHeight() / 2));
+            Coord finalAssistantSlot = assistantSlot.pureSumX(0);
 
-            Coord finalAssistantSlot = assistantSlot.pureSumY(0);
+            entered.add(getChildrenEnteredZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView));
 
-            entered.add(getChildrenEnteredZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
-
-            exited.add(getChildrenExitedZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+            exited.add(getChildrenExitedZoom(assistantView, finalAssistantSlot, actualBoardScale.get(), hoverZoom, boardView));
         }
 
 
@@ -348,8 +348,8 @@ public class BoardDrawer extends Drawer{
 
                 Coord finalButtonSlot = buttonSlot.pureSumX(tableLength / 2).pureSumY(tableWidth / 2);
 
-                entered.add(getChildrenEnteredZoom(tableButton, finalButtonSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
-                exited.add(getChildrenExitedZoom(tableButton, finalButtonSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+                entered.add(getChildrenEnteredZoom(tableButton, finalButtonSlot, actualBoardScale.get(), hoverZoom, boardView));
+                exited.add(getChildrenExitedZoom(tableButton, finalButtonSlot, actualBoardScale.get(), hoverZoom, boardView));
 
                 toDraw.add(tableButton);
 

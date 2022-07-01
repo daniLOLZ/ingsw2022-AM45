@@ -53,7 +53,7 @@ public class BoardHandlingToolbox implements HandlingToolbox{
                     onEntranceStudentClick.set(finalStudentIndex, event -> {
                                 onEntranceStudentClick.set(finalStudentIndex, NO_EFFECT);
                                 new Thread(() ->
-                                        resourceProvider.sendSelectedStudent(finalStudentIndex + 1)).start();
+                                        resourceProvider.sendSelectedStudent(finalStudentIndex)).start();
                             }
                     );
 
