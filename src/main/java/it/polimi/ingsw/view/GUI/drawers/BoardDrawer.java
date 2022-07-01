@@ -84,14 +84,14 @@ public class BoardDrawer extends Drawer{
     private static final List<Coord> towerSlots = new ArrayList<>();
 
     static {
-        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(-477));
-        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(-477));
-        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(-238));
-        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(-238));
-        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(1));
-        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(1));
-        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(240));
-        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(240));
+        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(-277));
+        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(-277));
+        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(-38));
+        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(-38));
+        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(201));
+        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(201));
+        towerSlots.add(upLeftCorner.pureSumX(1136).pureSumY(440));
+        towerSlots.add(upLeftCorner.pureSumX(1394).pureSumY(440));
     }
 
     private static final double hoverZoom = 1.4, woodenSize = 152, towerSize = 500;
@@ -121,7 +121,14 @@ public class BoardDrawer extends Drawer{
 
     private static final double coinStep = 45, coinSize = 260;
 
-    private static final Coord firstCoinSlot = upLeftCorner.pureSumX(-boards.get(USER).getWidth() / 2 - playerBoxWidth / 2).pureSumY(-boards.get(USER).getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2);
+    private static final List<Coord> firstCoinSlots = new ArrayList<>();
+
+    static {
+        firstCoinSlots.add(upLeftCorner.pureSumX(-boards.get(USER).getWidth() / 2 - playerBoxWidth / 2).pureSumY(-boards.get(USER).getHeight() / 2 + playerBoxHeight + coinStep + coinSize / 2));
+        firstCoinSlots.add(upLeftCorner.pureSumX(-boards.get(RIGHT).getWidth() / 2 + playerBoxHeight + coinStep + coinSize / 2).pureSumY(-boards.get(RIGHT).getHeight() / 2 - playerBoxWidth / 2));
+        firstCoinSlots.add(upLeftCorner.pureSumX(-boards.get(TOP).getWidth() / 2 - playerBoxWidth / 2).pureSumY(boards.get(TOP).getHeight() / 2 - playerBoxHeight - coinStep - coinSize / 2));
+        firstCoinSlots.add(upLeftCorner.pureSumX(boards.get(LEFT).getWidth() / 2 - playerBoxHeight - coinStep - coinSize / 2).pureSumY(boards.get(RIGHT).getHeight() / 2 + playerBoxWidth / 2));
+    }
 
 
     /**
@@ -375,39 +382,71 @@ public class BoardDrawer extends Drawer{
 
         //draw towers
         Iterator<Coord> currTowerSlot = towerSlots.iterator();
+
+        List<ImageView> towerViews = new ArrayList<>();
         for (int tower = 0; tower < data.getNumTowers(); tower++) {
             Coord towerSlot = currTowerSlot.next();
+
             Coord towerLocation = pos.pureSumX(towerSlot.x * actualBoardScale.get()).pureSumY(towerSlot.y * actualBoardScale.get());
             Coord towerPos = towerLocation.pureRotate(pos, rotation);
 
             ImageView towerView = TowerDrawer.drawTower(data.getTowerColor(), towerPos, towerSize / TowerDrawer.getTowerSize() * actualBoardScale.get());
-            toDraw.add(towerView);
+            towerViews.add(towerView);
 
-            Coord finalTowerSlot = towerSlot.pureSumY(0);
+            Coord finalTowerSlot;
+
+            double towerBaseOffset = TowerDrawer.getTowerBaseOffset();
+
+            switch (orientation){
+                case USER -> finalTowerSlot = towerSlot.pureSumY(-towerBaseOffset);
+                case RIGHT -> finalTowerSlot = towerSlot.pureSumX(-towerBaseOffset);
+                case TOP -> finalTowerSlot = towerSlot.pureSumY(towerBaseOffset);
+                case LEFT -> finalTowerSlot = towerSlot.pureSumX(towerBaseOffset);
+                default -> finalTowerSlot = towerSlot.pureSumY(-towerBaseOffset);
+            }
+
+            finalTowerSlot.moveY(-towerBaseOffset);
 
             entered.add(getChildrenEnteredZoom(towerView, finalTowerSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
             exited.add(getChildrenExitedZoom(towerView, finalTowerSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
         }
+
+        if (orientation == LEFT || orientation == TOP){
+            List<ImageView> tempTowers = new ArrayList<>();
+
+            for (int slot = towerViews.size() - 1; slot >= 0 ; slot--) {
+                tempTowers.add(towerViews.get(slot));
+            }
+
+            towerViews = tempTowers;
+        }
+
+        toDraw.addAll(towerViews);
 
         //draw coins (if any)
         if (data.getNumCoins() != 0){
 
             int coinIndex;
 
-            Coord coinSlot = firstCoinSlot.pureSumY(0);
+            Coord coinSlot = firstCoinSlots.get(orientation).pureSumY(0);
+
+            Coord moving = new Coord(0, coinStep).pureRotate(upLeftCorner, -45 * orientation);
+
+            ImageView lastCoin = new ImageView();
 
             for (coinIndex = 0; coinIndex < data.getNumCoins(); coinIndex++) {
 
-                coinSlot.moveY(coinStep);
+                coinSlot.moveCoord(moving);
                 Coord coinLocation = pos.pureSumX(coinSlot.x * actualBoardScale.get()).pureSumY(coinSlot.y * actualBoardScale.get());
-                Coord coinPos = coinLocation.pureRotate(pos, rotation);
-                ImageView coinView = CoinDrawer.drawCoin(coinPos, coinSize / CoinDrawer.getCoinSize() * actualBoardScale.get());
+                ImageView coinView = CoinDrawer.drawCoin(coinLocation, coinSize / CoinDrawer.getCoinSize() * actualBoardScale.get());
                 toDraw.add(coinView);
 
                 Coord finalCoinSlot = coinSlot.pureSumY(0);
 
-                entered.add(getChildrenEnteredZoom(coinView, finalCoinSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
-                exited.add(getChildrenExitedZoom(coinView, finalCoinSlot, actualBoardScale.get(), hoverZoom, boardView, rotation));
+                entered.add(getChildrenEnteredZoom(coinView, finalCoinSlot, actualBoardScale.get(), hoverZoom, boardView));
+                exited.add(getChildrenExitedZoom(coinView, finalCoinSlot, actualBoardScale.get(), hoverZoom, boardView));
+
+                if (coinIndex == data.getNumCoins() - 1) lastCoin = coinView;
             }
 
             Text numCoins = new Text(String.valueOf(data.getNumCoins()));
@@ -428,8 +467,8 @@ public class BoardDrawer extends Drawer{
 
             Coord finalNumCoinSlot = numCoinsSlot.pureSumX(numCoins.getWrappingWidth() / 2).pureSumY(numCoins.minHeight(-1) / 2).pureRotate(pos, rotation);
 
-            entered.add(getChildrenEnteredZoom(numCoins, finalNumCoinSlot, actualBoardScale.get(), hoverZoom, boardView));
-            exited.add(getChildrenExitedZoom(numCoins, finalNumCoinSlot, actualBoardScale.get(), hoverZoom, boardView));
+            entered.add(getChildrenEnteredZoom(numCoins, new Coord(lastCoin.getX() - coinSize * 1.1 * scale, lastCoin.getY() - coinSize * 0.9 * scale), actualBoardScale.get(), hoverZoom, boardView));
+            exited.add(getChildrenExitedZoom(numCoins, numCoinsPos, actualBoardScale.get(), hoverZoom, boardView));
         }
 
         EventHandler<MouseEvent> zoomChildren = event -> {
@@ -449,6 +488,19 @@ public class BoardDrawer extends Drawer{
         addHoveringEffects(boardView, pos, scale, zoomChildren, shrinkChildren, hoverZoom, toDraw.subList(1, toDraw.size()), rotation);
 
         return toDraw;
+    }
+
+    /**
+     * Draws a Board with the given parameters.
+     * This method only draw noninteractive nodes.
+     * @param data The Bean containing all relevant information about the board to draw
+     * @param pos The position in which the board must be drawn
+     * @param scale The scale to apply to the board view
+     * @param orientation Determines where the player owning the board in drawing is placed around the imaginary table (also determines if the board is the user's one)
+     * @return A list containing all the nodes that have been drawn
+     */
+    public static List<Node> drawBoard(AdvancedPlayerBean data, Coord pos, double scale, int orientation){
+        return drawBoard(data, pos, scale, orientation, BoardHandlingToolbox.NONINTERACTIVE);
     }
 
     /**

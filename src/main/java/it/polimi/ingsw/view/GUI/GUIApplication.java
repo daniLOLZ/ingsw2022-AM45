@@ -6,9 +6,11 @@ import it.polimi.ingsw.model.beans.*;
 import it.polimi.ingsw.network.client.ClientSender;
 import it.polimi.ingsw.network.client.InitialConnector;
 import it.polimi.ingsw.view.GUI.drawers.*;
+import it.polimi.ingsw.view.GUI.handlingToolbox.BoardHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import it.polimi.ingsw.view.GameInitBean;
 import it.polimi.ingsw.view.LobbyBean;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,7 +29,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
@@ -45,10 +46,10 @@ public class GUIApplication extends Application{
 
     static {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        WINDOW_WIDTH = gd.getDisplayMode().getWidth() / 1.3;
-        WINDOW_HEIGHT =  gd.getDisplayMode().getHeight() / 1.3;
+        WINDOW_WIDTH = gd.getDisplayMode().getWidth() / 1.4;
+        WINDOW_HEIGHT =  gd.getDisplayMode().getHeight() / 1.4;
     }
-    public static final double cloudSize = 40.0/1520 * WINDOW_WIDTH, assistantWidth = 5.0/76 * WINDOW_WIDTH, islandSize = 2.0 / 13 * WINDOW_HEIGHT, boardWidth = 101.0 / 304 * WINDOW_WIDTH;
+    public static final double cloudSize = 2.0 / 76 * WINDOW_WIDTH, assistantWidth = 5.0/76 * WINDOW_WIDTH, islandSize = 2.0 / 13 * WINDOW_HEIGHT, boardWidth = 101.0 / 304 * WINDOW_WIDTH;
 
     public static final double
             up      = 0,
@@ -238,10 +239,14 @@ public class GUIApplication extends Application{
         inputNickname.setPromptText("Insert your nickname");
         inputNickname.setMaxWidth(WINDOW_WIDTH/4);
         inputNickname.setOnAction(event -> loginButton.fire());
-        Label errorMessage = new Label("Invalid nickname! Please try again");
-        errorMessage.setTextFill(Color.RED);
+        Label loginErrorMessage = new Label("Invalid nickname! Please try again");
+        loginErrorMessage.setTextFill(Color.RED);
 
-        errorMessage.setVisible(loginError);
+        loginErrorMessage.setVisible(loginError);
+
+        Label noServerMessage = new Label("Server unavailable!");
+        noServerMessage.setTextFill(Color.RED);
+        noServerMessage.setVisible(false);
 
         //sends the request to the network
         loginButton.setOnAction(event -> {
@@ -250,6 +255,7 @@ public class GUIApplication extends Application{
                 if(initialConnector.login(inputNickname.getText())) {
                     initialConnector.startReceiving();
                 }
+                noServerMessage.setVisible(true);
                 initialConnector.reset(); // When the receiving stops we need to reset the connector
                 loginButton.setDisable(false);
             }).start();
@@ -259,7 +265,7 @@ public class GUIApplication extends Application{
         nicknameSelection.getChildren().addAll(loginLabel, inputNickname);
         nicknameSelection.setAlignment(Pos.CENTER);
 
-        login.getChildren().addAll(nicknameSelection, loginButton, errorMessage);
+        login.getChildren().addAll(nicknameSelection, loginButton, loginErrorMessage, noServerMessage);
 
         stage.setScene(loginScene);
     }
@@ -615,7 +621,7 @@ public class GUIApplication extends Application{
      * @param eventHandlerContainer The object containing the non-constant actions to respond to the player input
      * @param user The index of the user in the Player list
      */
-    public static void showGameInterface(VirtualViewBean data, GameToolBoxContainer eventHandlerContainer, int user){
+    public static void showGameInterface(VirtualViewBean  data, GameToolBoxContainer eventHandlerContainer, int user){
         Group root = new Group();
 
         //<editor-fold desc="Game Board">

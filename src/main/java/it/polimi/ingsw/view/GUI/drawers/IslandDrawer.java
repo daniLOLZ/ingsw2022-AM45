@@ -26,7 +26,7 @@ public class IslandDrawer extends Drawer{
     private static final double islandSize = islands.get(0).getWidth();
 
     private static final Coord MNSlot = GUIApplication.upLeftCorner.pureSumX(145).pureSumY(158),
-                               towerSlot = GUIApplication.upLeftCorner.pureSumX(268).pureSumY(-230);
+                               towerSlot = GUIApplication.upLeftCorner.pureSumX(268).pureSumY(-30);
 
     private static final double blockTileOffset = 20, blockTileGap = 15;
 
@@ -89,7 +89,7 @@ public class IslandDrawer extends Drawer{
 
                 ImageView studentView = StudentDrawer.drawStudent(
                         student,
-                        pos.pureSumX(studentsOnIslandSlots.get(studentIndex).x * scale).pureSumY(studentsOnIslandSlots.get(studentIndex).y * scale),
+                        pos.pureSumX(studentsOnIslandSlots.get(studentIndex % studentsOnIslandSlots.size()).x * scale).pureSumY((studentsOnIslandSlots.get(studentIndex % studentsOnIslandSlots.size()).y - defaultWoodenSize * scale / StudentDrawer.getStudentSize() / 3 * studentIndex) * scale),
                         defaultWoodenSize / StudentDrawer.getStudentSize() * scale,
                         onClick);
 
