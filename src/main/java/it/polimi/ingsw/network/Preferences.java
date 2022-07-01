@@ -33,7 +33,7 @@ public class Preferences {
             reader = new InputStreamReader(stream);
         } catch (NullPointerException e) {
             System.err.println("Preferences file hasn't been found, using standard port");
-            e.printStackTrace();
+            //e.printStackTrace();
             return standardPort;
         }
 
@@ -59,7 +59,7 @@ public class Preferences {
             reader = new InputStreamReader(stream);
         } catch (NullPointerException e) {
             System.err.println("Preferences file hasn't been found, using standard hostname");
-            e.printStackTrace();
+            //e.printStackTrace();
             return standardHostname;
         }
 

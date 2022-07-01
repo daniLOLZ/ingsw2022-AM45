@@ -104,8 +104,8 @@ public class ClientHandler implements Runnable{
                     if(!connected.get()) return;
                 }
             } catch (InterruptedException e) {
-                System.err.println("Interrupted while waiting for message");
-                e.printStackTrace();
+                //System.err.println("Interrupted while waiting for message");
+                //e.printStackTrace();
                 continue;
             }
 
@@ -275,7 +275,7 @@ public class ClientHandler implements Runnable{
         }
         catch (IOException e){
             System.err.println("Problem while closing the sockets");
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

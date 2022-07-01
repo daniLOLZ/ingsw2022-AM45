@@ -125,7 +125,7 @@ public class CLI implements UserInterface {
                 try {
                     command = reader.readLine();
                 } catch (IOException e) {
-                    System.err.println("Error reading from standard input");
+                    //System.err.println("Error reading from standard input");
                 }
                 readCommand.set(command);
             }
@@ -1153,7 +1153,7 @@ public class CLI implements UserInterface {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
-                System.err.println("Interrupted while waiting for input, starting a new cycle");
+                //System.err.println("Interrupted while waiting for input, starting a new cycle");
                 //e.printStackTrace();
                 continue;
             }
@@ -1215,10 +1215,10 @@ public class CLI implements UserInterface {
                 }
             } catch (InterruptedException e) {
                 //Run the next loop
-                System.err.println("I got interrupted");
+                //System.err.println("I got interrupted");
                 continue;
             } catch (ExecutionException e) {
-                System.err.println("Exception in thread: " + e.getCause());
+                //System.err.println("Exception in thread: " + e.getCause());
             } catch (TimeoutException e) {
                 //Do another round
                 continue;

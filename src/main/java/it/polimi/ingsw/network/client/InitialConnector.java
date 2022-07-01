@@ -58,7 +58,7 @@ public class InitialConnector {
                 pingThread.join();
             } catch (InterruptedException e) {
                 System.err.println("This is quite a conundrum");
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
 
@@ -165,10 +165,10 @@ public class InitialConnector {
         }
         catch (IOException e){
             System.err.println("Problem while closing the sockets");
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch (NullPointerException e) {
             System.err.println("Couldn't access the sockets, please restart the application");
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -185,7 +185,7 @@ public class InitialConnector {
             System.err.println("Sockets closed");
         }
         catch (IOException | NullPointerException e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

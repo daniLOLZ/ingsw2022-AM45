@@ -45,8 +45,8 @@ public class GUIApplication extends Application{
 
     static {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        WINDOW_WIDTH = gd.getDisplayMode().getWidth() / 1.2;
-        WINDOW_HEIGHT =  gd.getDisplayMode().getHeight() / 1.2;
+        WINDOW_WIDTH = gd.getDisplayMode().getWidth() / 1.3;
+        WINDOW_HEIGHT =  gd.getDisplayMode().getHeight() / 1.3;
     }
     public static final double cloudSize = 40.0/1520 * WINDOW_WIDTH, assistantWidth = 5.0/76 * WINDOW_WIDTH, islandSize = 2.0 / 13 * WINDOW_HEIGHT, boardWidth = 101.0 / 304 * WINDOW_WIDTH;
 

@@ -76,8 +76,8 @@ public class ClientReceiver {
             try {
                 parseAsyncThread.join();
             } catch (InterruptedException e) {
-                System.err.println("This is quite a conundrum 2");
-                e.printStackTrace();
+                //System.err.println("This is quite a conundrum 2"); //should never get here
+                //e.printStackTrace();
             }
         }
         if(receiveMessagesThread != null) {
@@ -85,8 +85,8 @@ public class ClientReceiver {
             try {
                 receiveMessagesThread.join();
             } catch (InterruptedException e) {
-                System.err.println("This is quite a conundrum 2");
-                e.printStackTrace();
+                //System.err.println("This is quite a conundrum 2"); //should never get here
+                //e.printStackTrace();
             }
         }
     }
@@ -129,7 +129,7 @@ public class ClientReceiver {
             try {
                 mainBroker.waitSyncMessage();
             } catch (InterruptedException e) {
-                System.err.println("Interrupted while waiting for sync message, continuing...");
+                //System.err.println("Interrupted while waiting for sync message, continuing...");
                 continue;
             }
 
@@ -199,7 +199,7 @@ public class ClientReceiver {
                     try {
                         mainBroker.waitAsyncMessage();
                     } catch (InterruptedException e) {
-                        System.err.println("Interrupted while waiting for async message, continuing...");
+                        //System.err.println("Interrupted while waiting for async message, continuing...");
                         continue;
                     }
 

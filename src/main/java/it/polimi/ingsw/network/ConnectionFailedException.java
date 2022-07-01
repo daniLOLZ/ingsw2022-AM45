@@ -8,9 +8,6 @@ public class ConnectionFailedException extends Exception{
         this.errorMessage = errorMessage;
     }
 
-    public void printErrorMessage(){
-        System.err.println(errorMessage);
-    }
     public String getErrorMessage(){
         return errorMessage;
     }

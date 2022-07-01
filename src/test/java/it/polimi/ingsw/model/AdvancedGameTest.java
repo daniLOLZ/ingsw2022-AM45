@@ -51,7 +51,7 @@ public class AdvancedGameTest {
             game.initializeGame();
         } catch (IncorrectPlayersException e) {
             System.err.println("Error while initializing test game");
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

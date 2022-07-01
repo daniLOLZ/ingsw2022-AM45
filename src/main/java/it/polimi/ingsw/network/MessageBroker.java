@@ -169,8 +169,8 @@ public class MessageBroker {
             destinationOutput.write(sendable.getBytes(StandardCharsets.UTF_8));
             destinationOutput.flush();
         } catch (IOException e) {
-            System.err.println("Couldn't send the message via the network");
-            e.printStackTrace();
+            //System.err.println("Couldn't send the message via the network");
+            //e.printStackTrace();
             throw e;
         }
         outFlush();
@@ -212,14 +212,14 @@ public class MessageBroker {
                 tempString.append(rawChar);
             }
         } catch (SocketException e) {
-            System.err.println("Socket error, couldn't read the message");
-            System.err.println(e.getMessage());
+            //System.err.println("Socket error, couldn't read the message");
+            //System.err.println(e.getMessage());
 
             //e.printStackTrace();
             throw e;
 
         } catch (IOException e) {
-            System.err.println("Error reading message from the network");
+            //System.err.println("Error reading message from the network");
             //e.printStackTrace();
             throw e;
 
@@ -229,7 +229,7 @@ public class MessageBroker {
         try{
             deserializedMessage = deserialize(receivedMessage);
         } catch (JsonSyntaxException e){
-            System.err.println("Bad message read");
+            //System.err.println("Bad message read");
             throw new IOException();
         }
 
