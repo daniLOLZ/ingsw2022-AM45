@@ -57,6 +57,10 @@ public class CharacterCardBean extends GameElementBean {
         return numBlocks;
     }
 
+    public boolean hasBeenUsed(){
+        return hasBeenUsed;
+    }
+
     public void setNumBlocks(int numBlocks) {
         this.numBlocks = numBlocks;
     }
