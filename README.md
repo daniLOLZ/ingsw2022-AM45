@@ -38,15 +38,22 @@ properly show the game interface.
 <h3>GUI:</h3>
 
 
-<h3>Game instructions:</h3>
-While in game, to input a command you must type 
-in exactly the name of the command (case insensitive)
+<h1>Game instructions:</h1>
+<h6>To play the game on the CLI, you must follow some 
+rules to input the commands</h6>
+
+While in a game, to input a command ,you must type 
+in exactly the name of the command, including the
+underscores. This command is case-insensitive 
+
+`ex: SELECT_STUDENT`
 
 When selecting elements identified by their id, the 
 parameter to write will be the id
 
-When selecting elements identified by their position, 
-the parameter to write will be the position, starting from 1
+When selecting elements identified by their position (students at the 
+entrance of your board and on character cards), 
+the parameter to write will be their position, starting from 1
 
 When using commands that require multiple elements to be
 selected at once, the parameter will be written enclosed 
@@ -54,15 +61,20 @@ in square brackets, separated by commas and without
 any whitespaces in them <br>
 `ex: [value1,value2,...,valueN]`
 
+Such commands are the ones used to select the components 
+required to play a character card
+`ex: SELECT_STUDENTS_ON_CARD [2,3]`
+
 The colors of the students have to be in capital letters <br>
+Available student colors: Red, Green, Blue, Pink, Yellow
 `ex: RED`
 
 
 <H1> Coverage </H1>
 
-| Package | Class        | Method        | Line           |
-|:-------:|:------------:|:-------------:|:--------------:|
-|  Model  | 98% (59/60)  | 87% (455/511) | 88% (1861/2105)|
+| Package |   Class %    |    Method %    |      Line %      |
+|:-------:|:------------:|:--------------:|:----------------:|
+|  Model  | 100% (61/61) | 86% (452/525)  | 87% (2068/2364)  |
 
 
 <H1>Implemented Components</H1>

@@ -724,7 +724,7 @@ public class CLI implements UserInterface {
         do {
             //The game was interrupted, show it to the client (might be removed as there are async handlers already)
             if(gameInterrupted.isTriggered()){
-                System.out.println("The game was interrupted :(\n");
+                System.out.println("The game was interrupted, exiting...\n");
 
                 lobbyInterrupts.remove(connected);
                 gameInitInterrupts.remove(connected);

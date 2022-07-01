@@ -156,12 +156,12 @@ public class InitialConnector {
     public void notifyNetworkError(String error){
         if(alreadyNotified.get()) return;
         alreadyNotified.set(true);
-        System.err.println(error);
+        //System.err.println(error);
         connected.set(false);
         try{
             if(mainSocket != null) mainSocket.close();
             if(pingSocket != null) pingSocket.close();
-            System.err.println("Sockets closed");
+            //System.err.println("Sockets closed");
         }
         catch (IOException e){
             System.err.println("Problem while closing the sockets");
