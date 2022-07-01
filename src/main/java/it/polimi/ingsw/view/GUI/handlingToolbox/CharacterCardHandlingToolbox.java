@@ -9,7 +9,6 @@ import javafx.scene.input.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class CharacterCardHandlingToolbox implements HandlingToolbox{
 
@@ -84,7 +83,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
                 int finalIndex = studentIndex;
                 onStudentOnCardClick.set(finalIndex, event -> {
                     onStudentOnCardClick.set(finalIndex, NO_EFFECT);
-                    selections.addStudentOnCard(finalIndex + 1);
+                    selections.addStudentOnCard(finalIndex);
                     System.out.println("Added student on card");
                 });
                 studentIndex++;

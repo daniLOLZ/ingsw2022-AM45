@@ -152,17 +152,17 @@ public class GUIApplication extends Application{
                 You can visit the entrance, the dining hall, or the alleys.
                 Either way, you're welcome to the world of Eriantys.""");
 
-        welcomeMessage.setFont(Font.font("Pristina",47));
+        welcomeMessage.setFont(Font.font("Pristina",47.0 / 780 * WINDOW_HEIGHT));
         welcomeMessage.setTextAlignment(TextAlignment.CENTER);
         root.getChildren().add(welcomeMessage);
 
-        playButton.setMaxWidth(700);
-        playButton.setMinHeight(120);
+        playButton.setMaxWidth(35.0 / 76 * WINDOW_WIDTH);
+        playButton.setMinHeight(2.0 / 13 * WINDOW_HEIGHT);
         playButton.setBackground(Background.EMPTY);
         playButton.setTextFill(Color.DARKRED);
-        playButton.setOnMouseEntered(event -> playButton.setFont(Font.font("Lucida Handwriting", 50)));
-        playButton.setOnMouseExited(event -> playButton.setFont(Font.font("Lucida Handwriting", 40)));
-        playButton.setFont(Font.font("Lucida Handwriting", 40));
+        playButton.setOnMouseEntered(event -> playButton.setFont(Font.font("Lucida Handwriting", 5.0 / 78 * WINDOW_HEIGHT)));
+        playButton.setOnMouseExited(event -> playButton.setFont(Font.font("Lucida Handwriting", 2.0 / 39 * WINDOW_HEIGHT)));
+        playButton.setFont(Font.font("Lucida Handwriting", 2.0 / 39 * WINDOW_HEIGHT));
 
         //</editor-fold>
 
@@ -481,7 +481,7 @@ public class GUIApplication extends Application{
 
         Label title = new Label("Select your Tower color!");
         title.setAlignment(Pos.CENTER);
-        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setFont(Font.font("Lucida Handwriting", 2.0 / 39 * WINDOW_HEIGHT));
         title.setTextFill(Color.DARKRED);
         layout.getChildren().add(title);
 
@@ -490,13 +490,13 @@ public class GUIApplication extends Application{
 
         HBox towers = new HBox(WINDOW_WIDTH / 76 * TeamEnum.getNumTeams() / numTeams);
         towers.setAlignment(Pos.CENTER);
-        towers.setMinHeight(TowerDrawer.getTowerSize() * 0.6);
+        towers.setMinHeight(TowerDrawer.getTowerSize() * WINDOW_HEIGHT / 1300);
         layout.getChildren().add(towers);
 
         Button selectTower = new Button("These words shall not be gazed upon by thy mortals!");
         selectTower.setVisible(false);
         selectTower.setBackground(Background.EMPTY);
-        selectTower.setFont(Font.font("Lucida Handwriting", 40));
+        selectTower.setFont(Font.font("Lucida Handwriting", 2.0 / 39 * WINDOW_HEIGHT));
         selectTower.setTextFill(Color.DARKRED);
         selectTower.setOnAction(event -> new Thread(() -> {
             defaultSender.sendTeamColorChoice(selectedTowerColor);
@@ -512,7 +512,7 @@ public class GUIApplication extends Application{
 
             TeamEnum tower = TeamEnum.getTeamFromId(index);
 
-            ImageView towerView = TowerDrawer.drawTower(tower, center, 0.5);
+            ImageView towerView = TowerDrawer.drawTower(tower, center, WINDOW_HEIGHT / 1560);
 
             if (data != null) {
                 if (!data.getChosenColors().contains(tower)){
@@ -525,7 +525,7 @@ public class GUIApplication extends Application{
                         selectTower.setText("Select " + tower.name);
                         selectTower.setVisible(true);
                     });
-                    addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+                    addHoveringEffects(towerView, new Coord(towerView.getX() + towerView.getFitWidth(), towerView.getY() + towerView.getFitHeight()), WINDOW_HEIGHT / 1560, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
                 }
             }
             towers.getChildren().add(towerView);
@@ -557,19 +557,19 @@ public class GUIApplication extends Application{
 
         Label title = new Label("Select your Wizard companion!");
         title.setAlignment(Pos.CENTER);
-        title.setFont(Font.font("Lucida Handwriting", 40));
+        title.setFont(Font.font("Lucida Handwriting", 2.0 / 39 * WINDOW_HEIGHT));
         title.setTextFill(Color.DARKRED);
         layout.getChildren().add(title);
 
         HBox wizards = new HBox(WINDOW_WIDTH / 76);
         wizards.setAlignment(Pos.CENTER);
-        wizards.setMinHeight(WizardDrawer.getWizardHeight() * 0.5 * 1.2);
+        wizards.setMinHeight(WizardDrawer.getWizardHeight() * 3 * WINDOW_HEIGHT / 3950);
         layout.getChildren().add(wizards);
 
         Button selectWizard = new Button("vgnkdhdrnhs");
         selectWizard.setVisible(false);
         selectWizard.setBackground(Background.EMPTY);
-        selectWizard.setFont(Font.font("Lucida Handwriting", 40));
+        selectWizard.setFont(Font.font("Lucida Handwriting", 2.0 / 39 * WINDOW_HEIGHT));
         selectWizard.setTextFill(Color.DARKRED);
         selectWizard.setOnAction(event -> new Thread(() -> {
             defaultSender.sendWizardChoice(selectedWizard);
@@ -579,7 +579,7 @@ public class GUIApplication extends Application{
 
         for (WizardEnum wizard:
                 WizardEnum.getWizards()) {
-            ImageView wizardView = WizardDrawer.drawWizard(wizard, center, 0.5);
+            ImageView wizardView = WizardDrawer.drawWizard(wizard, center, WINDOW_HEIGHT / 1560);
 
             if (data != null) {
                 if (!data.getChosenWizards().contains(wizard)){
@@ -593,7 +593,7 @@ public class GUIApplication extends Application{
                         selectWizard.setText("Select " + wizard.name);
                         selectWizard.setVisible(true);
                     });
-                    addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), 0.5, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
+                    addHoveringEffects(wizardView, new Coord(wizardView.getX() + wizardView.getFitWidth(), wizardView.getY() + wizardView.getFitHeight()), WINDOW_HEIGHT / 1560, HandlingToolbox.NO_EFFECT, HandlingToolbox.NO_EFFECT, 1.1, false);
 
                 }
             }

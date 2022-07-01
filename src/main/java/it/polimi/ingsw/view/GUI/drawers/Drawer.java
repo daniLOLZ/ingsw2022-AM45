@@ -388,27 +388,16 @@ public abstract class Drawer{
      * @param scale The scale that was applied to the parent view
      * @param hoverZoom The zoom ratio that will be used when enlarging the view
      * @param parentView The parent view
-     * @param rotation The rotation previously applied to the parent view
      * @return The Handler which will be assigned to the parent to allow him to zoom his children
      */
-    public static EventHandler<MouseEvent> getChildrenEnteredZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
+    public static EventHandler<MouseEvent> getChildrenEnteredZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView){
 
         double childWidth, childHeight, parentWidth, parentHeight;
 
-        if (rotation == Coord.CLOCKWISE || rotation == Coord.COUNTERCLOCKWISE){
-
-            childWidth = rectangle.getHeight();
-            childHeight = rectangle.getWidth();
-            parentWidth = parentView.getFitHeight();
-            parentHeight = parentView.getFitWidth();
-        }
-
-        else {
-            childWidth = rectangle.getWidth();
-            childHeight = rectangle.getHeight();
-            parentWidth = parentView.getFitWidth();
-            parentHeight = parentView.getFitHeight();
-        }
+        childWidth = rectangle.getWidth();
+        childHeight = rectangle.getHeight();
+        parentWidth = parentView.getFitWidth();
+        parentHeight = parentView.getFitHeight();
 
         return event -> {
             rectangle.setWidth(rectangle.getWidth() * hoverZoom);
@@ -426,27 +415,17 @@ public abstract class Drawer{
      * @param scale The scale that was applied to the parent view
      * @param hoverZoom The zoom ratio that will be used when enlarging the view
      * @param parentView The parent view
-     * @param rotation The rotation previously applied to the parent view
      * @return The Handler which will be assigned to the parent to allow him to shrink his children
      */
-    public static EventHandler<MouseEvent> getChildrenExitedZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView, int rotation){
+    public static EventHandler<MouseEvent> getChildrenExitedZoom(Rectangle rectangle, Coord slot, double scale, double hoverZoom, ImageView parentView){
 
         double childWidth, childHeight, parentWidth, parentHeight;
 
-        if (rotation == Coord.CLOCKWISE || rotation == Coord.COUNTERCLOCKWISE){
+        childWidth = rectangle.getWidth();
+        childHeight = rectangle.getHeight();
+        parentWidth = parentView.getFitWidth();
+        parentHeight = parentView.getFitHeight();
 
-            childWidth = rectangle.getHeight();
-            childHeight = rectangle.getWidth();
-            parentWidth = parentView.getFitHeight();
-            parentHeight = parentView.getFitWidth();
-        }
-
-        else {
-            childWidth = rectangle.getWidth();
-            childHeight = rectangle.getHeight();
-            parentWidth = parentView.getFitWidth();
-            parentHeight = parentView.getFitHeight();
-        }
 
         return event -> {
             rectangle.setWidth(rectangle.getWidth() / hoverZoom);
@@ -472,8 +451,8 @@ public abstract class Drawer{
 
             text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() * hoverZoom));
             text.setWrappingWidth(text.getWrappingWidth() * hoverZoom);
-            text.setX(parentView.getX() + parentView.getFitWidth() / 2 + slot.x * scale * hoverZoom - text.getWrappingWidth() / 2);
-            text.setY(parentView.getY() + parentView.getFitHeight() / 2 + slot.y * scale * hoverZoom - text.maxHeight(-1) / 2);
+            text.setX(slot.x);
+            text.setY(slot.y);
         };
     }
 
@@ -493,8 +472,8 @@ public abstract class Drawer{
         return event -> {
             text.setFont(Font.font(text.getFont().getName(), text.getFont().getSize() / hoverZoom));
             text.setWrappingWidth(text.getWrappingWidth() / hoverZoom);
-            text.setX(parentView.getX() + parentView.getFitWidth() / 2 + slot.x * scale - text.getWrappingWidth() / 2);
-            text.setY(parentView.getY() + parentView.getFitHeight() / 2 + slot.y * scale - text.maxHeight(-1) / 2);
+            text.setX(slot.x);
+            text.setY(slot.y);
         };
     }
 
