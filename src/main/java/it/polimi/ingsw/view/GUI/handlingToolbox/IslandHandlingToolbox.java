@@ -73,7 +73,7 @@ public class IslandHandlingToolbox implements HandlingToolbox{
      * Updates the maximum number of mother nature steps.
      * @param steps The maximum number of mother nature steps
      */
-    public void setMaxMNSteps(int steps){maxMNSteps = steps;}
+    public void setMaxMNSteps(int steps){maxMNSteps = steps + 2;} //raw, horrible, unforgivable way to allow the player to use the mailman since we don't know if he was activated this turn
 
     /**
      * Implements the above method for island handling.
