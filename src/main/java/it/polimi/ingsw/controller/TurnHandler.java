@@ -42,9 +42,6 @@ public class TurnHandler {
         controller.simpleGame.initialiseSelection();
         controller.boardHandler.refillClouds();
         controller.assistantHandler.clearAssistantsPlayed();
-        if(!(controller.advancedGame == null)){
-            controller.characterCardHandler.resetCardEffects();
-        }
         checkLastTurn();
     }
 
@@ -59,6 +56,7 @@ public class TurnHandler {
 
         // If the last action phase is ending, we need to take certain turn ending actions
         if (currentPhase.equals(PhaseEnum.ACTION)){
+            checkLastTurn();
             if(!controller.checkDeferredWinner()){
                 controller.setNewTurn(true);
                 initializeNewTurn();
@@ -84,6 +82,7 @@ public class TurnHandler {
      * increment playersPlayedInThisTurn.
      * Starts the next user's phase unless there should be a phase change
      * This method will be called after endTurn or chooseAssistant
+     * In case of an advanced game, this method resets the character effect
      */
     public void endPlayerPhase(){
         playersPlayedInThisTurn++;
@@ -92,6 +91,9 @@ public class TurnHandler {
             if (currentPhase.equals(PhaseEnum.PLANNING)) {
                 startPlanningPhase();
             } else startActionPhase();
+        }
+        if(!(controller.advancedGame == null)){
+            controller.characterCardHandler.resetCardEffects();
         }
     }
 

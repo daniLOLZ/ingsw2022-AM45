@@ -19,8 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class InitialConnector {
     private ClientSender sender;
     private ClientReceiver receiver;
-    private String hostname;
-    private int portNumber, pingPortNumber;
+    private final String hostname;
+    private final int portNumber, pingPortNumber;
     private Socket mainSocket, pingSocket;
     private MessageBroker mainBroker, pingBroker;
     private PingHandler pingHandler;
@@ -80,6 +80,8 @@ public class InitialConnector {
      * Connects to a Server with the already present hostname and port,
      * and sends the user nickname via private methods
      * @param nickname a nickname chosen by the user to be used during the game
+     * @return true if the login was successful and it was possible to connect to a server,
+     *          false otherwise. In case of failure, the connection must be reset
      */
     public boolean login(String nickname){
 
