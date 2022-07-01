@@ -84,7 +84,7 @@ public class CharacterCardHandlingToolbox implements HandlingToolbox{
                 int finalIndex = studentIndex;
                 onStudentOnCardClick.set(finalIndex, event -> {
                     onStudentOnCardClick.set(finalIndex, NO_EFFECT);
-                    selections.addStudentOnCard(finalIndex);
+                    selections.addStudentOnCard(finalIndex + 1);
                     System.out.println("Added student on card");
                 });
                 studentIndex++;

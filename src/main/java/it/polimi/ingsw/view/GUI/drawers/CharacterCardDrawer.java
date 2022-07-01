@@ -6,10 +6,12 @@ import it.polimi.ingsw.view.GUI.Coord;
 import it.polimi.ingsw.view.GUI.handlingToolbox.CharacterCardHandlingToolbox;
 import it.polimi.ingsw.view.GUI.handlingToolbox.HandlingToolbox;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -18,6 +20,8 @@ import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static it.polimi.ingsw.view.GUI.GUIApplication.upLeftCorner;
 
@@ -54,8 +58,17 @@ public class CharacterCardDrawer extends Drawer{
         studentsSlots.add(upLeftCorner.pureSumX(-2 * characterCardWidth / 5).pureSumY(-characterCardHeight / 8));
         studentsSlots.add(upLeftCorner.pureSumX(3 * characterCardWidth / 10));
         studentsSlots.add(upLeftCorner.pureSumX(-characterCardWidth / 10).pureSumY(3 * characterCardHeight / 8));
-        studentsSlots.add(upLeftCorner.pureSumX(characterCardWidth / 10).pureSumY(3 * characterCardHeight / 8));
-        studentsSlots.add(upLeftCorner.pureSumY(characterCardHeight / 2));
+        studentsSlots.add(upLeftCorner.pureSumX(-3 * characterCardWidth / 10).pureSumY(characterCardHeight / 6));
+        studentsSlots.add(upLeftCorner.pureSumX(2 * characterCardWidth / 5).pureSumY(0.2917 * characterCardHeight));
+    }
+
+    private static final List<Coord> blockTileSlots = new ArrayList<>();
+
+    static {
+        blockTileSlots.add(upLeftCorner.pureSumX(childrenSize / 2 - characterCardWidth / 2).pureSumY(characterCardHeight / 3));
+        blockTileSlots.add(upLeftCorner.pureSumX(characterCardWidth / 2 - childrenSize / 2).pureSumY(characterCardHeight / 3));
+        blockTileSlots.add(upLeftCorner.pureSumX(childrenSize / 2 - characterCardWidth / 2).pureSumY(characterCardHeight /2 - childrenSize));
+        blockTileSlots.add(upLeftCorner.pureSumX(characterCardWidth / 2 - childrenSize / 2).pureSumY(characterCardHeight / 2 - childrenSize));
     }
 
     /**
@@ -119,8 +132,40 @@ public class CharacterCardDrawer extends Drawer{
 
         toDraw.addAll(studentViews);
 
+        //draw block tiles
+        for (int blockTile = 0; blockTile < Optional.ofNullable(data.getNumBlocks()).orElse(0); blockTile++) {
+
+            ImageView blockView = BlockTileDrawer.drawBlockTile(
+                    pos
+                            .pureSumX(blockTileSlots.get(blockTile).x * scale)
+                            .pureSumY(blockTileSlots.get(blockTile).y * scale),
+                    scale);
+
+            toDraw.add(blockView);
+        }
+
+        //draw cost if increased
+
+        AtomicReference<ImageView> coinView = new AtomicReference<>(null);
+        AtomicReference<Text> cardCost = new AtomicReference<>(null);
+
+        if (data.hasBeenUsed()) {
+            coinView.set(CoinDrawer.drawCoin(pos.pureSumX(childrenSize * scale / 2 - characterCardWidth * scale / 2).pureSumY(childrenSize * scale / 2 - characterCardHeight * scale / 2), childrenSize * scale / CoinDrawer.getCoinSize()));
+            toDraw.add(coinView.get());
+
+            cardCost.set(new Text(String.valueOf(data.getCost())));
+            cardCost.get().setTextAlignment(TextAlignment.CENTER);
+            cardCost.get().setFont(Font.font(cardCost.get().getFont().getName(), cardCost.get().getFont().getSize() * 1.5));
+            cardCost.get().setFill(Color.RED);
+            cardCost.get().setX(coinView.get().getX() + coinView.get().getFitWidth() / 5);
+            cardCost.get().setY(coinView.get().getY() + 4 * coinView.get().getFitHeight() / 5);
+
+            toDraw.add(cardCost.get());
+        }
+
         EventHandler<MouseEvent> showDescription = event -> {
 
+            //add card description
             description.setX(characterView.getX() - characterView.getFitWidth() * 0.2);
             description.setY(characterView.getY() + 1.15 * characterView.getFitHeight());
             description.setWrappingWidth(characterView.getFitWidth() * 1.4);
@@ -131,6 +176,14 @@ public class CharacterCardDrawer extends Drawer{
             descBox.setHeight(description.maxHeight(-1) * 1.075);
             description.setVisible(true);
             descBox.setVisible(true);
+
+            if (data.hasBeenUsed()){
+                getChildrenEnteredZoom(coinView.get(), upLeftCorner.pureSumX(childrenSize / 2 - characterCardWidth / 2).pureSumY(childrenSize / 2 - characterCardHeight / 2), scale, hoverZoom, characterView).handle(event);
+                getChildrenEnteredZoom(cardCost.get(), upLeftCorner /*will be changed manually*/, scale, hoverZoom, characterView).handle(event);
+
+                cardCost.get().setX(coinView.get().getX() + coinView.get().getFitWidth() / 5);
+                cardCost.get().setY(coinView.get().getY() + 4 * coinView.get().getFitHeight() / 5);
+            }
 
             int index = 0;
 
@@ -147,6 +200,14 @@ public class CharacterCardDrawer extends Drawer{
             description.setVisible(false);
             descBox.setVisible(false);
 
+            if (data.hasBeenUsed()){
+                getChildrenExitedZoom(coinView.get(), upLeftCorner.pureSumX(childrenSize / 2 - characterCardWidth / 2).pureSumY(childrenSize / 2 - characterCardHeight / 2), scale, hoverZoom, characterView).handle(event);
+                getChildrenExitedZoom(cardCost.get(), upLeftCorner /*will be changed manually*/, scale, hoverZoom, characterView).handle(event);
+
+                cardCost.get().setX(coinView.get().getX() + coinView.get().getFitWidth() / 5);
+                cardCost.get().setY(coinView.get().getY() + 4 * coinView.get().getFitHeight() / 5);
+            }
+
             int index = 0;
 
             for (ImageView studentView:
@@ -156,6 +217,8 @@ public class CharacterCardDrawer extends Drawer{
                 index++;
             }
         };
+
+
 
         addHoveringEffects(characterView, pos, scale, showDescription, hideDescription, hoverZoom, toDraw.subList(1, toDraw.size()));
 

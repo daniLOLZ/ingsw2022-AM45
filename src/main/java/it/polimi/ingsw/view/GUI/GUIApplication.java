@@ -31,6 +31,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,10 +39,16 @@ import java.util.List;
 import static it.polimi.ingsw.view.GUI.drawers.IslandGroupDrawer.*;
 
 
-public abstract class GUIApplication extends Application{
+public class GUIApplication extends Application{
 
-    public static final double WINDOW_WIDTH = 1520, WINDOW_HEIGHT = 780;
-    public static final double cloudSize = 40, assistantWidth = 100, islandSize = 120, boardWidth = 505;
+    public static final double WINDOW_WIDTH, WINDOW_HEIGHT;
+
+    static {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        WINDOW_WIDTH = gd.getDisplayMode().getWidth() / 1.5;
+        WINDOW_HEIGHT =  gd.getDisplayMode().getHeight() / 1.5;
+    }
+    public static final double cloudSize = 40.0/1520 * WINDOW_WIDTH, assistantWidth = 5.0/76 * WINDOW_WIDTH, islandSize = 2.0 / 13 * WINDOW_HEIGHT, boardWidth = 101.0 / 304 * WINDOW_WIDTH;
 
     public static final double
             up      = 0,
@@ -66,17 +73,17 @@ public abstract class GUIApplication extends Application{
     private static final Coord islandsPos = center.pureSumY(-5.0/78 * WINDOW_HEIGHT);
     private static final Coord cloudCenterPos = center.pureSumY(-5.0/78 * WINDOW_HEIGHT);
     private static final Coord
-            userBoardPos = downCenter.pureSumY(-145),
-            oppositeBoardPos = upCenter.pureSumY(70),
-            leftBoardPos = centerLeft.pureSumX(100),
-            rightBoardPos = centerRight.pureSumX(-100);
+            userBoardPos = downCenter.pureSumY(-29.0 / 156 * WINDOW_HEIGHT),
+            oppositeBoardPos = upCenter.pureSumY(7.0 / 78 * WINDOW_HEIGHT),
+            leftBoardPos = centerLeft.pureSumX(5.0 / 76 * WINDOW_WIDTH),
+            rightBoardPos = centerRight.pureSumX(-5.0 / 76 * WINDOW_WIDTH);
 
     private static final Coord firstAssistantSlot = downCenter.pureSumX(WINDOW_WIDTH * 0.28).pureSumY(-WINDOW_HEIGHT / 7);
 
     private static final Coord firstCharacterCardSlot = upCenter.pureSumX(WINDOW_WIDTH / 5).pureSumY(WINDOW_HEIGHT / 8);
 
-    private static final double characterCardWidth = 90, characterCardGap = characterCardWidth * 1.2;
-    private static final double gameBoardCoinsSize = 25;
+    private static final double characterCardWidth = 9.0 / 152 * WINDOW_WIDTH, characterCardGap = characterCardWidth * 1.2;
+    private static final double gameBoardCoinsSize = 5.0 / 304 * WINDOW_WIDTH;
 
     private static final List<String> availableGameRules = new ArrayList<>(List.of("Normal mode", "Expert mode"));
     private static final List<Integer> availablePlayerNumber = new ArrayList<>(List.of(2, 3, 4));
@@ -127,7 +134,7 @@ public abstract class GUIApplication extends Application{
         stage.setX(0);
         stage.setY(0);
 
-        VBox root = new VBox(70);
+        VBox root = new VBox(7.0 / 78 * WINDOW_HEIGHT);
         root.setAlignment(Pos.CENTER);
 
         Button playButton = new Button("Start your journey");
@@ -217,7 +224,7 @@ public abstract class GUIApplication extends Application{
 
         //</editor-fold>
 
-        VBox login = new VBox(20);
+        VBox login = new VBox(WINDOW_HEIGHT / 39);
         login.setAlignment(Pos.CENTER);
 
         root.getChildren().add(login);
@@ -246,7 +253,7 @@ public abstract class GUIApplication extends Application{
             }).start();
         });
 
-        HBox nicknameSelection = new HBox(10);
+        HBox nicknameSelection = new HBox(WINDOW_WIDTH / 152);
         nicknameSelection.getChildren().addAll(loginLabel, inputNickname);
         nicknameSelection.setAlignment(Pos.CENTER);
 
@@ -283,15 +290,15 @@ public abstract class GUIApplication extends Application{
 
         //</editor-fold>
 
-        VBox lookingForLobby = new VBox(30);
+        VBox lookingForLobby = new VBox(WINDOW_HEIGHT / 26);
         lookingForLobby.setAlignment(Pos.CENTER);
-        lookingForLobby.setPadding(new Insets(100, 0, 0, 0));
+        lookingForLobby.setPadding(new Insets(5.0 / 39 * WINDOW_HEIGHT, 0, 0, 0));
 
         GridPane preferences = new GridPane();
         preferences.setAlignment(Pos.CENTER);
-        preferences.setPadding(new Insets(20,20,20,20));
-        preferences.setHgap(15);
-        preferences.setVgap(50);
+        preferences.setPadding(new Insets(WINDOW_HEIGHT / 39,WINDOW_WIDTH / 76,WINDOW_HEIGHT / 39,WINDOW_WIDTH / 76));
+        preferences.setHgap(3.0 / 304 * WINDOW_WIDTH);
+        preferences.setVgap(5.0 / 78 * WINDOW_HEIGHT);
 
         //select game rules
         Label gameRuleLabel = new Label("Select game rules");
@@ -313,7 +320,7 @@ public abstract class GUIApplication extends Application{
 
         preferences.getChildren().addAll(gameRuleLabel, gameRuleSelection, numPlayersLabel, numPlayersSelection);
 
-        HBox bottomBar = new HBox(13);
+        HBox bottomBar = new HBox(13.0 / 1520 * WINDOW_WIDTH);
         bottomBar.setAlignment(Pos.CENTER);
         Label searching = new Label();
         if (searchGameError) searching.setText("Error! Couldn't find your game");
@@ -377,14 +384,14 @@ public abstract class GUIApplication extends Application{
 
         //</editor-fold>
 
-        VBox layout = new VBox(20);
+        VBox layout = new VBox(WINDOW_HEIGHT / 39);
         layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(100,0,0,0));
+        layout.setPadding(new Insets(5.0 / 39 * WINDOW_HEIGHT,0,0,0));
 
         Label gameDetails = new Label("Game rules: " + "\nPlayers: " + preselectedNumPlayers);
         gameDetails.setFont(Font.font("Verdana", 25));
 
-        VBox players = new VBox(15);
+        VBox players = new VBox(WINDOW_HEIGHT / 52);
         players.setAlignment(Pos.CENTER);
         for (String nickname:
              data.getNicknames()) {
@@ -398,7 +405,7 @@ public abstract class GUIApplication extends Application{
             players.getChildren().add(player);
         }
 
-        HBox userActions = new HBox(35);
+        HBox userActions = new HBox(7.0 / 304 * WINDOW_WIDTH);
         userActions.setAlignment(Pos.CENTER);
 
         CheckBox ready = new CheckBox("Ready");
@@ -468,7 +475,7 @@ public abstract class GUIApplication extends Application{
 
         //</editor-fold>
 
-        VBox layout = new VBox(35);
+        VBox layout = new VBox(7.0 / 156 * WINDOW_HEIGHT);
         layout.setAlignment(Pos.CENTER);
         root.getChildren().add(layout);
 
@@ -481,7 +488,7 @@ public abstract class GUIApplication extends Application{
         int numTeams = TeamEnum.getNumTeams() - 1;
         if(preselectedNumPlayers == 3) numTeams = TeamEnum.getNumTeams();
 
-        HBox towers = new HBox(20.0 * TeamEnum.getNumTeams() / numTeams);
+        HBox towers = new HBox(WINDOW_WIDTH / 76 * TeamEnum.getNumTeams() / numTeams);
         towers.setAlignment(Pos.CENTER);
         towers.setMinHeight(TowerDrawer.getTowerSize() * 0.6);
         layout.getChildren().add(towers);
@@ -544,7 +551,7 @@ public abstract class GUIApplication extends Application{
 
         //</editor-fold>
 
-        VBox layout = new VBox(35);
+        VBox layout = new VBox(7.0 / 156 * WINDOW_HEIGHT);
         layout.setAlignment(Pos.CENTER);
         root.getChildren().add(layout);
 
@@ -554,7 +561,7 @@ public abstract class GUIApplication extends Application{
         title.setTextFill(Color.DARKRED);
         layout.getChildren().add(title);
 
-        HBox wizards = new HBox(20);
+        HBox wizards = new HBox(WINDOW_WIDTH / 76);
         wizards.setAlignment(Pos.CENTER);
         wizards.setMinHeight(WizardDrawer.getWizardHeight() * 0.5 * 1.2);
         layout.getChildren().add(wizards);
@@ -660,9 +667,9 @@ public abstract class GUIApplication extends Application{
         //weird helping buttons
 
         GridPane subLayout = new GridPane();
-        subLayout.setPadding(new Insets(5, 5, 5,5));
-        subLayout.setVgap(5);
-        subLayout.setHgap(10);
+        subLayout.setPadding(new Insets(WINDOW_HEIGHT / 156, WINDOW_WIDTH / 304, WINDOW_HEIGHT / 156,WINDOW_WIDTH / 304));
+        subLayout.setVgap(WINDOW_HEIGHT / 156);
+        subLayout.setHgap(WINDOW_WIDTH / 152);
         subLayout.setAlignment(Pos.CENTER);
 
         layout.getChildren().add(subLayout);
